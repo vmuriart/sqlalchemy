@@ -2050,9 +2050,9 @@ class RoundTripIndexTest(fixtures.TestBase):
 
         # make a dictionary of the reflected objects:
 
-        reflected = dict([(obj_definition(i), i) for i in
+        reflected = {obj_definition(i): i for i in
                          reflectedtable.indexes
-                         | reflectedtable.constraints])
+                         | reflectedtable.constraints}
 
         # assert we got primary key constraint and its name, Error
         # if not in dict

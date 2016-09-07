@@ -196,10 +196,8 @@ def load_on_ident(query, key,
         _get_clause = q._adapt_clause(_get_clause, True, False)
         q._criterion = _get_clause
 
-        params = dict([
-            (_get_params[primary_key].key, id_val)
-            for id_val, primary_key in zip(ident, mapper.primary_key)
-        ])
+        params = {_get_params[primary_key].key: id_val
+            for id_val, primary_key in zip(ident, mapper.primary_key)}
 
         q._params = params
 

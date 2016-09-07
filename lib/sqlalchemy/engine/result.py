@@ -237,10 +237,8 @@ class ResultMetaData(object):
         self._processors = [elem[3] for elem in raw]
 
         # keymap by primary string...
-        by_key = dict([
-            (elem[2], (elem[3], elem[4], elem[0]))
-            for elem in raw
-        ])
+        by_key = {elem[2]: (elem[3], elem[4], elem[0])
+            for elem in raw}
 
         # for compiled SQL constructs, copy additional lookup keys into
         # the key lookup map, such as Column objects, labels,

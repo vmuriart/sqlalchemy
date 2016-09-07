@@ -363,10 +363,8 @@ class Result(object):
 
         bq = bq.with_criteria(setup, tuple(elem is None for elem in ident))
 
-        params = dict([
-            (_get_params[primary_key].key, id_val)
-            for id_val, primary_key in zip(ident, mapper.primary_key)
-        ])
+        params = {_get_params[primary_key].key: id_val
+            for id_val, primary_key in zip(ident, mapper.primary_key)}
 
         result = list(bq.for_session(self.session).params(**params))
         l = len(result)

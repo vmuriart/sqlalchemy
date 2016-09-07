@@ -1872,7 +1872,7 @@ class ManyToManyTest(_fixtures.FixtureTest):
         session = create_session()
 
         objects = []
-        _keywords = dict([(k.name, k) for k in session.query(Keyword)])
+        _keywords = {k.name: k for k in session.query(Keyword)}
 
         for elem in data[1:]:
             item = Item(description=elem['description'])
@@ -2064,7 +2064,7 @@ class ManyToManyTest(_fixtures.FixtureTest):
         session = create_session()
 
         def fixture():
-            _kw = dict([(k.name, k) for k in session.query(Keyword)])
+            _kw = {k.name: k for k in session.query(Keyword)}
             for n in ('big', 'green', 'purple', 'round', 'huge',
                       'violet', 'yellow', 'blue'):
                 if n not in _kw:
