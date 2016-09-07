@@ -23,13 +23,12 @@ matrix:
         - python: "nightly"
 
 install:
-    - pip install tox coveralls codecov
+    - pip install tox codecov
 
 script:
     - tox
 
 after_success:
-    - coveralls
     - codecov
 
 notifications:
