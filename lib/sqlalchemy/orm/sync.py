@@ -65,9 +65,8 @@ def bulk_populate_inherit_keys(
 def clear(dest, dest_mapper, synchronize_pairs):
     for l, r in synchronize_pairs:
         if r.primary_key and \
-            dest_mapper._get_state_attr_by_column(
-                dest, dest.dict, r) not in orm_util._none_set:
-
+                        dest_mapper._get_state_attr_by_column(
+                            dest, dest.dict, r) not in orm_util._none_set:
             raise AssertionError(
                 "Dependency rule tried to blank-out primary key "
                 "column '%s' on instance '%s'" %

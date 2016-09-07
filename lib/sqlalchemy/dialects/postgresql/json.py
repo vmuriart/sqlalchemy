@@ -25,7 +25,6 @@ JSONPATH_ASTEXT = operators.custom_op(
     "#>>", precedence=15, natural_self_precedent=True,
 )
 
-
 HAS_KEY = operators.custom_op(
     "?", precedence=15, natural_self_precedent=True
 )
@@ -53,7 +52,7 @@ class JSONPathType(sqltypes.JSON.JSONPathType):
 
         def process(value):
             assert isinstance(value, collections.Sequence)
-            tokens = [util.text_type(elem)for elem in value]
+            tokens = [util.text_type(elem) for elem in value]
             value = "{%s}" % (", ".join(tokens))
             if super_proc:
                 value = super_proc(value)
@@ -66,13 +65,14 @@ class JSONPathType(sqltypes.JSON.JSONPathType):
 
         def process(value):
             assert isinstance(value, collections.Sequence)
-            tokens = [util.text_type(elem)for elem in value]
+            tokens = [util.text_type(elem) for elem in value]
             value = "{%s}" % (", ".join(tokens))
             if super_proc:
                 value = super_proc(value)
             return value
 
         return process
+
 
 colspecs[sqltypes.JSON.JSONPathType] = JSONPathType
 
@@ -288,5 +288,6 @@ class JSONB(JSON):
                 CONTAINED_BY, other, result_type=sqltypes.Boolean)
 
     comparator_factory = Comparator
+
 
 ischema_names['jsonb'] = JSONB

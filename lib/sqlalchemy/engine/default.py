@@ -370,8 +370,8 @@ class DefaultDialect(interfaces.Dialect):
         """
         return {
             'constrained_columns':
-            self.get_primary_keys(conn, table_name,
-                                  schema=schema, **kw)
+                self.get_primary_keys(conn, table_name,
+                                      schema=schema, **kw)
         }
 
     def validate_identifier(self, ident):
@@ -422,7 +422,7 @@ class DefaultDialect(interfaces.Dialect):
                 "the existing transaction, or have no effect until "
                 "next transaction")
         self.set_isolation_level(connection.connection, level)
-        connection.connection._connection_record.\
+        connection.connection._connection_record. \
             finalize_callback.append(self.reset_isolation_level)
 
     def do_begin(self, dbapi_connection):
@@ -475,7 +475,6 @@ class DefaultDialect(interfaces.Dialect):
 
 
 class StrCompileDialect(DefaultDialect):
-
     statement_compiler = compiler.StrSQLCompiler
     ddl_compiler = compiler.DDLCompiler
     type_compiler = compiler.StrSQLTypeCompiler
@@ -671,9 +670,10 @@ class DefaultExecutionContext(interfaces.ExecutionContext):
                 self.parameters = parameters
             else:
                 self.parameters = [
-                    dict((dialect._encoder(k)[0], d[k]) for k in d)
-                    for d in parameters
-                ] or [{}]
+                                      dict((dialect._encoder(k)[0], d[k]) for k
+                                           in d)
+                                      for d in parameters
+                                      ] or [{}]
         else:
             self.parameters = [dialect.execute_sequence_format(p)
                                for p in parameters]
@@ -846,7 +846,7 @@ class DefaultExecutionContext(interfaces.ExecutionContext):
         if self.isinsert and \
                 not self.executemany:
             if not self._is_implicit_returning and \
-                not self.compiled.inline and \
+                    not self.compiled.inline and \
                     self.dialect.postfetch_lastrowid:
 
                 self._setup_ins_pk_from_lastrowid()
@@ -898,14 +898,14 @@ class DefaultExecutionContext(interfaces.ExecutionContext):
                 lastrowid if c is autoinc_col else
                 compiled_params.get(key_getter(c), None)
                 for c in table.primary_key
-            ]
+                ]
         else:
             # don't have a usable lastrowid, so
             # do the same as _setup_ins_pk_from_empty
             self.inserted_primary_key = [
                 compiled_params.get(key_getter(c), None)
                 for c in table.primary_key
-            ]
+                ]
 
     def _setup_ins_pk_from_empty(self):
         key_getter = self.compiled._key_getters_for_crud_column[2]
@@ -914,7 +914,7 @@ class DefaultExecutionContext(interfaces.ExecutionContext):
         self.inserted_primary_key = [
             compiled_params.get(key_getter(c), None)
             for c in table.primary_key
-        ]
+            ]
 
     def _setup_ins_pk_from_implicit_returning(self, row):
         key_getter = self.compiled._key_getters_for_crud_column[2]
@@ -926,12 +926,12 @@ class DefaultExecutionContext(interfaces.ExecutionContext):
             for col, value in [
                 (col, compiled_params.get(key_getter(col), None))
                 for col in table.primary_key
+                ]
             ]
-        ]
 
     def lastrow_has_defaults(self):
         return (self.isinsert or self.isupdate) and \
-            bool(self.compiled.postfetch)
+               bool(self.compiled.postfetch)
 
     def set_input_sizes(self, translate=None, exclude_types=None):
         """Given a cursor and ClauseParameters, call the appropriate
@@ -954,7 +954,7 @@ class DefaultExecutionContext(interfaces.ExecutionContext):
             inputsizes = []
             for key in self.compiled.positiontup:
                 typeengine = types[key]
-                dbtype = typeengine.dialect_impl(self.dialect).\
+                dbtype = typeengine.dialect_impl(self.dialect). \
                     get_dbapi_type(self.dialect.dbapi)
                 if dbtype is not None and \
                         (not exclude_types or dbtype not in exclude_types):
@@ -968,7 +968,7 @@ class DefaultExecutionContext(interfaces.ExecutionContext):
             inputsizes = {}
             for key in self.compiled.bind_names.values():
                 typeengine = types[key]
-                dbtype = typeengine.dialect_impl(self.dialect).\
+                dbtype = typeengine.dialect_impl(self.dialect). \
                     get_dbapi_type(self.dialect.dbapi)
                 if dbtype is not None and \
                         (not exclude_types or dbtype not in exclude_types):

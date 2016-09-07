@@ -230,7 +230,6 @@ from __future__ import absolute_import
 from ..orm.attributes import flag_modified
 from ..ext.hybrid import hybrid_property
 
-
 __all__ = ['index_property']
 
 

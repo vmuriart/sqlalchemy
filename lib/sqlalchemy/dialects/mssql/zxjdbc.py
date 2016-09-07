@@ -23,7 +23,6 @@ from ... import engine
 
 
 class MSExecutionContext_zxjdbc(MSExecutionContext):
-
     _embedded_scope_identity = False
 
     def pre_exec(self):
@@ -65,5 +64,6 @@ class MSDialect_zxjdbc(ZxJDBCConnector, MSDialect):
             int(x)
             for x in connection.connection.dbversion.split('.')
         )
+
 
 dialect = MSDialect_zxjdbc

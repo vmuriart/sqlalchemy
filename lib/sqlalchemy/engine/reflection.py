@@ -45,7 +45,7 @@ def cache(fn, self, con, *args, **kw):
         tuple(a for a in args if isinstance(a, util.string_types)),
         tuple((k, v) for k, v in kw.items() if
               isinstance(v,
-                         util.string_types + util.int_types + (float, )
+                         util.string_types + util.int_types + (float,)
                          )
               )
     )
@@ -264,9 +264,9 @@ class Inspector(object):
 
             candidate_sort = list(topological.sort(tuples, tnames))
         return [
-            (tname, fknames_for_table[tname].difference(remaining_fkcs))
-            for tname in candidate_sort
-        ] + [(None, list(remaining_fkcs))]
+                   (tname, fknames_for_table[tname].difference(remaining_fkcs))
+                   for tname in candidate_sort
+                   ] + [(None, list(remaining_fkcs))]
 
     def get_temp_table_names(self):
         """return a list of temporary table names for the current bind.
@@ -375,7 +375,7 @@ class Inspector(object):
         return col_defs
 
     @deprecated('0.7', 'Call to deprecated method get_primary_keys.'
-                '  Use get_pk_constraint instead.')
+                       '  Use get_pk_constraint instead.')
     def get_primary_keys(self, table_name, schema=None, **kw):
         """Return information about primary keys in `table_name`.
 
@@ -617,7 +617,7 @@ class Inspector(object):
             include_columns, exclude_columns, reflection_options)
 
     def _reflect_column(
-        self, table, col_d, include_columns,
+            self, table, col_d, include_columns,
             exclude_columns, cols_by_orig_name):
 
         orig_name = col_d['name']
@@ -681,7 +681,7 @@ class Inspector(object):
                 cols_by_orig_name[pk]
                 for pk in pk_cons['constrained_columns']
                 if pk in cols_by_orig_name and pk not in exclude_columns
-            ]
+                ]
 
             # update pk constraint name
             table.primary_key.name = pk_cons.get('name')
@@ -703,7 +703,7 @@ class Inspector(object):
                 cols_by_orig_name[c].key
                 if c in cols_by_orig_name else c
                 for c in fkey_d['constrained_columns']
-            ]
+                ]
             if exclude_columns and set(constrained_columns).intersection(
                     exclude_columns):
                 continue
@@ -738,7 +738,7 @@ class Inspector(object):
                                                **options))
 
     def _reflect_indexes(
-        self, table_name, schema, table, cols_by_orig_name,
+            self, table_name, schema, table, cols_by_orig_name,
             include_columns, exclude_columns, reflection_options):
         # Indexes
         indexes = self.get_indexes(table_name, schema)
@@ -780,7 +780,7 @@ class Inspector(object):
             )
 
     def _reflect_unique_constraints(
-        self, table_name, schema, table, cols_by_orig_name,
+            self, table_name, schema, table, cols_by_orig_name,
             include_columns, exclude_columns, reflection_options):
 
         # Unique Constraints

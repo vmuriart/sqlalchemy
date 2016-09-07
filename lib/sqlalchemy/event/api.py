@@ -120,9 +120,11 @@ def listens_for(target, identifier, *args, **kw):
         :func:`.listen` - general description of event listening
 
     """
+
     def decorate(fn):
         listen(target, identifier, fn, *args, **kw)
         return fn
+
     return decorate
 
 

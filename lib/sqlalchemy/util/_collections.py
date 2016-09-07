@@ -138,7 +138,6 @@ class ImmutableContainer(object):
 
 
 class immutabledict(ImmutableContainer, dict):
-
     clear = pop = popitem = setdefault = \
         update = ImmutableContainer._immutable
 
@@ -151,7 +150,7 @@ class immutabledict(ImmutableContainer, dict):
         pass
 
     def __reduce__(self):
-        return immutabledict, (dict(self), )
+        return immutabledict, (dict(self),)
 
     def union(self, d):
         if not d:
@@ -674,7 +673,7 @@ class WeakSequence(object):
     def __init__(self, __elements=()):
         self._storage = [
             weakref.ref(element, self._remove) for element in __elements
-        ]
+            ]
 
     def append(self, item):
         self._storage.append(weakref.ref(item, self._remove))
@@ -729,6 +728,7 @@ class PopulateDict(dict):
         self[key] = val = self.creator(key)
         return val
 
+
 # Define collections that are capable of storing
 # ColumnElement objects as hashable keys/elements.
 # At this point, these are mostly historical, things
@@ -737,7 +737,6 @@ column_set = set
 column_dict = dict
 ordered_column_set = OrderedSet
 populate_column_dict = PopulateDict
-
 
 _getters = PopulateDict(operator.itemgetter)
 
@@ -932,7 +931,7 @@ _lw_tuples = LRUCache(100)
 
 
 def lightweight_named_tuple(name, fields):
-    hash_ = (name, ) + tuple(fields)
+    hash_ = (name,) + tuple(fields)
     tp_cls = _lw_tuples.get(hash_)
     if tp_cls:
         return tp_cls
@@ -940,9 +939,9 @@ def lightweight_named_tuple(name, fields):
     tp_cls = type(
         name, (_LW,),
         dict([
-            (field, _property_getters[idx])
-            for idx, field in enumerate(fields) if field is not None
-        ] + [('__slots__', ())])
+                 (field, _property_getters[idx])
+                 for idx, field in enumerate(fields) if field is not None
+                 ] + [('__slots__', ())])
     )
 
     tp_cls._real_fields = fields

@@ -11,6 +11,7 @@ from .. import util
 from .. import exc as sa_exc
 from . import util as orm_util
 
+
 class IdentityMap(object):
     def __init__(self):
         self._dict = {}
@@ -84,7 +85,6 @@ class IdentityMap(object):
 
 
 class WeakInstanceDict(IdentityMap):
-
     def __getitem__(self, key):
         state = self._dict[key]
         o = state.obj()
@@ -177,7 +177,6 @@ class WeakInstanceDict(IdentityMap):
         return iter(self.keys())
 
     if util.py2k:
-
         def iteritems(self):
             return iter(self.items())
 

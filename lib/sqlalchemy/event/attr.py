@@ -85,6 +85,7 @@ class _ClsLevelDispatch(RefCollection):
             argdict = dict(zip(self.arg_names, args))
             argdict.update(kw)
             return fn(**argdict)
+
         return wrap_kw
 
     def insert(self, event_key, propagate):
@@ -127,10 +128,10 @@ class _ClsLevelDispatch(RefCollection):
         for cls in target.__mro__[1:]:
             if cls in self._clslevel:
                 clslevel.extend([
-                    fn for fn
-                    in self._clslevel[cls]
-                    if fn not in clslevel
-                ])
+                                    fn for fn
+                                    in self._clslevel[cls]
+                                    if fn not in clslevel
+                                    ])
 
     def remove(self, event_key):
         target = event_key.dispatch_target

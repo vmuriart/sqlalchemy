@@ -29,11 +29,9 @@ alternate instrumentation forms.
 
 """
 
-
 from . import exc, collections, interfaces, state
 from .. import util
 from . import base
-
 
 _memoized_key_collection = util.group_expirable_memoized_property()
 
@@ -63,7 +61,7 @@ class ClassManager(dict):
             manager_of_class(base)
             for base in self.class_.__bases__
             if isinstance(base, type)
-        ] if mgr is not None]
+            ] if mgr is not None]
 
         for base in self._bases:
             self.update(base)
@@ -102,13 +100,14 @@ class ClassManager(dict):
     @_memoized_key_collection
     def _collection_impl_keys(self):
         return frozenset([
-            attr.key for attr in self.values() if attr.impl.collection])
+                             attr.key for attr in self.values() if
+                             attr.impl.collection])
 
     @_memoized_key_collection
     def _scalar_loader_impls(self):
         return frozenset([
-            attr.impl for attr in
-            self.values() if attr.impl.accepts_scalar_loader])
+                             attr.impl for attr in
+                             self.values() if attr.impl.accepts_scalar_loader])
 
     @util.memoized_property
     def mapper(self):
@@ -230,7 +229,7 @@ class ClassManager(dict):
                         yield m
 
     def post_configure_attribute(self, key):
-        _instrumentation_factory.dispatch.\
+        _instrumentation_factory.dispatch. \
             attribute_instrument(self.class_, key, self[key])
 
     def uninstrument_attribute(self, key, propagated=False):
@@ -341,7 +340,7 @@ class ClassManager(dict):
             # user error situation but allow the object
             # to be constructed, so that it is usable
             # in a non-ORM context at least.
-            return self._subclass_manager(instance.__class__).\
+            return self._subclass_manager(instance.__class__). \
                 _new_state_if_none(instance)
         else:
             state = self._state_constructor(instance, self)
@@ -438,6 +437,7 @@ class InstrumentationFactory(object):
         if ClassManager.MANAGER_ATTR in class_.__dict__:
             delattr(class_, ClassManager.MANAGER_ATTR)
 
+
 # this attribute is replaced by sqlalchemy.ext.instrumentation
 # when importred.
 _instrumentation_factory = InstrumentationFactory()
@@ -479,7 +479,7 @@ def is_instrumented(instance, key):
     applied directly to the class, i.e. no descriptors are required.
 
     """
-    return manager_of_class(instance.__class__).\
+    return manager_of_class(instance.__class__). \
         is_instrumented(key, search=True)
 
 
@@ -516,7 +516,7 @@ def __init__(%(apply_pos)s):
         func_kw_defaults = getattr(original__init__, '__kwdefaults__', None)
 
     env = locals().copy()
-    exec(func_text, env)
+    exec (func_text, env)
     __init__ = env['__init__']
     __init__.__doc__ = original__init__.__doc__
 

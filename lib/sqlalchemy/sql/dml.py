@@ -20,7 +20,7 @@ from .. import exc
 
 
 class UpdateBase(
-        HasCTE, DialectKWArgs, HasPrefixes, Executable, ClauseElement):
+    HasCTE, DialectKWArgs, HasPrefixes, Executable, ClauseElement):
     """Form the base for ``INSERT``, ``UPDATE``, and ``DELETE`` statements.
 
     """
@@ -88,6 +88,7 @@ class UpdateBase(
 
     def _set_bind(self, bind):
         self._bind = bind
+
     bind = property(bind, _set_bind)
 
     @_generative

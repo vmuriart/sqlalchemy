@@ -6,6 +6,7 @@ from . import config, engines
 import os
 import time
 import logging
+
 log = logging.getLogger(__name__)
 
 FOLLOWER_IDENT = None
@@ -23,6 +24,7 @@ class register(object):
         def decorate(fn):
             self.fns[dbname] = fn
             return self
+
         return decorate
 
     def __call__(self, cfg, *arg):
@@ -236,10 +238,11 @@ def _oracle_create_db(cfg, eng, ident):
         conn.execute("create user %s identified by xe" % ident)
         conn.execute("create user %s_ts1 identified by xe" % ident)
         conn.execute("create user %s_ts2 identified by xe" % ident)
-        conn.execute("grant dba to %s" % (ident, ))
+        conn.execute("grant dba to %s" % (ident,))
         conn.execute("grant unlimited tablespace to %s" % ident)
         conn.execute("grant unlimited tablespace to %s_ts1" % ident)
         conn.execute("grant unlimited tablespace to %s_ts2" % ident)
+
 
 @_configure_follower.for_db("oracle")
 def _oracle_configure_follower(config, ident):
@@ -282,7 +285,7 @@ def reap_oracle_dbs(eng, idents_file):
             "select u.username from all_users u where username "
             "like 'TEST_%' and not exists (select username "
             "from v$session where username=u.username)")
-        all_names = set([username.lower() for (username, ) in to_reap])
+        all_names = set([username.lower() for (username,) in to_reap])
         to_drop = set()
         for name in all_names:
             if name.endswith("_ts1") or name.endswith("_ts2"):
@@ -308,5 +311,3 @@ def _oracle_follower_url_from_main(url, ident):
     url.username = ident
     url.password = 'xe'
     return url
-
-

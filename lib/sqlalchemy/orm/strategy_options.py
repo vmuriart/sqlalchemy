@@ -183,7 +183,7 @@ class Load(Generative, MapperOption):
         return path
 
     def __str__(self):
-        return "Load(strategy=%r)" % (self.strategy, )
+        return "Load(strategy=%r)" % (self.strategy,)
 
     def _coerce_strat(self, strategy):
         if strategy is not None:
@@ -263,7 +263,7 @@ class Load(Generative, MapperOption):
                 if i == 0 and c_token.endswith(':' + _DEFAULT_TOKEN):
                     return to_chop
                 elif c_token != 'relationship:%s' % (_WILDCARD_TOKEN,) and \
-                        c_token != p_token.key:
+                                c_token != p_token.key:
                     return None
 
             if c_token is p_token:
@@ -296,12 +296,12 @@ class _UnboundLoad(Load):
 
     def _generate_path(self, path, attr, wildcard_key):
         if wildcard_key and isinstance(attr, util.string_types) and \
-                attr in (_WILDCARD_TOKEN, _DEFAULT_TOKEN):
+                        attr in (_WILDCARD_TOKEN, _DEFAULT_TOKEN):
             if attr == _DEFAULT_TOKEN:
                 self.propagate_to_loaders = False
             attr = "%s:%s" % (wildcard_key, attr)
 
-        return path + (attr, )
+        return path + (attr,)
 
     def __getstate__(self):
         d = self.__dict__.copy()
@@ -336,13 +336,14 @@ class _UnboundLoad(Load):
             if isinstance(key, util.string_types):
                 # coerce fooload('*') into "default loader strategy"
                 if key == _WILDCARD_TOKEN:
-                    return (_DEFAULT_TOKEN, )
+                    return (_DEFAULT_TOKEN,)
                 # coerce fooload(".*") into "wildcard on default entity"
                 elif key.startswith("." + _WILDCARD_TOKEN):
                     key = key[1:]
                 return key.split(".")
             else:
                 return (key,)
+
         all_tokens = [token for key in keys for token in _split_key(key)]
 
         for token in all_tokens[0:-1]:
@@ -460,7 +461,7 @@ class _UnboundLoad(Load):
                     raise sa_exc.ArgumentError(
                         "Query has only expression-based entities - "
                         "can't find property named '%s'."
-                        % (token, )
+                        % (token,)
                     )
                 else:
                     raise sa_exc.ArgumentError(
@@ -494,7 +495,7 @@ class _UnboundLoad(Load):
                 raise sa_exc.ArgumentError(
                     "Query has only expression-based entities - "
                     "can't find property named '%s'."
-                    % (token, )
+                    % (token,)
                 )
             else:
                 return None
@@ -990,7 +991,7 @@ def defer(loadopt, key):
 
     """
     return loadopt.set_column_strategy(
-        (key, ),
+        (key,),
         {"deferred": True, "instrument": True}
     )
 
@@ -998,7 +999,7 @@ def defer(loadopt, key):
 @defer._add_unbound_fn
 def defer(key, *addl_attrs):
     return _UnboundLoad._from_keys(
-        _UnboundLoad.defer, (key, ) + addl_attrs, False, {})
+        _UnboundLoad.defer, (key,) + addl_attrs, False, {})
 
 
 @loader_option()
@@ -1037,7 +1038,7 @@ def undefer(loadopt, key):
 
     """
     return loadopt.set_column_strategy(
-        (key, ),
+        (key,),
         {"deferred": False, "instrument": True}
     )
 
@@ -1045,7 +1046,7 @@ def undefer(loadopt, key):
 @undefer._add_unbound_fn
 def undefer(key, *addl_attrs):
     return _UnboundLoad._from_keys(
-        _UnboundLoad.undefer, (key, ) + addl_attrs, False, {})
+        _UnboundLoad.undefer, (key,) + addl_attrs, False, {})
 
 
 @loader_option()

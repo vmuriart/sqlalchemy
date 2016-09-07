@@ -546,6 +546,7 @@ class ConnectionEvents(event.Events):
                                         multiparams, params):
                     orig_fn(conn, clauseelement, multiparams, params)
                     return clauseelement, multiparams, params
+
                 fn = wrap_before_execute
             elif identifier == 'before_cursor_execute':
                 orig_fn = fn
@@ -556,10 +557,12 @@ class ConnectionEvents(event.Events):
                     orig_fn(conn, cursor, statement,
                             parameters, context, executemany)
                     return statement, parameters
+
                 fn = wrap_before_cursor_execute
         elif retval and \
-            identifier not in ('before_execute',
-                               'before_cursor_execute', 'handle_error'):
+                        identifier not in ('before_execute',
+                                           'before_cursor_execute',
+                                           'handle_error'):
             raise exc.ArgumentError(
                 "Only the 'before_execute', "
                 "'before_cursor_execute' and 'handle_error' engine "
@@ -944,6 +947,7 @@ class ConnectionEvents(event.Events):
         .. versionadded:: 1.0.5
 
         """
+
     def begin(self, conn):
         """Intercept begin() events.
 

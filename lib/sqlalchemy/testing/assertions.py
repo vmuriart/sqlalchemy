@@ -86,6 +86,7 @@ def emits_warning_on(db, *messages):
     were in fact seen.
 
     """
+
     @decorator
     def decorate(fn, *args, **kw):
         with expect_warnings_on(db, assert_=False, *messages):
@@ -114,12 +115,12 @@ def uses_deprecated(*messages):
     def decorate(fn, *args, **kw):
         with expect_deprecated(*messages, assert_=False):
             return fn(*args, **kw)
+
     return decorate
 
 
 @contextlib.contextmanager
 def _expect_warnings(exc_cls, messages, regex=True, assert_=True):
-
     if regex:
         filters = [re.compile(msg, re.I | re.S) for msg in messages]
     else:
@@ -149,7 +150,8 @@ def _expect_warnings(exc_cls, messages, regex=True, assert_=True):
 
     if assert_:
         assert not seen, "Warnings were not seen: %s" % \
-            ", ".join("%r" % (s.pattern if regex else s) for s in seen)
+                         ", ".join(
+                             "%r" % (s.pattern if regex else s) for s in seen)
 
 
 def global_cleanup_assertions():
@@ -161,6 +163,7 @@ def global_cleanup_assertions():
 
     """
     _assert_no_stray_pool_connections()
+
 
 _STRAY_CONNECTION_FAILURES = 0
 
@@ -175,7 +178,6 @@ def _assert_no_stray_pool_connections():
     # however, once in awhile, on an EC2 machine usually,
     # there's a ref in there.  usually just one.
     if pool._refs:
-
         # OK, let's be somewhat forgiving.
         _STRAY_CONNECTION_FAILURES += 1
 
@@ -364,7 +366,6 @@ class AssertsCompiledSQL(object):
 
 
 class ComparesTables(object):
-
     def assert_tables_equal(self, table, reflected_table, strict_types=False):
         assert len(table.c) == len(reflected_table.c)
         for c, reflected_c in zip(table.c, reflected_table.c):
@@ -396,7 +397,7 @@ class ComparesTables(object):
             assert reflected_table.primary_key.columns[c.name] is not None
 
     def assert_types_base(self, c1, c2):
-        assert c1.type._compare_type_affinity(c2.type),\
+        assert c1.type._compare_type_affinity(c2.type), \
             "On column %r, type '%s' doesn't correspond to type '%s'" % \
             (c1.name, c1.type, c2.type)
 
@@ -426,7 +427,7 @@ class AssertsExecutionResults(object):
             else:
                 self.assert_(getattr(rowobj, key) == value,
                              "attribute %s value %s does not match %s" % (
-                             key, getattr(rowobj, key), value))
+                                 key, getattr(rowobj, key), value))
 
     def assert_unordered_result(self, result, cls, *expected):
         """As assert_result, but the order of objects is not considered.
@@ -495,7 +496,7 @@ class AssertsExecutionResults(object):
             if isinstance(rule, dict):
                 newrule = assertsql.AllOf(*[
                     assertsql.CompiledSQL(k, v) for k, v in rule.items()
-                ])
+                    ])
             else:
                 newrule = assertsql.CompiledSQL(*rule)
             newrules.append(newrule)

@@ -118,7 +118,7 @@ class InstanceState(interfaces.InspectionAttr):
 
         """
         return self.key is None and \
-            not self._attached
+               not self._attached
 
     @property
     def pending(self):
@@ -131,7 +131,7 @@ class InstanceState(interfaces.InspectionAttr):
 
         """
         return self.key is None and \
-            self._attached
+               self._attached
 
     @property
     def deleted(self):
@@ -161,7 +161,7 @@ class InstanceState(interfaces.InspectionAttr):
 
         """
         return self.key is not None and \
-            self._attached and self._deleted
+               self._attached and self._deleted
 
     @property
     def was_deleted(self):
@@ -207,7 +207,7 @@ class InstanceState(interfaces.InspectionAttr):
 
             """
         return self.key is not None and \
-            self._attached and not self._deleted
+               self._attached and not self._deleted
 
     @property
     def detached(self):
@@ -224,7 +224,7 @@ class InstanceState(interfaces.InspectionAttr):
     @util.dependencies("sqlalchemy.orm.session")
     def _attached(self, sessionlib):
         return self.session_id is not None and \
-            self.session_id in sessionlib._sessions
+               self.session_id in sessionlib._sessions
 
     @property
     @util.dependencies("sqlalchemy.orm.session")
@@ -463,13 +463,13 @@ class InstanceState(interfaces.InspectionAttr):
                     del self.callables[k]
 
         self.__dict__.update([
-            (k, state_dict[k]) for k in (
+                                 (k, state_dict[k]) for k in (
                 'key', 'load_options',
             ) if k in state_dict
-        ])
+                                 ])
 
         if 'load_path' in state_dict:
-            self.load_path = PathRegistry.\
+            self.load_path = PathRegistry. \
                 deserialize(state_dict['load_path'])
 
         state_dict['manager'](self, inst, state_dict)
@@ -550,8 +550,8 @@ class InstanceState(interfaces.InspectionAttr):
             impl = self.manager[key].impl
             if impl.accepts_scalar_loader:
                 if no_loader and (
-                    impl.callable_ or
-                    key in callables
+                            impl.callable_ or
+                                key in callables
                 ):
                     continue
 
@@ -578,7 +578,7 @@ class InstanceState(interfaces.InspectionAttr):
         if not passive & SQL_OK:
             return PASSIVE_NO_RESULT
 
-        toload = self.expired_attributes.\
+        toload = self.expired_attributes. \
             intersection(self.unmodified)
 
         self.manager.deferred_scalar_loader(self, toload)
@@ -600,7 +600,7 @@ class InstanceState(interfaces.InspectionAttr):
     def unmodified_intersection(self, keys):
         """Return self.unmodified.intersection(keys)."""
 
-        return set(keys).intersection(self.manager).\
+        return set(keys).intersection(self.manager). \
             difference(self.committed_state)
 
     @property
@@ -611,8 +611,8 @@ class InstanceState(interfaces.InspectionAttr):
         was never populated or modified.
 
         """
-        return set(self.manager).\
-            difference(self.committed_state).\
+        return set(self.manager). \
+            difference(self.committed_state). \
             difference(self.dict)
 
     @property
@@ -689,10 +689,10 @@ class InstanceState(interfaces.InspectionAttr):
         # if this behavior has a clear rationale, however tests do
         # ensure this is what it does.
         if self.callables:
-            for key in set(self.callables).\
-                intersection(keys).\
+            for key in set(self.callables). \
+                    intersection(keys). \
                     intersection(dict_):
-                    del self.callables[key]
+                del self.callables[key]
 
     def _commit_all(self, dict_, instance_dict=None):
         """commit all attributes unconditionally.

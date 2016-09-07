@@ -563,9 +563,8 @@ from ... import engine
 from ...engine import reflection, default
 from ... import types as sqltypes
 from ...types import INTEGER, BIGINT, SMALLINT, DECIMAL, NUMERIC, \
-    FLOAT, TIMESTAMP, DATETIME, DATE, BINARY,\
+    FLOAT, TIMESTAMP, DATETIME, DATE, BINARY, \
     TEXT, VARCHAR, NVARCHAR, CHAR, NCHAR
-
 
 from ...util import update_wrapper
 from . import information_schema as ischema
@@ -627,13 +626,13 @@ class TINYINT(sqltypes.Integer):
 # not sure about other dialects).
 
 class _MSDate(sqltypes.Date):
-
     def bind_processor(self, dialect):
         def process(value):
             if type(value) == datetime.date:
                 return datetime.datetime(value.year, value.month, value.day)
             else:
                 return value
+
         return process
 
     _reg = re.compile(r"(\d+)-(\d+)-(\d+)")
@@ -646,18 +645,18 @@ class _MSDate(sqltypes.Date):
                 m = self._reg.match(value)
                 if not m:
                     raise ValueError(
-                        "could not parse %r as a date value" % (value, ))
+                        "could not parse %r as a date value" % (value,))
                 return datetime.date(*[
                     int(x or 0)
                     for x in m.groups()
-                ])
+                    ])
             else:
                 return value
+
         return process
 
 
 class TIME(sqltypes.TIME):
-
     def __init__(self, precision=None, **kwargs):
         self.precision = precision
         super(TIME, self).__init__()
@@ -672,6 +671,7 @@ class TIME(sqltypes.TIME):
             elif isinstance(value, datetime.time):
                 value = datetime.datetime.combine(self.__zero_date, value)
             return value
+
         return process
 
     _reg = re.compile(r"(\d+):(\d+):(\d+)(?:\.(\d{0,6}))?")
@@ -684,24 +684,27 @@ class TIME(sqltypes.TIME):
                 m = self._reg.match(value)
                 if not m:
                     raise ValueError(
-                        "could not parse %r as a time value" % (value, ))
+                        "could not parse %r as a time value" % (value,))
                 return datetime.time(*[
                     int(x or 0)
                     for x in m.groups()])
             else:
                 return value
+
         return process
+
+
 _MSTime = TIME
 
 
 class _DateTimeBase(object):
-
     def bind_processor(self, dialect):
         def process(value):
             if type(value) == datetime.date:
                 return datetime.datetime(value.year, value.month, value.day)
             else:
                 return value
+
         return process
 
 
@@ -730,7 +733,6 @@ class DATETIMEOFFSET(sqltypes.TypeEngine):
 
 
 class _StringType(object):
-
     """Base for MSSQL string types."""
 
     def __init__(self, collation=None):
@@ -738,7 +740,6 @@ class _StringType(object):
 
 
 class NTEXT(sqltypes.UnicodeText):
-
     """MSSQL NTEXT type, for variable-length unicode text up to 2^30
     characters."""
 
@@ -787,6 +788,7 @@ class UNIQUEIDENTIFIER(sqltypes.TypeEngine):
 
 class SQL_VARIANT(sqltypes.TypeEngine):
     __visit_name__ = 'SQL_VARIANT'
+
 
 # old names.
 MSDateTime = _MSDateTime
@@ -1021,9 +1023,9 @@ class MSExecutionContext(default.DefaultExecutionContext):
                 self._enable_identity_insert = False
 
             self._select_lastrowid = insert_has_sequence and \
-                not self.compiled.returning and \
-                not self._enable_identity_insert and \
-                not self.executemany
+                                     not self.compiled.returning and \
+                                     not self._enable_identity_insert and \
+                                     not self.executemany
 
             if self._enable_identity_insert:
                 self.root_connection._cursor_execute(
@@ -1061,7 +1063,7 @@ class MSExecutionContext(default.DefaultExecutionContext):
                 self.cursor,
                 self._opt_encode(
                     "SET IDENTITY_INSERT %s OFF" %
-                    self.dialect.identifier_preparer. format_table(
+                    self.dialect.identifier_preparer.format_table(
                         self.compiled.statement.table)),
                 (),
                 self)
@@ -1075,7 +1077,7 @@ class MSExecutionContext(default.DefaultExecutionContext):
                 self.cursor.execute(
                     self._opt_encode(
                         "SET IDENTITY_INSERT %s OFF" %
-                        self.dialect.identifier_preparer. format_table(
+                        self.dialect.identifier_preparer.format_table(
                             self.compiled.statement.table)))
             except Exception:
                 pass
@@ -1110,6 +1112,7 @@ class MSSQLCompiler(compiler.SQLCompiler):
             else:
                 super_ = getattr(super(MSSQLCompiler, self), fn.__name__)
                 return super_(*arg, **kw)
+
         return decorate
 
     def visit_now_func(self, fn, **kw):
@@ -1126,8 +1129,8 @@ class MSSQLCompiler(compiler.SQLCompiler):
 
     def visit_concat_op_binary(self, binary, operator, **kw):
         return "%s + %s" % \
-            (self.process(binary.left, **kw),
-             self.process(binary.right, **kw))
+               (self.process(binary.left, **kw),
+                self.process(binary.right, **kw))
 
     def visit_true(self, expr, **kw):
         return '1'
@@ -1175,13 +1178,13 @@ class MSSQLCompiler(compiler.SQLCompiler):
 
         """
         if (
-            (
-                not select._simple_int_limit and
-                select._limit_clause is not None
-            ) or (
-                select._offset_clause is not None and
-                not select._simple_int_offset or select._offset
-            )
+                    (
+                                not select._simple_int_limit and
+                                    select._limit_clause is not None
+                    ) or (
+                                    select._offset_clause is not None and
+                                not select._simple_int_offset or select._offset
+                )
         ) and not getattr(select, '_mssql_visit', None):
 
             # to use ROW_NUMBER(), an ORDER BY is required.
@@ -1193,7 +1196,7 @@ class MSSQLCompiler(compiler.SQLCompiler):
             _order_by_clauses = [
                 sql_util.unwrap_label_reference(elem)
                 for elem in select._order_by_clause.clauses
-            ]
+                ]
 
             limit_clause = select._limit_clause
             offset_clause = select._offset_clause
@@ -1202,7 +1205,7 @@ class MSSQLCompiler(compiler.SQLCompiler):
             select._mssql_visit = True
             select = select.column(
                 sql.func.ROW_NUMBER().over(order_by=_order_by_clauses)
-                .label("mssql_rn")).order_by(None).alias()
+                    .label("mssql_rn")).order_by(None).alias()
 
             mssql_rn = sql.column('mssql_rn')
             limitselect = sql.select([c for c in select.c if
@@ -1255,7 +1258,7 @@ class MSSQLCompiler(compiler.SQLCompiler):
                         column.type
                     )
 
-                return super(MSSQLCompiler, self).\
+                return super(MSSQLCompiler, self). \
                     visit_column(converted, **kw)
 
         return super(MSSQLCompiler, self).visit_column(
@@ -1272,11 +1275,11 @@ class MSSQLCompiler(compiler.SQLCompiler):
     def visit_extract(self, extract, **kw):
         field = self.extract_map.get(extract.field, extract.field)
         return 'DATEPART(%s, %s)' % \
-            (field, self.process(extract.expr, **kw))
+               (field, self.process(extract.expr, **kw))
 
     def visit_savepoint(self, savepoint_stmt):
         return "SAVE TRANSACTION %s" % \
-            self.preparer.format_savepoint(savepoint_stmt)
+               self.preparer.format_savepoint(savepoint_stmt)
 
     def visit_rollback_to_savepoint(self, savepoint_stmt):
         return ("ROLLBACK TRANSACTION %s"
@@ -1288,9 +1291,9 @@ class MSSQLCompiler(compiler.SQLCompiler):
 
         """
         if (
-            isinstance(binary.left, expression.BindParameter)
-            and binary.operator == operator.eq
-            and not isinstance(binary.right, expression.BindParameter)
+                        isinstance(binary.left, expression.BindParameter)
+                    and binary.operator == operator.eq
+                and not isinstance(binary.right, expression.BindParameter)
         ):
             return self.process(
                 expression.BinaryExpression(binary.right,
@@ -1312,7 +1315,7 @@ class MSSQLCompiler(compiler.SQLCompiler):
             self._label_select_column(None, adapter.traverse(c),
                                       True, False, {})
             for c in expression._select_iterables(returning_cols)
-        ]
+            ]
 
         return 'OUTPUT ' + ', '.join(columns)
 
@@ -1327,7 +1330,7 @@ class MSSQLCompiler(compiler.SQLCompiler):
         if isinstance(column, expression.Function):
             return column.label(None)
         else:
-            return super(MSSQLCompiler, self).\
+            return super(MSSQLCompiler, self). \
                 label_select_column(select, column, asfrom)
 
     def for_update_clause(self, select):
@@ -1362,7 +1365,6 @@ class MSSQLCompiler(compiler.SQLCompiler):
 
 
 class MSSQLStrictCompiler(MSSQLCompiler):
-
     """A subclass of MSSQLCompiler which disables the usage of bind
     parameters where not allowed natively by MS-SQL.
 
@@ -1402,12 +1404,11 @@ class MSSQLStrictCompiler(MSSQLCompiler):
             # SQL Server wants single quotes around the date string.
             return "'" + str(value) + "'"
         else:
-            return super(MSSQLStrictCompiler, self).\
+            return super(MSSQLStrictCompiler, self). \
                 render_literal_value(value, type_)
 
 
 class MSDDLCompiler(compiler.DDLCompiler):
-
     def get_column_specification(self, column, **kwargs):
         colspec = (
             self.preparer.format_column(column) + " "
@@ -1463,16 +1464,16 @@ class MSDDLCompiler(compiler.DDLCompiler):
                 text += "NONCLUSTERED "
 
         text += "INDEX %s ON %s (%s)" \
-            % (
-                self._prepared_index_name(index,
-                                          include_schema=include_schema),
-                preparer.format_table(index.table),
-                ', '.join(
-                    self.sql_compiler.process(expr,
-                                              include_table=False,
-                                              literal_binds=True) for
-                    expr in index.expressions)
-            )
+                % (
+                    self._prepared_index_name(index,
+                                              include_schema=include_schema),
+                    preparer.format_table(index.table),
+                    ', '.join(
+                        self.sql_compiler.process(expr,
+                                                  include_table=False,
+                                                  literal_binds=True) for
+                        expr in index.expressions)
+                )
 
         # handle other included columns
         if index.dialect_options['mssql']['include']:
@@ -1483,8 +1484,8 @@ class MSDDLCompiler(compiler.DDLCompiler):
                           ]
 
             text += " INCLUDE (%s)" \
-                % ', '.join([preparer.quote(c.name)
-                             for c in inclusions])
+                    % ', '.join([preparer.quote(c.name)
+                                 for c in inclusions])
 
         return text
 
@@ -1558,6 +1559,7 @@ def _db_plus_owner_listing(fn):
         dbname, owner = _owner_plus_db(dialect, schema)
         return _switch_db(dbname, connection, fn, dialect, connection,
                           dbname, owner, schema, **kw)
+
     return update_wrapper(wrap, fn)
 
 
@@ -1566,6 +1568,7 @@ def _db_plus_owner(fn):
         dbname, owner = _owner_plus_db(dialect, schema)
         return _switch_db(dbname, connection, fn, dialect, connection,
                           tablename, dbname, owner, schema, **kw)
+
     return update_wrapper(wrap, fn)
 
 
@@ -1647,7 +1650,7 @@ class MSDialect(default.DefaultDialect):
 
         self.use_scope_identity = use_scope_identity
         self.max_identifier_length = int(max_identifier_length or 0) or \
-            self.max_identifier_length
+                                     self.max_identifier_length
         self.deprecate_large_types = deprecate_large_types
         self.legacy_schema_aliasing = legacy_schema_aliasing
 
@@ -1706,6 +1709,7 @@ class MSDialect(default.DefaultDialect):
         if self.isolation_level is not None:
             def connect(conn):
                 self.set_isolation_level(conn, self.isolation_level)
+
             return connect
         else:
             return None
@@ -1726,7 +1730,7 @@ class MSDialect(default.DefaultDialect):
                 "4.2, is configured in the FreeTDS configuration." %
                 ".".join(str(x) for x in self.server_version_info))
         if self.server_version_info >= MS_2005_VERSION and \
-                'implicit_returning' not in self.__dict__:
+                        'implicit_returning' not in self.__dict__:
             self.implicit_returning = True
         if self.server_version_info >= MS_2008_VERSION:
             self.supports_multivalues_insert = True
@@ -1776,11 +1780,11 @@ class MSDialect(default.DefaultDialect):
         tables = ischema.tables
         s = sql.select([tables.c.table_name],
                        sql.and_(
-            tables.c.table_schema == owner,
-            tables.c.table_type == 'BASE TABLE'
-        ),
-            order_by=[tables.c.table_name]
-        )
+                           tables.c.table_schema == owner,
+                           tables.c.table_type == 'BASE TABLE'
+                       ),
+                       order_by=[tables.c.table_name]
+                       )
         table_names = [r[0] for r in connection.execute(s)]
         return table_names
 
@@ -1790,11 +1794,11 @@ class MSDialect(default.DefaultDialect):
         tables = ischema.tables
         s = sql.select([tables.c.table_name],
                        sql.and_(
-            tables.c.table_schema == owner,
-            tables.c.table_type == 'VIEW'
-        ),
-            order_by=[tables.c.table_name]
-        )
+                           tables.c.table_schema == owner,
+                           tables.c.table_type == 'VIEW'
+                       ),
+                       order_by=[tables.c.table_name]
+                       )
         view_names = [r[0] for r in connection.execute(s)]
         return view_names
 
@@ -1904,7 +1908,7 @@ class MSDialect(default.DefaultDialect):
             if row is None:
                 break
             (name, type, nullable, charlen,
-                numericprec, numericscale, default, collation) = (
+             numericprec, numericscale, default, collation) = (
                 row[columns.c.column_name],
                 row[columns.c.data_type],
                 row[columns.c.is_nullable] == 'YES',
@@ -1933,7 +1937,7 @@ class MSDialect(default.DefaultDialect):
                 coltype = sqltypes.NULLTYPE
             else:
                 if issubclass(coltype, sqltypes.Numeric) and \
-                        coltype is not MSReal:
+                                coltype is not MSReal:
                     kwargs['scale'] = numericscale
                     kwargs['precision'] = numericprec
 
@@ -2061,7 +2065,7 @@ class MSDialect(default.DefaultDialect):
                     rec['referred_schema'] = rschema
 
             local_cols, remote_cols = \
-                rec['constrained_columns'],\
+                rec['constrained_columns'], \
                 rec['referred_columns']
 
             local_cols.append(scol)

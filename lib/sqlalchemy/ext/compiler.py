@@ -428,6 +428,7 @@ def compiles(class_, *specs):
                         raise exc.CompileError(
                             "%s construct has no default "
                             "compilation handler." % type(element))
+
                 existing.specs['default'] = _wrap_existing_dispatch
 
             # TODO: why is the lambda needed ?
@@ -442,6 +443,7 @@ def compiles(class_, *specs):
         else:
             existing.specs['default'] = fn
         return fn
+
     return decorate
 
 

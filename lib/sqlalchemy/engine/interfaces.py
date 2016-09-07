@@ -880,6 +880,7 @@ class CreateEnginePlugin(object):
     .. versionadded:: 1.1
 
     """
+
     def __init__(self, url, kwargs):
         """Contruct a new :class:`.CreateEnginePlugin`.
 

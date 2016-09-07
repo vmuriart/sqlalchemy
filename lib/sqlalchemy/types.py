@@ -78,4 +78,4 @@ from .sql.sqltypes import (
     UnicodeText,
     VARBINARY,
     VARCHAR,
-    )
+)

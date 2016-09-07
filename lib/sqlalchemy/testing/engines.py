@@ -16,7 +16,6 @@ import warnings
 
 
 class ConnectionKiller(object):
-
     def __init__(self):
         self.proxy_refs = weakref.WeakKeyDictionary()
         self.testing_engines = weakref.WeakKeyDictionary()
@@ -91,6 +90,7 @@ class ConnectionKiller(object):
             if rec.is_valid:
                 assert False
 
+
 testing_reaper = ConnectionKiller()
 
 
@@ -157,7 +157,6 @@ def all_dialects(exclude=None):
 
 
 class ReconnectFixture(object):
-
     def __init__(self, dbapi):
         self.dbapi = dbapi
         self.connections = []
@@ -228,7 +227,7 @@ def testing_engine(url=None, options=None):
             options = {}
 
     engine = create_engine(url, **options)
-    engine._has_events = True   # enable event blocks, helps with profiling
+    engine._has_events = True  # enable event blocks, helps with profiling
 
     if isinstance(engine.pool, pool.QueuePool):
         engine.pool._timeout = 0
@@ -339,8 +338,8 @@ def proxying_engine(conn_cls=DBAPIProxyConnection,
     common methods.
 
     """
+
     def mock_conn():
         return conn_cls(config.db, cursor_cls)
+
     return testing_engine(options={'creator': mock_conn})
-
-

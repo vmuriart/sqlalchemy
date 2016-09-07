@@ -147,7 +147,7 @@ class _PlainColumnGetter(object):
         key = [
             m._get_state_attr_by_column(state, state.dict, col)
             for col in self._cols(m)
-        ]
+            ]
 
         if self.composite:
             return tuple(key)
@@ -175,7 +175,7 @@ class _SerializableColumnGetter(object):
         key = [m._get_state_attr_by_column(
             state, state.dict,
             m.mapped_table.columns[k])
-            for k in self.colkeys]
+               for k in self.colkeys]
         if self.composite:
             return tuple(key)
         else:
@@ -208,6 +208,7 @@ class _SerializableColumnGetterV2(_PlainColumnGetter):
                 return None
             else:
                 return c.table.key
+
         colkeys = [(c.key, _table_key(c)) for c in cols]
         return _SerializableColumnGetterV2, (colkeys,)
 
@@ -216,8 +217,8 @@ class _SerializableColumnGetterV2(_PlainColumnGetter):
         metadata = getattr(mapper.local_table, 'metadata', None)
         for (ckey, tkey) in self.colkeys:
             if tkey is None or \
-                    metadata is None or \
-                    tkey not in metadata:
+                            metadata is None or \
+                            tkey not in metadata:
                 cols.append(mapper.local_table.c[ckey])
             else:
                 cols.append(metadata.tables[tkey].c[ckey])
@@ -253,7 +254,7 @@ class _SerializableAttrGetter(object):
         return self.getter(target)
 
     def __reduce__(self):
-        return _SerializableAttrGetter, (self.name, )
+        return _SerializableAttrGetter, (self.name,)
 
 
 def attribute_mapped_collection(attr_name):
@@ -311,6 +312,7 @@ class collection(object):
         def popitem(self): ...
 
     """
+
     # Bundled as a class solely for ease of use: packaging, doc strings,
     # importability.
 
@@ -490,9 +492,11 @@ class collection(object):
             def do_stuff(self, thing, entity=None): ...
 
         """
+
         def decorator(fn):
             fn._sa_instrument_before = ('fire_append_event', arg)
             return fn
+
         return decorator
 
     @staticmethod
@@ -510,10 +514,12 @@ class collection(object):
             def __setitem__(self, index, item): ...
 
         """
+
         def decorator(fn):
             fn._sa_instrument_before = ('fire_append_event', arg)
             fn._sa_instrument_after = 'fire_remove_event'
             return fn
+
         return decorator
 
     @staticmethod
@@ -532,9 +538,11 @@ class collection(object):
         collection.removes_return.
 
         """
+
         def decorator(fn):
             fn._sa_instrument_before = ('fire_remove_event', arg)
             return fn
+
         return decorator
 
     @staticmethod
@@ -552,9 +560,11 @@ class collection(object):
         collection.remove.
 
         """
+
         def decorator(fn):
             fn._sa_instrument_after = 'fire_remove_event'
             return fn
+
         return decorator
 
 
@@ -870,7 +880,7 @@ def _locate_roles_and_methods(cls):
                 assert op in ('fire_append_event', 'fire_remove_event')
                 after = op
             if before:
-                methods[name] = before + (after, )
+                methods[name] = before + (after,)
             elif after:
                 methods[name] = None, None, after
     return roles, methods
@@ -907,7 +917,8 @@ def _assert_required_roles(cls, roles, methods):
             "Type %s must elect an appender method to be "
             "a collection class" % cls.__name__)
     elif (roles['appender'] not in methods and
-          not hasattr(getattr(cls, roles['appender']), '_sa_instrumented')):
+              not hasattr(getattr(cls, roles['appender']),
+                          '_sa_instrumented')):
         methods[roles['appender']] = ('fire_append_event', 1, None)
 
     if 'remover' not in roles or not hasattr(cls, roles['remover']):
@@ -915,7 +926,7 @@ def _assert_required_roles(cls, roles, methods):
             "Type %s must elect a remover method to be "
             "a collection class" % cls.__name__)
     elif (roles['remover'] not in methods and
-          not hasattr(getattr(cls, roles['remover']), '_sa_instrumented')):
+              not hasattr(getattr(cls, roles['remover']), '_sa_instrumented')):
         methods[roles['remover']] = ('fire_remove_event', 1, None)
 
     if 'iterator' not in roles or not hasattr(cls, roles['iterator']):
@@ -1038,6 +1049,7 @@ def _list_decorators():
         def append(self, item, _sa_initiator=None):
             item = __set(self, item, _sa_initiator)
             fn(self, item)
+
         _tidy(append)
         return append
 
@@ -1047,6 +1059,7 @@ def _list_decorators():
             # testlib.pragma exempt:__eq__
             fn(self, value)
             __del(self, value, _sa_initiator)
+
         _tidy(remove)
         return remove
 
@@ -1054,6 +1067,7 @@ def _list_decorators():
         def insert(self, index, value):
             value = __set(self, value)
             fn(self, index, value)
+
         _tidy(insert)
         return insert
 
@@ -1094,6 +1108,7 @@ def _list_decorators():
                                                            len(rng)))
                     for i, item in zip(rng, value):
                         self.__setitem__(i, item)
+
         _tidy(__setitem__)
         return __setitem__
 
@@ -1110,6 +1125,7 @@ def _list_decorators():
                 for item in self[index]:
                     __del(self, item)
                 fn(self, index)
+
         _tidy(__delitem__)
         return __delitem__
 
@@ -1120,6 +1136,7 @@ def _list_decorators():
                     __del(self, value)
                 values = [__set(self, value) for value in values]
                 fn(self, start, end, values)
+
             _tidy(__setslice__)
             return __setslice__
 
@@ -1128,6 +1145,7 @@ def _list_decorators():
                 for value in self[start:end]:
                     __del(self, value)
                 fn(self, start, end)
+
             _tidy(__delslice__)
             return __delslice__
 
@@ -1135,6 +1153,7 @@ def _list_decorators():
         def extend(self, iterable):
             for value in iterable:
                 self.append(value)
+
         _tidy(extend)
         return extend
 
@@ -1145,6 +1164,7 @@ def _list_decorators():
             for value in iterable:
                 self.append(value)
             return self
+
         _tidy(__iadd__)
         return __iadd__
 
@@ -1154,6 +1174,7 @@ def _list_decorators():
             item = fn(self, index)
             __del(self, item)
             return item
+
         _tidy(pop)
         return pop
 
@@ -1163,6 +1184,7 @@ def _list_decorators():
                 for item in self:
                     __del(self, item)
                 fn(self)
+
             _tidy(clear)
             return clear
 
@@ -1191,6 +1213,7 @@ def _dict_decorators():
                 __del(self, self[key], _sa_initiator)
             value = __set(self, value, _sa_initiator)
             fn(self, key, value)
+
         _tidy(__setitem__)
         return __setitem__
 
@@ -1199,6 +1222,7 @@ def _dict_decorators():
             if key in self:
                 __del(self, self[key], _sa_initiator)
             fn(self, key)
+
         _tidy(__delitem__)
         return __delitem__
 
@@ -1207,6 +1231,7 @@ def _dict_decorators():
             for key in self:
                 __del(self, self[key])
             fn(self)
+
         _tidy(clear)
         return clear
 
@@ -1218,6 +1243,7 @@ def _dict_decorators():
                 return fn(self, key)
             else:
                 return fn(self, key, default)
+
         _tidy(pop)
         return pop
 
@@ -1227,6 +1253,7 @@ def _dict_decorators():
             item = fn(self)
             __del(self, item[1])
             return item
+
         _tidy(popitem)
         return popitem
 
@@ -1237,6 +1264,7 @@ def _dict_decorators():
                 return default
             else:
                 return self.__getitem__(key)
+
         _tidy(setdefault)
         return setdefault
 
@@ -1246,7 +1274,7 @@ def _dict_decorators():
                 if hasattr(__other, 'keys'):
                     for key in list(__other):
                         if (key not in self or
-                                self[key] is not __other[key]):
+                                    self[key] is not __other[key]):
                             self[key] = __other[key]
                 else:
                     for key, value in __other:
@@ -1255,6 +1283,7 @@ def _dict_decorators():
             for key in kw:
                 if key not in self or self[key] is not kw[key]:
                     self[key] = kw[key]
+
         _tidy(update)
         return update
 
@@ -1262,6 +1291,7 @@ def _dict_decorators():
     l.pop('_tidy')
     l.pop('Unspecified')
     return l
+
 
 _set_binop_bases = (set, frozenset)
 
@@ -1293,6 +1323,7 @@ def _set_decorators():
                 value = __set(self, value, _sa_initiator)
             # testlib.pragma exempt:__hash__
             fn(self, value)
+
         _tidy(add)
         return add
 
@@ -1303,6 +1334,7 @@ def _set_decorators():
                 __del(self, value, _sa_initiator)
                 # testlib.pragma exempt:__hash__
             fn(self, value)
+
         _tidy(discard)
         return discard
 
@@ -1313,6 +1345,7 @@ def _set_decorators():
                 __del(self, value, _sa_initiator)
             # testlib.pragma exempt:__hash__
             fn(self, value)
+
         _tidy(remove)
         return remove
 
@@ -1322,6 +1355,7 @@ def _set_decorators():
             item = fn(self)
             __del(self, item)
             return item
+
         _tidy(pop)
         return pop
 
@@ -1329,6 +1363,7 @@ def _set_decorators():
         def clear(self):
             for item in list(self):
                 self.remove(item)
+
         _tidy(clear)
         return clear
 
@@ -1336,6 +1371,7 @@ def _set_decorators():
         def update(self, value):
             for item in value:
                 self.add(item)
+
         _tidy(update)
         return update
 
@@ -1346,6 +1382,7 @@ def _set_decorators():
             for item in value:
                 self.add(item)
             return self
+
         _tidy(__ior__)
         return __ior__
 
@@ -1353,6 +1390,7 @@ def _set_decorators():
         def difference_update(self, value):
             for item in value:
                 self.discard(item)
+
         _tidy(difference_update)
         return difference_update
 
@@ -1363,6 +1401,7 @@ def _set_decorators():
             for item in value:
                 self.discard(item)
             return self
+
         _tidy(__isub__)
         return __isub__
 
@@ -1375,6 +1414,7 @@ def _set_decorators():
                 self.remove(item)
             for item in add:
                 self.add(item)
+
         _tidy(intersection_update)
         return intersection_update
 
@@ -1390,6 +1430,7 @@ def _set_decorators():
             for item in add:
                 self.add(item)
             return self
+
         _tidy(__iand__)
         return __iand__
 
@@ -1402,6 +1443,7 @@ def _set_decorators():
                 self.remove(item)
             for item in add:
                 self.add(item)
+
         _tidy(symmetric_difference_update)
         return symmetric_difference_update
 
@@ -1417,6 +1459,7 @@ def _set_decorators():
             for item in add:
                 self.add(item)
             return self
+
         _tidy(__ixor__)
         return __ixor__
 
@@ -1535,6 +1578,7 @@ class MappedCollection(dict):
                     "keying function requires a key of %r for this value." % (
                         incoming_key, value, new_key))
             yield value
+
 
 # ensure instrumentation is associated with
 # these built-in classes; if a user-defined class

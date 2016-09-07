@@ -104,7 +104,6 @@ class _PGNumericNoBind(_PGNumeric):
 
 
 class _PGJSON(JSON):
-
     def result_processor(self, dialect, coltype):
         if dialect._dbapi_version > (1, 10, 1):
             return None  # Has native JSON
@@ -119,7 +118,7 @@ class PGExecutionContext_pg8000(PGExecutionContext):
 class PGCompiler_pg8000(PGCompiler):
     def visit_mod_binary(self, binary, operator, **kw):
         return self.process(binary.left, **kw) + " %% " + \
-            self.process(binary.right, **kw)
+               self.process(binary.right, **kw)
 
     def post_process_text(self, text):
         if '%%' in text:
@@ -173,7 +172,7 @@ class PGDialect_pg8000(PGDialect):
             return tuple(
                 [
                     int(x) for x in re.findall(
-                        r'(\d+)(?:[-\.]?|$)', self.dbapi.__version__)])
+                    r'(\d+)(?:[-\.]?|$)', self.dbapi.__version__)])
         else:
             return (99, 99, 99)
 
@@ -247,19 +246,23 @@ class PGDialect_pg8000(PGDialect):
         if self.client_encoding is not None:
             def on_connect(conn):
                 self.set_client_encoding(conn, self.client_encoding)
+
             fns.append(on_connect)
 
         if self.isolation_level is not None:
             def on_connect(conn):
                 self.set_isolation_level(conn, self.isolation_level)
+
             fns.append(on_connect)
 
         if len(fns) > 0:
             def on_connect(conn):
                 for fn in fns:
                     fn(conn)
+
             return on_connect
         else:
             return None
+
 
 dialect = PGDialect_pg8000

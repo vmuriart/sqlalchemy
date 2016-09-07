@@ -76,7 +76,8 @@ class _MultipleClassMarker(object):
     def __init__(self, classes, on_remove=None):
         self.on_remove = on_remove
         self.contents = set([
-            weakref.ref(item, self._remove_item) for item in classes])
+                                weakref.ref(item, self._remove_item) for item
+                                in classes])
         _registries.add(self)
 
     def __iter__(self):
@@ -109,8 +110,8 @@ class _MultipleClassMarker(object):
         # asynchronous garbage collection calling _remove_item,
         # [ticket:3208]
         modules = set([
-            cls.__module__ for cls in
-            [ref() for ref in self.contents] if cls is not None])
+                          cls.__module__ for cls in
+                          [ref() for ref in self.contents] if cls is not None])
         if item.__module__ in modules:
             util.warn(
                 "This declarative base already contains a class with the "
@@ -224,6 +225,7 @@ class _GetColumns(object):
                         " directly to a Column)." % key)
         return getattr(self.cls, key)
 
+
 inspection._inspects(_GetColumns)(
     lambda target: inspection.inspect(target.cls))
 
@@ -265,7 +267,7 @@ class _class_resolver(object):
         elif key in cls.metadata._schemas:
             return _GetTable(key, cls.metadata)
         elif '_sa_module_registry' in cls._decl_class_registry and \
-                key in cls._decl_class_registry['_sa_module_registry']:
+                        key in cls._decl_class_registry['_sa_module_registry']:
             registry = cls._decl_class_registry['_sa_module_registry']
             return registry.resolve_attr(key)
         elif self._resolvers:
@@ -303,11 +305,11 @@ def _resolver(cls, prop):
 
     def resolve_arg(arg):
         return _class_resolver(cls, prop, fallback, arg)
+
     return resolve_arg
 
 
 def _deferred_relationship(cls, prop):
-
     if isinstance(prop, RelationshipProperty):
         resolve_arg = _resolver(cls, prop)
 

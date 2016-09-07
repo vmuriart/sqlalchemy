@@ -19,6 +19,7 @@ def _legacy_signature(since, argnames, converter=None):
             fn._legacy_signatures = []
         fn._legacy_signatures.append((since, argnames, converter))
         return fn
+
     return leg
 
 
@@ -94,7 +95,7 @@ def _standard_listen_example(dispatch_collection, sample_target, fn):
 
     text %= {
         "current_since": " (arguments as of %s)" %
-        current_since if current_since else "",
+                         current_since if current_since else "",
         "event_name": fn.__name__,
         "has_kw_arguments": ", **kw" if dispatch_collection.has_kw else "",
         "named_event_arguments": ", ".join(dispatch_collection.arg_names),
@@ -143,9 +144,9 @@ def _version_signature_changes(dispatch_collection):
 
 
 def _augment_fn_docs(dispatch_collection, parent_dispatch_cls, fn):
-    header = ".. container:: event_signatures\n\n"\
-        "     Example argument forms::\n"\
-        "\n"
+    header = ".. container:: event_signatures\n\n" \
+             "     Example argument forms::\n" \
+             "\n"
 
     sample_target = getattr(parent_dispatch_cls, "_target_class_doc", "obj")
     text = (

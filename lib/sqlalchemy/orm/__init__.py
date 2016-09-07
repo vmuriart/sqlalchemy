@@ -106,6 +106,7 @@ def create_session(bind=None, **kwargs):
     kwargs.setdefault('expire_on_commit', False)
     return Session(bind=bind, **kwargs)
 
+
 relationship = public_factory(RelationshipProperty, ".orm.relationship")
 
 
@@ -186,7 +187,7 @@ comparable_property = public_factory(ComparableProperty,
 
 
 @_sa_util.deprecated("0.7", message=":func:`.compile_mappers` "
-                     "is renamed to :func:`.configure_mappers`")
+                                    "is renamed to :func:`.configure_mappers`")
 def compile_mappers():
     """Initialize the inter-mapper relationships of all mappers that have
     been defined.
@@ -226,6 +227,7 @@ def clear_mappers():
                 pass
     finally:
         mapperlib._CONFIGURE_MUTEX.release()
+
 
 from . import strategy_options
 
@@ -272,5 +274,6 @@ def __go(lcls):
                      if not (name.startswith('_') or _inspect.ismodule(obj)))
 
     _sa_util.dependencies.resolve_all("sqlalchemy.orm")
+
 
 __go(locals())

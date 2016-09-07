@@ -130,6 +130,7 @@ class Insert(StandardInsert):
             constraint, index_elements, index_where)
         return self
 
+
 insert = public_factory(Insert, '.dialects.postgresql.insert')
 
 
@@ -143,8 +144,8 @@ class OnConflictClause(ClauseElement):
         if constraint is not None:
             if not isinstance(constraint, util.string_types) and \
                     isinstance(constraint, (
-                        schema.Index, schema.Constraint,
-                        ext.ExcludeConstraint)):
+                            schema.Index, schema.Constraint,
+                            ext.ExcludeConstraint)):
                 constraint = getattr(constraint, 'name') or constraint
 
         if constraint is not None:
@@ -197,7 +198,7 @@ class OnConflictDoUpdate(OnConflictClause):
             index_where=index_where)
 
         if self.inferred_target_elements is None and \
-                self.constraint_target is None:
+                        self.constraint_target is None:
             raise ValueError(
                 "Either constraint or index_elements, "
                 "but not both, must be specified unless DO NOTHING")
@@ -207,5 +208,5 @@ class OnConflictDoUpdate(OnConflictClause):
         self.update_values_to_set = [
             (key, _literal_as_binds(value))
             for key, value in set_.items()
-        ]
+            ]
         self.update_whereclause = where

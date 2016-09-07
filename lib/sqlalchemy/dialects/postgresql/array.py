@@ -45,7 +45,6 @@ def All(other, arrexpr, operator=operators.eq):
 
 
 class array(expression.Tuple):
-
     """A Postgresql ARRAY literal.
 
     This is used to produce ARRAY literals in SQL expressions, e.g.::
@@ -96,8 +95,9 @@ class array(expression.Tuple):
 
         else:
             return array([
-                self._bind_param(operator, o, _assume_scalar=True, type_=type_)
-                for o in obj])
+                             self._bind_param(operator, o, _assume_scalar=True,
+                                              type_=type_)
+                             for o in obj])
 
     def self_group(self, against=None):
         if (against in (
@@ -115,7 +115,6 @@ OVERLAP = operators.custom_op("&&", precedence=5)
 
 
 class ARRAY(SchemaEventTarget, sqltypes.ARRAY):
-
     """Postgresql ARRAY type.
 
     .. versionchanged:: 1.1 The :class:`.postgresql.ARRAY` type is now
@@ -267,7 +266,7 @@ class ARRAY(SchemaEventTarget, sqltypes.ARRAY):
                 # this has to be (list, tuple), or at least
                 # not hasattr('__iter__'), since Py3K strings
                 # etc. have __iter__
-                not arr or not isinstance(arr[0], (list, tuple))):
+                    not arr or not isinstance(arr[0], (list, tuple))):
             if itemproc:
                 return collection(itemproc(x) for x in arr)
             else:
@@ -282,7 +281,7 @@ class ARRAY(SchemaEventTarget, sqltypes.ARRAY):
             )
 
     def bind_processor(self, dialect):
-        item_proc = self.item_type.dialect_impl(dialect).\
+        item_proc = self.item_type.dialect_impl(dialect). \
             bind_processor(dialect)
 
         def process(value):
@@ -294,10 +293,11 @@ class ARRAY(SchemaEventTarget, sqltypes.ARRAY):
                     item_proc,
                     self.dimensions,
                     list)
+
         return process
 
     def result_processor(self, dialect, coltype):
-        item_proc = self.item_type.dialect_impl(dialect).\
+        item_proc = self.item_type.dialect_impl(dialect). \
             result_processor(dialect, coltype)
 
         def process(value):
@@ -309,6 +309,8 @@ class ARRAY(SchemaEventTarget, sqltypes.ARRAY):
                     item_proc,
                     self.dimensions,
                     tuple if self.as_tuple else list)
+
         return process
+
 
 ischema_names['_array'] = ARRAY

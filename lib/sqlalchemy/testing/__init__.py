@@ -10,13 +10,14 @@ from .warnings import assert_warnings
 
 from . import config
 
-from .exclusions import db_spec, _is_excluded, fails_if, skip_if, future,\
+from .exclusions import db_spec, _is_excluded, fails_if, skip_if, future, \
     fails_on, fails_on_everything_except, skip, only_on, exclude, \
     against as _against, _server_version, only_if, fails
 
 
 def against(*queries):
     return _against(config._current, *queries)
+
 
 from .assertions import emits_warning, emits_warning_on, uses_deprecated, \
     eq_, ne_, le_, is_, is_not_, startswith_, assert_raises, \

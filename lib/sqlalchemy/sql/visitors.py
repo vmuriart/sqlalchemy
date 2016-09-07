@@ -204,6 +204,7 @@ class ReplacingCloningVisitor(CloningVisitor):
                 e = v.replace(elem)
                 if e is not None:
                     return e
+
         return replacement_traverse(obj, self.__traverse_options__, replace)
 
 
@@ -310,7 +311,7 @@ def replacement_traverse(obj, opts, replace):
 
     def clone(elem, **kw):
         if id(elem) in stop_on or \
-                'no_replacement_traverse' in elem._annotations:
+                        'no_replacement_traverse' in elem._annotations:
             return elem
         else:
             newelem = replace(elem)

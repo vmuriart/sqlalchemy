@@ -29,7 +29,6 @@ import re
 
 
 class MySQLExecutionContext_pyodbc(MySQLExecutionContext):
-
     def get_lastrowid(self):
         cursor = self.create_cursor()
         cursor.execute("SELECT LAST_INSERT_ID()")
@@ -75,5 +74,6 @@ class MySQLDialect_pyodbc(PyODBCConnector, MySQLDialect):
             return int(c)
         else:
             return None
+
 
 dialect = MySQLDialect_pyodbc

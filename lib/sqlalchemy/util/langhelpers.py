@@ -56,7 +56,7 @@ class safe_reraise(object):
         # see #2703 for notes
         if type_ is None:
             exc_type, exc_value, exc_tb = self._exc_info
-            self._exc_info = None   # remove potential circular references
+            self._exc_info = None  # remove potential circular references
             compat.reraise(exc_type, exc_value, exc_tb)
         else:
             if not compat.py3k and self._exc_info and self._exc_info[1]:
@@ -66,7 +66,7 @@ class safe_reraise(object):
                     "An exception has occurred during handling of a "
                     "previous exception.  The previous exception "
                     "is:\n %s %s\n" % (self._exc_info[0], self._exc_info[1]))
-            self._exc_info = None   # remove potential circular references
+            self._exc_info = None  # remove potential circular references
             compat.reraise(type_, value, traceback)
 
 
@@ -131,11 +131,12 @@ def %(name)s(%(args)s):
         decorated.__defaults__ = getattr(fn, 'im_func', fn).__defaults__
         decorated.__wrapped__ = fn
         return update_wrapper(decorated, fn)
+
     return update_wrapper(decorate, target)
 
 
 def _exec_code_in_env(code, env, fn_name):
-    exec(code, env)
+    exec (code, env)
     return env[fn_name]
 
 
@@ -149,15 +150,15 @@ def public_factory(target, location):
     if isinstance(target, type):
         fn = target.__init__
         callable_ = target
-        doc = "Construct a new :class:`.%s` object. \n\n"\
-            "This constructor is mirrored as a public API function; "\
-            "see :func:`~%s` "\
-            "for a full usage and argument description." % (
-                target.__name__, location, )
+        doc = "Construct a new :class:`.%s` object. \n\n" \
+              "This constructor is mirrored as a public API function; " \
+              "see :func:`~%s` " \
+              "for a full usage and argument description." % (
+                  target.__name__, location,)
     else:
         fn = callable_ = target
-        doc = "This function is mirrored; see :func:`~%s` "\
-            "for a description of arguments." % location
+        doc = "This function is mirrored; see :func:`~%s` " \
+              "for a description of arguments." % location
 
     location_name = location.split(".")[-1]
     spec = compat.inspect_getfullargspec(fn)
@@ -169,7 +170,7 @@ def %(name)s(%(args)s):
     return cls(%(apply_kw)s)
 """ % metadata
     env = {'cls': callable_, 'symbol': symbol}
-    exec(code, env)
+    exec (code, env)
     decorated = env[location_name]
     decorated.__doc__ = fn.__doc__
     decorated.__module__ = "sqlalchemy" + location.rsplit(".", 1)[0]
@@ -181,7 +182,6 @@ def %(name)s(%(args)s):
 
 
 class PluginLoader(object):
-
     def __init__(self, group, auto_fn=None):
         self.group = group
         self.impls = {}
@@ -217,6 +217,7 @@ class PluginLoader(object):
             for token in modulepath.split(".")[1:]:
                 mod = getattr(mod, token)
             return getattr(mod, objname)
+
         self.impls[name] = load
 
 
@@ -239,7 +240,7 @@ def get_cls_kwargs(cls, _set=None):
     ctr = cls.__dict__.get('__init__', False)
 
     has_init = ctr and isinstance(ctr, types.FunctionType) and \
-        isinstance(ctr.__code__, types.CodeType)
+               isinstance(ctr.__code__, types.CodeType)
 
     if has_init:
         names, has_kw = inspect_func_args(ctr)
@@ -260,6 +261,7 @@ def get_cls_kwargs(cls, _set=None):
 try:
     # TODO: who doesn't have this constant?
     from inspect import CO_VARKEYWORDS
+
 
     def inspect_func_args(fn):
         co = fn.__code__
@@ -485,15 +487,16 @@ def generic_repr(obj, additional_kw=(), to_inspect=None, omit_kwarg=()):
                     pos_args.extend(_args[1:])
             else:
                 kw_args.update([
-                    (arg, missing) for arg in _args[1:-default_len]
-                ])
+                                   (arg, missing) for arg in
+                                   _args[1:-default_len]
+                                   ])
 
             if default_len:
                 kw_args.update([
-                    (arg, default)
-                    for arg, default
-                    in zip(_args[-default_len:], defaults)
-                ])
+                                   (arg, default)
+                                   for arg, default
+                                   in zip(_args[-default_len:], defaults)
+                                   ])
     output = []
 
     output.extend(repr(getattr(obj, arg, None)) for arg in pos_args)
@@ -778,6 +781,7 @@ def memoized_instancemethod(fn):
         memo.__doc__ = fn.__doc__
         self.__dict__[fn.__name__] = memo
         return result
+
     return update_wrapper(oneshot, fn)
 
 
@@ -834,6 +838,7 @@ class MemoizedSlots(object):
                 memo.__doc__ = fn.__doc__
                 setattr(self, key, memo)
                 return result
+
             oneshot.__doc__ = fn.__doc__
             return oneshot
         else:
@@ -850,6 +855,7 @@ def dependency_for(modulename):
         mod = getattr(mod, tokens[-1])
         setattr(mod, obj.__name__, obj)
         return obj
+
     return decorate
 
 
@@ -989,11 +995,13 @@ def bool_or_str(*text):
     boolean, or one of a set of "alternate" string values.
 
     """
+
     def bool_or_value(obj):
         if obj in text:
             return obj
         else:
             return asbool(obj)
+
     return bool_or_value
 
 
@@ -1116,6 +1124,7 @@ def dictlike_iteritems(dictlike):
         def iterator():
             for key in dictlike.iterkeys():
                 yield key, getter(key)
+
         return iterator()
     elif hasattr(dictlike, 'keys'):
         return iter((key, getter(key)) for key in dictlike.keys())
@@ -1189,6 +1198,7 @@ class _symbol(int):
 
     def __repr__(self):
         return "symbol(%r)" % self.name
+
 
 _symbol.__name__ = 'symbol'
 
@@ -1275,9 +1285,11 @@ class _hash_limit_string(compat.text_type):
 
 
     """
+
     def __new__(cls, value, num, args):
         interpolated = (value % args) + \
-            (" (this warning may be suppressed after %d occurrences)" % num)
+                       (
+                       " (this warning may be suppressed after %d occurrences)" % num)
         self = super(_hash_limit_string, cls).__new__(cls, interpolated)
         self._hash = hash("%s_%d" % (value, hash(interpolated) % num))
         return self
@@ -1348,15 +1360,16 @@ def chop_traceback(tb, exclude_prefix=_UNITTEST_RE, exclude_suffix=_SQLA_RE):
         end -= 1
     return tb[start:end + 1]
 
+
 NoneType = type(None)
 
 
 def attrsetter(attrname):
     code = \
-        "def set(obj, value):"\
+        "def set(obj, value):" \
         "    obj.%s = value" % attrname
     env = locals().copy()
-    exec(code, env)
+    exec (code, env)
     return env['set']
 
 
@@ -1365,6 +1378,7 @@ class EnsureKWArgType(type):
     don't already.
 
     """
+
     def __init__(cls, clsname, bases, clsdict):
         fn_reg = cls.ensure_kwarg
         if fn_reg:
@@ -1382,6 +1396,7 @@ class EnsureKWArgType(type):
 
         def wrap(*arg, **kw):
             return fn(*arg)
+
         return update_wrapper(wrap, fn)
 
 

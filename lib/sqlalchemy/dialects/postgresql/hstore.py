@@ -16,7 +16,6 @@ from ... import util
 
 __all__ = ('HSTORE', 'hstore')
 
-
 GETITEM = operators.custom_op(
     "->", precedence=15, natural_self_precedent=True,
 )
@@ -132,7 +131,7 @@ class HSTORE(sqltypes.Indexable, sqltypes.Concatenable, sqltypes.TypeEngine):
             self.text_type = text_type
 
     class Comparator(
-            sqltypes.Indexable.Comparator, sqltypes.Concatenable.Comparator):
+        sqltypes.Indexable.Comparator, sqltypes.Concatenable.Comparator):
         """Define comparison operations for :class:`.HSTORE`."""
 
         def has_key(self, other):
@@ -398,6 +397,7 @@ def _serialize_hstore(val):
     both be strings (except None for values).
 
     """
+
     def esc(s, position):
         if position == 'value' and s is None:
             return 'NULL'
@@ -409,5 +409,3 @@ def _serialize_hstore(val):
 
     return ', '.join('%s=>%s' % (esc(k, 'key'), esc(v, 'value'))
                      for k, v in val.items())
-
-

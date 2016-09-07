@@ -27,7 +27,6 @@ from .json import JSON, JSONB
 
 
 class _PGNumeric(Numeric):
-
     def bind_processor(self, dialect):
         return None
 
@@ -57,15 +56,16 @@ class _PGNumeric(Numeric):
 
 
 class _PGHStore(HSTORE):
-
     def bind_processor(self, dialect):
         if not dialect.has_native_hstore:
             return super(_PGHStore, self).bind_processor(dialect)
         hstore = dialect.dbapi.Hstore
+
         def process(value):
             if isinstance(value, dict):
                 return hstore(value)
             return value
+
         return process
 
     def result_processor(self, dialect, coltype):
@@ -74,7 +74,6 @@ class _PGHStore(HSTORE):
 
 
 class _PGJSON(JSON):
-
     def bind_processor(self, dialect):
         if not dialect.has_native_json:
             return super(_PGJSON, self).bind_processor(dialect)
@@ -84,7 +83,7 @@ class _PGJSON(JSON):
             if value is self.NULL:
                 value = None
             elif isinstance(value, Null) or (
-                value is None and self.none_as_null):
+                            value is None and self.none_as_null):
                 return None
             if value is None or isinstance(value, (dict, list)):
                 return json(value)
@@ -98,7 +97,6 @@ class _PGJSON(JSON):
 
 
 class _PGJSONB(JSONB):
-
     def bind_processor(self, dialect):
         if not dialect.has_native_json:
             return super(_PGJSONB, self).bind_processor(dialect)
@@ -108,7 +106,7 @@ class _PGJSONB(JSONB):
             if value is self.NULL:
                 value = None
             elif isinstance(value, Null) or (
-                value is None and self.none_as_null):
+                            value is None and self.none_as_null):
                 return None
             if value is None or isinstance(value, (dict, list)):
                 return json(value)
@@ -122,7 +120,6 @@ class _PGJSONB(JSONB):
 
 
 class _PGUUID(UUID):
-
     def bind_processor(self, dialect):
         if not dialect.has_native_uuid:
             return super(_PGUUID, self).bind_processor(dialect)
@@ -148,28 +145,26 @@ class _PGUUID(UUID):
             def process(value):
                 if value is not None:
                     return str(value)
+
             return process
 
 
 class _PGCompiler(PGCompiler):
-
     def visit_mod_binary(self, binary, operator, **kw):
         return self.process(binary.left, **kw) + " %% " + \
-            self.process(binary.right, **kw)
+               self.process(binary.right, **kw)
 
     def post_process_text(self, text):
         return text.replace('%', '%%')
 
 
 class _PGIdentifierPreparer(PGIdentifierPreparer):
-
     def _escape_identifier(self, value):
         value = value.replace(self.escape_quote, self.escape_to_quote)
         return value.replace('%', '%%')
 
 
 class PGDialect_pygresql(PGDialect):
-
     driver = 'pygresql'
 
     statement_compiler = _PGCompiler
@@ -205,7 +200,7 @@ class PGDialect_pygresql(PGDialect):
             has_native_hstore = has_native_json = has_native_uuid = False
             if version != (0, 0):
                 util.warn("PyGreSQL is only fully supported by SQLAlchemy"
-                    " since version 5.0.")
+                          " since version 5.0.")
         else:
             self.supports_unicode_statements = True
             self.supports_unicode_binds = True

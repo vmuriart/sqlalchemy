@@ -9,10 +9,12 @@ import pytest
 import argparse
 import inspect
 import collections
+
 import os
 
 try:
     import xdist  # noqa
+
     has_xdist = True
 except ImportError:
     has_xdist = False
@@ -28,6 +30,7 @@ def pytest_addoption(parser):
                 def __call__(self, parser, namespace,
                              values, option_string=None):
                     callback_(option_string, values, parser)
+
             kw["action"] = CallableAction
 
         group.addoption(name, **kw)
@@ -70,6 +73,7 @@ def pytest_sessionfinish(session):
 if has_xdist:
     import uuid
 
+
     def pytest_configure_node(node):
         # the master for each node fills slaveinput dictionary
         # which pytest-xdist will transfer to the subprocess
@@ -79,6 +83,7 @@ if has_xdist:
         node.slaveinput["follower_ident"] = "test_%s" % uuid.uuid4().hex[0:12]
         from sqlalchemy.testing import provision
         provision.create_follower_db(node.slaveinput["follower_ident"])
+
 
     def pytest_testnodedown(node, error):
         from sqlalchemy.testing import provision
@@ -140,6 +145,7 @@ def pytest_pycollect_makeitem(collector, name, obj):
     else:
         return []
 
+
 _current_class = None
 
 
@@ -164,6 +170,7 @@ def pytest_runtest_setup(item):
             global _current_class
             class_teardown(item.parent.parent)
             _current_class = None
+
         item.parent.parent.addfinalizer(finalize)
 
     test_setup(item)

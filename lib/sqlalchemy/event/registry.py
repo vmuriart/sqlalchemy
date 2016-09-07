@@ -22,7 +22,6 @@ import collections
 import types
 from .. import exc, util
 
-
 _key_to_collection = collections.defaultdict(dict)
 """
 Given an original listen() argument, can locate all
@@ -233,10 +232,10 @@ class _EventKey(object):
         dispatch_collection = getattr(target.dispatch, identifier)
 
         if insert:
-            dispatch_collection.\
+            dispatch_collection. \
                 for_modify(target.dispatch).insert(self, propagate)
         else:
-            dispatch_collection.\
+            dispatch_collection. \
                 for_modify(target.dispatch).append(self, propagate)
 
     @property

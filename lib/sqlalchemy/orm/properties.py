@@ -202,7 +202,7 @@ class ColumnProperty(StrategizedProperty):
 
     def _getcommitted(self, state, dict_, column,
                       passive=attributes.PASSIVE_OFF):
-        return state.get_impl(self.key).\
+        return state.get_impl(self.key). \
             get_committed_value(state, dict_, passive=passive)
 
     def merge(self, session, source_state, source_dict, dest_state,

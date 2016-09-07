@@ -756,7 +756,7 @@ class AutomapBase(object):
         table_to_map_config = dict(
             (m.local_table, m)
             for m in _DeferredMapperConfig.
-            classes_for_base(cls, sort=False)
+                classes_for_base(cls, sort=False)
         )
 
         many_to_many = []
@@ -770,7 +770,7 @@ class AutomapBase(object):
             elif table not in table_to_map_config:
                 mapped_cls = type(
                     classname_for_table(cls, table.name, table),
-                    (cls, ),
+                    (cls,),
                     {"__table__": table}
                 )
                 map_config = _DeferredMapperConfig.config_for_cls(mapped_cls)
@@ -911,11 +911,11 @@ def _relationships_for_fks(automap_base, map_config, table_to_map_config,
                 o2m_kws['cascade'] = "all, delete-orphan"
 
                 if constraint.ondelete and \
-                        constraint.ondelete.lower() == "cascade":
+                                constraint.ondelete.lower() == "cascade":
                     o2m_kws['passive_deletes'] = True
             else:
                 if constraint.ondelete and \
-                        constraint.ondelete.lower() == "set null":
+                                constraint.ondelete.lower() == "set null":
                     o2m_kws['passive_deletes'] = True
 
             create_backref = backref_name not in referred_cfg.properties
@@ -972,7 +972,6 @@ def _m2m_relationship(automap_base, lcl_m2m, rem_m2m, m2m_const, table,
                       name_for_scalar_relationship,
                       name_for_collection_relationship,
                       generate_relationship):
-
     map_config = table_to_map_config.get(lcl_m2m, None)
     referred_cfg = table_to_map_config.get(rem_m2m, None)
     if map_config is None or referred_cfg is None:

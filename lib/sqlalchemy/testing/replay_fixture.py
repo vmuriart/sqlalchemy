@@ -11,7 +11,6 @@ from sqlalchemy.orm import Session
 
 
 class ReplayFixtureTest(fixtures.TestBase):
-
     @contextlib.contextmanager
     def _dummy_ctx(self, *arg, **kw):
         yield
@@ -75,20 +74,20 @@ class ReplayableSession(object):
 
     if util.py2k:
         Natives = set([getattr(types, t)
-                       for t in dir(types) if not t.startswith('_')]).\
+                       for t in dir(types) if not t.startswith('_')]). \
             difference([getattr(types, t)
                         for t in ('FunctionType', 'BuiltinFunctionType',
                                   'MethodType', 'BuiltinMethodType',
                                   'LambdaType', 'UnboundMethodType',)])
     else:
         Natives = set([getattr(types, t)
-                       for t in dir(types) if not t.startswith('_')]).\
+                       for t in dir(types) if not t.startswith('_')]). \
             union([type(t) if not isinstance(t, type)
-                   else t for t in __builtins__.values()]).\
+                   else t for t in __builtins__.values()]). \
             difference([getattr(types, t)
                         for t in ('FunctionType', 'BuiltinFunctionType',
                                   'MethodType', 'BuiltinMethodType',
-                                  'LambdaType', )])
+                                  'LambdaType',)])
 
     def __init__(self):
         self.buffer = deque()

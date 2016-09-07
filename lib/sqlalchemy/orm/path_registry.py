@@ -57,7 +57,7 @@ class PathRegistry(object):
 
     def __eq__(self, other):
         return other is not None and \
-            self.path == other.path
+               self.path == other.path
 
     def set(self, attributes, key, value):
         log.debug("set '%s' on path '%s' to '%s'", key, self, value)
@@ -89,7 +89,7 @@ class PathRegistry(object):
     def contains_mapper(self, mapper):
         for path_mapper in [
             self.path[i] for i in range(0, len(self.path), 2)
-        ]:
+            ]:
             if path_mapper.is_mapper and \
                     path_mapper.isa(mapper):
                 return True
@@ -100,7 +100,7 @@ class PathRegistry(object):
         return (key, self.path) in attributes
 
     def __reduce__(self):
-        return _unreduce_path, (self.serialize(), )
+        return _unreduce_path, (self.serialize(),)
 
     def serialize(self):
         path = self.path
@@ -146,7 +146,7 @@ class PathRegistry(object):
             other.path, self)
 
     def __repr__(self):
-        return "%s(%r)" % (self.__class__.__name__, self.path, )
+        return "%s(%r)" % (self.__class__.__name__, self.path,)
 
 
 class RootRegistry(PathRegistry):
@@ -161,6 +161,7 @@ class RootRegistry(PathRegistry):
 
     def __getitem__(self, entity):
         return entity._path_registry
+
 
 PathRegistry.root = RootRegistry()
 
@@ -195,7 +196,7 @@ class PropRegistry(PathRegistry):
             parent = parent.parent[prop.parent]
         elif insp.is_aliased_class and insp.with_polymorphic_mappers:
             if prop.parent is not insp.mapper and \
-                    prop.parent in insp.with_polymorphic_mappers:
+                            prop.parent in insp.with_polymorphic_mappers:
                 subclass_entity = parent[-1]._entity_for_mapper(prop.parent)
                 parent = parent.parent[subclass_entity]
 
@@ -278,6 +279,7 @@ class EntityRegistry(PathRegistry, dict):
 
     def __bool__(self):
         return True
+
     __nonzero__ = __bool__
 
     def __getitem__(self, entity):

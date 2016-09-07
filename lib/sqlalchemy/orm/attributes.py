@@ -20,10 +20,10 @@ from . import interfaces, collections, exc as orm_exc
 
 from .base import instance_state, instance_dict, manager_of_class
 
-from .base import PASSIVE_NO_RESULT, ATTR_WAS_SET, ATTR_EMPTY, NO_VALUE,\
-    NEVER_SET, NO_CHANGE, CALLABLES_OK, SQL_OK, RELATED_OBJECT_OK,\
-    INIT_OK, NON_PERSISTENT_OK, LOAD_AGAINST_COMMITTED, PASSIVE_OFF,\
-    PASSIVE_RETURN_NEVER_SET, PASSIVE_NO_INITIALIZE, PASSIVE_NO_FETCH,\
+from .base import PASSIVE_NO_RESULT, ATTR_WAS_SET, ATTR_EMPTY, NO_VALUE, \
+    NEVER_SET, NO_CHANGE, CALLABLES_OK, SQL_OK, RELATED_OBJECT_OK, \
+    INIT_OK, NON_PERSISTENT_OK, LOAD_AGAINST_COMMITTED, PASSIVE_OFF, \
+    PASSIVE_RETURN_NEVER_SET, PASSIVE_NO_INITIALIZE, PASSIVE_NO_FETCH, \
     PASSIVE_NO_FETCH_RELATED, PASSIVE_ONLY_PERSISTENT, NO_AUTOFLUSH
 from .base import state_str, instance_str
 
@@ -321,6 +321,7 @@ def create_proxied_attribute(descriptor):
                                       from_instance=descriptor)
     return Proxy
 
+
 OP_REMOVE = util.symbol("REMOVE")
 OP_APPEND = util.symbol("APPEND")
 OP_REPLACE = util.symbol("REPLACE")
@@ -362,8 +363,8 @@ class Event(object):
 
     def __eq__(self, other):
         return isinstance(other, Event) and \
-            other.impl is self.impl and \
-            other.op == self.op
+               other.impl is self.impl and \
+               other.op == self.op
 
     @property
     def key(self):
@@ -491,7 +492,7 @@ class AttributeImpl(object):
         assert self.trackparent, msg
 
         return state.parents.get(id(self.parent_token), optimistic) \
-            is not False
+               is not False
 
     def sethasparent(self, state, parent_state, value):
         """Set a boolean flag on the given item corresponding to
@@ -510,7 +511,7 @@ class AttributeImpl(object):
                 last_parent = state.parents[id_]
 
                 if last_parent is not False and \
-                        last_parent.key != parent_state.key:
+                                last_parent.key != parent_state.key:
 
                     if last_parent.obj() is None:
                         raise orm_exc.StaleDataError(
@@ -571,7 +572,7 @@ class AttributeImpl(object):
             # if history present, don't load
             key = self.key
             if key not in state.committed_state or \
-                    state.committed_state[key] is NEVER_SET:
+                            state.committed_state[key] is NEVER_SET:
                 if not passive & CALLABLES_OK:
                     return PASSIVE_NO_RESULT
 
@@ -765,8 +766,8 @@ class ScalarObjectAttributeImpl(ScalarAttributeImpl):
 
         # can't use __hash__(), can't use __eq__() here
         if current is not None and \
-                current is not PASSIVE_NO_RESULT and \
-                current is not NEVER_SET:
+                        current is not PASSIVE_NO_RESULT and \
+                        current is not NEVER_SET:
             ret = [(instance_state(current), current)]
         else:
             ret = [(None, None)]
@@ -774,10 +775,9 @@ class ScalarObjectAttributeImpl(ScalarAttributeImpl):
         if self.key in state.committed_state:
             original = state.committed_state[self.key]
             if original is not None and \
-                    original is not PASSIVE_NO_RESULT and \
-                    original is not NEVER_SET and \
-                    original is not current:
-
+                            original is not PASSIVE_NO_RESULT and \
+                            original is not NEVER_SET and \
+                            original is not current:
                 ret.append((instance_state(original), original))
         return ret
 
@@ -790,15 +790,15 @@ class ScalarObjectAttributeImpl(ScalarAttributeImpl):
             old = self.get(
                 state, dict_,
                 passive=PASSIVE_ONLY_PERSISTENT |
-                NO_AUTOFLUSH | LOAD_AGAINST_COMMITTED)
+                        NO_AUTOFLUSH | LOAD_AGAINST_COMMITTED)
         else:
             old = self.get(
                 state, dict_, passive=PASSIVE_NO_FETCH ^ INIT_OK |
-                LOAD_AGAINST_COMMITTED)
+                                      LOAD_AGAINST_COMMITTED)
 
         if check_old is not None and \
-                old is not PASSIVE_NO_RESULT and \
-                check_old is not old:
+                        old is not PASSIVE_NO_RESULT and \
+                        check_old is not old:
             if pop:
                 return
             else:
@@ -825,13 +825,13 @@ class ScalarObjectAttributeImpl(ScalarAttributeImpl):
     def fire_replace_event(self, state, dict_, value, previous, initiator):
         if self.trackparent:
             if (previous is not value and
-                    previous not in (None, PASSIVE_NO_RESULT, NEVER_SET)):
+                        previous not in (None, PASSIVE_NO_RESULT, NEVER_SET)):
                 self.sethasparent(instance_state(previous), state, False)
 
         for fn in self.dispatch.set:
             value = fn(
                 state, value, previous, initiator or
-                self._replace_token or self._init_append_or_replace_token())
+                                        self._replace_token or self._init_append_or_replace_token())
 
         state._modified_event(dict_, self, previous)
 
@@ -885,7 +885,6 @@ class CollectionAttributeImpl(AttributeImpl):
             self.collection_factory())
 
         if getattr(self.collection_factory, "_sa_linker", None):
-
             @event.listens_for(self, "init_collection")
             def link(target, collection, collection_adapter):
                 collection._sa_linker(collection_adapter)
@@ -936,11 +935,11 @@ class CollectionAttributeImpl(AttributeImpl):
 
                 return \
                     [(s, o) for s, o in current_states
-                        if s not in original_set] + \
+                     if s not in original_set] + \
                     [(s, o) for s, o in current_states
-                        if s in original_set] + \
+                     if s in original_set] + \
                     [(s, o) for s, o in original_states
-                        if s not in current_set]
+                     if s not in current_set]
 
         return [(instance_state(o), o) for o in current]
 
@@ -1042,7 +1041,7 @@ class CollectionAttributeImpl(AttributeImpl):
 
                 if setting_type is not receiving_type:
                     given = iterable is None and 'None' or \
-                        iterable.__class__.__name__
+                            iterable.__class__.__name__
                     wanted = self._duck_typed_as.__name__
                     raise TypeError(
                         "Incompatible collection type: %s is not %s-like" % (
@@ -1154,32 +1153,32 @@ def backref_listeners(attribute, key, uselist):
         if oldchild is child:
             return child
         if oldchild is not None and \
-                oldchild is not PASSIVE_NO_RESULT and \
-                oldchild is not NEVER_SET:
+                        oldchild is not PASSIVE_NO_RESULT and \
+                        oldchild is not NEVER_SET:
             # With lazy=None, there's no guarantee that the full collection is
             # present when updating via a backref.
-            old_state, old_dict = instance_state(oldchild),\
-                instance_dict(oldchild)
+            old_state, old_dict = instance_state(oldchild), \
+                                  instance_dict(oldchild)
             impl = old_state.manager[key].impl
 
             if initiator.impl is not impl or \
-                    initiator.op not in (OP_REPLACE, OP_REMOVE):
+                            initiator.op not in (OP_REPLACE, OP_REMOVE):
                 impl.pop(old_state,
                          old_dict,
                          state.obj(),
                          parent_impl._append_token or
-                            parent_impl._init_append_token(),
+                         parent_impl._init_append_token(),
                          passive=PASSIVE_NO_FETCH)
 
         if child is not None:
-            child_state, child_dict = instance_state(child),\
-                instance_dict(child)
+            child_state, child_dict = instance_state(child), \
+                                      instance_dict(child)
             child_impl = child_state.manager[key].impl
             if initiator.parent_token is not parent_token and \
-                    initiator.parent_token is not child_impl.parent_token:
+                            initiator.parent_token is not child_impl.parent_token:
                 _acceptable_key_err(state, initiator, child_impl)
             elif initiator.impl is not child_impl or \
-                    initiator.op not in (OP_APPEND, OP_REPLACE):
+                            initiator.op not in (OP_APPEND, OP_REPLACE):
                 child_impl.append(
                     child_state,
                     child_dict,
@@ -1193,14 +1192,14 @@ def backref_listeners(attribute, key, uselist):
             return
 
         child_state, child_dict = instance_state(child), \
-            instance_dict(child)
+                                  instance_dict(child)
         child_impl = child_state.manager[key].impl
 
         if initiator.parent_token is not parent_token and \
-                initiator.parent_token is not child_impl.parent_token:
+                        initiator.parent_token is not child_impl.parent_token:
             _acceptable_key_err(state, initiator, child_impl)
         elif initiator.impl is not child_impl or \
-                initiator.op not in (OP_APPEND, OP_REPLACE):
+                        initiator.op not in (OP_APPEND, OP_REPLACE):
             child_impl.append(
                 child_state,
                 child_dict,
@@ -1211,11 +1210,11 @@ def backref_listeners(attribute, key, uselist):
 
     def emit_backref_from_collection_remove_event(state, child, initiator):
         if child is not None:
-            child_state, child_dict = instance_state(child),\
-                instance_dict(child)
+            child_state, child_dict = instance_state(child), \
+                                      instance_dict(child)
             child_impl = child_state.manager[key].impl
             if initiator.impl is not child_impl or \
-                    initiator.op not in (OP_REMOVE, OP_REPLACE):
+                            initiator.op not in (OP_REMOVE, OP_REPLACE):
                 child_impl.pop(
                     child_state,
                     child_dict,
@@ -1235,6 +1234,7 @@ def backref_listeners(attribute, key, uselist):
     event.listen(attribute, "remove",
                  emit_backref_from_collection_remove_event,
                  retval=True, raw=True)
+
 
 _NO_HISTORY = util.symbol('NO_HISTORY')
 _NO_STATE_SYMBOLS = frozenset([
@@ -1274,6 +1274,7 @@ class History(History):
 
     def __bool__(self):
         return self != HISTORY_BLANK
+
     __nonzero__ = __bool__
 
     def empty(self):
@@ -1290,21 +1291,21 @@ class History(History):
     def sum(self):
         """Return a collection of added + unchanged + deleted."""
 
-        return (self.added or []) +\
-            (self.unchanged or []) +\
-            (self.deleted or [])
+        return (self.added or []) + \
+               (self.unchanged or []) + \
+               (self.deleted or [])
 
     def non_deleted(self):
         """Return a collection of added + unchanged."""
 
-        return (self.added or []) +\
-            (self.unchanged or [])
+        return (self.added or []) + \
+               (self.unchanged or [])
 
     def non_added(self):
         """Return a collection of unchanged + deleted."""
 
-        return (self.unchanged or []) +\
-            (self.deleted or [])
+        return (self.unchanged or []) + \
+               (self.deleted or [])
 
     def has_changes(self):
         """Return True if this :class:`.History` has changes."""
@@ -1409,6 +1410,7 @@ class History(History):
                 [o for s, o in original_states if s not in current_set]
             )
 
+
 HISTORY_BLANK = History(None, None, None)
 
 
@@ -1465,7 +1467,6 @@ def register_attribute_impl(class_, key,
                             uselist=False, callable_=None,
                             useobject=False,
                             impl_class=None, backref=None, **kw):
-
     manager = manager_of_class(class_)
     if uselist:
         factory = kw.pop('typecallable', None)

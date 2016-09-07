@@ -89,6 +89,7 @@ def Column(*args, **kw):
                         config.db.dialect, tbl.name + '_' + c.name + '_seq'),
                         optional=True)
                 )
+
             event.listen(col, 'after_parent_attach', add_seq, propagate=True)
     return col
 
@@ -96,6 +97,6 @@ def Column(*args, **kw):
 def _truncate_name(dialect, name):
     if len(name) > dialect.max_identifier_length:
         return name[0:max(dialect.max_identifier_length - 6, 0)] + \
-            "_" + hex(hash(name) % 64)[2:]
+               "_" + hex(hash(name) % 64)[2:]
     else:
         return name

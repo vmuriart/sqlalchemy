@@ -86,7 +86,6 @@ from .util import (
     connection_memoize
 )
 
-
 from . import util, strategies
 
 # backwards compat

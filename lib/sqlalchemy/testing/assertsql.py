@@ -17,7 +17,6 @@ from sqlalchemy.engine import url
 
 
 class AssertRule(object):
-
     is_consumed = False
     errormessage = None
     consume_statement = True
@@ -26,8 +25,8 @@ class AssertRule(object):
         pass
 
     def no_more_statements(self):
-        assert False, 'All statements are complete, but pending '\
-            'assertion rules remain'
+        assert False, 'All statements are complete, but pending ' \
+                      'assertion rules remain'
 
 
 class SQLMatchRule(AssertRule):
@@ -44,7 +43,7 @@ class CursorSQL(SQLMatchRule):
     def process_statement(self, execute_observed):
         stmt = execute_observed.statements[0]
         if self.statement != stmt.statement or (
-                self.params is not None and self.params != stmt.parameters):
+                        self.params is not None and self.params != stmt.parameters):
             self.errormessage = \
                 "Testing for exact SQL %s parameters %s received %s %s" % (
                     self.statement, self.params,
@@ -58,7 +57,6 @@ class CursorSQL(SQLMatchRule):
 
 
 class CompiledSQL(SQLMatchRule):
-
     def __init__(self, statement, params=None, dialect='default'):
         self.statement = statement
         self.params = params
@@ -90,7 +88,7 @@ class CompiledSQL(SQLMatchRule):
                 context.compiled.statement.compile(
                     dialect=compare_dialect,
                     schema_translate_map=context.
-                    execution_options.get('schema_translate_map'))
+                        execution_options.get('schema_translate_map'))
         else:
             compiled = (
                 context.compiled.statement.compile(
@@ -98,7 +96,7 @@ class CompiledSQL(SQLMatchRule):
                     column_keys=context.compiled.column_keys,
                     inline=context.compiled.inline,
                     schema_translate_map=context.
-                    execution_options.get('schema_translate_map'))
+                        execution_options.get('schema_translate_map'))
             )
         _received_statement = re.sub(r'[\n\t]', '', util.text_type(compiled))
         parameters = execute_observed.parameters
@@ -133,7 +131,8 @@ class CompiledSQL(SQLMatchRule):
                             # a key in param did not match current
                             # 'received'
                             if param_key not in received or \
-                                    received[param_key] != param[param_key]:
+                                            received[param_key] != param[
+                                        param_key]:
                                 break
                         else:
                             # all keys in param matched 'received';
@@ -209,7 +208,7 @@ class DialectSQL(CompiledSQL):
         return received_stmt == stmt
 
     def _received_statement(self, execute_observed):
-        received_stmt, received_params = super(DialectSQL, self).\
+        received_stmt, received_params = super(DialectSQL, self). \
             _received_statement(execute_observed)
 
         # TODO: why do we need this part?
@@ -246,7 +245,6 @@ class DialectSQL(CompiledSQL):
 
 
 class CountStatements(AssertRule):
-
     def __init__(self, count):
         self.count = count
         self._statement_count = 0
@@ -257,11 +255,10 @@ class CountStatements(AssertRule):
     def no_more_statements(self):
         if self.count != self._statement_count:
             assert False, 'desired statement count %d does not match %d' \
-                % (self.count, self._statement_count)
+                          % (self.count, self._statement_count)
 
 
 class AllOf(AssertRule):
-
     def __init__(self, *rules):
         self.rules = set(rules)
 
@@ -283,7 +280,6 @@ class AllOf(AssertRule):
 
 
 class Or(AllOf):
-
     def process_statement(self, execute_observed):
         for rule in self.rules:
             rule.process_statement(execute_observed)
@@ -359,7 +355,7 @@ def assert_engine(engine):
         # then grab real cursor statements and associate them all
         # around a single context
         if asserter.accumulated and \
-                asserter.accumulated[-1].context is context:
+                        asserter.accumulated[-1].context is context:
             obs = asserter.accumulated[-1]
         else:
             obs = SQLExecuteObserved(context, orig[0], orig[1], orig[2])

@@ -32,18 +32,17 @@ SQLException = zxJDBC = None
 
 
 class _ZxJDBCDate(sqltypes.Date):
-
     def result_processor(self, dialect, coltype):
         def process(value):
             if value is None:
                 return None
             else:
                 return value.date()
+
         return process
 
 
 class _ZxJDBCNumeric(sqltypes.Numeric):
-
     def result_processor(self, dialect, coltype):
         # XXX: does the dialect return Decimal or not???
         # if it does (in all cases), we could use a None processor as well as
@@ -64,7 +63,6 @@ class _ZxJDBCNumeric(sqltypes.Numeric):
 
 
 class OracleCompiler_zxjdbc(OracleCompiler):
-
     def returning_clause(self, stmt, returning_cols):
         self.returning_cols = list(
             expression._select_iterables(returning_cols))
@@ -92,7 +90,6 @@ class OracleCompiler_zxjdbc(OracleCompiler):
 
 
 class OracleExecutionContext_zxjdbc(OracleExecutionContext):
-
     def pre_exec(self):
         if hasattr(self.compiled, 'returning_parameters'):
             # prepare a zxJDBC statement so we can grab its underlying
@@ -136,7 +133,6 @@ class OracleExecutionContext_zxjdbc(OracleExecutionContext):
 
 
 class ReturningResultProxy(_result.FullyBufferedResultProxy):
-
     """ResultProxy backed by the RETURNING ResultSet results."""
 
     def __init__(self, context, returning_row):
@@ -157,7 +153,6 @@ class ReturningResultProxy(_result.FullyBufferedResultProxy):
 
 
 class ReturningParam(object):
-
     """A bindparam value representing a RETURNING parameter.
 
     Specially handled by OracleReturningDataHandler.
@@ -216,6 +211,7 @@ class OracleDialect_zxjdbc(ZxJDBCConnector, OracleDialect):
                 else:
                     OracleDataHandler.setJDBCObject(
                         self, statement, index, object, dbtype)
+
         self.DataHandler = OracleReturningDataHandler
 
     def initialize(self, connection):
@@ -231,5 +227,6 @@ class OracleDialect_zxjdbc(ZxJDBCConnector, OracleDialect):
         version = re.search(
             r'Release ([\d\.]+)', connection.connection.dbversion).group(1)
         return tuple(int(x) for x in version.split('.'))
+
 
 dialect = OracleDialect_zxjdbc

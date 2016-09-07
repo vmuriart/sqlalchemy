@@ -26,7 +26,6 @@ class ExceptionTest(fixtures.TablesTest):
 
     @requirements.duplicate_key_raises_integrity_error
     def test_integrity_error(self):
-
         with config.db.begin() as conn:
             conn.execute(
                 self.tables.manual_pk.insert(),

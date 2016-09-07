@@ -200,6 +200,7 @@ def _generative(*assertions):
             assertion(self, fn.__name__)
         fn(self, *args[1:], **kw)
         return self
+
     return generate
 
 
@@ -207,6 +208,7 @@ def _generative(*assertions):
 # if augmented class instrumentation is enabled.
 def manager_of_class(cls):
     return cls.__dict__.get(DEFAULT_MANAGER_ATTR, None)
+
 
 instance_state = operator.attrgetter(DEFAULT_STATE_ATTR)
 
@@ -236,7 +238,7 @@ def state_class_str(state):
     if state is None:
         return "None"
     else:
-        return '<%s>' % (state.class_.__name__, )
+        return '<%s>' % (state.class_.__name__,)
 
 
 def attribute_str(instance, attribute):
@@ -329,10 +331,10 @@ def _is_mapped_class(entity):
 
     insp = inspection.inspect(entity, False)
     return insp is not None and \
-        not insp.is_clause_element and \
-        (
-            insp.is_mapper or insp.is_aliased_class
-        )
+           not insp.is_clause_element and \
+           (
+               insp.is_mapper or insp.is_aliased_class
+           )
 
 
 def _attr_as_key(attr):
@@ -353,7 +355,7 @@ def _orm_columns(entity):
 def _is_aliased_class(entity):
     insp = inspection.inspect(entity, False)
     return insp is not None and \
-        getattr(insp, "is_aliased_class", False)
+           getattr(insp, "is_aliased_class", False)
 
 
 def _entity_descriptor(entity, key):
@@ -382,6 +384,7 @@ def _entity_descriptor(entity, key):
             "Entity '%s' has no property '%s'" %
             (description, key)
         )
+
 
 _state_mapper = util.dottedgetter('manager.mapper')
 
@@ -422,7 +425,7 @@ def class_mapper(class_, configure=True):
     if mapper is None:
         if not isinstance(class_, type):
             raise sa_exc.ArgumentError(
-                "Class object expected, got '%r'." % (class_, ))
+                "Class object expected, got '%r'." % (class_,))
         raise exc.UnmappedClassError(class_)
     else:
         return mapper

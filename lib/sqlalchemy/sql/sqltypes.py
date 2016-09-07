@@ -32,7 +32,6 @@ if util.jython:
 
 
 class _DateAffinity(object):
-
     """Mixin date/time specific expression adaptations.
 
     Rules are implemented within Date,Time,Interval,DateTime, Numeric,
@@ -53,14 +52,14 @@ class _DateAffinity(object):
             return (
                 op, to_instance(
                     self.type._expression_adaptations.
-                    get(op, self._blank_dict).
-                    get(othertype, NULLTYPE))
+                        get(op, self._blank_dict).
+                        get(othertype, NULLTYPE))
             )
+
     comparator_factory = Comparator
 
 
 class Concatenable(object):
-
     """A mixin that marks a type as supporting 'concatenation',
     typically strings."""
 
@@ -91,7 +90,6 @@ class Indexable(object):
     """
 
     class Comparator(TypeEngine.Comparator):
-
         def _setup_getitem(self, index):
             raise NotImplementedError()
 
@@ -108,7 +106,6 @@ class Indexable(object):
 
 
 class String(Concatenable, TypeEngine):
-
     """The base for all string and character types.
 
     In SQL, corresponds to VARCHAR.  Can also take Python unicode objects
@@ -204,12 +201,13 @@ class String(Concatenable, TypeEngine):
         def process(value):
             value = value.replace("'", "''")
             return "'%s'" % value
+
         return process
 
     def bind_processor(self, dialect):
         if self.convert_unicode or dialect.convert_unicode:
             if dialect.supports_unicode_binds and \
-                    self.convert_unicode != 'force':
+                            self.convert_unicode != 'force':
                 if self._warn_on_bytestring:
                     def process(value):
                         if isinstance(value, util.binary_type):
@@ -218,6 +216,7 @@ class String(Concatenable, TypeEngine):
                                 "bind param value %r.",
                                 (util.ellipses_string(value),))
                         return value
+
                     return process
                 else:
                     return None
@@ -241,8 +240,8 @@ class String(Concatenable, TypeEngine):
     def result_processor(self, dialect, coltype):
         wants_unicode = self.convert_unicode or dialect.convert_unicode
         needs_convert = wants_unicode and \
-            (dialect.returns_unicode_strings is not True or
-             self.convert_unicode in ('force', 'force_nocheck'))
+                        (dialect.returns_unicode_strings is not True or
+                         self.convert_unicode in ('force', 'force_nocheck'))
         needs_isinstance = (
             needs_convert and
             dialect.returns_unicode_strings and
@@ -270,7 +269,6 @@ class String(Concatenable, TypeEngine):
 
 
 class Text(String):
-
     """A variably sized string type.
 
     In SQL, usually corresponds to CLOB or TEXT. Can also take Python
@@ -284,7 +282,6 @@ class Text(String):
 
 
 class Unicode(String):
-
     """A variable length Unicode string type.
 
     The :class:`.Unicode` type is a :class:`.String` subclass
@@ -356,7 +353,6 @@ class Unicode(String):
 
 
 class UnicodeText(Text):
-
     """An unbounded-length Unicode string type.
 
     See :class:`.Unicode` for details on the unicode
@@ -385,7 +381,6 @@ class UnicodeText(Text):
 
 
 class Integer(_DateAffinity, TypeEngine):
-
     """A type for ``int`` integers."""
 
     __visit_name__ = 'integer'
@@ -400,6 +395,7 @@ class Integer(_DateAffinity, TypeEngine):
     def literal_processor(self, dialect):
         def process(value):
             return str(value)
+
         return process
 
     @util.memoized_property
@@ -433,7 +429,6 @@ class Integer(_DateAffinity, TypeEngine):
 
 
 class SmallInteger(Integer):
-
     """A type for smaller ``int`` integers.
 
     Typically generates a ``SMALLINT`` in DDL, and otherwise acts like
@@ -445,7 +440,6 @@ class SmallInteger(Integer):
 
 
 class BigInteger(Integer):
-
     """A type for bigger ``int`` integers.
 
     Typically generates a ``BIGINT`` in DDL, and otherwise acts like
@@ -457,7 +451,6 @@ class BigInteger(Integer):
 
 
 class Numeric(_DateAffinity, TypeEngine):
-
     """A type for fixed precision numbers, such as ``NUMERIC`` or ``DECIMAL``.
 
     This type returns Python ``decimal.Decimal`` objects by default, unless
@@ -566,6 +559,7 @@ class Numeric(_DateAffinity, TypeEngine):
     def literal_processor(self, dialect):
         def process(value):
             return str(value)
+
         return process
 
     @property
@@ -634,7 +628,6 @@ class Numeric(_DateAffinity, TypeEngine):
 
 
 class Float(Numeric):
-
     """Type representing floating point types, such as ``FLOAT`` or ``REAL``.
 
     This type returns Python ``float`` objects by default, unless the
@@ -726,7 +719,6 @@ class Float(Numeric):
 
 
 class DateTime(_DateAffinity, TypeEngine):
-
     """A type for ``datetime.datetime()`` objects.
 
     Date and time types return objects from the Python ``datetime``
@@ -771,7 +763,6 @@ class DateTime(_DateAffinity, TypeEngine):
 
 
 class Date(_DateAffinity, TypeEngine):
-
     """A type for ``datetime.date()`` objects."""
 
     __visit_name__ = 'date'
@@ -809,7 +800,6 @@ class Date(_DateAffinity, TypeEngine):
 
 
 class Time(_DateAffinity, TypeEngine):
-
     """A type for ``datetime.time()`` objects."""
 
     __visit_name__ = 'time'
@@ -839,7 +829,6 @@ class Time(_DateAffinity, TypeEngine):
 
 
 class _Binary(TypeEngine):
-
     """Define base behavior for binary types."""
 
     def __init__(self, length=None):
@@ -849,6 +838,7 @@ class _Binary(TypeEngine):
         def process(value):
             value = value.decode(dialect.encoding).replace("'", "''")
             return "'%s'" % value
+
         return process
 
     @property
@@ -868,6 +858,7 @@ class _Binary(TypeEngine):
                 return DBAPIBinary(value)
             else:
                 return None
+
         return process
 
     # Python 3 has native bytes() type
@@ -892,6 +883,7 @@ class _Binary(TypeEngine):
                 if value is not None:
                     value = bytes(value)
                 return value
+
             return process
 
     def coerce_compared_value(self, op, value):
@@ -907,7 +899,6 @@ class _Binary(TypeEngine):
 
 
 class LargeBinary(_Binary):
-
     """A type for large binary byte data.
 
     The :class:`.LargeBinary` type corresponds to a large and/or unlengthed
@@ -931,7 +922,6 @@ class LargeBinary(_Binary):
 
 
 class Binary(LargeBinary):
-
     """Deprecated.  Renamed to LargeBinary."""
 
     def __init__(self, *arg, **kw):
@@ -941,7 +931,6 @@ class Binary(LargeBinary):
 
 
 class SchemaType(SchemaEventTarget):
-
     """Mark a type as possibly requiring schema-level DDL for usage.
 
     Supports types that must be explicitly created/dropped (i.e. PG ENUM type)
@@ -1080,7 +1069,6 @@ class SchemaType(SchemaEventTarget):
 
 
 class Enum(String, SchemaType):
-
     """Generic Enum Type.
 
     The :class:`.Enum` type provides a set of possible string values
@@ -1300,7 +1288,7 @@ class Enum(String, SchemaType):
 
     def _should_create_constraint(self, compiler):
         return not self.native_enum or \
-            not compiler.dialect.supports_native_enum
+               not compiler.dialect.supports_native_enum
 
     @util.dependencies("sqlalchemy.sql.schema")
     def _set_table(self, schema, column, table):
@@ -1350,6 +1338,7 @@ class Enum(String, SchemaType):
             if parent_processor:
                 value = parent_processor(value)
             return value
+
         return process
 
     def bind_processor(self, dialect):
@@ -1464,7 +1453,6 @@ class PickleType(TypeDecorator):
 
 
 class Boolean(TypeEngine, SchemaType):
-
     """A bool datatype.
 
     Boolean typically uses BOOLEAN or SMALLINT on the DDL side, and on
@@ -1534,7 +1522,6 @@ class Boolean(TypeEngine, SchemaType):
 
 
 class Interval(_DateAffinity, TypeDecorator):
-
     """A type for ``datetime.timedelta()`` objects.
 
     The Interval type deals with ``datetime.timedelta`` objects.  In
@@ -1888,7 +1875,7 @@ class JSON(Indexable, TypeEngine):
             if value is self.NULL:
                 value = None
             elif isinstance(value, elements.Null) or (
-                value is None and self.none_as_null
+                            value is None and self.none_as_null
             ):
                 return None
 
@@ -1909,6 +1896,7 @@ class JSON(Indexable, TypeEngine):
             if string_process:
                 value = string_process(value)
             return json_deserializer(value)
+
         return process
 
 
@@ -2178,57 +2166,51 @@ class ARRAY(Indexable, Concatenable, TypeEngine):
 
 
 class REAL(Float):
-
     """The SQL REAL type."""
 
     __visit_name__ = 'REAL'
 
 
 class FLOAT(Float):
-
     """The SQL FLOAT type."""
 
     __visit_name__ = 'FLOAT'
 
 
 class NUMERIC(Numeric):
-
     """The SQL NUMERIC type."""
 
     __visit_name__ = 'NUMERIC'
 
 
 class DECIMAL(Numeric):
-
     """The SQL DECIMAL type."""
 
     __visit_name__ = 'DECIMAL'
 
 
 class INTEGER(Integer):
-
     """The SQL INT or INTEGER type."""
 
     __visit_name__ = 'INTEGER'
+
+
 INT = INTEGER
 
 
 class SMALLINT(SmallInteger):
-
     """The SQL SMALLINT type."""
 
     __visit_name__ = 'SMALLINT'
 
 
 class BIGINT(BigInteger):
-
     """The SQL BIGINT type."""
 
     __visit_name__ = 'BIGINT'
 
 
 class TIMESTAMP(DateTime):
-
     """The SQL TIMESTAMP type."""
 
     __visit_name__ = 'TIMESTAMP'
@@ -2238,35 +2220,30 @@ class TIMESTAMP(DateTime):
 
 
 class DATETIME(DateTime):
-
     """The SQL DATETIME type."""
 
     __visit_name__ = 'DATETIME'
 
 
 class DATE(Date):
-
     """The SQL DATE type."""
 
     __visit_name__ = 'DATE'
 
 
 class TIME(Time):
-
     """The SQL TIME type."""
 
     __visit_name__ = 'TIME'
 
 
 class TEXT(Text):
-
     """The SQL TEXT type."""
 
     __visit_name__ = 'TEXT'
 
 
 class CLOB(Text):
-
     """The CLOB type.
 
     This type is found in Oracle and Informix.
@@ -2276,63 +2253,54 @@ class CLOB(Text):
 
 
 class VARCHAR(String):
-
     """The SQL VARCHAR type."""
 
     __visit_name__ = 'VARCHAR'
 
 
 class NVARCHAR(Unicode):
-
     """The SQL NVARCHAR type."""
 
     __visit_name__ = 'NVARCHAR'
 
 
 class CHAR(String):
-
     """The SQL CHAR type."""
 
     __visit_name__ = 'CHAR'
 
 
 class NCHAR(Unicode):
-
     """The SQL NCHAR type."""
 
     __visit_name__ = 'NCHAR'
 
 
 class BLOB(LargeBinary):
-
     """The SQL BLOB type."""
 
     __visit_name__ = 'BLOB'
 
 
 class BINARY(_Binary):
-
     """The SQL BINARY type."""
 
     __visit_name__ = 'BINARY'
 
 
 class VARBINARY(_Binary):
-
     """The SQL VARBINARY type."""
 
     __visit_name__ = 'VARBINARY'
 
 
 class BOOLEAN(Boolean):
-
     """The SQL BOOLEAN type."""
 
     __visit_name__ = 'BOOLEAN'
 
 
 class NullType(TypeEngine):
-
     """An unknown type.
 
     :class:`.NullType` is used as a default type for those cases where
@@ -2364,6 +2332,7 @@ class NullType(TypeEngine):
     def literal_processor(self, dialect):
         def process(value):
             return "NULL"
+
         return process
 
     class Comparator(TypeEngine.Comparator):
@@ -2374,6 +2343,7 @@ class NullType(TypeEngine):
                 return op, self.expr.type
             else:
                 return other_comparator._adapt_expression(op, self)
+
     comparator_factory = Comparator
 
 
@@ -2391,6 +2361,7 @@ class MatchType(Boolean):
     .. versionadded:: 1.0.0
 
     """
+
 
 NULLTYPE = NullType()
 BOOLEANTYPE = Boolean()
@@ -2427,10 +2398,10 @@ def _resolve_value_to_type(value):
         # objects.
         insp = inspection.inspect(value, False)
         if (
-                insp is not None and
+                        insp is not None and
                 # foil mock.Mock() and other impostors by ensuring
                 # the inspection target itself self-inspects
-                insp.__class__ in inspection._registrars
+                        insp.__class__ in inspection._registrars
         ):
             raise exc.ArgumentError(
                 "Object %r is not legal as a SQL literal value" % value)
@@ -2438,8 +2409,10 @@ def _resolve_value_to_type(value):
     else:
         return _result_type
 
+
 # back-assign to type_api
 from . import type_api
+
 type_api.BOOLEANTYPE = BOOLEANTYPE
 type_api.STRINGTYPE = STRINGTYPE
 type_api.INTEGERTYPE = INTEGERTYPE

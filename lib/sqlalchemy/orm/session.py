@@ -6,7 +6,6 @@
 # the MIT License: http://www.opensource.org/licenses/mit-license.php
 """Provides the Session class and related utilities."""
 
-
 import weakref
 from .. import util, sql, engine, exc as sa_exc
 from ..sql import util as sql_util, expression
@@ -240,7 +239,7 @@ class SessionTransaction(object):
         current = self
         result = ()
         while current:
-            result += (current, )
+            result += (current,)
             if current._parent is upto:
                 break
             elif current._parent is None:
@@ -437,7 +436,6 @@ class SessionTransaction(object):
 
         if not rollback_err and sess._enable_transaction_accounting and \
                 not sess._is_clean():
-
             # if items were added, deleted, or mutated
             # here, we need to re-restore the snapshot
             util.warn(
@@ -663,7 +661,7 @@ class Session(_SessionClassMethods):
             self._identity_cls = identity.StrongInstanceDict
         self.identity_map = self._identity_cls()
 
-        self._new = {}   # InstanceState->object, strong refs object
+        self._new = {}  # InstanceState->object, strong refs object
         self._deleted = {}  # same
         self.bind = bind
         self.__binds = {}
@@ -1123,8 +1121,8 @@ class Session(_SessionClassMethods):
         except sa_exc.NoInspectionAvailable:
             if not isinstance(key, type):
                 raise exc.ArgumentError(
-                            "Not acceptable bind target: %s" %
-                            key)
+                    "Not acceptable bind target: %s" %
+                    key)
             else:
                 self.__binds[key] = bind
         else:
@@ -1136,8 +1134,8 @@ class Session(_SessionClassMethods):
                     self.__binds[selectable] = bind
             else:
                 raise exc.ArgumentError(
-                            "Not acceptable bind target: %s" %
-                            key)
+                    "Not acceptable bind target: %s" %
+                    key)
 
     def bind_mapper(self, mapper, bind):
         """Associate a :class:`.Mapper` with a "bind", e.g. a :class:`.Engine`
@@ -1460,7 +1458,7 @@ class Session(_SessionClassMethods):
             state._detach(self)
 
     @util.deprecated("0.7", "The non-weak-referencing identity map "
-                     "feature is no longer needed.")
+                            "feature is no longer needed.")
     def prune(self):
         """Remove unreferenced instances cached in the identity map.
 
@@ -1788,9 +1786,9 @@ class Session(_SessionClassMethods):
             new_instance = True
 
         elif key_is_persistent and (
-            not _none_set.intersection(key[1]) or
-            (mapper.allow_partial_pks and
-             not _none_set.issuperset(key[1]))):
+                    not _none_set.intersection(key[1]) or
+                    (mapper.allow_partial_pks and
+                         not _none_set.issuperset(key[1]))):
             merged = self.query(mapper.class_).get(key[1])
         else:
             merged = None
@@ -1826,8 +1824,8 @@ class Session(_SessionClassMethods):
                     passive=attributes.PASSIVE_NO_INITIALIZE)
 
                 if existing_version is not attributes.PASSIVE_NO_RESULT and \
-                        merged_version is not attributes.PASSIVE_NO_RESULT and \
-                        existing_version != merged_version:
+                                merged_version is not attributes.PASSIVE_NO_RESULT and \
+                                existing_version != merged_version:
                     raise exc.StaleDataError(
                         "Version id '%s' on merged state %s "
                         "does not match existing version '%s'. "
@@ -2076,8 +2074,8 @@ class Session(_SessionClassMethods):
 
     def _is_clean(self):
         return not self.identity_map.check_modified() and \
-            not self._deleted and \
-            not self._new
+               not self._deleted and \
+               not self._new
 
     def _flush(self, objects=None):
 
@@ -2256,8 +2254,8 @@ class Session(_SessionClassMethods):
 
         """
         for (mapper, isupdate), states in itertools.groupby(
-            (attributes.instance_state(obj) for obj in objects),
-            lambda state: (state.mapper, state.key is not None)
+                (attributes.instance_state(obj) for obj in objects),
+                lambda state: (state.mapper, state.key is not None)
         ):
             self._bulk_save_mappings(
                 mapper, states, isupdate, True,
@@ -2504,10 +2502,10 @@ class Session(_SessionClassMethods):
 
         for attr in state.manager.attributes:
             if \
-                    (
-                        not include_collections and
-                        hasattr(attr.impl, 'get_collection')
-                    ) or not hasattr(attr.impl, 'get_history'):
+                            (
+                                        not include_collections and
+                                        hasattr(attr.impl, 'get_collection')
+                            ) or not hasattr(attr.impl, 'get_history'):
                 continue
 
             (added, unchanged, deleted) = \

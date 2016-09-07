@@ -236,7 +236,7 @@ class AssociationProxy(interfaces.InspectionAttrInfo):
 
     @util.memoized_property
     def _value_is_scalar(self):
-        return not self._get_property().\
+        return not self._get_property(). \
             mapper.get_property(self.value_attr).uselist
 
     @util.memoized_property
@@ -409,7 +409,7 @@ class AssociationProxy(interfaces.InspectionAttrInfo):
         if self._target_is_object:
             return self._comparator.has(
                 getattr(self.target_class, self.value_attr).
-                has(criterion, **kwargs)
+                    has(criterion, **kwargs)
             )
         else:
             if criterion is not None or kwargs:
@@ -682,6 +682,7 @@ class _AssociationList(_AssociationCollection):
         if not isinstance(n, int):
             return NotImplemented
         return list(self) * n
+
     __rmul__ = __mul__
 
     def __iadd__(self, iterable):

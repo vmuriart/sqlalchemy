@@ -72,6 +72,7 @@ class CircularDependencyError(SQLAlchemyError):
       see :ref:`use_alter`.
 
     """
+
     def __init__(self, message, cycles, edges, msg=None):
         if msg is None:
             message += " (%s)" % ", ".join(repr(s) for s in cycles)
@@ -155,6 +156,7 @@ class NoReferencedTableError(NoReferenceError):
     located.
 
     """
+
     def __init__(self, message, tname):
         NoReferenceError.__init__(self, message)
         self.table_name = tname
@@ -168,6 +170,7 @@ class NoReferencedColumnError(NoReferenceError):
     located.
 
     """
+
     def __init__(self, message, tname, cname):
         NoReferenceError.__init__(self, message)
         self.table_name = tname
@@ -206,6 +209,7 @@ class DontWrapMixin(object):
                     raise MyCustomException("invalid!")
 
     """
+
 
 # Moved to orm.exc; compatibility definition installed by orm import until 0.6
 UnmappedColumnError = None
@@ -257,8 +261,8 @@ class StatementError(SQLAlchemyError):
                 params_repr = util._repr_params(self.params, 10)
                 details.append("[parameters: %r]" % params_repr)
         return ' '.join([
-            "(%s)" % det for det in self.detail
-        ] + details)
+                            "(%s)" % det for det in self.detail
+                            ] + details)
 
     def __unicode__(self):
         return self.__str__()
@@ -334,7 +338,7 @@ class DBAPIError(StatementError):
         StatementError.__init__(
             self,
             '(%s.%s) %s' % (
-                orig.__class__.__module__, orig.__class__.__name__, text, ),
+                orig.__class__.__module__, orig.__class__.__name__, text,),
             statement,
             params,
             orig

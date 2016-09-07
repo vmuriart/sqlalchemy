@@ -250,7 +250,7 @@ class MySQLTableDefinitionParser(object):
                 if 'auto_increment' in default:
                     pass
                 elif (col_type.startswith('timestamp') and
-                      default.startswith('C')):
+                          default.startswith('C')):
                     line.append('DEFAULT')
                     line.append(default)
                 elif default == 'NULL':
@@ -432,6 +432,7 @@ class MySQLTableDefinitionParser(object):
                  r'(?P<val>%s)' %
                  (re.escape(directive), self._optional_equals, regex))
         self._pr_options.append(_pr_compile(regex))
+
 
 _options_of_type_string = ('COMMENT', 'DATA DIRECTORY', 'INDEX DIRECTORY',
                            'PASSWORD', 'CONNECTION')

@@ -123,7 +123,7 @@ class URL(object):
         return [
             plugins.load(plugin_name)(self, kwargs)
             for plugin_name in plugin_names
-        ]
+            ]
 
     def _get_entrypoint(self):
         """Return the "entry point" dialect class.
@@ -220,7 +220,8 @@ def _parse_rfc1738_args(name):
             tokens = components['database'].split('?', 2)
             components['database'] = tokens[0]
             query = (
-                len(tokens) > 1 and dict(util.parse_qsl(tokens[1]))) or None
+                        len(tokens) > 1 and dict(
+                            util.parse_qsl(tokens[1]))) or None
             if util.py2k and query is not None:
                 query = dict((k.encode('ascii'), query[k]) for k in query)
         else:

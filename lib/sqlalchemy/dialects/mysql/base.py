@@ -588,7 +588,6 @@ from .types import _StringType, _IntegerType, _NumericType, \
 from .enumerated import ENUM, SET
 from .json import JSON, JSONIndexType, JSONPathType
 
-
 RESERVED_WORDS = set(
     ['accessible', 'add', 'all', 'alter', 'analyze', 'and', 'as', 'asc',
      'asensitive', 'before', 'between', 'bigint', 'binary', 'blob', 'both',
@@ -637,7 +636,7 @@ RESERVED_WORDS = set(
      'resignal', 'signal', 'slow',  # 5.5
 
      'get', 'io_after_gtids', 'io_before_gtids', 'master_bind', 'one_shot',
-        'partition', 'sql_after_gtids', 'sql_before_gtids',  # 5.6
+     'partition', 'sql_after_gtids', 'sql_before_gtids',  # 5.6
 
      'generated', 'optimizer_costs', 'stored', 'virtual',  # 5.7
 
@@ -649,7 +648,6 @@ AUTOCOMMIT_RE = re.compile(
 SET_RE = re.compile(
     r'\s*SET\s+(?:(?:GLOBAL|SESSION)\s+)?\w',
     re.I | re.UNICODE)
-
 
 # old names
 MSTime = TIME
@@ -739,13 +737,11 @@ ischema_names = {
 
 
 class MySQLExecutionContext(default.DefaultExecutionContext):
-
     def should_autocommit_text(self, statement):
         return AUTOCOMMIT_RE.match(statement)
 
 
 class MySQLCompiler(compiler.SQLCompiler):
-
     render_table_with_column_in_update_from = True
     """Overridden from base SQLCompiler value"""
 
@@ -777,7 +773,7 @@ class MySQLCompiler(compiler.SQLCompiler):
 
     def visit_match_op_binary(self, binary, operator, **kw):
         return "MATCH (%s) AGAINST (%s IN BOOLEAN MODE)" % \
-            (self.process(binary.left), self.process(binary.right))
+               (self.process(binary.left), self.process(binary.right))
 
     def get_from_hint_text(self, table, text):
         return text
@@ -891,7 +887,7 @@ class MySQLCompiler(compiler.SQLCompiler):
         # former until we can refine dialects by server revision.
 
         limit_clause, offset_clause = select._limit_clause, \
-            select._offset_clause
+                                      select._offset_clause
 
         if limit_clause is None and offset_clause is None:
             return ''
@@ -959,8 +955,8 @@ class MySQLDDLCompiler(compiler.DDLCompiler):
             colspec.append('DEFAULT ' + default)
 
         if column.table is not None \
-            and column is column.table._autoincrement_column and \
-                column.server_default is None:
+                and column is column.table._autoincrement_column and \
+                        column.server_default is None:
             colspec.append('AUTO_INCREMENT')
 
         return ' '.join(colspec)
@@ -1053,7 +1049,7 @@ class MySQLDDLCompiler(compiler.DDLCompiler):
         return text
 
     def visit_primary_key_constraint(self, constraint):
-        text = super(MySQLDDLCompiler, self).\
+        text = super(MySQLDDLCompiler, self). \
             visit_primary_key_constraint(constraint)
         using = constraint.dialect_options['mysql']['using']
         if using:
@@ -1083,8 +1079,8 @@ class MySQLDDLCompiler(compiler.DDLCompiler):
             qual = ""
             const = self.preparer.format_constraint(constraint)
         return "ALTER TABLE %s DROP %s%s" % \
-            (self.preparer.format_table(constraint.table),
-             qual, const)
+               (self.preparer.format_table(constraint.table),
+                qual, const)
 
     def define_constraint_match(self, constraint):
         if constraint.match is not None:
@@ -1188,8 +1184,8 @@ class MySQLTypeCompiler(compiler.GenericTypeCompiler):
 
     def visit_FLOAT(self, type_, **kw):
         if self._mysql_type(type_) and \
-                type_.scale is not None and \
-                type_.precision is not None:
+                        type_.scale is not None and \
+                        type_.precision is not None:
             return self._extend_numeric(
                 type_, "FLOAT(%s, %s)" % (type_.precision, type_.scale))
         elif type_.precision is not None:
@@ -1202,7 +1198,7 @@ class MySQLTypeCompiler(compiler.GenericTypeCompiler):
         if self._mysql_type(type_) and type_.display_width is not None:
             return self._extend_numeric(
                 type_, "INTEGER(%(display_width)s)" %
-                {'display_width': type_.display_width})
+                       {'display_width': type_.display_width})
         else:
             return self._extend_numeric(type_, "INTEGER")
 
@@ -1210,7 +1206,7 @@ class MySQLTypeCompiler(compiler.GenericTypeCompiler):
         if self._mysql_type(type_) and type_.display_width is not None:
             return self._extend_numeric(
                 type_, "BIGINT(%(display_width)s)" %
-                {'display_width': type_.display_width})
+                       {'display_width': type_.display_width})
         else:
             return self._extend_numeric(type_, "BIGINT")
 
@@ -1218,7 +1214,7 @@ class MySQLTypeCompiler(compiler.GenericTypeCompiler):
         if self._mysql_type(type_) and type_.display_width is not None:
             return self._extend_numeric(
                 type_, "MEDIUMINT(%(display_width)s)" %
-                {'display_width': type_.display_width})
+                       {'display_width': type_.display_width})
         else:
             return self._extend_numeric(type_, "MEDIUMINT")
 
@@ -1360,7 +1356,7 @@ class MySQLTypeCompiler(compiler.GenericTypeCompiler):
             quoted_enums.append("'%s'" % e.replace("'", "''"))
         return self._extend_string(type_, {}, "%s(%s)" % (
             name, ",".join(quoted_enums))
-        )
+                                   )
 
     def visit_ENUM(self, type_, **kw):
         return self._visit_enumerated_values("ENUM", type_,
@@ -1375,7 +1371,6 @@ class MySQLTypeCompiler(compiler.GenericTypeCompiler):
 
 
 class MySQLIdentifierPreparer(compiler.IdentifierPreparer):
-
     reserved_words = RESERVED_WORDS
 
     def __init__(self, dialect, server_ansiquotes=False, **kw):
@@ -1451,7 +1446,7 @@ class MySQLDialect(default.DefaultDialect):
 
     def __init__(self, isolation_level=None, json_serializer=None,
                  json_deserializer=None, **kwargs):
-        kwargs.pop('use_ansiquotes', None)   # legacy
+        kwargs.pop('use_ansiquotes', None)  # legacy
         default.DefaultDialect.__init__(self, **kwargs)
         self.isolation_level = isolation_level
         self._json_serializer = json_serializer
@@ -1461,6 +1456,7 @@ class MySQLDialect(default.DefaultDialect):
         if self.isolation_level is not None:
             def connect(conn):
                 self.set_isolation_level(conn, self.isolation_level)
+
             return connect
         else:
             return None
@@ -1557,7 +1553,7 @@ class MySQLDialect(default.DefaultDialect):
         if isinstance(e, (self.dbapi.OperationalError,
                           self.dbapi.ProgrammingError)):
             return self._extract_error_code(e) in \
-                (2006, 2013, 2014, 2045, 2055)
+                   (2006, 2013, 2014, 2045, 2055)
         elif isinstance(e, self.dbapi.InterfaceError):
             # if underlying connection is closed,
             # this is the error you get
@@ -1638,7 +1634,7 @@ class MySQLDialect(default.DefaultDialect):
     @property
     def _supports_cast(self):
         return self.server_version_info is None or \
-            self.server_version_info >= (4, 0, 2)
+               self.server_version_info >= (4, 0, 2)
 
     @reflection.cache
     def get_schema_names(self, connection, **kw):
@@ -1722,7 +1718,7 @@ class MySQLDialect(default.DefaultDialect):
             # only FOREIGN KEYs
             ref_name = spec['table'][-1]
             ref_schema = len(spec['table']) > 1 and \
-                spec['table'][-2] or schema
+                         spec['table'][-2] or schema
 
             if not ref_schema:
                 if default_schema is None:
@@ -1793,7 +1789,7 @@ class MySQLDialect(default.DefaultDialect):
             }
             for key in parsed_state.keys
             if key['type'] == 'UNIQUE'
-        ]
+            ]
 
     @reflection.cache
     def get_view_definition(self, connection, view_name, schema=None, **kw):
@@ -1959,7 +1955,6 @@ class MySQLDialect(default.DefaultDialect):
         return rows
 
 
-
 class _DecodingRowProxy(object):
     """Return unicode-decoded values based on type inspection.
 
@@ -2003,4 +1998,3 @@ class _DecodingRowProxy(object):
             return item.decode(self.charset)
         else:
             return item
-

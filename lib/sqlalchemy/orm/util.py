@@ -74,7 +74,7 @@ class CascadeOptions(frozenset):
             c for c
             in re.split('\s*,\s*', arg or "")
             if c
-        ]
+            ]
         return cls(values)
 
 
@@ -181,7 +181,7 @@ def polymorphic_union(table_map, typecolname,
                 sql.select([col(name, table) for name in colnames] +
                            [sql.literal_column(
                                sql_util._quote_ddl_expr(type)).
-                               label(typecolname)],
+                           label(typecolname)],
                            from_obj=[table]))
         else:
             result.append(sql.select([col(name, table) for name in colnames],
@@ -528,10 +528,10 @@ class AliasedInsp(InspectionAttr):
         )
 
     def _adapt_element(self, elem):
-        return self._adapter.traverse(elem).\
+        return self._adapter.traverse(elem). \
             _annotate({
-                'parententity': self,
-                'parentmapper': self.mapper}
+            'parententity': self,
+            'parentmapper': self.mapper}
         )
 
     def _entity_for_mapper(self, mapper):
@@ -729,13 +729,13 @@ def with_polymorphic(base, classes, selectable=False,
         assert _existing_alias.mapper is primary_mapper
         classes = util.to_set(classes)
         new_classes = set([
-            mp.class_ for mp in
-            _existing_alias.with_polymorphic_mappers])
+                              mp.class_ for mp in
+                              _existing_alias.with_polymorphic_mappers])
         if classes == new_classes:
             return _existing_alias
         else:
             classes = classes.union(new_classes)
-    mappers, selectable = primary_mapper.\
+    mappers, selectable = primary_mapper. \
         _with_polymorphic_args(classes, selectable,
                                innerjoin=innerjoin)
     if aliased or flat:
@@ -816,12 +816,12 @@ class _ORMJoin(expression.Join):
                 adapt_from = left_info.selectable
 
             pj, sj, source, dest, \
-                secondary, target_adapter = prop._create_joins(
-                    source_selectable=adapt_from,
-                    dest_selectable=adapt_to,
-                    source_polymorphic=True,
-                    dest_polymorphic=True,
-                    of_type=right_info.mapper)
+            secondary, target_adapter = prop._create_joins(
+                source_selectable=adapt_from,
+                dest_selectable=adapt_to,
+                source_polymorphic=True,
+                dest_polymorphic=True,
+                of_type=right_info.mapper)
 
             if sj is not None:
                 if isouter:

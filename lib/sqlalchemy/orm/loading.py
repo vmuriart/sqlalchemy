@@ -35,7 +35,7 @@ def instances(query, cursor, context):
     filtered = query._has_mapper_entities
 
     single_entity = len(query._entities) == 1 and \
-        query._entities[0].supports_single_entity
+                    query._entities[0].supports_single_entity
 
     if filtered:
         if single_entity:
@@ -55,7 +55,7 @@ def instances(query, cursor, context):
                 query_entity.row_processor(query,
                                            context, cursor)
                 for query_entity in query._entities
-            ]))
+                ]))
 
         if not single_entity:
             keyed_tuple = util.lightweight_named_tuple('result', labels)
@@ -109,7 +109,7 @@ def merge_result(querylib, query, iterator, load=True):
                     attributes.instance_state(instance),
                     attributes.instance_dict(instance),
                     load=load, _recursive={}, _resolve_conflict_map={})
-                    for instance in iterator]
+                          for instance in iterator]
             else:
                 result = list(iterator)
         else:
@@ -187,9 +187,9 @@ def load_on_ident(query, key,
         # into "IS NULL"
         if None in ident:
             nones = set([
-                        _get_params[col].key for col, value in
-                        zip(mapper.primary_key, ident) if value is None
-                        ])
+                            _get_params[col].key for col, value in
+                            zip(mapper.primary_key, ident) if value is None
+                            ])
             _get_clause = sql_util.adapt_criterion_to_null(
                 _get_clause, nones)
 
@@ -197,9 +197,10 @@ def load_on_ident(query, key,
         q._criterion = _get_clause
 
         params = dict([
-            (_get_params[primary_key].key, id_val)
-            for id_val, primary_key in zip(ident, mapper.primary_key)
-        ])
+                          (_get_params[primary_key].key, id_val)
+                          for id_val, primary_key in
+                          zip(ident, mapper.primary_key)
+                          ])
 
         q._params = params
 
@@ -226,11 +227,10 @@ def load_on_ident(query, key,
 
 
 def _setup_entity_query(
-    context, mapper, query_entity,
+        context, mapper, query_entity,
         path, adapter, column_collection,
         with_polymorphic=None, only_load_props=None,
         polymorphic_discriminator=None, **kw):
-
     if with_polymorphic:
         poly_properties = mapper._iterate_polymorphic_properties(
             with_polymorphic)
@@ -246,7 +246,7 @@ def _setup_entity_query(
 
     for value in poly_properties:
         if only_load_props and \
-                value.key not in only_load_props:
+                        value.key not in only_load_props:
             continue
         value.setup(
             context,
@@ -260,8 +260,8 @@ def _setup_entity_query(
         )
 
     if polymorphic_discriminator is not None and \
-        polymorphic_discriminator \
-            is not mapper.polymorphic_on:
+                    polymorphic_discriminator \
+                    is not mapper.polymorphic_on:
 
         if adapter:
             pd = adapter.columns[polymorphic_discriminator]
@@ -547,7 +547,6 @@ def _populate_partial(
 
 
 def _validate_version_id(mapper, state, dict_, row, adapter):
-
     version_id_col = mapper.version_id_col
 
     if version_id_col is None:
@@ -562,7 +561,7 @@ def _validate_version_id(mapper, state, dict_, row, adapter):
             "Instance '%s' has version id '%s' which "
             "does not match database-loaded version id '%s'."
             % (state_str(state), mapper._get_state_attr_by_column(
-               state, dict_, mapper.version_id_col),
+                state, dict_, mapper.version_id_col),
                row[version_id_col]))
 
 
@@ -605,6 +604,7 @@ def _decorate_polymorphic_switch(
             if _instance:
                 return _instance(row)
         return instance_fn(row)
+
     return polymorphic_instance
 
 
@@ -632,7 +632,7 @@ def load_scalar_attributes(mapper, state, attribute_names):
         if statement is not None:
             result = load_on_ident(
                 session.query(mapper).
-                options(
+                    options(
                     strategy_options.Load(mapper).undefer("*")
                 ).from_statement(statement),
                 None,

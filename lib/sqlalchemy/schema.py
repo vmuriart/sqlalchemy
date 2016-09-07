@@ -11,8 +11,7 @@
 
 from .sql.base import (
     SchemaVisitor
-    )
-
+)
 
 from .sql.schema import (
     BLANK_SCHEMA,
@@ -37,11 +36,9 @@ from .sql.schema import (
     _get_table_key,
     ColumnCollectionConstraint,
     ColumnCollectionMixin
-    )
-
+)
 
 from .sql.naming import conv
-
 
 from .sql.ddl import (
     DDL,

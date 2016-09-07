@@ -26,6 +26,7 @@ win32 = sys.platform.startswith('win')
 cpython = not pypy and not jython  # TODO: something better for this ?
 
 import collections
+
 next = next
 
 if py3k:
@@ -56,10 +57,12 @@ if py3k:
 
     from io import BytesIO as byte_buffer
 
+
     def inspect_getargspec(func):
         return ArgSpec(
             *inspect_getfullargspec(func)[0:4]
         )
+
 
     string_types = str,
     binary_types = bytes,
@@ -68,14 +71,18 @@ if py3k:
     int_types = int,
     iterbytes = iter
 
+
     def u(s):
         return s
+
 
     def ue(s):
         return s
 
+
     def b(s):
         return s.encode("latin-1")
+
 
     if py32:
         callable = callable
@@ -83,8 +90,10 @@ if py3k:
         def callable(fn):
             return hasattr(fn, '__call__')
 
+
     def cmp(a, b):
         return (a > b) - (a < b)
+
 
     from functools import reduce
 
@@ -93,6 +102,7 @@ if py3k:
     import_ = getattr(builtins, '__import__')
 
     import itertools
+
     itertools_filterfalse = itertools.filterfalse
     itertools_filter = filter
     itertools_imap = map
@@ -100,14 +110,17 @@ if py3k:
 
     import base64
 
+
     def b64encode(x):
         return base64.b64encode(x).decode('ascii')
+
 
     def b64decode(x):
         return base64.b64decode(x.encode('ascii'))
 
 else:
     from inspect import getargspec as inspect_getfullargspec
+
     inspect_getargspec = inspect_getfullargspec
     from urllib import quote_plus, unquote_plus, quote, unquote
     from urlparse import parse_qsl
@@ -121,8 +134,10 @@ else:
     text_type = unicode
     int_types = int, long
 
+
     def iterbytes(buf):
         return (ord(byte) for byte in buf)
+
 
     def u(s):
         # this differs from what six does, which doesn't support non-ASCII
@@ -131,24 +146,30 @@ else:
         # in them (all are tests) are utf-8 encoded.
         return unicode(s, "utf-8")
 
+
     def ue(s):
         return unicode(s, "unicode_escape")
 
+
     def b(s):
         return s
+
 
     def import_(*args):
         if len(args) == 4:
             args = args[0:3] + ([str(arg) for arg in args[3]],)
         return __import__(*args)
 
+
     callable = callable
     cmp = cmp
     reduce = reduce
 
     import base64
+
     b64encode = base64.b64encode
     b64decode = base64.b64decode
+
 
     def print_(*args, **kwargs):
         fp = kwargs.pop("file", sys.stdout)
@@ -159,14 +180,16 @@ else:
                 arg = str(arg)
             fp.write(arg)
 
+
     import itertools
+
     itertools_filterfalse = itertools.ifilterfalse
     itertools_filter = itertools.ifilter
     itertools_imap = itertools.imap
     from itertools import izip_longest as zip_longest
 
-
 import time
+
 if win32 or jython:
     time_func = time.clock
 else:
@@ -174,7 +197,6 @@ else:
 
 from collections import namedtuple
 from operator import attrgetter as dottedgetter
-
 
 if py3k:
     def reraise(tp, value, tb=None, cause=None):
@@ -188,10 +210,10 @@ if py3k:
 else:
     # not as nice as that of Py3K, but at least preserves
     # the code line where the issue occurred
-    exec("def reraise(tp, value, tb=None, cause=None):\n"
-         "    if cause is not None:\n"
-         "        assert cause is not value, 'Same cause emitted'\n"
-         "    raise tp, value, tb\n")
+    exec ("def reraise(tp, value, tb=None, cause=None):\n"
+          "    if cause is not None:\n"
+          "        assert cause is not value, 'Same cause emitted'\n"
+          "    raise tp, value, tb\n")
 
 
 def raise_from_cause(exception, exc_info=None):
@@ -201,14 +223,15 @@ def raise_from_cause(exception, exc_info=None):
     cause = exc_value if exc_value is not exception else None
     reraise(type(exception), exception, tb=exc_tb, cause=cause)
 
+
 if py3k:
     exec_ = getattr(builtins, 'exec')
 else:
     def exec_(func_text, globals_, lcl=None):
         if lcl is None:
-            exec('exec func_text in globals_')
+            exec ('exec func_text in globals_')
         else:
-            exec('exec func_text in globals_, lcl')
+            exec ('exec func_text in globals_, lcl')
 
 
 def with_metaclass(meta, *bases):
@@ -228,6 +251,7 @@ def with_metaclass(meta, *bases):
             if this_bases is None:
                 return type.__new__(cls, name, (), d)
             return meta(name, bases, d)
+
     return metaclass('temporary_class', None, {})
 
 

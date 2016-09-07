@@ -25,7 +25,7 @@ from ..sql import operators
 from .base import (ONETOMANY, MANYTOONE, MANYTOMANY,
                    EXT_CONTINUE, EXT_STOP, NOT_EXTENSION)
 from .base import (InspectionAttr, InspectionAttr,
-    InspectionAttrInfo, _MappedAttribute)
+                   InspectionAttrInfo, _MappedAttribute)
 import collections
 from .. import inspect
 
@@ -473,9 +473,9 @@ class StrategizedProperty(MapperProperty):
         # search among: exact match, "attr.*", "default" strategy
         # if any.
         for path_key in (
-            search_path._loader_key,
-            search_path._wildcard_path_loader_key,
-            search_path._default_path_loader_key
+                search_path._loader_key,
+                search_path._wildcard_path_loader_key,
+                search_path._default_path_loader_key
         ):
             if path_key in context.attributes:
                 load = context.attributes[path_key]
@@ -538,6 +538,7 @@ class StrategizedProperty(MapperProperty):
             cls._all_strategies[cls][key] = dec_cls
             dec_cls._strategy_keys.append(key)
             return dec_cls
+
         return decorate
 
     @classmethod

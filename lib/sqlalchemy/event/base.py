@@ -39,7 +39,7 @@ class _UnpickleDispatch(object):
     def __call__(self, _instance_cls):
         for cls in _instance_cls.__mro__:
             if 'dispatch' in cls.__dict__:
-                return cls.__dict__['dispatch'].\
+                return cls.__dict__['dispatch']. \
                     dispatch_cls._for_class(_instance_cls)
         else:
             raise AttributeError("No class with a 'dispatch' member present.")
@@ -80,9 +80,9 @@ class _Dispatch(object):
             except KeyError:
                 self._empty_listeners = \
                     self._empty_listener_reg[instance_cls] = dict(
-                        (ls.name, _EmptyListener(ls, instance_cls))
-                        for ls in parent._event_descriptors
-                    )
+                    (ls.name, _EmptyListener(ls, instance_cls))
+                    for ls in parent._event_descriptors
+                )
         else:
             self._empty_listeners = {}
 
@@ -123,14 +123,14 @@ class _Dispatch(object):
         if '_joined_dispatch_cls' not in self.__class__.__dict__:
             cls = type(
                 "Joined%s" % self.__class__.__name__,
-                (_JoinedDispatcher, ), {'__slots__': self._event_names}
+                (_JoinedDispatcher,), {'__slots__': self._event_names}
             )
 
             self.__class__._joined_dispatch_cls = cls
         return self._joined_dispatch_cls(self, other)
 
     def __reduce__(self):
-        return _UnpickleDispatch(), (self._instance_cls, )
+        return _UnpickleDispatch(), (self._instance_cls,)
 
     def _update(self, other, only_propagate=True):
         """Populate from the listeners in another :class:`_Dispatch`
@@ -138,7 +138,7 @@ class _Dispatch(object):
         for ls in other._event_descriptors:
             if isinstance(ls, _EmptyListener):
                 continue
-            getattr(self, ls.name).\
+            getattr(self, ls.name). \
                 for_modify(self)._update(ls, only_propagate=only_propagate)
 
     def _clear(self):
@@ -169,7 +169,7 @@ def _create_dispatcher_class(cls, classname, bases, dict_):
 
     event_names = [k for k in dict_ if _is_event_name(k)]
     dispatch_cls = type("%sDispatch" % classname,
-                        (dispatch_base, ), {'__slots__': event_names})
+                        (dispatch_base,), {'__slots__': event_names})
 
     dispatch_cls._event_names = event_names
 
@@ -215,19 +215,20 @@ class Events(util.with_metaclass(_EventMeta, object)):
         # also accept classes, scoped_sessions, sessionmakers, etc.
         if hasattr(target, 'dispatch') and (
 
-                isinstance(target.dispatch, cls.dispatch.__class__) or
+                        isinstance(target.dispatch, cls.dispatch.__class__) or
 
+                        (
+                                    isinstance(target.dispatch, type) and
+                                    isinstance(target.dispatch,
+                                               cls.dispatch.__class__)
+                        ) or
 
-                (
-                    isinstance(target.dispatch, type) and
-                    isinstance(target.dispatch, cls.dispatch.__class__)
-                ) or
-
-                (
-                    isinstance(target.dispatch, _JoinedDispatcher) and
-                    isinstance(target.dispatch.parent, cls.dispatch.__class__)
-                )
-
+                    (
+                                isinstance(target.dispatch,
+                                           _JoinedDispatcher) and
+                                isinstance(target.dispatch.parent,
+                                           cls.dispatch.__class__)
+                    )
 
         ):
             return target

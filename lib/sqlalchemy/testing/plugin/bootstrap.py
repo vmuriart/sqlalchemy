@@ -34,6 +34,7 @@ def load_file_as_module(name):
         mod = imp.load_source(name, path)
     return mod
 
+
 if to_bootstrap == "pytest":
     sys.modules["sqla_plugin_base"] = load_file_as_module("plugin_base")
     sys.modules["sqla_pytestplugin"] = load_file_as_module("pytestplugin")

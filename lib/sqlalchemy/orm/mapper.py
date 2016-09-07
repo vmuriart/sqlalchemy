@@ -34,12 +34,10 @@ from .path_registry import PathRegistry
 
 import sys
 
-
 _mapper_registry = weakref.WeakKeyDictionary()
 _already_compiling = False
 
 _memoized_configured_property = util.group_expirable_memoized_property()
-
 
 # a constant returned by _get_attr_by_column to indicate
 # this mapper is not handling an attribute for a particular
@@ -633,8 +631,8 @@ class Mapper(InspectionAttr):
             )
 
         if self.with_polymorphic and \
-            isinstance(self.with_polymorphic[1],
-                       expression.SelectBase):
+                isinstance(self.with_polymorphic[1],
+                           expression.SelectBase):
             self.with_polymorphic = (self.with_polymorphic[0],
                                      self.with_polymorphic[1].alias())
 
@@ -998,7 +996,7 @@ class Mapper(InspectionAttr):
                 self.version_id_col = self.inherits.version_id_col
                 self.version_id_generator = self.inherits.version_id_generator
             elif self.inherits.version_id_col is not None and \
-                    self.version_id_col is not self.inherits.version_id_col:
+                            self.version_id_col is not self.inherits.version_id_col:
                 util.warn(
                     "Inheriting version_id_col '%s' does not match inherited "
                     "version_id_col '%s' and will not automatically populate "
@@ -1011,7 +1009,7 @@ class Mapper(InspectionAttr):
 
             if self.order_by is False and \
                     not self.concrete and \
-                    self.inherits.order_by is not False:
+                            self.inherits.order_by is not False:
                 self.order_by = self.inherits.order_by
 
             self.polymorphic_map = self.inherits.polymorphic_map
@@ -1020,7 +1018,7 @@ class Mapper(InspectionAttr):
             self.base_mapper = self.inherits.base_mapper
             self.passive_updates = self.inherits.passive_updates
             self.passive_deletes = self.inherits.passive_deletes or \
-                self.passive_deletes
+                                   self.passive_deletes
             self._all_tables = self.inherits._all_tables
 
             if self.polymorphic_identity is not None:
@@ -1071,8 +1069,8 @@ class Mapper(InspectionAttr):
             )
 
         if self.with_polymorphic and \
-            isinstance(self.with_polymorphic[1],
-                       expression.SelectBase):
+                isinstance(self.with_polymorphic[1],
+                           expression.SelectBase):
             self.with_polymorphic = (self.with_polymorphic[0],
                                      self.with_polymorphic[1].alias())
         if self.configured:
@@ -1100,8 +1098,8 @@ class Mapper(InspectionAttr):
         self._all_tables = self.inherits._all_tables
         for key, prop in mapper._props.items():
             if key not in self._props and \
-                not self._should_exclude(key, key, local=False,
-                                         column=None):
+                    not self._should_exclude(key, key, local=False,
+                                             column=None):
                 self._adapt_inherited_property(key, prop, False)
 
     def _set_polymorphic_on(self, polymorphic_on):
@@ -1168,7 +1166,7 @@ class Mapper(InspectionAttr):
                     "create a non primary Mapper.  clear_mappers() will "
                     "remove *all* current mappers from all classes." %
                     self.class_)
-            # else:
+                # else:
                 # a ClassManager may already exist as
                 # ClassManager.instrument_attribute() creates
                 # new managers for each subclass if they don't yet exist.
@@ -1229,9 +1227,9 @@ class Mapper(InspectionAttr):
             del self._configure_failed
 
         if not self.non_primary and \
-            self.class_manager is not None and \
-            self.class_manager.is_mapped and \
-                self.class_manager.mapper is self:
+                        self.class_manager is not None and \
+                self.class_manager.is_mapped and \
+                        self.class_manager.mapper is self:
             instrumentation.unregister_class(self.class_)
 
     def _configure_pks(self):
@@ -1254,11 +1252,11 @@ class Mapper(InspectionAttr):
                 # ordering is important since it determines the ordering of
                 # mapper.primary_key (and therefore query.get())
                 self._pks_by_table[t] = \
-                    util.ordered_column_set(t.primary_key).\
-                    intersection(pk_cols)
+                    util.ordered_column_set(t.primary_key). \
+                        intersection(pk_cols)
             self._cols_by_table[t] = \
-                util.ordered_column_set(t.c).\
-                intersection(all_cols)
+                util.ordered_column_set(t.c). \
+                    intersection(all_cols)
 
         # if explicit PK argument sent, add those columns to the
         # primary key mappings
@@ -1270,7 +1268,7 @@ class Mapper(InspectionAttr):
 
         # otherwise, see that we got a full PK for the mapped table
         elif self.mapped_table not in self._pks_by_table or \
-                len(self._pks_by_table[self.mapped_table]) == 0:
+                        len(self._pks_by_table[self.mapped_table]) == 0:
             raise sa_exc.ArgumentError(
                 "Mapper %s could not assemble any primary "
                 "key columns for mapped table '%s'" %
@@ -1317,7 +1315,7 @@ class Mapper(InspectionAttr):
             for col in self._columntoproperty
             if self._columntoproperty[col] not in self._identity_key_props and
             (not hasattr(col, 'table') or
-                col.table not in self._cols_by_table))
+             col.table not in self._cols_by_table))
 
     def _configure_properties(self):
         # Column and other ClauseElement objects which are mapped
@@ -1340,8 +1338,8 @@ class Mapper(InspectionAttr):
         if self.inherits:
             for key, prop in self.inherits._props.items():
                 if key not in self._props and \
-                    not self._should_exclude(key, key, local=False,
-                                             column=None):
+                        not self._should_exclude(key, key, local=False,
+                                                 column=None):
                     self._adapt_inherited_property(key, prop, False)
 
         # create properties for each column in the mapped table,
@@ -1353,9 +1351,9 @@ class Mapper(InspectionAttr):
             column_key = (self.column_prefix or '') + column.key
 
             if self._should_exclude(
-                column.key, column_key,
-                local=self.local_table.c.contains_column(column),
-                column=column
+                    column.key, column_key,
+                    local=self.local_table.c.contains_column(column),
+                    column=column
             ):
                 continue
 
@@ -1447,9 +1445,9 @@ class Mapper(InspectionAttr):
                     instrument = False
                     col = self.polymorphic_on
                     if isinstance(col, schema.Column) and (
-                            self.with_polymorphic is None or
-                            self.with_polymorphic[1].
-                            corresponding_column(col) is None):
+                                    self.with_polymorphic is None or
+                                    self.with_polymorphic[1].
+                                            corresponding_column(col) is None):
                         raise sa_exc.InvalidRequestError(
                             "Could not map polymorphic_on column "
                             "'%s' to the mapped table - polymorphic "
@@ -1521,8 +1519,8 @@ class Mapper(InspectionAttr):
 
             def _validate_polymorphic_identity(mapper, state, dict_):
                 if polymorphic_key in dict_ and \
-                        dict_[polymorphic_key] not in \
-                        mapper._acceptable_polymorphic_identities:
+                                dict_[polymorphic_key] not in \
+                                mapper._acceptable_polymorphic_identities:
                     util.warn_limited(
                         "Flushing object %s with "
                         "incompatible polymorphic identity %r; the "
@@ -1603,16 +1601,16 @@ class Mapper(InspectionAttr):
                 # column is coming in after _readonly_props was
                 # initialized; check for 'readonly'
                 if hasattr(self, '_readonly_props') and \
-                    (not hasattr(col, 'table') or
-                        col.table not in self._cols_by_table):
+                        (not hasattr(col, 'table') or
+                                 col.table not in self._cols_by_table):
                     self._readonly_props.add(prop)
 
             else:
                 # if column is coming in after _cols_by_table was
                 # initialized, ensure the col is in the right set
                 if hasattr(self, '_cols_by_table') and \
-                        col.table in self._cols_by_table and \
-                        col not in self._cols_by_table[col.table]:
+                                col.table in self._cols_by_table and \
+                                col not in self._cols_by_table[col.table]:
                     self._cols_by_table[col.table].add(col)
 
             # if this properties.ColumnProperty represents the "polymorphic
@@ -1647,8 +1645,8 @@ class Mapper(InspectionAttr):
                 not isinstance(
                     self._props[key],
                     (
-                        properties.ColumnProperty,
-                        properties.ConcreteInheritedProperty)
+                            properties.ColumnProperty,
+                            properties.ConcreteInheritedProperty)
                 ):
             util.warn("Property %s on %s being replaced with new "
                       "property %s; the old property will be discarded" % (
@@ -1691,12 +1689,13 @@ class Mapper(InspectionAttr):
 
         if isinstance(prop, properties.ColumnProperty):
             if (
-                not self._inherits_equated_pairs or
-                (prop.columns[0], column) not in self._inherits_equated_pairs
+                        not self._inherits_equated_pairs or
+                            (prop.columns[0],
+                             column) not in self._inherits_equated_pairs
             ) and \
                     not prop.columns[0].shares_lineage(column) and \
-                    prop.columns[0] is not self.version_id_col and \
-                    column is not self.version_id_col:
+                            prop.columns[0] is not self.version_id_col and \
+                            column is not self.version_id_col:
                 warn_only = prop.parent is not self
                 msg = ("Implicitly combining column %s with column "
                        "%s under attribute '%s'.  Please configure one "
@@ -1800,12 +1799,12 @@ class Mapper(InspectionAttr):
     @property
     def _log_desc(self):
         return "(" + self.class_.__name__ + \
-            "|" + \
-            (self.local_table is not None and
+               "|" + \
+               (self.local_table is not None and
                 self.local_table.description or
-                str(self.local_table)) +\
-            (self.non_primary and
-             "|non-primary" or "") + ")"
+                str(self.local_table)) + \
+               (self.non_primary and
+                "|non-primary" or "") + ")"
 
     def _log(self, msg, *args):
         self.logger.info(
@@ -1938,7 +1937,7 @@ class Mapper(InspectionAttr):
     def _single_table_criterion(self):
         if self.single and \
                 self.inherits and \
-                self.polymorphic_on is not None:
+                        self.polymorphic_on is not None:
             return self.polymorphic_on.in_(
                 m.polymorphic_identity
                 for m in self.self_and_descendants)
@@ -2028,8 +2027,8 @@ class Mapper(InspectionAttr):
             (
                 table,
                 frozenset([
-                    col.key for col in columns
-                    if col.server_default is not None])
+                              col.key for col in columns
+                              if col.server_default is not None])
             )
             for table, columns in self._cols_by_table.items()
         )
@@ -2040,8 +2039,8 @@ class Mapper(InspectionAttr):
             (
                 table,
                 frozenset([
-                    col.key for col in columns
-                    if col.server_onupdate is not None])
+                              col.key for col in columns
+                              if col.server_onupdate is not None])
             )
             for table, columns in self._cols_by_table.items()
         )
@@ -2093,14 +2092,14 @@ class Mapper(InspectionAttr):
             # from other mappers, as these are sometimes dependent on that
             # mapper's polymorphic selectable (which we don't want rendered)
             for c in util.unique_list(
-                chain(*[
-                    list(mapper.iterate_properties) for mapper in
-                    [self] + mappers
-                ])
+                    chain(*[
+                        list(mapper.iterate_properties) for mapper in
+                        [self] + mappers
+                        ])
             ):
                 if getattr(c, '_is_polymorphic_discriminator', False) and \
                         (self.polymorphic_on is None or
-                         c.columns[0] is not self.polymorphic_on):
+                                 c.columns[0] is not self.polymorphic_on):
                     continue
                 yield c
 
@@ -2272,7 +2271,7 @@ class Mapper(InspectionAttr):
         params = [(primary_key, sql.bindparam(None, type_=primary_key.type))
                   for primary_key in self.primary_key]
         return sql.and_(*[k == v for (k, v) in params]), \
-            util.column_dict(params)
+               util.column_dict(params)
 
     @_memoized_configured_property
     def _equivalent_columns(self):
@@ -2307,6 +2306,7 @@ class Mapper(InspectionAttr):
                     result[binary.right].add(binary.left)
                 else:
                     result[binary.right] = util.column_set((binary.left,))
+
         for mapper in self.base_mapper.self_and_descendants:
             if mapper.inherit_condition is not None:
                 visitors.traverse(
@@ -2337,24 +2337,25 @@ class Mapper(InspectionAttr):
         if local:
             if self.class_.__dict__.get(assigned_name, None) is not None \
                     and self._is_userland_descriptor(
-                    self.class_.__dict__[assigned_name]):
+                        self.class_.__dict__[assigned_name]):
                 return True
         else:
             if getattr(self.class_, assigned_name, None) is not None \
                     and self._is_userland_descriptor(
-                    getattr(self.class_, assigned_name)):
+                        getattr(self.class_, assigned_name)):
                 return True
 
         if self.include_properties is not None and \
-                name not in self.include_properties and \
+                        name not in self.include_properties and \
                 (column is None or column not in self.include_properties):
             self._log("not including property %s" % (name))
             return True
 
         if self.exclude_properties is not None and \
                 (
-                    name in self.exclude_properties or
-                    (column is not None and column in self.exclude_properties)
+                                name in self.exclude_properties or
+                            (
+                                    column is not None and column in self.exclude_properties)
                 ):
             self._log("excluding property %s" % (name))
             return True
@@ -2453,7 +2454,7 @@ class Mapper(InspectionAttr):
             pk_cols = [adapter.columns[c] for c in pk_cols]
 
         return self._identity_class, \
-            tuple(row[column] for column in pk_cols)
+               tuple(row[column] for column in pk_cols)
 
     def identity_key_from_primary_key(self, primary_key):
         """Return an identity-map key for use in storing/retrieving an
@@ -2484,10 +2485,12 @@ class Mapper(InspectionAttr):
         dict_ = state.dict
         manager = state.manager
         return self._identity_class, tuple([
-            manager[self._columntoproperty[col].key].
-            impl.get(state, dict_, attributes.PASSIVE_RETURN_NEVER_SET)
-            for col in self.primary_key
-        ])
+                                               manager[self._columntoproperty[
+                                                   col].key].
+                                           impl.get(state, dict_,
+                                                    attributes.PASSIVE_RETURN_NEVER_SET)
+                                               for col in self.primary_key
+                                               ])
 
     def primary_key_from_instance(self, instance):
         """Return the list of primary key values for the given
@@ -2508,9 +2511,9 @@ class Mapper(InspectionAttr):
         manager = state.manager
         return [
             manager[prop.key].
-            impl.get(state, dict_, passive)
+                impl.get(state, dict_, passive)
             for prop in self._identity_key_props
-        ]
+            ]
 
     @_memoized_configured_property
     def _identity_key_props(self):
@@ -2559,7 +2562,7 @@ class Mapper(InspectionAttr):
             passive=attributes.PASSIVE_RETURN_NEVER_SET):
 
         prop = self._columntoproperty[column]
-        return state.manager[prop.key].impl.\
+        return state.manager[prop.key].impl. \
             get_committed_value(state, dict_, passive=passive)
 
     def _optimized_get_statement(self, state, attribute_names):
@@ -2686,9 +2689,9 @@ class Mapper(InspectionAttr):
                     visitables.append((queue, mpp, None, None))
             elif item_type is mpp:
                 instance, instance_mapper, corresponding_state, \
-                    corresponding_dict = iterator.popleft()
+                corresponding_dict = iterator.popleft()
                 yield instance, instance_mapper, \
-                    corresponding_state, corresponding_dict
+                      corresponding_state, corresponding_dict
                 visitables.append((deque(instance_mapper._props.values()),
                                    prp, corresponding_state,
                                    corresponding_dict))
@@ -2710,9 +2713,9 @@ class Mapper(InspectionAttr):
             super_ = mapper.inherits
             if super_:
                 extra_dependencies.extend([
-                    (super_table, table)
-                    for super_table in super_.tables
-                ])
+                                              (super_table, table)
+                                              for super_table in super_.tables
+                                              ])
 
         def skip(fk):
             # attempt to skip dependencies that are not
@@ -2723,9 +2726,9 @@ class Mapper(InspectionAttr):
             parent = table_to_mapper.get(fk.parent.table)
             dep = table_to_mapper.get(fk.column.table)
             if parent is not None and \
-                dep is not None and \
-                dep is not parent and \
-                    dep.inherit_condition is not None:
+                            dep is not None and \
+                            dep is not parent and \
+                            dep.inherit_condition is not None:
                 cols = set(sql_util._find_columns(dep.inherit_condition))
                 if parent.inherit_condition is not None:
                     cols = cols.union(sql_util._find_columns(
@@ -2923,6 +2926,7 @@ def validates(*names, **kw):
             "include_backrefs": include_backrefs
         }
         return fn
+
     return wrap
 
 

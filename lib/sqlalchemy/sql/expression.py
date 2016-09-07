@@ -15,7 +15,8 @@ class.
 """
 
 __all__ = [
-    'Alias', 'Any', 'All', 'ClauseElement', 'ColumnCollection', 'ColumnElement',
+    'Alias', 'Any', 'All', 'ClauseElement', 'ColumnCollection',
+    'ColumnElement',
     'CompoundSelect', 'Delete', 'FromClause', 'Insert', 'Join', 'Lateral',
     'Select',
     'Selectable', 'TableClause', 'Update', 'alias', 'and_', 'asc', 'between',
@@ -29,16 +30,15 @@ __all__ = [
     'tuple_', 'type_coerce', 'union', 'union_all', 'update', 'within_group',
     'TableSample', 'tablesample']
 
-
 from .visitors import Visitable
 from .functions import func, modifier, FunctionElement, Function
 from ..util.langhelpers import public_factory
-from .elements import ClauseElement, ColumnElement,\
+from .elements import ClauseElement, ColumnElement, \
     BindParameter, CollectionAggregate, UnaryExpression, BooleanClauseList, \
     Label, Cast, Case, ColumnClause, TextClause, Over, Null, \
     True_, False_, BinaryExpression, Tuple, TypeClause, Extract, \
     Grouping, WithinGroup, not_, \
-    collate, literal_column, between,\
+    collate, literal_column, between, \
     literal, outparam, TypeCoerce, ClauseList, FunctionFilter
 
 from .elements import SavepointClause, RollbackToSavepointClause, \
@@ -51,7 +51,6 @@ from .selectable import Alias, Join, Select, Selectable, TableClause, \
     CompoundSelect, CTE, FromClause, FromGrouping, Lateral, SelectBase, \
     alias, GenerativeSelect, subquery, HasCTE, HasPrefixes, HasSuffixes, \
     lateral, Exists, ScalarSelect, TextAsFrom, TableSample, tablesample
-
 
 from .dml import Insert, Update, Delete, UpdateBase, ValuesBase
 
@@ -107,18 +106,16 @@ delete = public_factory(Delete, ".expression.delete")
 funcfilter = public_factory(
     FunctionFilter, ".expression.funcfilter")
 
-
 # internal functions still being called from tests and the ORM,
 # these might be better off in some other namespace
 from .base import _from_objects
-from .elements import _literal_as_text, _clause_element_as_expr,\
+from .elements import _literal_as_text, _clause_element_as_expr, \
     _is_column, _labeled, _only_column_elements, _string_or_unprintable, \
-    _truncated_label, _clone, _cloned_difference, _cloned_intersection,\
+    _truncated_label, _clone, _cloned_difference, _cloned_intersection, \
     _column_as_key, _literal_as_binds, _select_iterables, \
     _corresponding_column_or_error, _literal_as_label_reference, \
     _expression_literal_as_text
 from .selectable import _interpret_as_from
-
 
 # old names for compatibility
 _Executable = Executable

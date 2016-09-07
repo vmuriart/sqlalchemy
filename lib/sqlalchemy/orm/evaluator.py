@@ -12,12 +12,12 @@ from ..sql import operators
 class UnevaluatableError(Exception):
     pass
 
+
 _straight_ops = set(getattr(operators, op)
                     for op in ('add', 'mul', 'sub',
                                'div',
                                'mod', 'truediv',
                                'lt', 'le', 'ne', 'gt', 'ge', 'eq'))
-
 
 _notimplemented_ops = set(getattr(operators, op)
                           for op in ('like_op', 'notlike_op', 'ilike_op',
@@ -124,6 +124,7 @@ class EvaluatorCompiler(object):
                 if value is None:
                     return None
                 return not value
+
             return evaluate
         raise UnevaluatableError(
             "Cannot evaluate %s with operator %s" %

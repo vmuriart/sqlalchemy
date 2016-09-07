@@ -168,6 +168,7 @@ class DefaultEngineStrategy(EngineStrategy):
                                     _has_events=False)
                 c._execution_options = util.immutabledict()
                 dialect.initialize(c)
+
             event.listen(pool, 'first_connect', first_connect, once=True)
 
         dialect_cls.engine_created(engine)
@@ -186,6 +187,7 @@ class PlainEngineStrategy(DefaultEngineStrategy):
     name = 'plain'
     engine_cls = base.Engine
 
+
 PlainEngineStrategy()
 
 
@@ -194,6 +196,7 @@ class ThreadLocalEngineStrategy(DefaultEngineStrategy):
 
     name = 'threadlocal'
     engine_cls = threadlocal.TLEngine
+
 
 ThreadLocalEngineStrategy()
 
@@ -268,5 +271,6 @@ class MockEngineStrategy(EngineStrategy):
 
         def execute(self, object, *multiparams, **params):
             raise NotImplementedError()
+
 
 MockEngineStrategy()
