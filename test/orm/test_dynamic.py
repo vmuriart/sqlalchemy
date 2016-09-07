@@ -10,7 +10,9 @@ from sqlalchemy.testing.assertsql import CompiledSQL
 
 
 class _DynamicFixture(object):
-    def _user_address_fixture(self, addresses_args={}):
+    def _user_address_fixture(self, addresses_args=None):
+        if addresses_args is None:
+            addresses_args = {}
         users, Address, addresses, User = (self.tables.users,
                                 self.classes.Address,
                                 self.tables.addresses,
@@ -23,7 +25,9 @@ class _DynamicFixture(object):
         mapper(Address, addresses)
         return User, Address
 
-    def _order_item_fixture(self, items_args={}):
+    def _order_item_fixture(self, items_args=None):
+        if items_args is None:
+            items_args = {}
         items, Order, orders, order_items, Item = (self.tables.items,
                                 self.classes.Order,
                                 self.tables.orders,
@@ -736,7 +740,9 @@ class UOWTest(
 class HistoryTest(_DynamicFixture, _fixtures.FixtureTest):
     run_inserts = None
 
-    def _transient_fixture(self, addresses_args={}):
+    def _transient_fixture(self, addresses_args=None):
+        if addresses_args is None:
+            addresses_args = {}
         User, Address = self._user_address_fixture(
             addresses_args=addresses_args)
 
@@ -744,7 +750,9 @@ class HistoryTest(_DynamicFixture, _fixtures.FixtureTest):
         a1 = Address()
         return u1, a1
 
-    def _persistent_fixture(self, autoflush=True, addresses_args={}):
+    def _persistent_fixture(self, autoflush=True, addresses_args=None):
+        if addresses_args is None:
+            addresses_args = {}
         User, Address = self._user_address_fixture(
             addresses_args=addresses_args)
 
@@ -755,7 +763,9 @@ class HistoryTest(_DynamicFixture, _fixtures.FixtureTest):
         s.flush()
         return u1, a1, s
 
-    def _persistent_m2m_fixture(self, autoflush=True, items_args={}):
+    def _persistent_m2m_fixture(self, autoflush=True, items_args=None):
+        if items_args is None:
+            items_args = {}
         Order, Item = self._order_item_fixture(items_args=items_args)
 
         o1 = Order()

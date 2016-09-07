@@ -155,7 +155,7 @@ class URL(object):
         dialect_cls = entrypoint.get_dialect_cls(self)
         return dialect_cls
 
-    def translate_connect_args(self, names=[], **kw):
+    def translate_connect_args(self, names=None, **kw):
         """Translate url attributes into a dictionary of connection arguments.
 
         Returns attributes of this url (`host`, `database`, `username`,
@@ -168,6 +168,8 @@ class URL(object):
         :param names: Deprecated.  Same purpose as the keyword-based alternate
             names, but correlates the name to the original positionally.
         """
+        if names is None:
+            names = []
 
         translated = {}
         attribute_names = ['host', 'database', 'username', 'password', 'port']

@@ -18,7 +18,9 @@ from sqlalchemy.testing import AssertsCompiledSQL
 class AliasedClassTest(fixtures.TestBase, AssertsCompiledSQL):
     __dialect__ = 'default'
 
-    def _fixture(self, cls, properties={}):
+    def _fixture(self, cls, properties=None):
+        if properties is None:
+            properties = {}
         table = Table('point', MetaData(),
                     Column('id', Integer(), primary_key=True),
                     Column('x', Integer),
