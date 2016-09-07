@@ -6,6 +6,7 @@ and listen for change events.
 
 from sqlalchemy import event
 
+
 def configure_listener(class_, key, inst):
     def append(instance, value, initiator):
         instance.receive_change_event("append", key, value, None)
@@ -27,18 +28,22 @@ if __name__ == '__main__':
     from sqlalchemy.orm import relationship
     from sqlalchemy.ext.declarative import declarative_base
 
+
     class Base(object):
 
         def receive_change_event(self, verb, key, value, oldvalue):
-            s = "Value '{0!s}' {1!s} on attribute '{2!s}', ".format(value, verb, key)
+            s = "Value '{0!s}' {1!s} on attribute '{2!s}', ".format(value,
+                                                                    verb, key)
             if oldvalue:
                 s += "which replaced the value '{0!s}', ".format(oldvalue)
             s += "on object {0!s}".format(self)
             print(s)
 
+
     Base = declarative_base(cls=Base)
 
     event.listen(Base, 'attribute_instrument', configure_listener)
+
 
     class MyMappedClass(Base):
         __tablename__ = "mytable"
@@ -51,6 +56,7 @@ if __name__ == '__main__':
         def __str__(self):
             return "MyMappedClass(data={0!r})".format(self.data)
 
+
     class Related(Base):
         __tablename__ = "related"
 
@@ -60,11 +66,10 @@ if __name__ == '__main__':
         def __str__(self):
             return "Related(data={0!r})".format(self.data)
 
+
     # classes are instrumented.  Demonstrate the events !
 
     m1 = MyMappedClass(data='m1', related=Related(data='r1'))
     m1.data = 'm1mod'
     m1.related.mapped.append(MyMappedClass(data='m2'))
     del m1.data
-
-

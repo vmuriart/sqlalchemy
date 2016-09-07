@@ -16,7 +16,6 @@ matchtable = cattable = None
 
 
 class InsertTest(fixtures.TestBase, AssertsExecutionResults):
-
     __only_on__ = 'postgresql'
     __backend__ = True
 
@@ -170,7 +169,6 @@ class InsertTest(fixtures.TestBase, AssertsExecutionResults):
             engines.testing_engine(options={'implicit_returning': False})
 
         with self.sql_execution_asserter(engine) as asserter:
-
             with engine.connect() as conn:
                 # execute with explicit id
 
@@ -301,7 +299,6 @@ class InsertTest(fixtures.TestBase, AssertsExecutionResults):
 
         with self.sql_execution_asserter(engine) as asserter:
             with engine.connect() as conn:
-
                 # execute with explicit id
 
                 r = conn.execute(table.insert(), {'id': 30, 'data': 'd1'})
@@ -461,8 +458,8 @@ class InsertTest(fixtures.TestBase, AssertsExecutionResults):
                 ]
             )
 
-        # cant test reflection here since the Sequence must be
-        # explicitly specified
+            # cant test reflection here since the Sequence must be
+            # explicitly specified
 
     def _assert_data_with_sequence_returning(self, table, seqname):
         engine = \
@@ -581,7 +578,6 @@ class InsertTest(fixtures.TestBase, AssertsExecutionResults):
 
 
 class ServerSideCursorsTest(fixtures.TestBase, AssertsExecutionResults):
-
     __requires__ = 'psycopg2_compatibility',
 
     def _fixture(self, server_side_cursors):
@@ -632,9 +628,9 @@ class ServerSideCursorsTest(fixtures.TestBase, AssertsExecutionResults):
 
         # and this one
         result = \
-            engine.connect().execution_options(stream_results=True).\
-            execute('select 1'
-                    )
+            engine.connect().execution_options(stream_results=True). \
+                execute('select 1'
+                        )
         assert result.cursor.name
 
     def test_stmt_enabled_conn_option_disabled(self):
@@ -644,8 +640,8 @@ class ServerSideCursorsTest(fixtures.TestBase, AssertsExecutionResults):
 
         # not this one
         result = \
-            engine.connect().execution_options(stream_results=False).\
-            execute(s)
+            engine.connect().execution_options(stream_results=False). \
+                execute(s)
         assert not result.cursor.name
 
     def test_stmt_option_disabled(self):
@@ -706,7 +702,7 @@ class ServerSideCursorsTest(fixtures.TestBase, AssertsExecutionResults):
         test_table.update().where(
             test_table.c.id == 2).values(
             data=test_table.c.data +
-            ' updated').execute()
+                 ' updated').execute()
         eq_(test_table.select().execute().fetchall(),
             [(1, 'data1'), (2, 'data2 updated')])
         test_table.delete().execute()
@@ -714,7 +710,6 @@ class ServerSideCursorsTest(fixtures.TestBase, AssertsExecutionResults):
 
 
 class MatchTest(fixtures.TestBase, AssertsCompiledSQL):
-
     __only_on__ = 'postgresql >= 8.3'
     __backend__ = True
 
@@ -829,7 +824,6 @@ class TupleTest(fixtures.TestBase):
     __backend__ = True
 
     def test_tuple_containment(self):
-
         for test, exp in [
             ([('a', 'b')], True),
             ([('a', 'c')], False),
@@ -843,12 +837,13 @@ class TupleTest(fixtures.TestBase):
                             literal_column("'a'"),
                             literal_column("'b'")
                         ).
-                        in_([
-                            tuple_(*[
-                                literal_column("'{0!s}'".format(letter))
-                                for letter in elem
-                            ]) for elem in test
-                        ])
+                            in_([
+                                    tuple_(*[
+                                        literal_column(
+                                            "'{0!s}'".format(letter))
+                                        for letter in elem
+                                        ]) for elem in test
+                                    ])
                     ])
                 ).scalar(),
                 exp
@@ -856,7 +851,6 @@ class TupleTest(fixtures.TestBase):
 
 
 class ExtractTest(fixtures.TablesTest):
-
     """The rationale behind this test is that for many years we've had a system
     of embedding type casts into the expressions rendered by visit_extract()
     on the postgreql platform.  The reason for this cast is not clear.
@@ -899,7 +893,6 @@ class ExtractTest(fixtures.TablesTest):
         # TODO: why does setting hours to anything
         # not affect the TZ in the DB col ?
         class TZ(datetime.tzinfo):
-
             def utcoffset(self, dt):
                 return datetime.timedelta(hours=4)
 
@@ -956,7 +949,7 @@ class ExtractTest(fixtures.TablesTest):
         self.tables.t
 
         actual_ts = self.bind.scalar(func.current_timestamp()) - \
-            datetime.timedelta(days=5)
+                    datetime.timedelta(days=5)
         self._test(func.current_timestamp() - datetime.timedelta(days=5),
                    {"hour": actual_ts.hour, "year": actual_ts.year,
                     "month": actual_ts.month}
@@ -1006,7 +999,7 @@ class ExtractTest(fixtures.TablesTest):
         t = self.tables.t
         actual_ts = self.bind.scalar(
             func.current_timestamp()).replace(tzinfo=None) - \
-            datetime.datetime(2012, 5, 10, 12, 15, 25)
+                    datetime.datetime(2012, 5, 10, 12, 15, 25)
 
         self._test(
             func.current_timestamp() - func.coalesce(

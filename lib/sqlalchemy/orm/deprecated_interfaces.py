@@ -88,7 +88,9 @@ class MapperExtension(object):
                     def go(ls_meth):
                         def reconstruct(instance, ctx):
                             ls_meth(self, instance)
+
                         return reconstruct
+
                     event.listen(self.class_manager, 'load',
                                  go(ls_meth), raw=False, propagate=True)
                 elif meth == 'init_instance':
@@ -97,7 +99,9 @@ class MapperExtension(object):
                             ls_meth(self, self.class_,
                                     self.class_manager.original_init,
                                     instance, args, kwargs)
+
                         return init_instance
+
                     event.listen(self.class_manager, 'init',
                                  go(ls_meth), raw=False, propagate=True)
                 elif meth == 'init_failed':
@@ -109,6 +113,7 @@ class MapperExtension(object):
                                 instance, args, kwargs)
 
                         return init_failed
+
                     event.listen(self.class_manager, 'init_failure',
                                  go(ls_meth), raw=False, propagate=True)
                 else:
@@ -273,7 +278,6 @@ class MapperExtension(object):
 
 @util.langhelpers.dependency_for("sqlalchemy.orm.interfaces")
 class SessionExtension(object):
-
     """Base implementation for :class:`.Session` event hooks.
 
     .. note::

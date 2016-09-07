@@ -39,7 +39,7 @@ class BindTest(fixtures.TestBase):
     def test_create_drop_explicit(self):
         metadata = MetaData()
         table = Table('test_table', metadata,
-            Column('foo', Integer))
+                      Column('foo', Integer))
         for bind in (
             testing.db,
             testing.db.connect()
@@ -68,7 +68,7 @@ class BindTest(fixtures.TestBase):
     def test_create_drop_err_table(self):
         metadata = MetaData()
         table = Table('test_table', metadata,
-            Column('foo', Integer))
+                      Column('foo', Integer))
 
         for meth in [
             table.exists,
@@ -92,7 +92,7 @@ class BindTest(fixtures.TestBase):
             ):
                 metadata = meta()
                 table = Table('test_table', metadata,
-                Column('foo', Integer))
+                              Column('foo', Integer))
                 metadata.bind = bind
                 assert metadata.bind is table.bind is bind
                 metadata.create_all()
@@ -104,7 +104,7 @@ class BindTest(fixtures.TestBase):
 
                 metadata = meta()
                 table = Table('test_table', metadata,
-                    Column('foo', Integer))
+                              Column('foo', Integer))
 
                 metadata.bind = bind
 
@@ -130,7 +130,7 @@ class BindTest(fixtures.TestBase):
                 ):
                     metadata = MetaData(*args[0], **args[1])
                     table = Table('test_table', metadata,
-                        Column('foo', Integer))
+                                  Column('foo', Integer))
                     assert metadata.bind is table.bind is bind
                     metadata.create_all()
                     assert table.exists()
@@ -145,9 +145,9 @@ class BindTest(fixtures.TestBase):
     def test_implicit_execution(self):
         metadata = MetaData()
         table = Table('test_table', metadata,
-            Column('foo', Integer),
-            test_needs_acid=True,
-            )
+                      Column('foo', Integer),
+                      test_needs_acid=True,
+                      )
         conn = testing.db.connect()
         metadata.create_all(bind=conn)
         try:
@@ -168,14 +168,14 @@ class BindTest(fixtures.TestBase):
     def test_clauseelement(self):
         metadata = MetaData()
         table = Table('test_table', metadata,
-            Column('foo', Integer))
+                      Column('foo', Integer))
         metadata.create_all(bind=testing.db)
         try:
             for elem in [
                 table.select,
                 lambda **kwargs: sa.func.current_timestamp(**kwargs).select(),
-               # func.current_timestamp().select,
-                lambda **kwargs:text("select * from test_table", **kwargs)
+                # func.current_timestamp().select,
+                lambda **kwargs: text("select * from test_table", **kwargs)
             ]:
                 for bind in (
                     testing.db,

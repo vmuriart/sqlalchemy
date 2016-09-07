@@ -4,7 +4,7 @@ from sqlalchemy.testing.assertions import AssertsCompiledSQL, is_, \
     assert_raises, assert_raises_message
 from sqlalchemy.testing import engines, fixtures
 from sqlalchemy import testing
-from sqlalchemy import Sequence, Table, Column, Integer, update, String,\
+from sqlalchemy import Sequence, Table, Column, Integer, update, String, \
     func, MetaData, Enum, Index, and_, delete, select, cast, text, \
     Text
 from sqlalchemy.dialects.postgresql import ExcludeConstraint, array
@@ -17,6 +17,7 @@ from sqlalchemy.sql import util as sql_util
 from sqlalchemy.util import u, OrderedDict
 from sqlalchemy.dialects.postgresql import aggregate_order_by, insert
 
+
 class SequenceTest(fixtures.TestBase, AssertsCompiledSQL):
     __prefer__ = 'postgresql'
 
@@ -24,13 +25,13 @@ class SequenceTest(fixtures.TestBase, AssertsCompiledSQL):
         seq = Sequence('my_seq_no_schema')
         dialect = postgresql.dialect()
         assert dialect.identifier_preparer.format_sequence(seq) \
-            == 'my_seq_no_schema'
+               == 'my_seq_no_schema'
         seq = Sequence('my_seq', schema='some_schema')
         assert dialect.identifier_preparer.format_sequence(seq) \
-            == 'some_schema.my_seq'
+               == 'some_schema.my_seq'
         seq = Sequence('My_Seq', schema='Some_Schema')
         assert dialect.identifier_preparer.format_sequence(seq) \
-            == '"Some_Schema"."My_Seq"'
+               == '"Some_Schema"."My_Seq"'
 
     @testing.only_on('postgresql', 'foo')
     @testing.provide_metadata
@@ -53,7 +54,6 @@ class SequenceTest(fixtures.TestBase, AssertsCompiledSQL):
 
 
 class CompileTest(fixtures.TestBase, AssertsCompiledSQL):
-
     __dialect__ = postgresql.dialect()
 
     def test_update_returning(self):
@@ -127,7 +127,7 @@ class CompileTest(fixtures.TestBase, AssertsCompiledSQL):
         self.assert_compile(
             postgresql.CreateEnumType(typ),
             u("CREATE TYPE myname AS "
-                "ENUM ('val1', 'val2', 'val''s 3', 'méil')"))
+              "ENUM ('val1', 'val2', 'val''s 3', 'méil')"))
 
         typ = postgresql.ENUM(
             "val1", "val2", "val's 3", name="PleaseQuoteMe")
@@ -415,8 +415,10 @@ class CompileTest(fixtures.TestBase, AssertsCompiledSQL):
         tbl = Table('testtbl', m, Column('data', String))
 
         idx1 = Index('test_idx1', tbl.c.data)
-        idx2 = Index('test_idx2', tbl.c.data, postgresql_tablespace='sometablespace')
-        idx3 = Index('test_idx3', tbl.c.data, postgresql_tablespace='another table space')
+        idx2 = Index('test_idx2', tbl.c.data,
+                     postgresql_tablespace='sometablespace')
+        idx3 = Index('test_idx3', tbl.c.data,
+                     postgresql_tablespace='another table space')
 
         self.assert_compile(schema.CreateIndex(idx1),
                             'CREATE INDEX test_idx1 ON testtbl '
@@ -438,12 +440,12 @@ class CompileTest(fixtures.TestBase, AssertsCompiledSQL):
         tbl = Table('testtbl', m, Column('data', String))
 
         idx1 = Index(
-                'test_idx1',
-                tbl.c.data,
-                postgresql_using='btree',
-                postgresql_tablespace='atablespace',
-                postgresql_with={"fillfactor": 60},
-                postgresql_where=and_(tbl.c.data > 5, tbl.c.data < 10))
+            'test_idx1',
+            tbl.c.data,
+            postgresql_using='btree',
+            postgresql_tablespace='atablespace',
+            postgresql_with={"fillfactor": 60},
+            postgresql_where=and_(tbl.c.data > 5, tbl.c.data < 10))
 
         self.assert_compile(schema.CreateIndex(idx1),
                             'CREATE INDEX test_idx1 ON testtbl '
@@ -631,7 +633,7 @@ class CompileTest(fixtures.TestBase, AssertsCompiledSQL):
 
         self.assert_compile(
             table1.select(table1.c.myid == 7).
-            with_for_update(skip_locked=True),
+                with_for_update(skip_locked=True),
             "SELECT mytable.myid, mytable.name, mytable.description "
             "FROM mytable WHERE mytable.myid = %(myid_1)s "
             "FOR UPDATE SKIP LOCKED")
@@ -643,102 +645,102 @@ class CompileTest(fixtures.TestBase, AssertsCompiledSQL):
 
         self.assert_compile(
             table1.select(table1.c.myid == 7).
-            with_for_update(read=True, nowait=True),
+                with_for_update(read=True, nowait=True),
             "SELECT mytable.myid, mytable.name, mytable.description "
             "FROM mytable WHERE mytable.myid = %(myid_1)s FOR SHARE NOWAIT")
 
         self.assert_compile(
             table1.select(table1.c.myid == 7).
-            with_for_update(read=True, skip_locked=True),
+                with_for_update(read=True, skip_locked=True),
             "SELECT mytable.myid, mytable.name, mytable.description "
             "FROM mytable WHERE mytable.myid = %(myid_1)s "
             "FOR SHARE SKIP LOCKED")
 
         self.assert_compile(
             table1.select(table1.c.myid == 7).
-            with_for_update(of=table1.c.myid),
+                with_for_update(of=table1.c.myid),
             "SELECT mytable.myid, mytable.name, mytable.description "
             "FROM mytable WHERE mytable.myid = %(myid_1)s "
             "FOR UPDATE OF mytable")
 
         self.assert_compile(
             table1.select(table1.c.myid == 7).
-            with_for_update(read=True, nowait=True, of=table1),
+                with_for_update(read=True, nowait=True, of=table1),
             "SELECT mytable.myid, mytable.name, mytable.description "
             "FROM mytable WHERE mytable.myid = %(myid_1)s "
             "FOR SHARE OF mytable NOWAIT")
 
         self.assert_compile(
             table1.select(table1.c.myid == 7).
-            with_for_update(read=True, nowait=True, of=table1.c.myid),
+                with_for_update(read=True, nowait=True, of=table1.c.myid),
             "SELECT mytable.myid, mytable.name, mytable.description "
             "FROM mytable WHERE mytable.myid = %(myid_1)s "
             "FOR SHARE OF mytable NOWAIT")
 
         self.assert_compile(
             table1.select(table1.c.myid == 7).
-            with_for_update(read=True, nowait=True,
-                            of=[table1.c.myid, table1.c.name]),
+                with_for_update(read=True, nowait=True,
+                                of=[table1.c.myid, table1.c.name]),
             "SELECT mytable.myid, mytable.name, mytable.description "
             "FROM mytable WHERE mytable.myid = %(myid_1)s "
             "FOR SHARE OF mytable NOWAIT")
 
         self.assert_compile(
             table1.select(table1.c.myid == 7).
-            with_for_update(read=True, skip_locked=True,
-                            of=[table1.c.myid, table1.c.name]),
+                with_for_update(read=True, skip_locked=True,
+                                of=[table1.c.myid, table1.c.name]),
             "SELECT mytable.myid, mytable.name, mytable.description "
             "FROM mytable WHERE mytable.myid = %(myid_1)s "
             "FOR SHARE OF mytable SKIP LOCKED")
 
         self.assert_compile(
             table1.select(table1.c.myid == 7).
-            with_for_update(key_share=True, nowait=True,
-                            of=[table1.c.myid, table1.c.name]),
+                with_for_update(key_share=True, nowait=True,
+                                of=[table1.c.myid, table1.c.name]),
             "SELECT mytable.myid, mytable.name, mytable.description "
             "FROM mytable WHERE mytable.myid = %(myid_1)s "
             "FOR NO KEY UPDATE OF mytable NOWAIT")
 
         self.assert_compile(
             table1.select(table1.c.myid == 7).
-            with_for_update(key_share=True, skip_locked=True,
-                            of=[table1.c.myid, table1.c.name]),
+                with_for_update(key_share=True, skip_locked=True,
+                                of=[table1.c.myid, table1.c.name]),
             "SELECT mytable.myid, mytable.name, mytable.description "
             "FROM mytable WHERE mytable.myid = %(myid_1)s "
             "FOR NO KEY UPDATE OF mytable SKIP LOCKED")
 
         self.assert_compile(
             table1.select(table1.c.myid == 7).
-            with_for_update(key_share=True,
-                            of=[table1.c.myid, table1.c.name]),
+                with_for_update(key_share=True,
+                                of=[table1.c.myid, table1.c.name]),
             "SELECT mytable.myid, mytable.name, mytable.description "
             "FROM mytable WHERE mytable.myid = %(myid_1)s "
             "FOR NO KEY UPDATE OF mytable")
 
         self.assert_compile(
             table1.select(table1.c.myid == 7).
-            with_for_update(key_share=True),
+                with_for_update(key_share=True),
             "SELECT mytable.myid, mytable.name, mytable.description "
             "FROM mytable WHERE mytable.myid = %(myid_1)s "
             "FOR NO KEY UPDATE")
 
         self.assert_compile(
             table1.select(table1.c.myid == 7).
-            with_for_update(read=True, key_share=True),
+                with_for_update(read=True, key_share=True),
             "SELECT mytable.myid, mytable.name, mytable.description "
             "FROM mytable WHERE mytable.myid = %(myid_1)s "
             "FOR KEY SHARE")
 
         self.assert_compile(
             table1.select(table1.c.myid == 7).
-            with_for_update(read=True, key_share=True, of=table1),
+                with_for_update(read=True, key_share=True, of=table1),
             "SELECT mytable.myid, mytable.name, mytable.description "
             "FROM mytable WHERE mytable.myid = %(myid_1)s "
             "FOR KEY SHARE OF mytable")
 
         self.assert_compile(
             table1.select(table1.c.myid == 7).
-            with_for_update(read=True, key_share=True, skip_locked=True),
+                with_for_update(read=True, key_share=True, skip_locked=True),
             "SELECT mytable.myid, mytable.name, mytable.description "
             "FROM mytable WHERE mytable.myid = %(myid_1)s "
             "FOR KEY SHARE SKIP LOCKED")
@@ -746,7 +748,7 @@ class CompileTest(fixtures.TestBase, AssertsCompiledSQL):
         ta = table1.alias()
         self.assert_compile(
             ta.select(ta.c.myid == 7).
-            with_for_update(of=[ta.c.myid, ta.c.name]),
+                with_for_update(of=[ta.c.myid, ta.c.name]),
             "SELECT mytable_1.myid, mytable_1.name, mytable_1.description "
             "FROM mytable AS mytable_1 "
             "WHERE mytable_1.myid = %(myid_1)s FOR UPDATE OF mytable_1"
@@ -905,7 +907,7 @@ class CompileTest(fixtures.TestBase, AssertsCompiledSQL):
             "ARRAY[%(param_1)s, %(param_2)s] = "
             "ARRAY[%(param_3)s, %(param_4)s, %(param_5)s]",
             checkparams={'param_5': 5, 'param_4': 4, 'param_1': 1,
-                'param_3': 3, 'param_2': 2}
+                         'param_3': 3, 'param_2': 2}
 
         )
 
@@ -980,8 +982,8 @@ class CompileTest(fixtures.TestBase, AssertsCompiledSQL):
 
         tbl3 = Table('testtbl3', m, Column('id', Integer), schema='testschema')
         stmt = tbl3.select().with_hint(tbl3, 'ONLY', 'postgresql')
-        expected = 'SELECT testschema.testtbl3.id FROM '\
-            'ONLY testschema.testtbl3'
+        expected = 'SELECT testschema.testtbl3.id FROM ' \
+                   'ONLY testschema.testtbl3'
         self.assert_compile(stmt, expected)
 
         assert_raises(
@@ -1068,7 +1070,6 @@ class InsertOnConflictTest(fixtures.TestBase, AssertsCompiledSQL):
         )
 
     def test_do_nothing_no_target(self):
-
         i = insert(
             self.table1, values=dict(name='foo'),
         ).on_conflict_do_nothing()
@@ -1077,7 +1078,6 @@ class InsertOnConflictTest(fixtures.TestBase, AssertsCompiledSQL):
                             '(%(name)s) ON CONFLICT DO NOTHING')
 
     def test_do_nothing_index_elements_target(self):
-
         i = insert(
             self.table1, values=dict(name='foo'),
         ).on_conflict_do_nothing(
@@ -1261,13 +1261,13 @@ class InsertOnConflictTest(fixtures.TestBase, AssertsCompiledSQL):
     def test_quote_raw_string_col(self):
         t = table('t', column("FancyName"), column("other name"))
 
-        stmt = insert(t).values(FancyName='something new').\
+        stmt = insert(t).values(FancyName='something new'). \
             on_conflict_do_update(
-                index_elements=['FancyName', 'other name'],
-                set_=OrderedDict([
-                    ("FancyName", 'something updated'),
-                    ("other name", "something else")
-                ])
+            index_elements=['FancyName', 'other name'],
+            set_=OrderedDict([
+                ("FancyName", 'something updated'),
+                ("other name", "something else")
+            ])
         )
 
         self.assert_compile(
@@ -1282,7 +1282,6 @@ class InsertOnConflictTest(fixtures.TestBase, AssertsCompiledSQL):
 
 
 class DistinctOnTest(fixtures.TestBase, AssertsCompiledSQL):
-
     """Test 'DISTINCT' with SQL expression language and orm.Query with
     an emphasis on PG's 'DISTINCT ON' syntax.
 
@@ -1311,7 +1310,7 @@ class DistinctOnTest(fixtures.TestBase, AssertsCompiledSQL):
     def test_on_columns_generative_multi_call(self):
         self.assert_compile(
             select([self.table]).distinct(self.table.c.a).
-            distinct(self.table.c.b),
+                distinct(self.table.c.b),
             "SELECT DISTINCT ON (t.a, t.b) t.id, t.a, t.b FROM t"
         )
 
@@ -1325,7 +1324,7 @@ class DistinctOnTest(fixtures.TestBase, AssertsCompiledSQL):
         self.assert_compile(
             select([self.table],
                    distinct=[self.table.c.a, self.table.c.b]).
-            order_by(self.table.c.a, self.table.c.b),
+                order_by(self.table.c.a, self.table.c.b),
             "SELECT DISTINCT ON (t.a, t.b) t.id, "
             "t.a, t.b FROM t ORDER BY t.a, t.b"
         )
@@ -1356,7 +1355,7 @@ class DistinctOnTest(fixtures.TestBase, AssertsCompiledSQL):
         sess = Session()
         self.assert_compile(
             sess.query(self.table).distinct(self.table.c.a).
-            distinct(self.table.c.b),
+                distinct(self.table.c.b),
             "SELECT DISTINCT ON (t.a, t.b) t.id AS t_id, t.a AS t_a, "
             "t.b AS t_b FROM t"
         )
@@ -1366,6 +1365,7 @@ class DistinctOnTest(fixtures.TestBase, AssertsCompiledSQL):
 
         class Foo(object):
             pass
+
         mapper(Foo, self.table)
         sess = Session()
         self.assert_compile(
@@ -1379,6 +1379,7 @@ class DistinctOnTest(fixtures.TestBase, AssertsCompiledSQL):
     def test_query_distinct_on_aliased(self):
         class Foo(object):
             pass
+
         mapper(Foo, self.table)
         a1 = aliased(Foo)
         sess = Session()
@@ -1389,10 +1390,9 @@ class DistinctOnTest(fixtures.TestBase, AssertsCompiledSQL):
         )
 
     def test_distinct_on_subquery_anon(self):
-
         sq = select([self.table]).alias()
-        q = select([self.table.c.id, sq.c.id]).\
-            distinct(sq.c.id).\
+        q = select([self.table.c.id, sq.c.id]). \
+            distinct(sq.c.id). \
             where(self.table.c.id == sq.c.id)
 
         self.assert_compile(
@@ -1404,8 +1404,8 @@ class DistinctOnTest(fixtures.TestBase, AssertsCompiledSQL):
 
     def test_distinct_on_subquery_named(self):
         sq = select([self.table]).alias('sq')
-        q = select([self.table.c.id, sq.c.id]).\
-            distinct(sq.c.id).\
+        q = select([self.table.c.id, sq.c.id]). \
+            distinct(sq.c.id). \
             where(self.table.c.id == sq.c.id)
         self.assert_compile(
             q,
@@ -1416,7 +1416,6 @@ class DistinctOnTest(fixtures.TestBase, AssertsCompiledSQL):
 
 
 class FullTextSearchTest(fixtures.TestBase, AssertsCompiledSQL):
-
     """Tests for full text searching
     """
     __dialect__ = postgresql.dialect()
@@ -1441,7 +1440,7 @@ class FullTextSearchTest(fixtures.TestBase, AssertsCompiledSQL):
         raise ValueError(c)
 
     def test_match_basic(self):
-        s = select([self.table_alt.c.id])\
+        s = select([self.table_alt.c.id]) \
             .where(self.table_alt.c.title.match('somestring'))
         self.assert_compile(s,
                             'SELECT mytable.id '
@@ -1456,38 +1455,38 @@ class FullTextSearchTest(fixtures.TestBase, AssertsCompiledSQL):
         )
         self.assert_compile(
             s, 'SELECT mytable.id '
-            'FROM mytable '
-            """WHERE mytable.title @@ to_tsquery('english', %(title_1)s)""")
+               'FROM mytable '
+               """WHERE mytable.title @@ to_tsquery('english', %(title_1)s)""")
 
     def test_match_tsvector(self):
         s = select([self.table_alt.c.id]).where(
             func.to_tsvector(self.table_alt.c.title)
-            .match('somestring')
+                .match('somestring')
         )
         self.assert_compile(
             s, 'SELECT mytable.id '
-            'FROM mytable '
-            'WHERE to_tsvector(mytable.title) '
-            '@@ to_tsquery(%(to_tsvector_1)s)')
+               'FROM mytable '
+               'WHERE to_tsvector(mytable.title) '
+               '@@ to_tsquery(%(to_tsvector_1)s)')
 
     def test_match_tsvectorconfig(self):
         s = select([self.table_alt.c.id]).where(
             func.to_tsvector('english', self.table_alt.c.title)
-            .match('somestring')
+                .match('somestring')
         )
         self.assert_compile(
             s, 'SELECT mytable.id '
-            'FROM mytable '
-            'WHERE to_tsvector(%(to_tsvector_1)s, mytable.title) @@ '
-            'to_tsquery(%(to_tsvector_2)s)')
+               'FROM mytable '
+               'WHERE to_tsvector(%(to_tsvector_1)s, mytable.title) @@ '
+               'to_tsquery(%(to_tsvector_2)s)')
 
     def test_match_tsvectorconfig_regconfig(self):
         s = select([self.table_alt.c.id]).where(
             func.to_tsvector('english', self.table_alt.c.title)
-            .match('somestring', postgresql_regconfig='english')
+                .match('somestring', postgresql_regconfig='english')
         )
         self.assert_compile(
             s, 'SELECT mytable.id '
-            'FROM mytable '
-            'WHERE to_tsvector(%(to_tsvector_1)s, mytable.title) @@ '
-            """to_tsquery('english', %(to_tsvector_2)s)""")
+               'FROM mytable '
+               'WHERE to_tsvector(%(to_tsvector_1)s, mytable.title) @@ '
+               """to_tsquery('english', %(to_tsvector_2)s)""")

@@ -24,7 +24,6 @@ class DeclarativeReflectionBase(fixtures.TablesTest):
 
 
 class DeclarativeReflectionTest(DeclarativeReflectionBase):
-
     @classmethod
     def define_tables(cls, metadata):
         Table('users', metadata,
@@ -151,16 +150,15 @@ class DeclarativeReflectionTest(DeclarativeReflectionBase):
 
 
 class DeferredReflectBase(DeclarativeReflectionBase):
-
     def teardown(self):
         super(DeferredReflectBase, self).teardown()
         _DeferredMapperConfig._configs.clear()
+
 
 Base = None
 
 
 class DeferredReflectPKFKTest(DeferredReflectBase):
-
     @classmethod
     def define_tables(cls, metadata):
         Table("a", metadata,
@@ -188,7 +186,6 @@ class DeferredReflectPKFKTest(DeferredReflectBase):
 
 
 class DeferredReflectionTest(DeferredReflectBase):
-
     @classmethod
     def define_tables(cls, metadata):
         Table('users', metadata,
@@ -206,7 +203,6 @@ class DeferredReflectionTest(DeferredReflectBase):
         )
 
     def _roundtrip(self):
-
         User = Base._decl_class_registry['User']
         Address = Base._decl_class_registry['Address']
 
@@ -312,6 +308,7 @@ class DeferredReflectionTest(DeferredReflectBase):
         class Address(decl.DeferredReflection, fixtures.ComparableEntity,
                       Base):
             __tablename__ = 'addresses'
+
         eq_(len(_DeferredMapperConfig._configs), 2)
         del Address
         gc_collect()
@@ -321,7 +318,6 @@ class DeferredReflectionTest(DeferredReflectBase):
 
 
 class DeferredSecondaryReflectionTest(DeferredReflectBase):
-
     @classmethod
     def define_tables(cls, metadata):
         Table('users', metadata,
@@ -343,7 +339,6 @@ class DeferredSecondaryReflectionTest(DeferredReflectBase):
               )
 
     def _roundtrip(self):
-
         User = Base._decl_class_registry['User']
         Item = Base._decl_class_registry['Item']
 
@@ -383,7 +378,6 @@ class DeferredSecondaryReflectionTest(DeferredReflectBase):
 
 
 class DeferredInhReflectBase(DeferredReflectBase):
-
     def _roundtrip(self):
         Foo = Base._decl_class_registry['Foo']
         Bar = Base._decl_class_registry['Bar']
@@ -410,7 +404,6 @@ class DeferredInhReflectBase(DeferredReflectBase):
 
 
 class DeferredSingleInhReflectionTest(DeferredInhReflectBase):
-
     @classmethod
     def define_tables(cls, metadata):
         Table("foo", metadata,
@@ -464,7 +457,6 @@ class DeferredSingleInhReflectionTest(DeferredInhReflectBase):
 
 
 class DeferredJoinedInhReflectionTest(DeferredInhReflectBase):
-
     @classmethod
     def define_tables(cls, metadata):
         Table("foo", metadata,

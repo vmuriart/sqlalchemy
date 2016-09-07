@@ -50,7 +50,7 @@ class OrderByLabelTest(fixtures.TablesTest):
         lx = table.c.x.label('lx')
         self._assert_result(
             select([lx]).order_by(lx),
-            [(1, ), (2, ), (3, )]
+            [(1,), (2,), (3,)]
         )
 
     def test_composed_int(self):
@@ -58,7 +58,7 @@ class OrderByLabelTest(fixtures.TablesTest):
         lx = (table.c.x + table.c.y).label('lx')
         self._assert_result(
             select([lx]).order_by(lx),
-            [(3, ), (5, ), (7, )]
+            [(3,), (5,), (7,)]
         )
 
     def test_composed_multiple(self):
@@ -75,7 +75,7 @@ class OrderByLabelTest(fixtures.TablesTest):
         lx = table.c.x.label('lx')
         self._assert_result(
             select([lx]).order_by(lx.desc()),
-            [(3, ), (2, ), (1, )]
+            [(3,), (2,), (1,)]
         )
 
     def test_composed_int_desc(self):
@@ -83,13 +83,14 @@ class OrderByLabelTest(fixtures.TablesTest):
         lx = (table.c.x + table.c.y).label('lx')
         self._assert_result(
             select([lx]).order_by(lx.desc()),
-            [(7, ), (5, ), (3, )]
+            [(7,), (5,), (3,)]
         )
 
     def test_group_by_composed(self):
         table = self.tables.some_table
         expr = (table.c.x + table.c.y).label('lx')
-        stmt = select([func.count(table.c.id), expr]).group_by(expr).order_by(expr)
+        stmt = select([func.count(table.c.id), expr]).group_by(expr).order_by(
+            expr)
         self._assert_result(
             stmt,
             [(1, 3), (1, 5), (1, 7)]
@@ -186,7 +187,7 @@ class LimitOffsetTest(fixtures.TablesTest):
         table = self.tables.some_table
         self._assert_result(
             select([table]).order_by(table.c.id).
-            limit(bindparam("l")).offset(bindparam("o")),
+                limit(bindparam("l")).offset(bindparam("o")),
             [(2, 2, 3), (3, 3, 4)],
             params={"l": 2, "o": 1}
         )
@@ -245,9 +246,9 @@ class CompoundSelectTest(fixtures.TablesTest):
     @testing.requires.parens_in_union_contained_select_w_limit_offset
     def test_limit_offset_selectable_in_unions(self):
         table = self.tables.some_table
-        s1 = select([table]).where(table.c.id == 2).\
+        s1 = select([table]).where(table.c.id == 2). \
             limit(1).order_by(table.c.id)
-        s2 = select([table]).where(table.c.id == 3).\
+        s2 = select([table]).where(table.c.id == 3). \
             limit(1).order_by(table.c.id)
 
         u1 = union(s1, s2).limit(2)
@@ -259,9 +260,9 @@ class CompoundSelectTest(fixtures.TablesTest):
     @testing.requires.parens_in_union_contained_select_wo_limit_offset
     def test_order_by_selectable_in_unions(self):
         table = self.tables.some_table
-        s1 = select([table]).where(table.c.id == 2).\
+        s1 = select([table]).where(table.c.id == 2). \
             order_by(table.c.id)
-        s2 = select([table]).where(table.c.id == 3).\
+        s2 = select([table]).where(table.c.id == 3). \
             order_by(table.c.id)
 
         u1 = union(s1, s2).limit(2)
@@ -272,9 +273,9 @@ class CompoundSelectTest(fixtures.TablesTest):
 
     def test_distinct_selectable_in_unions(self):
         table = self.tables.some_table
-        s1 = select([table]).where(table.c.id == 2).\
+        s1 = select([table]).where(table.c.id == 2). \
             distinct()
-        s2 = select([table]).where(table.c.id == 3).\
+        s2 = select([table]).where(table.c.id == 3). \
             distinct()
 
         u1 = union(s1, s2).limit(2)
@@ -286,9 +287,9 @@ class CompoundSelectTest(fixtures.TablesTest):
     @testing.requires.parens_in_union_contained_select_w_limit_offset
     def test_limit_offset_in_unions_from_alias(self):
         table = self.tables.some_table
-        s1 = select([table]).where(table.c.id == 2).\
+        s1 = select([table]).where(table.c.id == 2). \
             limit(1).order_by(table.c.id)
-        s2 = select([table]).where(table.c.id == 3).\
+        s2 = select([table]).where(table.c.id == 3). \
             limit(1).order_by(table.c.id)
 
         # this necessarily has double parens
@@ -300,9 +301,9 @@ class CompoundSelectTest(fixtures.TablesTest):
 
     def test_limit_offset_aliased_selectable_in_unions(self):
         table = self.tables.some_table
-        s1 = select([table]).where(table.c.id == 2).\
+        s1 = select([table]).where(table.c.id == 2). \
             limit(1).order_by(table.c.id).alias().select()
-        s2 = select([table]).where(table.c.id == 3).\
+        s2 = select([table]).where(table.c.id == 3). \
             limit(1).order_by(table.c.id).alias().select()
 
         u1 = union(s1, s2).limit(2)

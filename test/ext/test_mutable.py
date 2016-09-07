@@ -20,7 +20,6 @@ class SubFoo(Foo):
 
 
 class FooWithEq(object):
-
     def __init__(self, **kw):
         for k in kw:
             setattr(self, k, kw[k])
@@ -33,7 +32,6 @@ class FooWithEq(object):
 
 
 class Point(MutableComposite):
-
     def __init__(self, x, y):
         self.x = x
         self.y = y
@@ -53,12 +51,11 @@ class Point(MutableComposite):
 
     def __eq__(self, other):
         return isinstance(other, Point) and \
-            other.x == self.x and \
-            other.y == self.y
+               other.x == self.x and \
+               other.y == self.y
 
 
 class MyPoint(Point):
-
     @classmethod
     def coerce(cls, key, value):
         if isinstance(value, tuple):
@@ -671,9 +668,7 @@ class MutableColumnDefaultTest(_MutableDictTestFixture, fixtures.MappedTest):
         assert f1 in sess.dirty
 
 
-
 class MutableWithScalarPickleTest(_MutableDictTestBase, fixtures.MappedTest):
-
     @classmethod
     def define_tables(cls, metadata):
         MutableDict = cls._type_fixture()
@@ -693,7 +688,6 @@ class MutableWithScalarPickleTest(_MutableDictTestBase, fixtures.MappedTest):
 
 
 class MutableWithScalarJSONTest(_MutableDictTestBase, fixtures.MappedTest):
-
     @classmethod
     def define_tables(cls, metadata):
         import json
@@ -726,8 +720,8 @@ class MutableWithScalarJSONTest(_MutableDictTestBase, fixtures.MappedTest):
         self._test_non_mutable()
 
 
-class MutableListWithScalarPickleTest(_MutableListTestBase, fixtures.MappedTest):
-
+class MutableListWithScalarPickleTest(_MutableListTestBase,
+                                      fixtures.MappedTest):
     @classmethod
     def define_tables(cls, metadata):
         MutableList = cls._type_fixture()
@@ -744,7 +738,6 @@ class MutableListWithScalarPickleTest(_MutableListTestBase, fixtures.MappedTest)
 
 
 class MutableSetWithScalarPickleTest(_MutableSetTestBase, fixtures.MappedTest):
-
     @classmethod
     def define_tables(cls, metadata):
         MutableSet = cls._type_fixture()
@@ -762,10 +755,8 @@ class MutableSetWithScalarPickleTest(_MutableSetTestBase, fixtures.MappedTest):
 
 class MutableAssocWithAttrInheritTest(_MutableDictTestBase,
                                       fixtures.MappedTest):
-
     @classmethod
     def define_tables(cls, metadata):
-
         Table('foo', metadata,
               Column('id', Integer, primary_key=True,
                      test_needs_autoincrement=True),
@@ -811,7 +802,6 @@ class MutableAssocWithAttrInheritTest(_MutableDictTestBase,
 
 class MutableAssociationScalarPickleTest(_MutableDictTestBase,
                                          fixtures.MappedTest):
-
     @classmethod
     def define_tables(cls, metadata):
         MutableDict = cls._type_fixture()
@@ -828,7 +818,6 @@ class MutableAssociationScalarPickleTest(_MutableDictTestBase,
 
 class MutableAssociationScalarJSONTest(_MutableDictTestBase,
                                        fixtures.MappedTest):
-
     @classmethod
     def define_tables(cls, metadata):
         import json
@@ -860,17 +849,17 @@ class MutableAssociationScalarJSONTest(_MutableDictTestBase,
 
 class CustomMutableAssociationScalarJSONTest(_MutableDictTestBase,
                                              fixtures.MappedTest):
-
     CustomMutableDict = None
 
     @classmethod
     def _type_fixture(cls):
-        if not(getattr(cls, 'CustomMutableDict')):
+        if not (getattr(cls, 'CustomMutableDict')):
             MutableDict = super(
                 CustomMutableAssociationScalarJSONTest, cls)._type_fixture()
 
             class CustomMutableDict(MutableDict):
                 pass
+
             cls.CustomMutableDict = CustomMutableDict
         return cls.CustomMutableDict
 
@@ -916,7 +905,6 @@ class CustomMutableAssociationScalarJSONTest(_MutableDictTestBase,
 
 
 class _CompositeTestBase(object):
-
     @classmethod
     def define_tables(cls, metadata):
         Table('foo', metadata,
@@ -940,7 +928,6 @@ class _CompositeTestBase(object):
 
     @classmethod
     def _type_fixture(cls):
-
         return Point
 
 
@@ -982,7 +969,6 @@ class MutableCompositeColumnDefaultTest(_CompositeTestBase,
 
 
 class MutableCompositesUnpickleTest(_CompositeTestBase, fixtures.MappedTest):
-
     @classmethod
     def setup_mappers(cls):
         foo = cls.tables.foo
@@ -1000,7 +986,6 @@ class MutableCompositesUnpickleTest(_CompositeTestBase, fixtures.MappedTest):
 
 
 class MutableCompositesTest(_CompositeTestBase, fixtures.MappedTest):
-
     @classmethod
     def setup_mappers(cls):
         foo = cls.tables.foo
@@ -1074,7 +1059,6 @@ class MutableCompositesTest(_CompositeTestBase, fixtures.MappedTest):
 
 
 class MutableCompositeCallableTest(_CompositeTestBase, fixtures.MappedTest):
-
     @classmethod
     def setup_mappers(cls):
         foo = cls.tables.foo
@@ -1101,10 +1085,8 @@ class MutableCompositeCallableTest(_CompositeTestBase, fixtures.MappedTest):
 
 class MutableCompositeCustomCoerceTest(_CompositeTestBase,
                                        fixtures.MappedTest):
-
     @classmethod
     def _type_fixture(cls):
-
         return MyPoint
 
     @classmethod
@@ -1134,7 +1116,6 @@ class MutableCompositeCustomCoerceTest(_CompositeTestBase,
 
 
 class MutableInheritedCompositesTest(_CompositeTestBase, fixtures.MappedTest):
-
     @classmethod
     def define_tables(cls, metadata):
         Table('foo', metadata,

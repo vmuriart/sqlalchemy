@@ -25,7 +25,7 @@ from ..sql import operators
 from .base import (ONETOMANY, MANYTOONE, MANYTOMANY,
                    EXT_CONTINUE, EXT_STOP, NOT_EXTENSION)
 from .base import (InspectionAttr, InspectionAttr,
-    InspectionAttrInfo, _MappedAttribute)
+                   InspectionAttrInfo, _MappedAttribute)
 import collections
 from .. import inspect
 
@@ -496,7 +496,7 @@ class StrategizedProperty(MapperProperty):
         return self._get_strategy(cls._strategy_keys[0])
 
     def setup(
-            self, context, entity, path, adapter, **kwargs):
+        self, context, entity, path, adapter, **kwargs):
         loader = self._get_context_loader(context, path)
         if loader and loader.strategy:
             strat = self._get_strategy(loader.strategy)
@@ -505,8 +505,8 @@ class StrategizedProperty(MapperProperty):
         strat.setup_query(context, entity, path, loader, adapter, **kwargs)
 
     def create_row_processor(
-            self, context, path, mapper,
-            result, adapter, populators):
+        self, context, path, mapper,
+        result, adapter, populators):
         loader = self._get_context_loader(context, path)
         if loader and loader.strategy:
             strat = self._get_strategy(loader.strategy)
@@ -522,7 +522,7 @@ class StrategizedProperty(MapperProperty):
 
     def post_instrument_class(self, mapper):
         if not self.parent.non_primary and \
-                not mapper.class_manager._attr_has_impl(self.key):
+            not mapper.class_manager._attr_has_impl(self.key):
             self.strategy.init_class_attribute(mapper)
 
     _all_strategies = collections.defaultdict(dict)
@@ -538,6 +538,7 @@ class StrategizedProperty(MapperProperty):
             cls._all_strategies[cls][key] = dec_cls
             dec_cls._strategy_keys.append(key)
             return dec_cls
+
         return decorate
 
     @classmethod
@@ -549,7 +550,8 @@ class StrategizedProperty(MapperProperty):
                     return strategies[key]
                 except KeyError:
                     pass
-        raise Exception("can't locate strategy for {0!s} {1!s}".format(cls, key))
+        raise Exception(
+            "can't locate strategy for {0!s} {1!s}".format(cls, key))
 
 
 class MapperOption(object):

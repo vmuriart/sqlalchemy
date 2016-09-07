@@ -1,7 +1,6 @@
-
 # step 1. imports
 from sqlalchemy import (create_engine, MetaData, Table, Column, Integer,
-    String, ForeignKey, Float, DateTime, event)
+                        String, ForeignKey, Float, DateTime, event)
 from sqlalchemy.orm import sessionmaker, mapper, relationship
 from sqlalchemy.ext.horizontal_shard import ShardedSession
 from sqlalchemy.sql import operators, visitors
@@ -18,18 +17,16 @@ db2 = create_engine('sqlite://', echo=echo)
 db3 = create_engine('sqlite://', echo=echo)
 db4 = create_engine('sqlite://', echo=echo)
 
-
 # step 3. create session function.  this binds the shard ids
 # to databases within a ShardedSession and returns it.
 create_session = sessionmaker(class_=ShardedSession)
 
 create_session.configure(shards={
-    'north_america':db1,
-    'asia':db2,
-    'europe':db3,
-    'south_america':db4
+    'north_america': db1,
+    'asia': db2,
+    'europe': db3,
+    'south_america': db4
 })
-
 
 # step 4.  table setup.
 meta = MetaData()
@@ -41,14 +38,16 @@ meta = MetaData()
 # #1.  Any other method will do just as well; UUID, hilo, application-specific, etc.
 
 ids = Table('ids', meta,
-    Column('nextid', Integer, nullable=False))
+            Column('nextid', Integer, nullable=False))
+
 
 def id_generator(ctx):
     # in reality, might want to use a separate transaction for this.
     c = db1.connect()
     nextid = c.execute(ids.select(for_update=True)).scalar()
-    c.execute(ids.update(values={ids.c.nextid : ids.c.nextid + 1}))
+    c.execute(ids.update(values={ids.c.nextid: ids.c.nextid + 1}))
     return nextid
+
 
 # table setup.  we'll store a lead table of continents/cities,
 # and a secondary table storing locations.
@@ -58,17 +57,20 @@ def id_generator(ctx):
 # if you're willing to write more complex sharding functions.
 
 weather_locations = Table("weather_locations", meta,
-        Column('id', Integer, primary_key=True, default=id_generator),
-        Column('continent', String(30), nullable=False),
-        Column('city', String(50), nullable=False)
-    )
+                          Column('id', Integer, primary_key=True,
+                                 default=id_generator),
+                          Column('continent', String(30), nullable=False),
+                          Column('city', String(50), nullable=False)
+                          )
 
 weather_reports = Table("weather_reports", meta,
-    Column('id', Integer, primary_key=True),
-    Column('location_id', Integer, ForeignKey('weather_locations.id')),
-    Column('temperature', Float),
-    Column('report_time', DateTime, default=datetime.datetime.now),
-)
+                        Column('id', Integer, primary_key=True),
+                        Column('location_id', Integer,
+                               ForeignKey('weather_locations.id')),
+                        Column('temperature', Float),
+                        Column('report_time', DateTime,
+                               default=datetime.datetime.now),
+                        )
 
 # create tables
 for db in (db1, db2, db3, db4):
@@ -78,17 +80,17 @@ for db in (db1, db2, db3, db4):
 # establish initial "id" in db1
 db1.execute(ids.insert(), nextid=1)
 
-
 # step 5. define sharding functions.
 
 # we'll use a straight mapping of a particular set of "country"
 # attributes to shard id.
 shard_lookup = {
-    'North America':'north_america',
-    'Asia':'asia',
-    'Europe':'europe',
-    'South America':'south_america'
+    'North America': 'north_america',
+    'Asia': 'asia',
+    'Europe': 'europe',
+    'South America': 'south_america'
 }
+
 
 def shard_chooser(mapper, instance, clause=None):
     """shard chooser.
@@ -104,6 +106,7 @@ def shard_chooser(mapper, instance, clause=None):
     else:
         return shard_chooser(mapper, instance.location)
 
+
 def id_chooser(query, ident):
     """id chooser.
 
@@ -115,6 +118,7 @@ def id_chooser(query, ident):
 
     """
     return ['north_america', 'asia', 'europe', 'south_america']
+
 
 def query_chooser(query):
     """query chooser.
@@ -145,6 +149,7 @@ def query_chooser(query):
         return ['north_america', 'asia', 'europe', 'south_america']
     else:
         return ids
+
 
 def _get_query_comparisons(query):
     """Search an orm.Query object for binary expressions.
@@ -183,20 +188,20 @@ def _get_query_comparisons(query):
         # special handling for "col IN (params)"
         if binary.left in clauses and \
                 binary.operator == operators.in_op and \
-                hasattr(binary.right, 'clauses'):
+            hasattr(binary.right, 'clauses'):
             comparisons.append(
                 (binary.left, binary.operator,
-                    tuple(binds[bind] for bind in binary.right.clauses)
-                )
+                 tuple(binds[bind] for bind in binary.right.clauses)
+                 )
             )
         elif binary.left in clauses and binary.right in binds:
             comparisons.append(
-                (binary.left, binary.operator,binds[binary.right])
+                (binary.left, binary.operator, binds[binary.right])
             )
 
         elif binary.left in binds and binary.right in clauses:
             comparisons.append(
-                (binary.right, binary.operator,binds[binary.left])
+                (binary.right, binary.operator, binds[binary.left])
             )
 
     # here we will traverse through the query's criterion, searching
@@ -204,19 +209,21 @@ def _get_query_comparisons(query):
     # into a list.
     if query._criterion is not None:
         visitors.traverse_depthfirst(query._criterion, {},
-                    {'bindparam':visit_bindparam,
-                        'binary':visit_binary,
-                        'column':visit_column
-                    }
-        )
+                                     {'bindparam': visit_bindparam,
+                                      'binary': visit_binary,
+                                      'column': visit_column
+                                      }
+                                     )
     return comparisons
+
 
 # further configure create_session to use these functions
 create_session.configure(
-                    shard_chooser=shard_chooser,
-                    id_chooser=id_chooser,
-                    query_chooser=query_chooser
-                    )
+    shard_chooser=shard_chooser,
+    id_chooser=id_chooser,
+    query_chooser=query_chooser
+)
+
 
 # step 6.  mapped classes.
 class WeatherLocation(object):
@@ -224,16 +231,19 @@ class WeatherLocation(object):
         self.continent = continent
         self.city = city
 
+
 class Report(object):
     def __init__(self, temperature):
         self.temperature = temperature
 
+
 # step 7.  mappers
 mapper(WeatherLocation, weather_locations, properties={
-    'reports':relationship(Report, backref='location')
+    'reports': relationship(Report, backref='location')
 })
 
 mapper(Report, weather_reports)
+
 
 # step 8 (optional), events.  The "shard_id" is placed
 # in the QueryContext where it can be intercepted and associated
@@ -241,6 +251,7 @@ mapper(Report, weather_reports)
 
 def add_shard_id(instance, ctx):
     instance.shard_id = ctx.attributes["shard_id"]
+
 
 event.listen(WeatherLocation, "load", add_shard_id)
 event.listen(Report, "load", add_shard_id)
@@ -272,9 +283,11 @@ t = sess.query(WeatherLocation).get(tokyo_id)
 assert t.city == tokyo.city
 assert t.reports[0].temperature == 80.0
 
-north_american_cities = sess.query(WeatherLocation).filter(WeatherLocation.continent == 'North America')
+north_american_cities = sess.query(WeatherLocation).filter(
+    WeatherLocation.continent == 'North America')
 assert [c.city for c in north_american_cities] == ['New York', 'Toronto']
 
-asia_and_europe = sess.query(WeatherLocation).filter(WeatherLocation.continent.in_(['Europe', 'Asia']))
-assert set([c.city for c in asia_and_europe]) == set(['Tokyo', 'London', 'Dublin'])
-
+asia_and_europe = sess.query(WeatherLocation).filter(
+    WeatherLocation.continent.in_(['Europe', 'Asia']))
+assert set([c.city for c in asia_and_europe]) == set(
+    ['Tokyo', 'London', 'Dublin'])

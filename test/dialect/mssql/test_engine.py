@@ -11,7 +11,6 @@ from sqlalchemy.testing.mock import Mock
 
 
 class ParseConnectTest(fixtures.TestBase):
-
     def test_pyodbc_connect_dsn_trusted(self):
         dialect = pyodbc.dialect()
         u = url.make_url('mssql://mydsn')
@@ -42,10 +41,11 @@ class ParseConnectTest(fixtures.TestBase):
 
     def test_pyodbc_hostname(self):
         dialect = pyodbc.dialect()
-        u = url.make_url('mssql://username:password@hostspec/database?driver=SQL+Server')
+        u = url.make_url(
+            'mssql://username:password@hostspec/database?driver=SQL+Server')
         connection = dialect.create_connect_args(u)
         eq_([['DRIVER={SQL Server};Server=hostspec;Database=database;UI'
-            'D=username;PWD=password'], {}], connection)
+              'D=username;PWD=password'], {}], connection)
 
     def test_pyodbc_host_no_driver(self):
         dialect = pyodbc.dialect()
@@ -53,13 +53,14 @@ class ParseConnectTest(fixtures.TestBase):
 
         def go():
             return dialect.create_connect_args(u)
+
         connection = assert_warnings(
             go,
             ["No driver name specified; this is expected by "
              "PyODBC when using DSN-less connections"])
 
         eq_([['Server=hostspec;Database=database;UI'
-            'D=username;PWD=password'], {}], connection)
+              'D=username;PWD=password'], {}], connection)
 
     def test_pyodbc_connect_comma_port(self):
         dialect = pyodbc.dialect()
@@ -68,7 +69,7 @@ class ParseConnectTest(fixtures.TestBase):
                          'base?driver=SQL Server')
         connection = dialect.create_connect_args(u)
         eq_([['DRIVER={SQL Server};Server=hostspec,12345;Database=datab'
-            'ase;UID=username;PWD=password'], {}], connection)
+              'ase;UID=username;PWD=password'], {}], connection)
 
     def test_pyodbc_connect_config_port(self):
         dialect = pyodbc.dialect()
@@ -77,7 +78,7 @@ class ParseConnectTest(fixtures.TestBase):
                          'ort=12345&driver=SQL+Server')
         connection = dialect.create_connect_args(u)
         eq_([['DRIVER={SQL Server};Server=hostspec;Database=database;UI'
-            'D=username;PWD=password;port=12345'], {}], connection)
+              'D=username;PWD=password;port=12345'], {}], connection)
 
     def test_pyodbc_extra_connect(self):
         dialect = pyodbc.dialect()
@@ -88,9 +89,9 @@ class ParseConnectTest(fixtures.TestBase):
         eq_(connection[1], {})
         eq_(connection[0][0]
             in ('DRIVER={SQL Server};Server=hostspec;Database=database;'
-            'UID=username;PWD=password;foo=bar;LANGUAGE=us_english',
-            'DRIVER={SQL Server};Server=hostspec;Database=database;UID='
-            'username;PWD=password;LANGUAGE=us_english;foo=bar'), True)
+                'UID=username;PWD=password;foo=bar;LANGUAGE=us_english',
+                'DRIVER={SQL Server};Server=hostspec;Database=database;UID='
+                'username;PWD=password;LANGUAGE=us_english;foo=bar'), True)
 
     def test_pyodbc_odbc_connect(self):
         dialect = pyodbc.dialect()
@@ -100,7 +101,7 @@ class ParseConnectTest(fixtures.TestBase):
                          '%3BUID%3Dusername%3BPWD%3Dpassword')
         connection = dialect.create_connect_args(u)
         eq_([['DRIVER={SQL Server};Server=hostspec;Database=database;UI'
-            'D=username;PWD=password'], {}], connection)
+              'D=username;PWD=password'], {}], connection)
 
     def test_pyodbc_odbc_connect_with_dsn(self):
         dialect = pyodbc.dialect()
@@ -110,7 +111,7 @@ class ParseConnectTest(fixtures.TestBase):
                          )
         connection = dialect.create_connect_args(u)
         eq_([['dsn=mydsn;Database=database;UID=username;PWD=password'],
-            {}], connection)
+             {}], connection)
 
     def test_pyodbc_odbc_connect_ignores_other_values(self):
         dialect = pyodbc.dialect()
@@ -121,7 +122,7 @@ class ParseConnectTest(fixtures.TestBase):
                          'rname%3BPWD%3Dpassword')
         connection = dialect.create_connect_args(u)
         eq_([['DRIVER={SQL Server};Server=hostspec;Database=database;UI'
-            'D=username;PWD=password'], {}], connection)
+              'D=username;PWD=password'], {}], connection)
 
     def test_pymssql_port_setting(self):
         dialect = pymssql.dialect()
@@ -131,7 +132,7 @@ class ParseConnectTest(fixtures.TestBase):
         connection = dialect.create_connect_args(u)
         eq_(
             [[], {'host': 'somehost', 'password': 'tiger',
-                    'user': 'scott', 'database': 'test'}], connection
+                  'user': 'scott', 'database': 'test'}], connection
         )
 
         u = \
@@ -139,20 +140,20 @@ class ParseConnectTest(fixtures.TestBase):
         connection = dialect.create_connect_args(u)
         eq_(
             [[], {'host': 'somehost:5000', 'password': 'tiger',
-                    'user': 'scott', 'database': 'test'}], connection
+                  'user': 'scott', 'database': 'test'}], connection
         )
 
     def test_pymssql_disconnect(self):
         dialect = pymssql.dialect()
 
         for error in [
-                'Adaptive Server connection timed out',
-                'Net-Lib error during Connection reset by peer',
-                'message 20003',
-                'Error 10054',
-                'Not connected to any MS SQL server',
-                'Connection is closed'
-                ]:
+            'Adaptive Server connection timed out',
+            'Net-Lib error during Connection reset by peer',
+            'message 20003',
+            'Error 10054',
+            'Not connected to any MS SQL server',
+            'Connection is closed'
+        ]:
             eq_(dialect.is_disconnect(error, None, None), True)
 
         eq_(dialect.is_disconnect("not an error", None, None), False)

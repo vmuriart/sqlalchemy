@@ -26,23 +26,24 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
         meta = self.metadata
 
         users = Table('engine_users', meta,
-            Column('user_id', sa.INT, primary_key=True),
-            Column('user_name', sa.VARCHAR(20), nullable=False),
-            Column('test1', sa.CHAR(5), nullable=False),
-            Column('test2', sa.Float(5), nullable=False),
-            Column('test3', sa.Text),
-            Column('test4', sa.Numeric(10, 2), nullable=False),
-            Column('test5', sa.Date),
-            Column('parent_user_id', sa.Integer,
-                   sa.ForeignKey('engine_users.user_id')),
-            Column('test6', sa.Date, nullable=False),
-            Column('test7', sa.Text),
-            Column('test8', sa.LargeBinary),
-            Column('test_passivedefault2', sa.Integer, server_default='5'),
-            Column('test9', sa.LargeBinary(100)),
-            Column('test10', sa.Numeric(10, 2)),
-            test_needs_fk=True,
-        )
+                      Column('user_id', sa.INT, primary_key=True),
+                      Column('user_name', sa.VARCHAR(20), nullable=False),
+                      Column('test1', sa.CHAR(5), nullable=False),
+                      Column('test2', sa.Float(5), nullable=False),
+                      Column('test3', sa.Text),
+                      Column('test4', sa.Numeric(10, 2), nullable=False),
+                      Column('test5', sa.Date),
+                      Column('parent_user_id', sa.Integer,
+                             sa.ForeignKey('engine_users.user_id')),
+                      Column('test6', sa.Date, nullable=False),
+                      Column('test7', sa.Text),
+                      Column('test8', sa.LargeBinary),
+                      Column('test_passivedefault2', sa.Integer,
+                             server_default='5'),
+                      Column('test9', sa.LargeBinary(100)),
+                      Column('test10', sa.Numeric(10, 2)),
+                      test_needs_fk=True,
+                      )
 
         addresses = Table(
             'engine_email_addresses',
@@ -52,7 +53,7 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
                    sa.ForeignKey(users.c.user_id)),
             Column('email_address', sa.String(20)),
             test_needs_fk=True,
-            )
+        )
         meta.create_all()
 
         meta2 = MetaData()
@@ -60,24 +61,25 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
                                 autoload=True,
                                 autoload_with=testing.db)
         reflected_addresses = Table('engine_email_addresses',
-                meta2, autoload=True, autoload_with=testing.db)
+                                    meta2, autoload=True,
+                                    autoload_with=testing.db)
         self.assert_tables_equal(users, reflected_users)
         self.assert_tables_equal(addresses, reflected_addresses)
 
     @testing.provide_metadata
-    def test_autoload_with_imply_autoload(self,):
+    def test_autoload_with_imply_autoload(self, ):
         meta = self.metadata
         t = Table(
-                't',
-                meta,
-                Column('id', sa.Integer, primary_key=True),
-                Column('x', sa.String(20)),
-                Column('y', sa.Integer))
+            't',
+            meta,
+            Column('id', sa.Integer, primary_key=True),
+            Column('x', sa.String(20)),
+            Column('y', sa.Integer))
         meta.create_all()
 
         meta2 = MetaData()
-        reflected_t = Table('t',  meta2,
-                autoload_with=testing.db)
+        reflected_t = Table('t', meta2,
+                            autoload_with=testing.db)
         self.assert_tables_equal(t, reflected_t)
 
     @testing.provide_metadata
@@ -90,18 +92,18 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
             Column('t2id', sa.Integer, sa.ForeignKey('t2.id')),
             Column('t3id', sa.Integer, sa.ForeignKey('t3.id')),
             test_needs_fk=True,
-            )
+        )
         Table('t2', meta,
-                    Column('id', sa.Integer, primary_key=True),
-                    test_needs_fk=True)
+              Column('id', sa.Integer, primary_key=True),
+              test_needs_fk=True)
         Table('t3', meta,
-                    Column('id', sa.Integer, primary_key=True),
-                    test_needs_fk=True)
+              Column('id', sa.Integer, primary_key=True),
+              test_needs_fk=True)
         meta.create_all()
         meta2 = MetaData()
         t1r, t2r, t3r = [Table(x, meta2, autoload=True,
-                         autoload_with=testing.db) for x in ('t1',
-                         't2', 't3')]
+                               autoload_with=testing.db) for x in ('t1',
+                                                                   't2', 't3')]
         assert t1r.c.t2id.references(t2r.c.id)
         assert t1r.c.t3id.references(t3r.c.id)
 
@@ -143,11 +145,11 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
         meta = self.metadata
 
         Table('t', meta,
-            Column('id', Integer, primary_key=True),
-            Column('x', Integer),
-            Column('y', Integer),
-            Column('z', Integer, server_default="5"),
-        )
+              Column('id', Integer, primary_key=True),
+              Column('x', Integer),
+              Column('y', Integer),
+              Column('z', Integer, server_default="5"),
+              )
         meta.create_all()
 
         m2 = MetaData()
@@ -155,16 +157,16 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
         old_y = Column('y', String)
         old_q = Column('q', Integer)
         t2 = Table('t', m2, old_z, old_q)
-        eq_(t2.primary_key.columns, (t2.c.z, ))
+        eq_(t2.primary_key.columns, (t2.c.z,))
         t2 = Table('t', m2, old_y,
-                        extend_existing=True,
-                        autoload=True,
-                        autoload_with=testing.db)
+                   extend_existing=True,
+                   autoload=True,
+                   autoload_with=testing.db)
         eq_(
             set(t2.columns.keys()),
             set(['x', 'y', 'z', 'q', 'id'])
         )
-        eq_(t2.primary_key.columns, (t2.c.id, ))
+        eq_(t2.primary_key.columns, (t2.c.id,))
         assert t2.c.z is not old_z
         assert t2.c.y is old_y
         assert t2.c.z.type._type_affinity is Integer
@@ -173,8 +175,8 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
         m3 = MetaData()
         t3 = Table('t', m3, Column('z', Integer))
         t3 = Table('t', m3, extend_existing=False,
-                        autoload=True,
-                        autoload_with=testing.db)
+                   autoload=True,
+                   autoload_with=testing.db)
         eq_(
             set(t3.columns.keys()),
             set(['z'])
@@ -185,17 +187,17 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
         old_y = Column('y', String)
         old_q = Column('q', Integer)
         t4 = Table('t', m4, old_z, old_q)
-        eq_(t4.primary_key.columns, (t4.c.z, ))
+        eq_(t4.primary_key.columns, (t4.c.z,))
         t4 = Table('t', m4, old_y,
-                        extend_existing=True,
-                        autoload=True,
-                        autoload_replace=False,
-                        autoload_with=testing.db)
+                   extend_existing=True,
+                   autoload=True,
+                   autoload_replace=False,
+                   autoload_with=testing.db)
         eq_(
             set(t4.columns.keys()),
             set(['x', 'y', 'z', 'q', 'id'])
         )
-        eq_(t4.primary_key.columns, (t4.c.id, ))
+        eq_(t4.primary_key.columns, (t4.c.id,))
         assert t4.c.z is old_z
         assert t4.c.y is old_y
         assert t4.c.z.type._type_affinity is String
@@ -230,15 +232,15 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
         """
         Table('a', self.metadata, Column('id', Integer, primary_key=True))
         Table('b', self.metadata, Column('id', Integer, primary_key=True),
-                                    Column('a_id', Integer))
+              Column('a_id', Integer))
         self.metadata.create_all()
 
         m2 = MetaData()
         b2 = Table('b', m2, Column('a_id', Integer, sa.ForeignKey('a.id')))
         a2 = Table('a', m2, autoload=True, autoload_with=testing.db)
         b2 = Table('b', m2, extend_existing=True, autoload=True,
-                                autoload_with=testing.db,
-                                autoload_replace=False)
+                   autoload_with=testing.db,
+                   autoload_replace=False)
 
         assert b2.c.id is not None
         assert b2.c.a_id.references(a2.c.id)
@@ -253,15 +255,15 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
         """
         Table('a', self.metadata, Column('id', Integer, primary_key=True))
         Table('b', self.metadata, Column('id', Integer, primary_key=True),
-                Column('a_id', Integer, sa.ForeignKey('a.id')))
+              Column('a_id', Integer, sa.ForeignKey('a.id')))
         self.metadata.create_all()
 
         m2 = MetaData()
         b2 = Table('b', m2, Column('a_id', Integer, sa.ForeignKey('a.id')))
         a2 = Table('a', m2, autoload=True, autoload_with=testing.db)
         b2 = Table('b', m2, extend_existing=True, autoload=True,
-                                autoload_with=testing.db,
-                                autoload_replace=False)
+                   autoload_with=testing.db,
+                   autoload_replace=False)
 
         assert b2.c.id is not None
         assert b2.c.a_id.references(a2.c.id)
@@ -275,15 +277,15 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
         """
         Table('a', self.metadata, Column('id', Integer, primary_key=True))
         Table('b', self.metadata, Column('id', Integer, primary_key=True),
-                Column('a_id', Integer, sa.ForeignKey('a.id')))
+              Column('a_id', Integer, sa.ForeignKey('a.id')))
         self.metadata.create_all()
 
         m2 = MetaData()
         b2 = Table('b', m2, Column('a_id', Integer))
         a2 = Table('a', m2, autoload=True, autoload_with=testing.db)
         b2 = Table('b', m2, extend_existing=True, autoload=True,
-                                autoload_with=testing.db,
-                                autoload_replace=False)
+                   autoload_with=testing.db,
+                   autoload_replace=False)
 
         assert b2.c.id is not None
         assert not b2.c.a_id.references(a2.c.id)
@@ -298,7 +300,7 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
         a2 = Table('a', m2, Column('id', Integer, primary_key=True))
 
         Table('a', m2, autoload=True, autoload_with=testing.db,
-                        autoload_replace=False, extend_existing=True)
+              autoload_replace=False, extend_existing=True)
         eq_(list(a2.primary_key), [a2.c.id])
 
     def test_autoload_replace_arg(self):
@@ -335,7 +337,6 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
         t2a = Table('test2', m2, autoload=True)
         assert t2a._autoincrement_column is None
 
-
     @skip('sqlite')
     @testing.provide_metadata
     def test_unknown_types(self):
@@ -346,7 +347,7 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
         """
         meta = self.metadata
         t = Table("test", meta,
-            Column('foo', sa.DateTime))
+                  Column('foo', sa.DateTime))
 
         ischema_names = testing.db.dialect.ischema_names
         t.create()
@@ -413,18 +414,18 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
 
         meta = self.metadata
         Table('users', meta,
-            Column('id', sa.Integer, primary_key=True),
-            Column('name', sa.String(30)))
+              Column('id', sa.Integer, primary_key=True),
+              Column('name', sa.String(30)))
         Table('addresses', meta,
-            Column('id', sa.Integer, primary_key=True),
-            Column('street', sa.String(30)))
+              Column('id', sa.Integer, primary_key=True),
+              Column('street', sa.String(30)))
 
         meta.create_all()
         meta2 = MetaData(testing.db)
         a2 = Table('addresses', meta2,
-            Column('id', sa.Integer,
-                   sa.ForeignKey('users.id'), primary_key=True),
-            autoload=True)
+                   Column('id', sa.Integer,
+                          sa.ForeignKey('users.id'), primary_key=True),
+                   autoload=True)
         u2 = Table('users', meta2, autoload=True)
 
         assert list(a2.primary_key) == [a2.c.id]
@@ -434,9 +435,9 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
         meta3 = MetaData(testing.db)
         u3 = Table('users', meta3, autoload=True)
         a3 = Table('addresses', meta3,
-            Column('id', sa.Integer, sa.ForeignKey('users.id'),
-                   primary_key=True),
-            autoload=True)
+                   Column('id', sa.Integer, sa.ForeignKey('users.id'),
+                          primary_key=True),
+                   autoload=True)
 
         assert list(a3.primary_key) == [a3.c.id]
         assert list(u3.primary_key) == [u3.c.id]
@@ -450,41 +451,42 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
 
         meta = self.metadata
         Table('users', meta,
-            Column('id', sa.Integer, primary_key=True),
-            Column('name', sa.String(30)))
+              Column('id', sa.Integer, primary_key=True),
+              Column('name', sa.String(30)))
         Table('addresses', meta,
-            Column('id', sa.Integer, primary_key=True),
-            Column('street', sa.String(30)),
-            Column('user_id', sa.Integer))
+              Column('id', sa.Integer, primary_key=True),
+              Column('street', sa.String(30)),
+              Column('user_id', sa.Integer))
 
         meta.create_all()
         meta2 = MetaData(testing.db)
         a2 = Table('addresses', meta2,
-                Column('user_id', sa.Integer, sa.ForeignKey('users.id')),
-               autoload=True)
+                   Column('user_id', sa.Integer, sa.ForeignKey('users.id')),
+                   autoload=True)
         u2 = Table('users', meta2, autoload=True)
         assert len(a2.c.user_id.foreign_keys) == 1
         assert len(a2.foreign_keys) == 1
         assert [c.parent for c in a2.foreign_keys] == [a2.c.user_id]
         assert [c.parent for c in a2.c.user_id.foreign_keys] \
-            == [a2.c.user_id]
+               == [a2.c.user_id]
         assert list(a2.c.user_id.foreign_keys)[0].parent \
-            is a2.c.user_id
+               is a2.c.user_id
         assert u2.join(a2).onclause.compare(u2.c.id == a2.c.user_id)
         meta3 = MetaData(testing.db)
 
         u3 = Table('users', meta3, autoload=True)
 
         a3 = Table('addresses', meta3, Column('user_id',
-                   sa.Integer, sa.ForeignKey('users.id')),
+                                              sa.Integer,
+                                              sa.ForeignKey('users.id')),
                    autoload=True)
         assert u3.join(a3).onclause.compare(u3.c.id == a3.c.user_id)
 
         meta4 = MetaData(testing.db)
 
         u4 = Table('users', meta4,
-                Column('id', sa.Integer, key='u_id', primary_key=True),
-                autoload=True)
+                   Column('id', sa.Integer, key='u_id', primary_key=True),
+                   autoload=True)
 
         a4 = Table(
             'addresses',
@@ -493,9 +495,9 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
                    primary_key=True),
             Column('street', sa.String(30), key='user_id'),
             Column('user_id', sa.Integer, sa.ForeignKey('users.u_id'
-                   ), key='id'),
+                                                        ), key='id'),
             autoload=True,
-            )
+        )
         assert u4.join(a4).onclause.compare(u4.c.u_id == a4.c.id)
         assert list(u4.primary_key) == [u4.c.u_id]
         assert len(u4.columns) == 2
@@ -510,17 +512,17 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
         metadata = self.metadata
 
         Table('a',
-            metadata,
-            Column('x', sa.Integer, primary_key=True),
-            Column('y', sa.Integer, primary_key=True),
-        )
+              metadata,
+              Column('x', sa.Integer, primary_key=True),
+              Column('y', sa.Integer, primary_key=True),
+              )
 
         Table('b',
-            metadata,
-            Column('x', sa.Integer, primary_key=True),
-            Column('y', sa.Integer, primary_key=True),
-            sa.ForeignKeyConstraint(['x', 'y'], ['a.x', 'a.y'])
-        )
+              metadata,
+              Column('x', sa.Integer, primary_key=True),
+              Column('y', sa.Integer, primary_key=True),
+              sa.ForeignKeyConstraint(['x', 'y'], ['a.x', 'a.y'])
+              )
 
         metadata.create_all()
 
@@ -530,10 +532,10 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
         c2 = Column('y', sa.Integer, primary_key=True)
         f1 = sa.ForeignKeyConstraint(['x', 'y'], ['a.x', 'a.y'])
         b1 = Table('b',
-            meta2, c1, c2, f1,
-            autoload=True,
-            autoload_with=testing.db
-        )
+                   meta2, c1, c2, f1,
+                   autoload=True,
+                   autoload_with=testing.db
+                   )
 
         assert b1.c.x is c1
         assert b1.c.y is c2
@@ -547,19 +549,19 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
 
         meta = self.metadata
         Table('a', meta,
-            Column('x', sa.Integer, primary_key=True),
-            Column('z', sa.Integer),
-            test_needs_fk=True
-        )
+              Column('x', sa.Integer, primary_key=True),
+              Column('z', sa.Integer),
+              test_needs_fk=True
+              )
         Table('b', meta,
-            Column('y', sa.Integer, sa.ForeignKey('a.x')),
-            test_needs_fk=True
-        )
+              Column('y', sa.Integer, sa.ForeignKey('a.x')),
+              test_needs_fk=True
+              )
         meta.create_all()
         m2 = MetaData(testing.db)
         a2 = Table('a', m2,
-                Column('x', sa.Integer, primary_key=True, key='x1'),
-                autoload=True)
+                   Column('x', sa.Integer, primary_key=True, key='x1'),
+                   autoload=True)
         b2 = Table('b', m2, autoload=True)
         assert a2.join(b2).onclause.compare(a2.c.x1 == b2.c.y)
         assert b2.c.y.references(a2.c.x1)
@@ -574,14 +576,14 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
 
         meta = self.metadata
         Table('a', meta,
-            Column('x', sa.Integer, primary_key=True),
-            Column('z', sa.Integer),
-            test_needs_fk=True
-        )
+              Column('x', sa.Integer, primary_key=True),
+              Column('z', sa.Integer),
+              test_needs_fk=True
+              )
         Table('b', meta,
-            Column('y', sa.Integer, sa.ForeignKey('a.x')),
-            test_needs_fk=True
-        )
+              Column('y', sa.Integer, sa.ForeignKey('a.x')),
+              test_needs_fk=True
+              )
         meta.create_all()
         m2 = MetaData(testing.db)
         a2 = Table('a', m2, include_columns=['z'], autoload=True)
@@ -598,19 +600,19 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
 
         meta = self.metadata
         Table('users', meta,
-            Column('id', sa.Integer, primary_key=True),
-            Column('name', sa.String(30)),
-            test_needs_fk=True)
+              Column('id', sa.Integer, primary_key=True),
+              Column('name', sa.String(30)),
+              test_needs_fk=True)
         Table('addresses', meta,
-            Column('id', sa.Integer, primary_key=True),
-            Column('user_id', sa.Integer, sa.ForeignKey('users.id')),
-            test_needs_fk=True)
+              Column('id', sa.Integer, primary_key=True),
+              Column('user_id', sa.Integer, sa.ForeignKey('users.id')),
+              test_needs_fk=True)
 
         meta.create_all()
         meta2 = MetaData(testing.db)
         a2 = Table('addresses', meta2,
-                Column('user_id', sa.Integer, sa.ForeignKey('users.id')),
-                autoload=True)
+                   Column('user_id', sa.Integer, sa.ForeignKey('users.id')),
+                   autoload=True)
         u2 = Table('users', meta2, autoload=True)
         s = sa.select([a2])
 
@@ -620,17 +622,18 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
         assert len(a2.constraints) == 2
         assert [c.parent for c in a2.foreign_keys] == [a2.c.user_id]
         assert [c.parent for c in a2.c.user_id.foreign_keys] \
-            == [a2.c.user_id]
+               == [a2.c.user_id]
         assert list(a2.c.user_id.foreign_keys)[0].parent \
-            is a2.c.user_id
+               is a2.c.user_id
         assert u2.join(a2).onclause.compare(u2.c.id == a2.c.user_id)
 
         meta2 = MetaData(testing.db)
         u2 = Table('users', meta2, Column('id', sa.Integer,
-                   primary_key=True), autoload=True)
+                                          primary_key=True), autoload=True)
         a2 = Table('addresses', meta2, Column('id', sa.Integer,
-                   primary_key=True), Column('user_id', sa.Integer,
-                   sa.ForeignKey('users.id')), autoload=True)
+                                              primary_key=True),
+                   Column('user_id', sa.Integer,
+                          sa.ForeignKey('users.id')), autoload=True)
         s = sa.select([a2])
 
         assert s.c.user_id is not None
@@ -639,9 +642,9 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
         assert len(a2.constraints) == 2
         assert [c.parent for c in a2.foreign_keys] == [a2.c.user_id]
         assert [c.parent for c in a2.c.user_id.foreign_keys] \
-            == [a2.c.user_id]
+               == [a2.c.user_id]
         assert list(a2.c.user_id.foreign_keys)[0].parent \
-            is a2.c.user_id
+               is a2.c.user_id
         assert u2.join(a2).onclause.compare(u2.c.id == a2.c.user_id)
 
     @testing.only_on(['postgresql', 'mysql'])
@@ -652,7 +655,7 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
 
         if testing.against('postgresql'):
             test_attrs = ('match', 'onupdate', 'ondelete',
-                            'deferrable', 'initially')
+                          'deferrable', 'initially')
             addresses_user_id_fkey = sa.ForeignKey(
                 # Each option is specifically not a Postgres default, or
                 # it won't be returned by PG's inspection
@@ -678,13 +681,13 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
 
         meta = self.metadata
         Table('users', meta,
-            Column('id', sa.Integer, primary_key=True),
-            Column('name', sa.String(30)),
-            test_needs_fk=True)
+              Column('id', sa.Integer, primary_key=True),
+              Column('name', sa.String(30)),
+              test_needs_fk=True)
         Table('addresses', meta,
-            Column('id', sa.Integer, primary_key=True),
-            Column('user_id', sa.Integer, addresses_user_id_fkey),
-            test_needs_fk=True)
+              Column('id', sa.Integer, primary_key=True),
+              Column('user_id', sa.Integer, addresses_user_id_fkey),
+              test_needs_fk=True)
         meta.create_all()
 
         meta2 = MetaData()
@@ -719,10 +722,10 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
     def test_fk_error(self):
         metadata = MetaData(testing.db)
         Table('slots', metadata,
-            Column('slot_id', sa.Integer, primary_key=True),
-            Column('pkg_id', sa.Integer, sa.ForeignKey('pkgs.pkg_id')),
-            Column('slot', sa.String(128)),
-            )
+              Column('slot_id', sa.Integer, primary_key=True),
+              Column('pkg_id', sa.Integer, sa.ForeignKey('pkgs.pkg_id')),
+              Column('slot', sa.String(128)),
+              )
 
         assert_raises_message(
             sa.exc.InvalidRequestError,
@@ -770,16 +773,18 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
             test_needs_fk=True,
         )
         multi2 = Table('multi2', meta,
-            Column('id', sa.Integer, primary_key=True),
-            Column('foo', sa.Integer),
-            Column('bar', sa.Integer),
-            Column('lala', sa.Integer),
-            Column('data', sa.String(50)),
-            sa.ForeignKeyConstraint(['foo', 'bar', 'lala'],
-             ['multi.multi_id', 'multi.multi_rev', 'multi.multi_hoho'
-             ]),
-            test_needs_fk=True,
-        )
+                       Column('id', sa.Integer, primary_key=True),
+                       Column('foo', sa.Integer),
+                       Column('bar', sa.Integer),
+                       Column('lala', sa.Integer),
+                       Column('data', sa.String(50)),
+                       sa.ForeignKeyConstraint(['foo', 'bar', 'lala'],
+                                               ['multi.multi_id',
+                                                'multi.multi_rev',
+                                                'multi.multi_hoho'
+                                                ]),
+                       test_needs_fk=True,
+                       )
         meta.create_all()
 
         meta2 = MetaData()
@@ -792,9 +797,9 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
         j = sa.join(table, table2)
 
         self.assert_(sa.and_(table.c.multi_id == table2.c.foo,
-                     table.c.multi_rev == table2.c.bar,
-                     table.c.multi_hoho
-                     == table2.c.lala).compare(j.onclause))
+                             table.c.multi_rev == table2.c.bar,
+                             table.c.multi_hoho
+                             == table2.c.lala).compare(j.onclause))
 
     @testing.crashes('oracle', 'FIXME: unknown, confirm not fails_on')
     @testing.requires.check_constraints
@@ -806,8 +811,9 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
 
         meta = self.metadata
         table_a = Table('select', meta, Column('not', sa.Integer,
-                        primary_key=True), Column('from',
-                        sa.String(12), nullable=False),
+                                               primary_key=True),
+                        Column('from',
+                               sa.String(12), nullable=False),
                         sa.UniqueConstraint('from', name='when'))
         sa.Index('where', table_a.c['from'])
 
@@ -821,16 +827,19 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
         quoter = meta.bind.dialect.identifier_preparer.quote_identifier
 
         Table('false', meta,
-                    Column('create', sa.Integer, primary_key=True),
-                    Column('true', sa.Integer, sa.ForeignKey('select.not')),
-                    sa.CheckConstraint('{0!s} <> 1'.format(quoter(check_col)), name='limit')
-                    )
+              Column('create', sa.Integer, primary_key=True),
+              Column('true', sa.Integer, sa.ForeignKey('select.not')),
+              sa.CheckConstraint('{0!s} <> 1'.format(quoter(check_col)),
+                                 name='limit')
+              )
 
         table_c = Table('is', meta,
-                Column('or', sa.Integer, nullable=False, primary_key=True),
-                Column('join', sa.Integer, nullable=False, primary_key=True),
-                sa.PrimaryKeyConstraint('or', 'join', name='to')
-                )
+                        Column('or', sa.Integer, nullable=False,
+                               primary_key=True),
+                        Column('join', sa.Integer, nullable=False,
+                               primary_key=True),
+                        sa.PrimaryKeyConstraint('or', 'join', name='to')
+                        )
         index_c = sa.Index('else', table_c.c.join)
         meta.create_all()
         index_c.drop()
@@ -848,7 +857,7 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
     @testing.uses_deprecated()
     def test_reflect_uses_bind_constructor_conn(self):
         self._test_reflect_uses_bind(lambda e: MetaData(e.connect(),
-                    reflect=True))
+                                                        reflect=True))
 
     @testing.uses_deprecated()
     def test_reflect_uses_bind_constructor_engine(self):
@@ -956,9 +965,9 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
     def test_index_reflection(self):
         m1 = self.metadata
         t1 = Table('party', m1,
-            Column('id', sa.Integer, nullable=False),
-            Column('name', sa.String(20), index=True)
-            )
+                   Column('id', sa.Integer, nullable=False),
+                   Column('name', sa.String(20), index=True)
+                   )
         sa.Index('idx1', t1.c.id, unique=True)
         sa.Index('idx2', t1.c.name, t1.c.id, unique=False)
         m1.create_all()
@@ -1013,10 +1022,10 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
             ]
 
         with testing.mock.patch.object(
-                testing.db.dialect, "get_columns", mock_get_columns):
+            testing.db.dialect, "get_columns", mock_get_columns):
             m = MetaData()
             with testing.expect_warnings(
-                    "index key 'a' was not located in columns"):
+                "index key 'a' was not located in columns"):
                 t = Table('x', m, autoload=True, autoload_with=testing.db)
 
         eq_(list(t.indexes)[0].columns, [t.c.b])
@@ -1064,7 +1073,7 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
             eq_(
                 set(m2.tables),
                 set(['email_addresses_v', 'users_v',
-                            'users', 'dingalings', 'email_addresses'])
+                     'users', 'dingalings', 'email_addresses'])
             )
         finally:
             _drop_views(metadata.bind)
@@ -1078,36 +1087,37 @@ class CreateDropTest(fixtures.TestBase):
         global metadata, users
         metadata = MetaData()
         users = Table('users', metadata,
-                    Column('user_id', sa.Integer,
-                      sa.Sequence('user_id_seq', optional=True),
-                      primary_key=True),
-                    Column('user_name', sa.String(40)))
+                      Column('user_id', sa.Integer,
+                             sa.Sequence('user_id_seq', optional=True),
+                             primary_key=True),
+                      Column('user_name', sa.String(40)))
 
         Table('email_addresses', metadata,
-                      Column('address_id', sa.Integer,
-                          sa.Sequence('address_id_seq', optional=True),
-                          primary_key=True),
-                      Column('user_id',
-                          sa.Integer, sa.ForeignKey(users.c.user_id)),
-                      Column('email_address', sa.String(40)))
+              Column('address_id', sa.Integer,
+                     sa.Sequence('address_id_seq', optional=True),
+                     primary_key=True),
+              Column('user_id',
+                     sa.Integer, sa.ForeignKey(users.c.user_id)),
+              Column('email_address', sa.String(40)))
 
         Table(
             'orders',
             metadata,
             Column('order_id', sa.Integer, sa.Sequence('order_id_seq',
-                   optional=True), primary_key=True),
+                                                       optional=True),
+                   primary_key=True),
             Column('user_id', sa.Integer,
                    sa.ForeignKey(users.c.user_id)),
             Column('description', sa.String(50)),
             Column('isopen', sa.Integer),
-            )
+        )
         Table('items', metadata,
-                        Column('item_id', sa.INT,
-                           sa.Sequence('items_id_seq', optional=True),
-                               primary_key=True),
-                        Column('order_id',
-                           sa.INT, sa.ForeignKey('orders')),
-                           Column('item_name', sa.VARCHAR(50)))
+              Column('item_id', sa.INT,
+                     sa.Sequence('items_id_seq', optional=True),
+                     primary_key=True),
+              Column('order_id',
+                     sa.INT, sa.ForeignKey('orders')),
+              Column('item_name', sa.VARCHAR(50)))
 
     def test_sorter(self):
         tables = metadata.sorted_tables
@@ -1154,7 +1164,7 @@ class CreateDropTest(fixtures.TestBase):
         # tsearch2 w/ the pg windows installer.)
 
         self.assert_(not set(metadata.tables)
-                     - set(testing.db.table_names()))
+                         - set(testing.db.table_names()))
         metadata.drop_all(bind=testing.db)
 
 
@@ -1166,8 +1176,8 @@ class SchemaManipulationTest(fixtures.TestBase):
 
         users = Table('users', meta, Column('id', sa.Integer))
         addresses = Table('addresses', meta,
-                        Column('id', sa.Integer),
-                        Column('user_id', sa.Integer))
+                          Column('id', sa.Integer),
+                          Column('user_id', sa.Integer))
 
         fk = sa.ForeignKeyConstraint(['user_id'], [users.c.id])
 
@@ -1232,7 +1242,7 @@ class UnicodeReflectionTest(fixtures.TestBase):
             names = no_multibyte_period
         # mysql can't handle casing usually
         elif testing.against("mysql") and \
-                not testing.requires.mysql_fully_case_sensitive.enabled:
+            not testing.requires.mysql_fully_case_sensitive.enabled:
             names = no_multibyte_period.union(no_case_sensitivity)
         # mssql + pyodbc + freetds can't compare multibyte names to
         # information_schema.tables.table_name
@@ -1243,11 +1253,11 @@ class UnicodeReflectionTest(fixtures.TestBase):
 
         for tname, cname, ixname in names:
             t = Table(tname, metadata,
-                        Column('id', sa.Integer,
-                                sa.Sequence(cname + '_id_seq'),
-                                primary_key=True),
-                        Column(cname, Integer)
-                  )
+                      Column('id', sa.Integer,
+                             sa.Sequence(cname + '_id_seq'),
+                             primary_key=True),
+                      Column(cname, Integer)
+                      )
             schema.Index(ixname, t.c[cname])
 
         metadata.create_all(testing.db)
@@ -1260,7 +1270,8 @@ class UnicodeReflectionTest(fixtures.TestBase):
     @testing.requires.unicode_connections
     def test_has_table(self):
         for tname, cname, ixname in self.names:
-            assert testing.db.has_table(tname), "Can't detect name {0!s}".format(tname)
+            assert testing.db.has_table(
+                tname), "Can't detect name {0!s}".format(tname)
 
     @testing.requires.unicode_connections
     def test_basic(self):
@@ -1277,7 +1288,6 @@ class UnicodeReflectionTest(fixtures.TestBase):
         # Jython 2.5 on Java 5 lacks unicodedata.normalize
 
         if not names.issubset(reflected) and hasattr(unicodedata, 'normalize'):
-
             # Python source files in the utf-8 coding seem to
             # normalize literals as NFC (and the above are
             # explicitly NFC).  Maybe this database normalizes NFD
@@ -1306,7 +1316,7 @@ class UnicodeReflectionTest(fixtures.TestBase):
                 [
                     (rec['name'], rec['column_names'][0])
                     for rec in inspector.get_indexes(tname)
-                ],
+                    ],
                 [(names[tname][1], names[tname][0])]
             )
 
@@ -1318,9 +1328,9 @@ class SchemaTest(fixtures.TestBase):
     @testing.requires.cross_schema_fk_reflection
     def test_has_schema(self):
         eq_(testing.db.dialect.has_schema(testing.db,
-            testing.config.test_schema), True)
+                                          testing.config.test_schema), True)
         eq_(testing.db.dialect.has_schema(testing.db,
-            'sa_fake_schema_123'), False)
+                                          'sa_fake_schema_123'), False)
 
     @testing.requires.schemas
     @testing.requires.cross_schema_fk_reflection
@@ -1366,15 +1376,15 @@ class SchemaTest(fixtures.TestBase):
 
         metadata = MetaData(engine)
         Table('table1', metadata,
-                       Column('col1', sa.Integer, primary_key=True),
-                       test_needs_fk=True,
-                       schema=schema)
+              Column('col1', sa.Integer, primary_key=True),
+              test_needs_fk=True,
+              schema=schema)
         Table('table2', metadata,
-                       Column('col1', sa.Integer, primary_key=True),
-                       Column('col2', sa.Integer,
-                              sa.ForeignKey('{0!s}.table1.col1'.format(schema))),
-                       test_needs_fk=True,
-                       schema=schema)
+              Column('col1', sa.Integer, primary_key=True),
+              Column('col2', sa.Integer,
+                     sa.ForeignKey('{0!s}.table1.col1'.format(schema))),
+              test_needs_fk=True,
+              schema=schema)
         try:
             metadata.create_all()
             metadata.create_all(checkfirst=True)
@@ -1390,15 +1400,18 @@ class SchemaTest(fixtures.TestBase):
     @testing.requires.schemas
     @testing.provide_metadata
     def test_schema_translation(self):
-        Table('foob', self.metadata, Column('q', Integer), schema=config.test_schema)
+        Table('foob', self.metadata, Column('q', Integer),
+              schema=config.test_schema)
         self.metadata.create_all()
 
         m = MetaData()
         map_ = {"foob": config.test_schema}
-        with config.db.connect().execution_options(schema_translate_map=map_) as conn:
+        with config.db.connect().execution_options(
+            schema_translate_map=map_) as conn:
             t = Table('foob', m, schema="foob", autoload_with=conn)
             eq_(t.schema, "foob")
             eq_(t.c.keys(), ['q'])
+
     @testing.requires.schemas
     @testing.fails_on('sybase', 'FIXME: unknown')
     def test_explicit_default_schema_metadata(self):
@@ -1416,13 +1429,13 @@ class SchemaTest(fixtures.TestBase):
 
         metadata = MetaData(engine, schema=schema)
         Table('table1', metadata,
-                       Column('col1', sa.Integer, primary_key=True),
-                       test_needs_fk=True)
+              Column('col1', sa.Integer, primary_key=True),
+              test_needs_fk=True)
         Table('table2', metadata,
-                       Column('col1', sa.Integer, primary_key=True),
-                       Column('col2', sa.Integer,
-                              sa.ForeignKey('table1.col1')),
-                       test_needs_fk=True)
+              Column('col1', sa.Integer, primary_key=True),
+              Column('col2', sa.Integer,
+                     sa.ForeignKey('table1.col1')),
+              test_needs_fk=True)
         try:
             metadata.create_all()
             metadata.create_all(checkfirst=True)
@@ -1449,7 +1462,7 @@ class SchemaTest(fixtures.TestBase):
                 '{0!s}.dingalings'.format(testing.config.test_schema),
                 '{0!s}.users'.format(testing.config.test_schema),
                 '{0!s}.email_addresses'.format(testing.config.test_schema)
-                ])
+            ])
         )
 
     @testing.requires.schemas
@@ -1457,12 +1470,12 @@ class SchemaTest(fixtures.TestBase):
     @testing.provide_metadata
     def test_reflect_all_schemas_default_overlap(self):
         t1 = Table('t', self.metadata,
-                Column('id', Integer, primary_key=True))
+                   Column('id', Integer, primary_key=True))
 
         t2 = Table('t', self.metadata,
-            Column('id1', sa.ForeignKey('t.id')),
-            schema=testing.config.test_schema
-        )
+                   Column('id1', sa.ForeignKey('t.id')),
+                   schema=testing.config.test_schema
+                   )
 
         self.metadata.create_all()
         m2 = MetaData()
@@ -1488,42 +1501,46 @@ def createTables(meta, schema=None):
         schema_prefix = ""
 
     users = Table('users', meta,
-        Column('user_id', sa.INT, primary_key=True),
-        Column('user_name', sa.VARCHAR(20), nullable=False),
-        Column('test1', sa.CHAR(5), nullable=False),
-        Column('test2', sa.Float(5), nullable=False),
-        Column('test3', sa.Text),
-        Column('test4', sa.Numeric(10, 2), nullable=False),
-        Column('test5', sa.Date),
-        Column('test5_1', sa.TIMESTAMP),
-        Column('parent_user_id', sa.Integer,
-                    sa.ForeignKey('{0!s}users.user_id'.format(schema_prefix))),
-        Column('test6', sa.Date, nullable=False),
-        Column('test7', sa.Text),
-        Column('test8', sa.LargeBinary),
-        Column('test_passivedefault2', sa.Integer, server_default='5'),
-        Column('test9', sa.LargeBinary(100)),
-        Column('test10', sa.Numeric(10, 2)),
-        schema=schema,
-        test_needs_fk=True,
-    )
+                  Column('user_id', sa.INT, primary_key=True),
+                  Column('user_name', sa.VARCHAR(20), nullable=False),
+                  Column('test1', sa.CHAR(5), nullable=False),
+                  Column('test2', sa.Float(5), nullable=False),
+                  Column('test3', sa.Text),
+                  Column('test4', sa.Numeric(10, 2), nullable=False),
+                  Column('test5', sa.Date),
+                  Column('test5_1', sa.TIMESTAMP),
+                  Column('parent_user_id', sa.Integer,
+                         sa.ForeignKey(
+                             '{0!s}users.user_id'.format(schema_prefix))),
+                  Column('test6', sa.Date, nullable=False),
+                  Column('test7', sa.Text),
+                  Column('test8', sa.LargeBinary),
+                  Column('test_passivedefault2', sa.Integer,
+                         server_default='5'),
+                  Column('test9', sa.LargeBinary(100)),
+                  Column('test10', sa.Numeric(10, 2)),
+                  schema=schema,
+                  test_needs_fk=True,
+                  )
     dingalings = Table("dingalings", meta,
-                Column('dingaling_id', sa.Integer, primary_key=True),
-                Column('address_id', sa.Integer,
-                     sa.ForeignKey(
-                         '{0!s}email_addresses.address_id'.format(schema_prefix))),
-                Column('data', sa.String(30)),
-                schema=schema, test_needs_fk=True,
-            )
+                       Column('dingaling_id', sa.Integer, primary_key=True),
+                       Column('address_id', sa.Integer,
+                              sa.ForeignKey(
+                                  '{0!s}email_addresses.address_id'.format(
+                                      schema_prefix))),
+                       Column('data', sa.String(30)),
+                       schema=schema, test_needs_fk=True,
+                       )
     addresses = Table('email_addresses', meta,
-        Column('address_id', sa.Integer),
-        Column('remote_user_id', sa.Integer,
-               sa.ForeignKey(users.c.user_id)),
-        Column('email_address', sa.String(20)),
-        sa.PrimaryKeyConstraint('address_id', name='email_ad_pk'),
-        schema=schema,
-        test_needs_fk=True,
-    )
+                      Column('address_id', sa.Integer),
+                      Column('remote_user_id', sa.Integer,
+                             sa.ForeignKey(users.c.user_id)),
+                      Column('email_address', sa.String(20)),
+                      sa.PrimaryKeyConstraint('address_id',
+                                              name='email_ad_pk'),
+                      schema=schema,
+                      test_needs_fk=True,
+                      )
 
     return (users, addresses, dingalings)
 
@@ -1543,7 +1560,8 @@ def _create_views(con, schema=None):
         if schema:
             fullname = "{0!s}.{1!s}".format(schema, table_name)
         view_name = fullname + '_v'
-        query = "CREATE VIEW {0!s} AS SELECT * FROM {1!s}".format(view_name, fullname)
+        query = "CREATE VIEW {0!s} AS SELECT * FROM {1!s}".format(view_name,
+                                                                  fullname)
         con.execute(sa.sql.text(query))
 
 
@@ -1593,14 +1611,14 @@ class CaseSensitiveTest(fixtures.TablesTest):
     @classmethod
     def define_tables(cls, metadata):
         Table('SomeTable', metadata,
-            Column('x', Integer, primary_key=True),
-            test_needs_fk=True
-        )
+              Column('x', Integer, primary_key=True),
+              test_needs_fk=True
+              )
         Table('SomeOtherTable', metadata,
-            Column('x', Integer, primary_key=True),
-            Column('y', Integer, sa.ForeignKey("SomeTable.x")),
-            test_needs_fk=True
-        )
+              Column('x', Integer, primary_key=True),
+              Column('y', Integer, sa.ForeignKey("SomeTable.x")),
+              test_needs_fk=True
+              )
 
     @testing.fails_if(testing.requires._has_mysql_on_windows)
     def test_table_names(self):
@@ -1616,13 +1634,13 @@ class CaseSensitiveTest(fixtures.TablesTest):
         assert t1.c.x is not None
 
     @testing.fails_if(lambda:
-            testing.against(('mysql', '<', (5, 5))) and
-            not testing.requires._has_mysql_fully_case_sensitive()
-            )
+                      testing.against(('mysql', '<', (5, 5))) and
+                      not testing.requires._has_mysql_fully_case_sensitive()
+                      )
     def test_reflect_via_fk(self):
         m = MetaData()
         t2 = Table("SomeOtherTable", m, autoload=True,
-                    autoload_with=testing.db)
+                   autoload_with=testing.db)
         eq_(t2.name, "SomeOtherTable")
         assert "SomeTable" in m.tables
 
@@ -1716,13 +1734,14 @@ class ColumnEventsTest(fixtures.RemovesEvents, fixtures.TestBase):
         ])
         related = Table("related", m, autoload=True, listeners=[
             ('column_reflect', column_reflect),
-            ])
+        ])
 
         assert related.c.qyz.references(to_reflect.c.xyz)
 
     def test_override_type(self):
         def assert_(table):
             assert isinstance(table.c.x.type, sa.String)
+
         self._do_test(
             "x", {"type": sa.String},
             assert_

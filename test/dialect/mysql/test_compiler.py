@@ -17,8 +17,8 @@ from sqlalchemy import testing
 from sqlalchemy.sql import table, column
 import re
 
-class CompileTest(fixtures.TestBase, AssertsCompiledSQL):
 
+class CompileTest(fixtures.TestBase, AssertsCompiledSQL):
     __dialect__ = mysql.dialect()
 
     def test_reserved_words(self):
@@ -208,7 +208,6 @@ class CompileTest(fixtures.TestBase, AssertsCompiledSQL):
 
 
 class SQLTest(fixtures.TestBase, AssertsCompiledSQL):
-
     """Tests MySQL-dialect specific compilation."""
 
     __dialect__ = mysql.dialect()
@@ -518,7 +517,8 @@ class SQLTest(fixtures.TestBase, AssertsCompiledSQL):
         for field in 'year', 'month', 'day':
             self.assert_compile(
                 select([extract(field, t.c.col1)]),
-                "SELECT EXTRACT({0!s} FROM t.col1) AS anon_1 FROM t".format(field))
+                "SELECT EXTRACT({0!s} FROM t.col1) AS anon_1 FROM t".format(
+                    field))
 
         # millsecondS to millisecond
         self.assert_compile(

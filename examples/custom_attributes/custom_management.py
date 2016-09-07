@@ -9,7 +9,7 @@ descriptors with a user-defined system.
 
 
 """
-from sqlalchemy import create_engine, MetaData, Table, Column, Integer, Text,\
+from sqlalchemy import create_engine, MetaData, Table, Column, Integer, Text, \
     ForeignKey
 from sqlalchemy.orm import mapper, relationship, Session
 
@@ -18,6 +18,7 @@ from sqlalchemy.orm.attributes import set_attribute, get_attribute, \
 from sqlalchemy.orm.instrumentation import is_instrumented
 
 from sqlalchemy.ext.instrumentation import InstrumentationManager
+
 
 class MyClassState(InstrumentationManager):
     def get_instance_dict(self, class_, instance):
@@ -32,7 +33,9 @@ class MyClassState(InstrumentationManager):
     def state_getter(self, class_):
         def find(instance):
             return instance.__dict__['_goofy_dict']['state']
+
         return find
+
 
 class MyClass(object):
     __sa_instrumentation_manager__ = MyClassState
@@ -68,19 +71,22 @@ if __name__ == '__main__':
     meta = MetaData()
 
     table1 = Table('table1', meta,
-                    Column('id', Integer, primary_key=True),
-                    Column('name', Text))
+                   Column('id', Integer, primary_key=True),
+                   Column('name', Text))
     table2 = Table('table2', meta,
-                    Column('id', Integer, primary_key=True),
-                    Column('name', Text),
-                    Column('t1id', Integer, ForeignKey('table1.id')))
+                   Column('id', Integer, primary_key=True),
+                   Column('name', Text),
+                   Column('t1id', Integer, ForeignKey('table1.id')))
     meta.create_all(engine)
+
 
     class A(MyClass):
         pass
 
+
     class B(MyClass):
         pass
+
 
     mapper(A, table1, properties={
         'bs': relationship(B)

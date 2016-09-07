@@ -113,11 +113,11 @@ class AutomapTest(fixtures.MappedTest):
             return str("cls_" + tablename)
 
         def name_for_scalar_relationship(
-                base, local_cls, referred_cls, constraint):
+            base, local_cls, referred_cls, constraint):
             return "scalar_" + referred_cls.__name__
 
         def name_for_collection_relationship(
-                base, local_cls, referred_cls, constraint):
+            base, local_cls, referred_cls, constraint):
             return "coll_" + referred_cls.__name__
 
         Base.prepare(
@@ -156,6 +156,7 @@ class AutomapTest(fixtures.MappedTest):
                 "items",
                 secondary="order_items",
                 collection_class=set)
+
         Base.prepare()
 
         Item = Base.classes['items']
@@ -176,7 +177,7 @@ class AutomapTest(fixtures.MappedTest):
 
         def _gen_relationship(
             base, direction, return_fn, attrname,
-                local_cls, referred_cls, **kw):
+            local_cls, referred_cls, **kw):
             mock(base, direction, attrname)
             return generate_relationship(
                 base, direction, return_fn,
@@ -335,6 +336,7 @@ class AutomapInhTest(fixtures.MappedTest):
 
         def _gen_relationship(*arg, **kw):
             return None
+
         Base.prepare(
             engine=testing.db, reflect=True,
             generate_relationship=_gen_relationship)

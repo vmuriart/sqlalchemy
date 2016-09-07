@@ -27,13 +27,11 @@ from sqlalchemy import and_, not_, between, or_
 
 
 class LoopOperate(operators.ColumnOperators):
-
     def operate(self, op, *other, **kwargs):
         return op
 
 
 class DefaultColumnComparatorTest(fixtures.TestBase):
-
     def _do_scalar_test(self, operator, compare_to):
         left = column('left')
         assert left.comparator.operate(operator).compare(
@@ -200,9 +198,7 @@ class DefaultColumnComparatorTest(fixtures.TestBase):
     def test_in_no_accept_non_list_thing_with_getitem(self):
         # test [ticket:2726]
         class HasGetitem(String):
-
             class comparator_factory(String.Comparator):
-
                 def __getitem__(self, value):
                     return value
 
@@ -296,9 +292,7 @@ class CustomUnaryOperatorTest(fixtures.TestBase, testing.AssertsCompiledSQL):
 
     def _factorial_fixture(self):
         class MyInteger(Integer):
-
             class comparator_factory(Integer.Comparator):
-
                 def factorial(self):
                     return UnaryExpression(self.expr,
                                            modifier=operators.custom_op("!"),
@@ -370,7 +364,6 @@ class CustomUnaryOperatorTest(fixtures.TestBase, testing.AssertsCompiledSQL):
 
 
 class _CustomComparatorTests(object):
-
     def test_override_builtin(self):
         c1 = Column('foo', self._add_override_factory())
         self._assert_add_override(c1)
@@ -433,13 +426,9 @@ class _CustomComparatorTests(object):
 
 
 class CustomComparatorTest(_CustomComparatorTests, fixtures.TestBase):
-
     def _add_override_factory(self):
-
         class MyInteger(Integer):
-
             class comparator_factory(TypeEngine.Comparator):
-
                 def __init__(self, expr):
                     super(MyInteger.comparator_factory, self).__init__(expr)
 
@@ -453,14 +442,11 @@ class CustomComparatorTest(_CustomComparatorTests, fixtures.TestBase):
 
 
 class TypeDecoratorComparatorTest(_CustomComparatorTests, fixtures.TestBase):
-
     def _add_override_factory(self):
-
         class MyInteger(TypeDecorator):
             impl = Integer
 
             class comparator_factory(TypeDecorator.Comparator):
-
                 def __init__(self, expr):
                     super(MyInteger.comparator_factory, self).__init__(expr)
 
@@ -474,15 +460,12 @@ class TypeDecoratorComparatorTest(_CustomComparatorTests, fixtures.TestBase):
 
 
 class TypeDecoratorTypeDecoratorComparatorTest(
-        _CustomComparatorTests, fixtures.TestBase):
-
+    _CustomComparatorTests, fixtures.TestBase):
     def _add_override_factory(self):
-
         class MyIntegerOne(TypeDecorator):
             impl = Integer
 
             class comparator_factory(TypeDecorator.Comparator):
-
                 def __init__(self, expr):
                     super(MyIntegerOne.comparator_factory, self).__init__(expr)
 
@@ -499,15 +482,11 @@ class TypeDecoratorTypeDecoratorComparatorTest(
 
 
 class TypeDecoratorWVariantComparatorTest(
-        _CustomComparatorTests,
-        fixtures.TestBase):
-
+    _CustomComparatorTests,
+    fixtures.TestBase):
     def _add_override_factory(self):
-
         class SomeOtherInteger(Integer):
-
             class comparator_factory(TypeEngine.Comparator):
-
                 def __init__(self, expr):
                     super(
                         SomeOtherInteger.comparator_factory,
@@ -523,7 +502,6 @@ class TypeDecoratorWVariantComparatorTest(
             impl = Integer
 
             class comparator_factory(TypeDecorator.Comparator):
-
                 def __init__(self, expr):
                     super(MyInteger.comparator_factory, self).__init__(expr)
 
@@ -537,14 +515,11 @@ class TypeDecoratorWVariantComparatorTest(
 
 
 class CustomEmbeddedinTypeDecoratorTest(
-        _CustomComparatorTests,
-        fixtures.TestBase):
-
+    _CustomComparatorTests,
+    fixtures.TestBase):
     def _add_override_factory(self):
         class MyInteger(Integer):
-
             class comparator_factory(TypeEngine.Comparator):
-
                 def __init__(self, expr):
                     super(MyInteger.comparator_factory, self).__init__(expr)
 
@@ -561,17 +536,15 @@ class CustomEmbeddedinTypeDecoratorTest(
 
 
 class NewOperatorTest(_CustomComparatorTests, fixtures.TestBase):
-
     def _add_override_factory(self):
         class MyInteger(Integer):
-
             class comparator_factory(TypeEngine.Comparator):
-
                 def __init__(self, expr):
                     super(MyInteger.comparator_factory, self).__init__(expr)
 
                 def foob(self, other):
                     return self.expr.op("foob")(other)
+
         return MyInteger
 
     def _assert_add_override(self, expr):
@@ -594,9 +567,7 @@ class ExtensionOperatorTest(fixtures.TestBase, testing.AssertsCompiledSQL):
 
     def test_contains(self):
         class MyType(UserDefinedType):
-
             class comparator_factory(UserDefinedType.Comparator):
-
                 def contains(self, other, **kw):
                     return self.op("->")(other)
 
@@ -607,9 +578,7 @@ class ExtensionOperatorTest(fixtures.TestBase, testing.AssertsCompiledSQL):
 
     def test_getitem(self):
         class MyType(UserDefinedType):
-
             class comparator_factory(UserDefinedType.Comparator):
-
                 def __getitem__(self, index):
                     return self.op("->")(index)
 
@@ -621,9 +590,7 @@ class ExtensionOperatorTest(fixtures.TestBase, testing.AssertsCompiledSQL):
     def test_op_not_an_iterator(self):
         # see [ticket:2726]
         class MyType(UserDefinedType):
-
             class comparator_factory(UserDefinedType.Comparator):
-
                 def __getitem__(self, index):
                     return self.op("->")(index)
 
@@ -632,9 +599,7 @@ class ExtensionOperatorTest(fixtures.TestBase, testing.AssertsCompiledSQL):
 
     def test_lshift(self):
         class MyType(UserDefinedType):
-
             class comparator_factory(UserDefinedType.Comparator):
-
                 def __lshift__(self, other):
                     return self.op("->")(other)
 
@@ -645,9 +610,7 @@ class ExtensionOperatorTest(fixtures.TestBase, testing.AssertsCompiledSQL):
 
     def test_rshift(self):
         class MyType(UserDefinedType):
-
             class comparator_factory(UserDefinedType.Comparator):
-
                 def __rshift__(self, other):
                     return self.op("->")(other)
 
@@ -667,14 +630,13 @@ class JSONIndexOpTest(fixtures.TestBase, testing.AssertsCompiledSQL):
                 return "MYOTHERTYPE"
 
         class MyCompiler(compiler.SQLCompiler):
-
             def visit_json_getitem_op_binary(self, binary, operator, **kw):
                 return self._generate_generic_binary(
                     binary, " -> ", **kw
                 )
 
             def visit_json_path_getitem_op_binary(
-                    self, binary, operator, **kw):
+                self, binary, operator, **kw):
                 return self._generate_generic_binary(
                     binary, " #> ", **kw
                 )
@@ -708,7 +670,6 @@ class JSONIndexOpTest(fixtures.TestBase, testing.AssertsCompiledSQL):
         )
 
     def test_getindex_literal_integer(self):
-
         col = Column('x', self.MyType())
 
         self.assert_compile(
@@ -718,7 +679,6 @@ class JSONIndexOpTest(fixtures.TestBase, testing.AssertsCompiledSQL):
         )
 
     def test_getindex_literal_string(self):
-
         col = Column('x', self.MyType())
 
         self.assert_compile(
@@ -728,7 +688,6 @@ class JSONIndexOpTest(fixtures.TestBase, testing.AssertsCompiledSQL):
         )
 
     def test_path_getindex_literal(self):
-
         col = Column('x', self.MyType())
 
         self.assert_compile(
@@ -738,7 +697,6 @@ class JSONIndexOpTest(fixtures.TestBase, testing.AssertsCompiledSQL):
         )
 
     def test_getindex_sqlexpr(self):
-
         col = Column('x', self.MyType())
         col2 = Column('y', Integer())
 
@@ -761,7 +719,6 @@ class JSONIndexOpTest(fixtures.TestBase, testing.AssertsCompiledSQL):
             __visit_name__ = 'myothertype'
 
             class Comparator(TypeEngine.Comparator):
-
                 def _adapt_expression(self, op, other_comparator):
                     return special_index_op, MyOtherType()
 
@@ -836,7 +793,6 @@ class ArrayIndexOpTest(fixtures.TestBase, testing.AssertsCompiledSQL):
         )
 
     def test_getindex_literal(self):
-
         col = Column('x', self.MyType())
 
         self.assert_compile(
@@ -855,7 +811,6 @@ class ArrayIndexOpTest(fixtures.TestBase, testing.AssertsCompiledSQL):
         )
 
     def test_getindex_sqlexpr(self):
-
         col = Column('x', self.MyType())
         col2 = Column('y', Integer())
 
@@ -872,7 +827,6 @@ class ArrayIndexOpTest(fixtures.TestBase, testing.AssertsCompiledSQL):
         )
 
     def test_getslice_literal(self):
-
         col = Column('x', self.MyType())
 
         self.assert_compile(
@@ -882,7 +836,6 @@ class ArrayIndexOpTest(fixtures.TestBase, testing.AssertsCompiledSQL):
         )
 
     def test_getslice_sqlexpr(self):
-
         col = Column('x', self.MyType())
         col2 = Column('y', Integer())
 
@@ -893,7 +846,6 @@ class ArrayIndexOpTest(fixtures.TestBase, testing.AssertsCompiledSQL):
         )
 
     def test_getindex_literal_zeroind(self):
-
         col = Column('x', self.MyType(zero_indexes=True))
 
         self.assert_compile(
@@ -903,7 +855,6 @@ class ArrayIndexOpTest(fixtures.TestBase, testing.AssertsCompiledSQL):
         )
 
     def test_getindex_sqlexpr_zeroind(self):
-
         col = Column('x', self.MyType(zero_indexes=True))
         col2 = Column('y', Integer())
 
@@ -920,7 +871,6 @@ class ArrayIndexOpTest(fixtures.TestBase, testing.AssertsCompiledSQL):
         )
 
     def test_getslice_literal_zeroind(self):
-
         col = Column('x', self.MyType(zero_indexes=True))
 
         self.assert_compile(
@@ -930,7 +880,6 @@ class ArrayIndexOpTest(fixtures.TestBase, testing.AssertsCompiledSQL):
         )
 
     def test_getslice_sqlexpr_zeroind(self):
-
         col = Column('x', self.MyType(zero_indexes=True))
         col2 = Column('y', Integer())
 
@@ -947,7 +896,6 @@ class ArrayIndexOpTest(fixtures.TestBase, testing.AssertsCompiledSQL):
             __visit_name__ = 'myothertype'
 
             class Comparator(TypeEngine.Comparator):
-
                 def _adapt_expression(self, op, other_comparator):
                     return special_index_op, MyOtherType()
 
@@ -962,7 +910,6 @@ class ArrayIndexOpTest(fixtures.TestBase, testing.AssertsCompiledSQL):
 
 
 class BooleanEvalTest(fixtures.TestBase, testing.AssertsCompiledSQL):
-
     """test standalone booleans being wrapped in an AsBoolean, as well
     as true/false compilation."""
 
@@ -1085,7 +1032,6 @@ class BooleanEvalTest(fixtures.TestBase, testing.AssertsCompiledSQL):
 
 
 class ConjunctionTest(fixtures.TestBase, testing.AssertsCompiledSQL):
-
     """test interaction of and_()/or_() with boolean , null constants
     """
     __dialect__ = default.DefaultDialect(supports_native_boolean=True)
@@ -1131,7 +1077,7 @@ class ConjunctionTest(fixtures.TestBase, testing.AssertsCompiledSQL):
                     true())),
             "SELECT x WHERE 1 = 1",
             dialect=default.DefaultDialect(
-                    supports_native_boolean=False))
+                supports_native_boolean=False))
 
     def test_seven(self):
         x = column("x")
@@ -1303,9 +1249,9 @@ class OperatorPrecedenceTest(fixtures.TestBase, testing.AssertsCompiledSQL):
 
     def test_operator_precedence_5(self):
         self.assert_compile(self.table2.select(
-                            5 + self.table2.c.field.in_([5, 6])),
-                            "SELECT op.field FROM op WHERE :param_1 + "
-                            "(op.field IN (:field_1, :field_2))")
+            5 + self.table2.c.field.in_([5, 6])),
+            "SELECT op.field FROM op WHERE :param_1 + "
+            "(op.field IN (:field_1, :field_2))")
 
     def test_operator_precedence_6(self):
         self.assert_compile(self.table2.select(
@@ -1343,7 +1289,7 @@ class OperatorPrecedenceTest(fixtures.TestBase, testing.AssertsCompiledSQL):
     def test_operator_precedence_11(self):
         self.assert_compile(self.table2.select(
             (self.table2.c.field == self.table2.c.field).
-            between(False, True)),
+                between(False, True)),
             "SELECT op.field FROM op WHERE (op.field = op.field) "
             "BETWEEN :param_1 AND :param_2")
 
@@ -1705,7 +1651,7 @@ class InTest(fixtures.TestBase, testing.AssertsCompiledSQL):
 
     def test_in_21(self):
         self.assert_compile(~self.table1.c.myid.in_(
-                            select([self.table2.c.otherid])),
+            select([self.table2.c.otherid])),
                             "mytable.myid NOT IN (SELECT myothertable.otherid FROM myothertable)")
 
     def test_in_22(self):
@@ -1744,8 +1690,8 @@ class InTest(fixtures.TestBase, testing.AssertsCompiledSQL):
                 select([self.table1.c.myid], self.table1.c.myid == 12),
             )
         ), "mytable.myid IN ("
-            "SELECT mytable.myid FROM mytable WHERE mytable.myid = :myid_1 "
-            "UNION SELECT mytable.myid FROM mytable WHERE mytable.myid = :myid_2)")
+           "SELECT mytable.myid FROM mytable WHERE mytable.myid = :myid_1 "
+           "UNION SELECT mytable.myid FROM mytable WHERE mytable.myid = :myid_2)")
 
     def test_in_27(self):
         # test that putting a select in an IN clause does not
@@ -1753,14 +1699,14 @@ class InTest(fixtures.TestBase, testing.AssertsCompiledSQL):
         self.assert_compile(
             select([self.table1, self.table2],
                    self.table2.c.otherid.in_(
-                select([self.table2.c.otherid],
-                       order_by=[self.table2.c.othername],
-                       limit=10, correlate=False)
-            ),
-                from_obj=[self.table1.join(self.table2,
-                                           self.table1.c.myid == self.table2.c.otherid)],
-                order_by=[self.table1.c.myid]
-            ),
+                       select([self.table2.c.otherid],
+                              order_by=[self.table2.c.othername],
+                              limit=10, correlate=False)
+                   ),
+                   from_obj=[self.table1.join(self.table2,
+                                              self.table1.c.myid == self.table2.c.otherid)],
+                   order_by=[self.table1.c.myid]
+                   ),
             "SELECT mytable.myid, "
             "myothertable.otherid, myothertable.othername FROM mytable "
             "JOIN myothertable ON mytable.myid = myothertable.otherid "
@@ -1836,8 +1782,8 @@ class ComparisonOperatorTest(fixtures.TestBase, testing.AssertsCompiledSQL):
 
     def test_pickle_operators_one(self):
         clause = (self.table1.c.myid == 12) & \
-            self.table1.c.myid.between(15, 20) & \
-            self.table1.c.myid.like('hoho')
+                 self.table1.c.myid.between(15, 20) & \
+                 self.table1.c.myid.like('hoho')
         eq_(str(clause), str(util.pickle.loads(util.pickle.dumps(clause))))
 
     def test_pickle_operators_two(self):
@@ -1859,7 +1805,6 @@ class ComparisonOperatorTest(fixtures.TestBase, testing.AssertsCompiledSQL):
             (dt, literal('b'), ':param_2', ':param_1'),
             (literal('b'), dt, ':param_1', ':param_2'),
         ):
-
             # the compiled clause should match either (e.g.):
             # 'a' < 'b' -or- 'b' > 'a'.
             compiled = str(py_op(lhs, rhs))
@@ -1890,7 +1835,6 @@ class ComparisonOperatorTest(fixtures.TestBase, testing.AssertsCompiledSQL):
 
 
 class NonZeroTest(fixtures.TestBase):
-
     def _raises(self, expr):
         assert_raises_message(
             TypeError,
@@ -1960,7 +1904,8 @@ class NegationTest(fixtures.TestBase, testing.AssertsCompiledSQL):
                 (self.table1.c.myid, "mytable.myid"),
                 (literal("foo"), ":param_1"),
             ):
-                self.assert_compile(py_op(expr), "{0!s}{1!s}".format(op, expected))
+                self.assert_compile(py_op(expr),
+                                    "{0!s}{1!s}".format(op, expected))
 
     def test_negate_operators_2(self):
         self.assert_compile(
@@ -2421,7 +2366,6 @@ class ComposedLikeOperatorsTest(fixtures.TestBase, testing.AssertsCompiledSQL):
 
 
 class CustomOpTest(fixtures.TestBase):
-
     def test_is_comparison(self):
         c = column('x')
         c2 = column('y')
@@ -2433,7 +2377,6 @@ class CustomOpTest(fixtures.TestBase):
 
 
 class TupleTypingTest(fixtures.TestBase):
-
     def _assert_types(self, expr):
         eq_(expr.clauses[0].type._type_affinity, Integer)
         eq_(expr.clauses[1].type._type_affinity, String)
@@ -2608,4 +2551,3 @@ class AnyAllTest(fixtures.TestBase, testing.AssertsCompiledSQL):
             "FROM tab1 WHERE tab1.data < :data_1)",
             checkparams={'data_1': 10, 'param_1': 5}
         )
-

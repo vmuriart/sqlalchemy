@@ -51,6 +51,7 @@ class _kinterbasdb_numeric(object):
                 return str(value)
             else:
                 return value
+
         return process
 
 
@@ -163,7 +164,8 @@ class FBDialect_kinterbasdb(FBDialect):
             '\w+-V(\d+)\.(\d+)\.(\d+)\.(\d+)( \w+ (\d+)\.(\d+))?', version)
         if not m:
             raise AssertionError(
-                "Could not determine version from string '{0!s}'".format(version))
+                "Could not determine version from string '{0!s}'".format(
+                    version))
 
         if m.group(5) != None:
             return tuple([int(x) for x in m.group(6, 7, 4)] + ['firebird'])
@@ -180,5 +182,6 @@ class FBDialect_kinterbasdb(FBDialect):
                     'connection shutdown' in msg)
         else:
             return False
+
 
 dialect = FBDialect_kinterbasdb

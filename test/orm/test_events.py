@@ -19,7 +19,6 @@ from sqlalchemy.testing.mock import Mock, call, ANY
 
 
 class _RemoveListeners(object):
-
     def teardown(self):
         events.MapperEvents._clear()
         events.InstanceEvents._clear()
@@ -92,6 +91,7 @@ class MapperEventsTest(_RemoveListeners, _fixtures.FixtureTest):
         def evt(meth):
             def go(*args, **kwargs):
                 canary.append(meth)
+
             return go
 
         for meth in [
@@ -216,7 +216,8 @@ class MapperEventsTest(_RemoveListeners, _fixtures.FixtureTest):
 
         event.listen(m, "before_insert", canary.listen1, )
         event.listen(m, "before_insert", canary.listen2, insert=True)
-        event.listen(m, "before_insert", canary.listen3, propagate=True, insert=True)
+        event.listen(m, "before_insert", canary.listen3, propagate=True,
+                     insert=True)
         event.listen(m, "load", canary.listen4)
         event.listen(m, "load", canary.listen5, insert=True)
         event.listen(m, "load", canary.listen6, propagate=True, insert=True)
@@ -246,6 +247,7 @@ class MapperEventsTest(_RemoveListeners, _fixtures.FixtureTest):
 
         def load(obj, ctx):
             canary.append('load')
+
         event.listen(mapper, 'load', load)
 
         s = Session()
@@ -312,6 +314,7 @@ class MapperEventsTest(_RemoveListeners, _fixtures.FixtureTest):
 
         class AdminUser(User):
             pass
+
         mapper(AdminUser, addresses, inherits=User,
                properties={'address_id': addresses.c.id})
         canary3 = self.listen_all(AdminUser)
@@ -511,7 +514,6 @@ class DeclarativeEventListenTest(_RemoveListeners,
 
 
 class DeferredMapperEventsTest(_RemoveListeners, _fixtures.FixtureTest):
-
     """"test event listeners against unmapped classes.
 
     This incurs special logic.  Note if we ever do the "remove" case,
@@ -534,6 +536,7 @@ class DeferredMapperEventsTest(_RemoveListeners, _fixtures.FixtureTest):
 
         def evt(x, y, z):
             canary.append(x)
+
         event.listen(User, "before_insert", evt, raw=True)
 
         m = mapper(User, users)
@@ -560,6 +563,7 @@ class DeferredMapperEventsTest(_RemoveListeners, _fixtures.FixtureTest):
 
         def evt(x, y, z):
             canary.append(x)
+
         event.listen(User, "before_insert", canary, propagate=True, raw=True)
 
         m = mapper(SubUser, users)
@@ -590,6 +594,7 @@ class DeferredMapperEventsTest(_RemoveListeners, _fixtures.FixtureTest):
 
         def evt(x, y, z):
             canary.append(x)
+
         event.listen(User, "before_insert", evt, propagate=False)
 
         m = mapper(SubUser, users)
@@ -615,6 +620,7 @@ class DeferredMapperEventsTest(_RemoveListeners, _fixtures.FixtureTest):
 
         def evt(x, y, z):
             canary.append(x)
+
         event.listen(User, "before_insert", evt, propagate=True, raw=True)
 
         m.dispatch.before_insert(5, 6, 7)
@@ -668,6 +674,7 @@ class DeferredMapperEventsTest(_RemoveListeners, _fixtures.FixtureTest):
 
         def evt(x):
             canary.append(x)
+
         event.listen(User, "load", evt, propagate=True, raw=True)
 
         m.class_manager.dispatch.load(5)
@@ -687,6 +694,7 @@ class DeferredMapperEventsTest(_RemoveListeners, _fixtures.FixtureTest):
 
         def evt(x):
             canary.append(x)
+
         event.listen(User, "load", evt, raw=True)
 
         m = mapper(User, users)
@@ -713,6 +721,7 @@ class DeferredMapperEventsTest(_RemoveListeners, _fixtures.FixtureTest):
 
         def evt(x):
             canary.append(x)
+
         event.listen(User, "load", evt, propagate=True, raw=True)
 
         m = mapper(SubUser, users)
@@ -779,6 +788,7 @@ class DeferredMapperEventsTest(_RemoveListeners, _fixtures.FixtureTest):
 
         def evt(x):
             canary.append(x)
+
         event.listen(User, "load", evt, propagate=False)
 
         m = mapper(SubUser, users)
@@ -792,9 +802,10 @@ class DeferredMapperEventsTest(_RemoveListeners, _fixtures.FixtureTest):
 
         def evt(x):
             canary.append(x)
+
         event.listen(User, "attribute_instrument", evt)
 
-        instrumentation._instrumentation_factory.\
+        instrumentation._instrumentation_factory. \
             dispatch.attribute_instrument(User)
         eq_(canary, [User])
 
@@ -808,9 +819,10 @@ class DeferredMapperEventsTest(_RemoveListeners, _fixtures.FixtureTest):
 
         def evt(x):
             canary.append(x)
+
         event.listen(Bar, "attribute_instrument", evt)
 
-        instrumentation._instrumentation_factory.dispatch.\
+        instrumentation._instrumentation_factory.dispatch. \
             attribute_instrument(User)
         eq_(canary, [])
 
@@ -841,9 +853,10 @@ class DeferredMapperEventsTest(_RemoveListeners, _fixtures.FixtureTest):
 
         def evt(x):
             canary.append(x)
+
         event.listen(User, "attribute_instrument", evt, propagate=True)
 
-        instrumentation._instrumentation_factory.dispatch.\
+        instrumentation._instrumentation_factory.dispatch. \
             attribute_instrument(SubUser)
         eq_(canary, [SubUser])
 
@@ -858,10 +871,11 @@ class DeferredMapperEventsTest(_RemoveListeners, _fixtures.FixtureTest):
 
         def evt(x):
             canary.append(x)
+
         event.listen(User, "attribute_instrument", evt, propagate=False)
 
         mapper(SubUser, users)
-        instrumentation._instrumentation_factory.dispatch.\
+        instrumentation._instrumentation_factory.dispatch. \
             attribute_instrument(5)
         eq_(canary, [])
 
@@ -980,6 +994,7 @@ class RemovalTest(_fixtures.FixtureTest):
         # the _HoldEvents is also cleaned out
         class Bar(Foo):
             pass
+
         m = mapper(Bar, users)
         b1 = Bar()
         m.dispatch.before_insert(m, None, attributes.instance_state(b1))
@@ -1230,7 +1245,6 @@ class SessionEventsTest(_RemoveListeners, _fixtures.FixtureTest):
             pass
 
         class NotASession(object):
-
             def __call__(self):
                 return Session()
 
@@ -1260,6 +1274,7 @@ class SessionEventsTest(_RemoveListeners, _fixtures.FixtureTest):
         def listener(name):
             def go(*arg, **kw):
                 canary.append(name)
+
             return go
 
         sess = Session(**kw)
@@ -1390,7 +1405,7 @@ class SessionEventsTest(_RemoveListeners, _fixtures.FixtureTest):
         u.name = 'ed'
         sess.commit()
         eq_(canary, ['before_commit', 'before_flush',
-            'after_transaction_create', 'after_flush',
+                     'after_transaction_create', 'after_flush',
                      'after_flush_postexec',
                      'after_transaction_end',
                      'after_commit',
@@ -1452,6 +1467,7 @@ class SessionEventsTest(_RemoveListeners, _fixtures.FixtureTest):
 
         def legacy(ses, qry, ctx, res):
             canary.after_bulk_update_legacy(ses, qry, ctx, res)
+
         event.listen(sess, "after_bulk_update", legacy)
 
         mapper(User, users)
@@ -1488,6 +1504,7 @@ class SessionEventsTest(_RemoveListeners, _fixtures.FixtureTest):
 
         def legacy(ses, qry, ctx, res):
             canary.after_bulk_delete_legacy(ses, qry, ctx, res)
+
         event.listen(sess, "after_bulk_delete", legacy)
 
         mapper(User, users)
@@ -1558,16 +1575,16 @@ class SessionEventsTest(_RemoveListeners, _fixtures.FixtureTest):
             [
                 User(name='another u1'),
                 User(name='u1')
-        ]
-        )
+            ]
+            )
 
         sess.flush()
         eq_(sess.query(User).order_by(User.name).all(),
             [
                 User(name='another u1'),
                 User(name='u1')
-        ]
-        )
+            ]
+            )
 
         u.name = 'u2'
         sess.flush()
@@ -1576,16 +1593,16 @@ class SessionEventsTest(_RemoveListeners, _fixtures.FixtureTest):
                 User(name='another u1'),
                 User(name='another u2'),
                 User(name='u2')
-        ]
-        )
+            ]
+            )
 
         sess.delete(u)
         sess.flush()
         eq_(sess.query(User).order_by(User.name).all(),
             [
                 User(name='another u1'),
-        ]
-        )
+            ]
+            )
 
     def test_before_flush_affects_dirty(self):
         users, User = self.tables.users, self.classes.User
@@ -1613,8 +1630,8 @@ class SessionEventsTest(_RemoveListeners, _fixtures.FixtureTest):
             [
                 User(name='u1 modified'),
                 User(name='u2')
-        ]
-        )
+            ]
+            )
 
 
 class SessionLifecycleEventsTest(_RemoveListeners, _fixtures.FixtureTest):
@@ -2118,7 +2135,6 @@ class SessionLifecycleEventsTest(_RemoveListeners, _fixtures.FixtureTest):
 
 
 class MapperExtensionTest(_fixtures.FixtureTest):
-
     """Superseded by MapperEventsTest - test backwards
     compatibility of MapperExtension."""
 
@@ -2128,18 +2144,17 @@ class MapperExtensionTest(_fixtures.FixtureTest):
         methods = []
 
         class Ext(sa.orm.MapperExtension):
-
             def instrument_class(self, mapper, cls):
                 methods.append('instrument_class')
                 return sa.orm.EXT_CONTINUE
 
             def init_instance(
-                    self, mapper, class_, oldinit, instance, args, kwargs):
+                self, mapper, class_, oldinit, instance, args, kwargs):
                 methods.append('init_instance')
                 return sa.orm.EXT_CONTINUE
 
             def init_failed(
-                    self, mapper, class_, oldinit, instance, args, kwargs):
+                self, mapper, class_, oldinit, instance, args, kwargs):
                 methods.append('init_failed')
                 return sa.orm.EXT_CONTINUE
 
@@ -2309,12 +2324,12 @@ class MapperExtensionTest(_fixtures.FixtureTest):
         users = self.tables.users
 
         class MyExtension(sa.orm.MapperExtension):
-
             def before_insert(self, mapper, connection, instance):
                 pass
 
         class Foo(object):
             pass
+
         m = mapper(Foo, users, extension=MyExtension())
         assert not m.class_manager.dispatch.load
         assert not m.dispatch.before_update
@@ -2322,7 +2337,6 @@ class MapperExtensionTest(_fixtures.FixtureTest):
 
 
 class AttributeExtensionTest(fixtures.MappedTest):
-
     @classmethod
     def define_tables(cls, metadata):
         Table('t1',
@@ -2339,13 +2353,11 @@ class AttributeExtensionTest(fixtures.MappedTest):
         ext_msg = []
 
         class Ex1(sa.orm.AttributeExtension):
-
             def set(self, state, value, oldvalue, initiator):
                 ext_msg.append("Ex1 {0!r}".format(value))
                 return "ex1" + value
 
         class Ex2(sa.orm.AttributeExtension):
-
             def set(self, state, value, oldvalue, initiator):
                 ext_msg.append("Ex2 {0!r}".format(value))
                 return "ex2" + value
@@ -2399,7 +2411,6 @@ class SessionExtensionTest(_fixtures.FixtureTest):
         log = []
 
         class MyExt(sa.orm.session.SessionExtension):
-
             def before_commit(self, session):
                 log.append('before_commit')
 
@@ -2483,12 +2494,10 @@ class SessionExtensionTest(_fixtures.FixtureTest):
         log = []
 
         class MyExt1(sa.orm.session.SessionExtension):
-
             def before_commit(self, session):
                 log.append('before_commit_one')
 
         class MyExt2(sa.orm.session.SessionExtension):
-
             def before_commit(self, session):
                 log.append('before_commit_two')
 
@@ -2504,7 +2513,6 @@ class SessionExtensionTest(_fixtures.FixtureTest):
 
     def test_unnecessary_methods_not_evented(self):
         class MyExtension(sa.orm.session.SessionExtension):
-
             def before_commit(self, session):
                 pass
 
@@ -2514,7 +2522,7 @@ class SessionExtensionTest(_fixtures.FixtureTest):
 
 
 class QueryEventsTest(
-        _RemoveListeners, _fixtures.FixtureTest, AssertsCompiledSQL):
+    _RemoveListeners, _fixtures.FixtureTest, AssertsCompiledSQL):
     __dialect__ = 'default'
 
     @classmethod

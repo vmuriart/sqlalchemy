@@ -15,6 +15,7 @@ import sys
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta
 
+
 # whether or not we use unittest changes things dramatically,
 # as far as how py.test collection works.
 
@@ -52,7 +53,6 @@ class TestBase(object):
 
 
 class TablesTest(TestBase):
-
     # 'once', None
     run_setup_bind = 'once'
 
@@ -140,7 +140,8 @@ class TablesTest(TestBase):
                         conn.execute(table.delete())
                     except sa.exc.DBAPIError as ex:
                         util.print_(
-                            ("Error emptying table {0!s}: {1!r}".format(table, ex)),
+                            ("Error emptying table {0!s}: {1!r}".format(table,
+                                                                        ex)),
                             file=sys.stderr)
 
     def setup(self):
@@ -215,6 +216,7 @@ class TablesTest(TestBase):
                 [dict(zip(headers[table], column_values))
                  for column_values in rows[table]])
 
+
 from sqlalchemy import event
 
 
@@ -236,7 +238,6 @@ class RemovesEvents(object):
 
 
 class _ORMTest(object):
-
     @classmethod
     def teardown_class(cls):
         sa.orm.session.Session.close_all()

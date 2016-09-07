@@ -6,6 +6,7 @@ from . import config, engines
 import os
 import time
 import logging
+
 log = logging.getLogger(__name__)
 
 FOLLOWER_IDENT = None
@@ -23,6 +24,7 @@ class register(object):
         def decorate(fn):
             self.fns[dbname] = fn
             return self
+
         return decorate
 
     def __call__(self, cfg, *arg):
@@ -91,12 +93,14 @@ def _configs_for_db_operation():
 
 @register.init
 def _create_db(cfg, eng, ident):
-    raise NotImplementedError("no DB creation routine for cfg: {0!s}".format(eng.url))
+    raise NotImplementedError(
+        "no DB creation routine for cfg: {0!s}".format(eng.url))
 
 
 @register.init
 def _drop_db(cfg, eng, ident):
-    raise NotImplementedError("no DB drop routine for cfg: {0!s}".format(eng.url))
+    raise NotImplementedError(
+        "no DB drop routine for cfg: {0!s}".format(eng.url))
 
 
 @register.init
@@ -148,13 +152,14 @@ def _sqlite_post_configure_engine(url, engine, follower_ident):
                 'ATTACH DATABASE "test_schema.db" AS test_schema')
         else:
             dbapi_connection.execute(
-                'ATTACH DATABASE "{0!s}_test_schema.db" AS test_schema'.format(follower_ident))
+                'ATTACH DATABASE "{0!s}_test_schema.db" AS test_schema'.format(
+                    follower_ident))
 
 
 @_create_db.for_db("postgresql")
 def _pg_create_db(cfg, eng, ident):
     with eng.connect().execution_options(
-            isolation_level="AUTOCOMMIT") as conn:
+        isolation_level="AUTOCOMMIT") as conn:
         try:
             _pg_drop_db(cfg, conn, ident)
         except Exception:
@@ -163,7 +168,8 @@ def _pg_create_db(cfg, eng, ident):
         for attempt in range(3):
             try:
                 conn.execute(
-                    "CREATE DATABASE {0!s} TEMPLATE {1!s}".format(ident, currentdb))
+                    "CREATE DATABASE {0!s} TEMPLATE {1!s}".format(ident,
+                                                                  currentdb))
             except exc.OperationalError as err:
                 if attempt != 2 and "accessed by other users" in str(err):
                     time.sleep(.2)
@@ -200,7 +206,7 @@ def _sqlite_create_db(cfg, eng, ident):
 @_drop_db.for_db("postgresql")
 def _pg_drop_db(cfg, eng, ident):
     with eng.connect().execution_options(
-            isolation_level="AUTOCOMMIT") as conn:
+        isolation_level="AUTOCOMMIT") as conn:
         conn.execute(
             text(
                 "select pg_terminate_backend(pid) from pg_stat_activity "
@@ -235,10 +241,11 @@ def _oracle_create_db(cfg, eng, ident):
         conn.execute("create user {0!s} identified by xe".format(ident))
         conn.execute("create user {0!s}_ts1 identified by xe".format(ident))
         conn.execute("create user {0!s}_ts2 identified by xe".format(ident))
-        conn.execute("grant dba to {0!s}".format(ident ))
+        conn.execute("grant dba to {0!s}".format(ident))
         conn.execute("grant unlimited tablespace to {0!s}".format(ident))
         conn.execute("grant unlimited tablespace to {0!s}_ts1".format(ident))
         conn.execute("grant unlimited tablespace to {0!s}_ts2".format(ident))
+
 
 @_configure_follower.for_db("oracle")
 def _oracle_configure_follower(config, ident):
@@ -281,7 +288,7 @@ def reap_oracle_dbs(eng, idents_file):
             "select u.username from all_users u where username "
             "like 'TEST_%' and not exists (select username "
             "from v$session where username=u.username)")
-        all_names = set([username.lower() for (username, ) in to_reap])
+        all_names = set([username.lower() for (username,) in to_reap])
         to_drop = set()
         for name in all_names:
             if name.endswith("_ts1") or name.endswith("_ts2"):
@@ -307,5 +314,3 @@ def _oracle_follower_url_from_main(url, ident):
     url.username = ident
     url.password = 'xe'
     return url
-
-

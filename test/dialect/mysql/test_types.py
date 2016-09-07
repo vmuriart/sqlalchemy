@@ -6,14 +6,16 @@ from sqlalchemy import sql, exc, schema
 from sqlalchemy.util import u
 from sqlalchemy import util
 from sqlalchemy.dialects.mysql import base as mysql
-from sqlalchemy.testing import fixtures, AssertsCompiledSQL, AssertsExecutionResults
+from sqlalchemy.testing import fixtures, AssertsCompiledSQL, \
+    AssertsExecutionResults
 from sqlalchemy import testing
 import datetime
 import decimal
 from sqlalchemy import types as sqltypes
 
 
-class TypesTest(fixtures.TestBase, AssertsExecutionResults, AssertsCompiledSQL):
+class TypesTest(fixtures.TestBase, AssertsExecutionResults,
+                AssertsCompiledSQL):
     "Test MySQL column types"
 
     __dialect__ = mysql.dialect()
@@ -33,11 +35,11 @@ class TypesTest(fixtures.TestBase, AssertsExecutionResults, AssertsCompiledSQL):
              'NUMERIC'),
             (mysql.MSNumeric, [12], {},
              'NUMERIC(12)'),
-            (mysql.MSNumeric, [12, 4], {'unsigned':True},
+            (mysql.MSNumeric, [12, 4], {'unsigned': True},
              'NUMERIC(12, 4) UNSIGNED'),
-            (mysql.MSNumeric, [12, 4], {'zerofill':True},
+            (mysql.MSNumeric, [12, 4], {'zerofill': True},
              'NUMERIC(12, 4) ZEROFILL'),
-            (mysql.MSNumeric, [12, 4], {'zerofill':True, 'unsigned':True},
+            (mysql.MSNumeric, [12, 4], {'zerofill': True, 'unsigned': True},
              'NUMERIC(12, 4) UNSIGNED ZEROFILL'),
 
             (mysql.MSDecimal, [], {},
@@ -48,29 +50,29 @@ class TypesTest(fixtures.TestBase, AssertsExecutionResults, AssertsCompiledSQL):
              'DECIMAL(12)'),
             (mysql.MSDecimal, [12, None], {},
              'DECIMAL(12)'),
-            (mysql.MSDecimal, [12, 4], {'unsigned':True},
+            (mysql.MSDecimal, [12, 4], {'unsigned': True},
              'DECIMAL(12, 4) UNSIGNED'),
-            (mysql.MSDecimal, [12, 4], {'zerofill':True},
+            (mysql.MSDecimal, [12, 4], {'zerofill': True},
              'DECIMAL(12, 4) ZEROFILL'),
-            (mysql.MSDecimal, [12, 4], {'zerofill':True, 'unsigned':True},
+            (mysql.MSDecimal, [12, 4], {'zerofill': True, 'unsigned': True},
              'DECIMAL(12, 4) UNSIGNED ZEROFILL'),
 
             (mysql.MSDouble, [None, None], {},
              'DOUBLE'),
-            (mysql.MSDouble, [12, 4], {'unsigned':True},
+            (mysql.MSDouble, [12, 4], {'unsigned': True},
              'DOUBLE(12, 4) UNSIGNED'),
-            (mysql.MSDouble, [12, 4], {'zerofill':True},
+            (mysql.MSDouble, [12, 4], {'zerofill': True},
              'DOUBLE(12, 4) ZEROFILL'),
-            (mysql.MSDouble, [12, 4], {'zerofill':True, 'unsigned':True},
+            (mysql.MSDouble, [12, 4], {'zerofill': True, 'unsigned': True},
              'DOUBLE(12, 4) UNSIGNED ZEROFILL'),
 
             (mysql.MSReal, [None, None], {},
              'REAL'),
-            (mysql.MSReal, [12, 4], {'unsigned':True},
+            (mysql.MSReal, [12, 4], {'unsigned': True},
              'REAL(12, 4) UNSIGNED'),
-            (mysql.MSReal, [12, 4], {'zerofill':True},
+            (mysql.MSReal, [12, 4], {'zerofill': True},
              'REAL(12, 4) ZEROFILL'),
-            (mysql.MSReal, [12, 4], {'zerofill':True, 'unsigned':True},
+            (mysql.MSReal, [12, 4], {'zerofill': True, 'unsigned': True},
              'REAL(12, 4) UNSIGNED ZEROFILL'),
 
             (mysql.MSFloat, [], {},
@@ -81,68 +83,68 @@ class TypesTest(fixtures.TestBase, AssertsExecutionResults, AssertsCompiledSQL):
              'FLOAT(12)'),
             (mysql.MSFloat, [12, 4], {},
              'FLOAT(12, 4)'),
-            (mysql.MSFloat, [12, 4], {'unsigned':True},
+            (mysql.MSFloat, [12, 4], {'unsigned': True},
              'FLOAT(12, 4) UNSIGNED'),
-            (mysql.MSFloat, [12, 4], {'zerofill':True},
+            (mysql.MSFloat, [12, 4], {'zerofill': True},
              'FLOAT(12, 4) ZEROFILL'),
-            (mysql.MSFloat, [12, 4], {'zerofill':True, 'unsigned':True},
+            (mysql.MSFloat, [12, 4], {'zerofill': True, 'unsigned': True},
              'FLOAT(12, 4) UNSIGNED ZEROFILL'),
 
             (mysql.MSInteger, [], {},
              'INTEGER'),
             (mysql.MSInteger, [4], {},
              'INTEGER(4)'),
-            (mysql.MSInteger, [4], {'unsigned':True},
+            (mysql.MSInteger, [4], {'unsigned': True},
              'INTEGER(4) UNSIGNED'),
-            (mysql.MSInteger, [4], {'zerofill':True},
+            (mysql.MSInteger, [4], {'zerofill': True},
              'INTEGER(4) ZEROFILL'),
-            (mysql.MSInteger, [4], {'zerofill':True, 'unsigned':True},
+            (mysql.MSInteger, [4], {'zerofill': True, 'unsigned': True},
              'INTEGER(4) UNSIGNED ZEROFILL'),
 
             (mysql.MSBigInteger, [], {},
              'BIGINT'),
             (mysql.MSBigInteger, [4], {},
              'BIGINT(4)'),
-            (mysql.MSBigInteger, [4], {'unsigned':True},
+            (mysql.MSBigInteger, [4], {'unsigned': True},
              'BIGINT(4) UNSIGNED'),
-            (mysql.MSBigInteger, [4], {'zerofill':True},
+            (mysql.MSBigInteger, [4], {'zerofill': True},
              'BIGINT(4) ZEROFILL'),
-            (mysql.MSBigInteger, [4], {'zerofill':True, 'unsigned':True},
+            (mysql.MSBigInteger, [4], {'zerofill': True, 'unsigned': True},
              'BIGINT(4) UNSIGNED ZEROFILL'),
 
-             (mysql.MSMediumInteger, [], {},
-              'MEDIUMINT'),
-             (mysql.MSMediumInteger, [4], {},
-              'MEDIUMINT(4)'),
-             (mysql.MSMediumInteger, [4], {'unsigned':True},
-              'MEDIUMINT(4) UNSIGNED'),
-             (mysql.MSMediumInteger, [4], {'zerofill':True},
-              'MEDIUMINT(4) ZEROFILL'),
-             (mysql.MSMediumInteger, [4], {'zerofill':True, 'unsigned':True},
-              'MEDIUMINT(4) UNSIGNED ZEROFILL'),
+            (mysql.MSMediumInteger, [], {},
+             'MEDIUMINT'),
+            (mysql.MSMediumInteger, [4], {},
+             'MEDIUMINT(4)'),
+            (mysql.MSMediumInteger, [4], {'unsigned': True},
+             'MEDIUMINT(4) UNSIGNED'),
+            (mysql.MSMediumInteger, [4], {'zerofill': True},
+             'MEDIUMINT(4) ZEROFILL'),
+            (mysql.MSMediumInteger, [4], {'zerofill': True, 'unsigned': True},
+             'MEDIUMINT(4) UNSIGNED ZEROFILL'),
 
             (mysql.MSTinyInteger, [], {},
              'TINYINT'),
             (mysql.MSTinyInteger, [1], {},
              'TINYINT(1)'),
-            (mysql.MSTinyInteger, [1], {'unsigned':True},
+            (mysql.MSTinyInteger, [1], {'unsigned': True},
              'TINYINT(1) UNSIGNED'),
-            (mysql.MSTinyInteger, [1], {'zerofill':True},
+            (mysql.MSTinyInteger, [1], {'zerofill': True},
              'TINYINT(1) ZEROFILL'),
-            (mysql.MSTinyInteger, [1], {'zerofill':True, 'unsigned':True},
+            (mysql.MSTinyInteger, [1], {'zerofill': True, 'unsigned': True},
              'TINYINT(1) UNSIGNED ZEROFILL'),
 
             (mysql.MSSmallInteger, [], {},
              'SMALLINT'),
             (mysql.MSSmallInteger, [4], {},
              'SMALLINT(4)'),
-            (mysql.MSSmallInteger, [4], {'unsigned':True},
+            (mysql.MSSmallInteger, [4], {'unsigned': True},
              'SMALLINT(4) UNSIGNED'),
-            (mysql.MSSmallInteger, [4], {'zerofill':True},
+            (mysql.MSSmallInteger, [4], {'zerofill': True},
              'SMALLINT(4) ZEROFILL'),
-            (mysql.MSSmallInteger, [4], {'zerofill':True, 'unsigned':True},
+            (mysql.MSSmallInteger, [4], {'zerofill': True, 'unsigned': True},
              'SMALLINT(4) UNSIGNED ZEROFILL'),
-           ]
+        ]
 
         for type_, args, kw, res in columns:
             type_inst = type_(*args, **kw)
@@ -161,11 +163,11 @@ class TypesTest(fixtures.TestBase, AssertsExecutionResults, AssertsCompiledSQL):
     @testing.provide_metadata
     def test_precision_float_roundtrip(self):
         t = Table('t', self.metadata,
-                    Column('scale_value', mysql.DOUBLE(
-                            precision=15, scale=12, asdecimal=True)),
-                    Column('unscale_value', mysql.DOUBLE(
-                            decimal_return_scale=12, asdecimal=True))
-            )
+                  Column('scale_value', mysql.DOUBLE(
+                      precision=15, scale=12, asdecimal=True)),
+                  Column('unscale_value', mysql.DOUBLE(
+                      decimal_return_scale=12, asdecimal=True))
+                  )
         t.create(testing.db)
         testing.db.execute(
             t.insert(), scale_value=45.768392065789,
@@ -184,25 +186,25 @@ class TypesTest(fixtures.TestBase, AssertsExecutionResults, AssertsCompiledSQL):
         columns = [
             (mysql.MSChar, [1], {},
              'CHAR(1)'),
-             (mysql.NCHAR, [1], {},
-              'NATIONAL CHAR(1)'),
-            (mysql.MSChar, [1], {'binary':True},
+            (mysql.NCHAR, [1], {},
+             'NATIONAL CHAR(1)'),
+            (mysql.MSChar, [1], {'binary': True},
              'CHAR(1) BINARY'),
-            (mysql.MSChar, [1], {'ascii':True},
+            (mysql.MSChar, [1], {'ascii': True},
              'CHAR(1) ASCII'),
-            (mysql.MSChar, [1], {'unicode':True},
+            (mysql.MSChar, [1], {'unicode': True},
              'CHAR(1) UNICODE'),
-            (mysql.MSChar, [1], {'ascii':True, 'binary':True},
+            (mysql.MSChar, [1], {'ascii': True, 'binary': True},
              'CHAR(1) ASCII BINARY'),
-            (mysql.MSChar, [1], {'unicode':True, 'binary':True},
+            (mysql.MSChar, [1], {'unicode': True, 'binary': True},
              'CHAR(1) UNICODE BINARY'),
-            (mysql.MSChar, [1], {'charset':'utf8'},
+            (mysql.MSChar, [1], {'charset': 'utf8'},
              'CHAR(1) CHARACTER SET utf8'),
-            (mysql.MSChar, [1], {'charset':'utf8', 'binary':True},
+            (mysql.MSChar, [1], {'charset': 'utf8', 'binary': True},
              'CHAR(1) CHARACTER SET utf8 BINARY'),
-            (mysql.MSChar, [1], {'charset':'utf8', 'unicode':True},
+            (mysql.MSChar, [1], {'charset': 'utf8', 'unicode': True},
              'CHAR(1) CHARACTER SET utf8'),
-            (mysql.MSChar, [1], {'charset':'utf8', 'ascii':True},
+            (mysql.MSChar, [1], {'charset': 'utf8', 'ascii': True},
              'CHAR(1) CHARACTER SET utf8'),
             (mysql.MSChar, [1], {'collation': 'utf8_bin'},
              'CHAR(1) COLLATE utf8_bin'),
@@ -211,42 +213,43 @@ class TypesTest(fixtures.TestBase, AssertsExecutionResults, AssertsCompiledSQL):
             (mysql.MSChar, [1], {'charset': 'utf8', 'binary': True},
              'CHAR(1) CHARACTER SET utf8 BINARY'),
             (mysql.MSChar, [1], {'charset': 'utf8', 'collation': 'utf8_bin',
-                              'binary': True},
+                                 'binary': True},
              'CHAR(1) CHARACTER SET utf8 COLLATE utf8_bin'),
-            (mysql.MSChar, [1], {'national':True},
+            (mysql.MSChar, [1], {'national': True},
              'NATIONAL CHAR(1)'),
-            (mysql.MSChar, [1], {'national':True, 'charset':'utf8'},
+            (mysql.MSChar, [1], {'national': True, 'charset': 'utf8'},
              'NATIONAL CHAR(1)'),
-            (mysql.MSChar, [1], {'national':True, 'charset':'utf8',
-                                'binary':True},
+            (mysql.MSChar, [1], {'national': True, 'charset': 'utf8',
+                                 'binary': True},
              'NATIONAL CHAR(1) BINARY'),
-            (mysql.MSChar, [1], {'national':True, 'binary':True,
-                                'unicode':True},
+            (mysql.MSChar, [1], {'national': True, 'binary': True,
+                                 'unicode': True},
              'NATIONAL CHAR(1) BINARY'),
-            (mysql.MSChar, [1], {'national':True, 'collation':'utf8_bin'},
+            (mysql.MSChar, [1], {'national': True, 'collation': 'utf8_bin'},
              'NATIONAL CHAR(1) COLLATE utf8_bin'),
 
-            (mysql.MSString, [1], {'charset':'utf8', 'collation':'utf8_bin'},
+            (mysql.MSString, [1], {'charset': 'utf8', 'collation': 'utf8_bin'},
              'VARCHAR(1) CHARACTER SET utf8 COLLATE utf8_bin'),
-            (mysql.MSString, [1], {'national':True, 'collation':'utf8_bin'},
+            (mysql.MSString, [1], {'national': True, 'collation': 'utf8_bin'},
              'NATIONAL VARCHAR(1) COLLATE utf8_bin'),
 
-            (mysql.MSTinyText, [], {'charset':'utf8', 'collation':'utf8_bin'},
-             'TINYTEXT CHARACTER SET utf8 COLLATE utf8_bin'),
+            (
+                mysql.MSTinyText, [],
+                {'charset': 'utf8', 'collation': 'utf8_bin'},
+                'TINYTEXT CHARACTER SET utf8 COLLATE utf8_bin'),
 
-            (mysql.MSMediumText, [], {'charset':'utf8', 'binary':True},
+            (mysql.MSMediumText, [], {'charset': 'utf8', 'binary': True},
              'MEDIUMTEXT CHARACTER SET utf8 BINARY'),
 
-            (mysql.MSLongText, [], {'ascii':True},
+            (mysql.MSLongText, [], {'ascii': True},
              'LONGTEXT ASCII'),
 
-            (mysql.ENUM, ["foo", "bar"], {'unicode':True},
+            (mysql.ENUM, ["foo", "bar"], {'unicode': True},
              '''ENUM('foo','bar') UNICODE'''),
 
             (String, [20], {"collation": "utf8"}, 'VARCHAR(20) COLLATE utf8')
 
-
-           ]
+        ]
 
         for type_, args, kw, res in columns:
             type_inst = type_(*args, **kw)
@@ -257,8 +260,8 @@ class TypesTest(fixtures.TestBase, AssertsExecutionResults, AssertsCompiledSQL):
             # test that repr() copies out all arguments
             self.assert_compile(
                 eval("mysql.{0!r}".format(type_inst))
-                    if type_ is not String
-                    else eval("{0!r}".format(type_inst)),
+                if type_ is not String
+                else eval("{0!r}".format(type_inst)),
                 res
             )
 
@@ -268,11 +271,11 @@ class TypesTest(fixtures.TestBase, AssertsExecutionResults, AssertsCompiledSQL):
     @testing.provide_metadata
     def test_charset_collate_table(self):
         t = Table('foo', self.metadata,
-            Column('id', Integer),
-            Column('data', UnicodeText),
-            mysql_default_charset='utf8',
-            mysql_collate='utf8_bin'
-        )
+                  Column('id', Integer),
+                  Column('data', UnicodeText),
+                  mysql_default_charset='utf8',
+                  mysql_collate='utf8_bin'
+                  )
         t.create()
         m2 = MetaData(testing.db)
         t2 = Table('foo', m2, autoload=True)
@@ -284,7 +287,8 @@ class TypesTest(fixtures.TestBase, AssertsExecutionResults, AssertsCompiledSQL):
         # MySQLdb 1.2.3 and also need to pass either use_unicode=1
         # or charset=utf8 to the URL.
         t.insert().execute(id=1, data=u('some text'))
-        assert isinstance(testing.db.scalar(select([t.c.data])), util.text_type)
+        assert isinstance(testing.db.scalar(select([t.c.data])),
+                          util.text_type)
 
     def test_bit_50(self):
         """Exercise BIT types on 5.0+ (not valid for all engine types)"""
@@ -361,7 +365,7 @@ class TypesTest(fixtures.TestBase, AssertsExecutionResults, AssertsCompiledSQL):
             Column('b3', mysql.MSTinyInteger(1)),
             Column('b4', mysql.MSTinyInteger(1, unsigned=True)),
             Column('b5', mysql.MSTinyInteger),
-            )
+        )
         self.metadata.create_all()
         table = bool_table
 
@@ -379,7 +383,7 @@ class TypesTest(fixtures.TestBase, AssertsExecutionResults, AssertsCompiledSQL):
         roundtrip([True, True, 1, 1, 1])
         roundtrip([False, False, 0, 0, 0])
         roundtrip([True, True, True, True, True], [True, True, 1,
-                  1, 1])
+                                                   1, 1])
         roundtrip([False, False, 0, 0, 0], [False, False, 0, 0, 0])
 
         meta2 = MetaData(testing.db)
@@ -395,23 +399,23 @@ class TypesTest(fixtures.TestBase, AssertsExecutionResults, AssertsCompiledSQL):
             Column('b3', BOOLEAN),
             Column('b4', BOOLEAN),
             autoload=True,
-            )
+        )
         eq_(colspec(table.c.b3), 'b3 BOOL')
         eq_(colspec(table.c.b4), 'b4 BOOL')
         roundtrip([None, None, None, None, None])
         roundtrip([True, True, 1, 1, 1], [True, True, True, True,
-                  1])
+                                          1])
         roundtrip([False, False, 0, 0, 0], [False, False, False,
-                  False, 0])
+                                            False, 0])
         roundtrip([True, True, True, True, True], [True, True,
-                  True, True, 1])
+                                                   True, True, 1])
         roundtrip([False, False, 0, 0, 0], [False, False, False,
-                  False, 0])
+                                            False, 0])
 
     def test_timestamp_fsp(self):
         self.assert_compile(
-                mysql.TIMESTAMP(fsp=5),
-                "TIMESTAMP(5)"
+            mysql.TIMESTAMP(fsp=5),
+            "TIMESTAMP(5)"
         )
 
     def test_timestamp_defaults(self):
@@ -532,40 +536,38 @@ class TypesTest(fixtures.TestBase, AssertsExecutionResults, AssertsCompiledSQL):
                 ]
             )
 
-
     def test_datetime_generic(self):
         self.assert_compile(
-                mysql.DATETIME(),
-                "DATETIME"
+            mysql.DATETIME(),
+            "DATETIME"
         )
 
     def test_datetime_fsp(self):
         self.assert_compile(
-                mysql.DATETIME(fsp=4),
-                "DATETIME(4)"
+            mysql.DATETIME(fsp=4),
+            "DATETIME(4)"
         )
-
 
     def test_time_generic(self):
         """"Exercise TIME."""
 
         self.assert_compile(
-                mysql.TIME(),
-                "TIME"
+            mysql.TIME(),
+            "TIME"
         )
 
     def test_time_fsp(self):
         self.assert_compile(
-                mysql.TIME(fsp=5),
-                "TIME(5)"
+            mysql.TIME(fsp=5),
+            "TIME(5)"
         )
 
     def test_time_result_processor(self):
         eq_(
             mysql.TIME().result_processor(None, None)(
-                    datetime.timedelta(seconds=35, minutes=517,
-                            microseconds=450
-                    )),
+                datetime.timedelta(seconds=35, minutes=517,
+                                   microseconds=450
+                                   )),
             datetime.time(8, 37, 35, 450)
         )
 
@@ -573,8 +575,8 @@ class TypesTest(fixtures.TestBase, AssertsExecutionResults, AssertsCompiledSQL):
     @testing.provide_metadata
     def test_time_roundtrip(self):
         t = Table('mysql_time', self.metadata,
-                Column('t1', mysql.TIME())
-            )
+                  Column('t1', mysql.TIME())
+                  )
         t.create()
         t.insert().values(t1=datetime.time(8, 37, 35)).execute()
         eq_(select([t.c.t1]).scalar(), datetime.time(8, 37, 35))
@@ -605,13 +607,12 @@ class TypesTest(fixtures.TestBase, AssertsExecutionResults, AssertsCompiledSQL):
 
 
 class JSONTest(fixtures.TestBase):
-    __requires__ = ('json_type', )
+    __requires__ = ('json_type',)
     __only_on__ = 'mysql'
     __backend__ = True
 
     @testing.provide_metadata
     def test_reflection(self):
-
         Table(
             'mysql_json', self.metadata,
             Column('foo', mysql.JSON)
@@ -648,8 +649,7 @@ class JSONTest(fixtures.TestBase):
 
 
 class EnumSetTest(
-        fixtures.TestBase, AssertsExecutionResults, AssertsCompiledSQL):
-
+    fixtures.TestBase, AssertsExecutionResults, AssertsCompiledSQL):
     __only_on__ = 'mysql'
     __dialect__ = mysql.dialect()
     __backend__ = True
@@ -921,7 +921,6 @@ class EnumSetTest(
         reflected = Table('mysql_set', MetaData(testing.db),
                           autoload=True)
         for table in set_table, reflected:
-
             def roundtrip(store, expected=None):
                 expected = expected or store
                 table.insert(store).execute()
@@ -933,7 +932,7 @@ class EnumSetTest(
             roundtrip(['', '', ''], [set([])] * 3)
             roundtrip([set(['dq']), set(['a']), set(['5'])])
             roundtrip(['dq', 'a', '5'], [set(['dq']), set(['a']),
-                      set(['5'])])
+                                         set(['5'])])
             roundtrip([1, 1, 1], [set(['dq']), set(['a']), set(['5'])])
             roundtrip([set(['dq', 'sq']), None, set(['9', '5', '7'])])
         set_table.insert().execute(
@@ -994,7 +993,8 @@ class EnumSetTest(
                             "CREATE TABLE sometable (somecolumn "
                             "ENUM('x','y','z'))")
         t1 = Table('sometable', MetaData(), Column('somecolumn',
-                   Enum('x', 'y', 'z', native_enum=False)))
+                                                   Enum('x', 'y', 'z',
+                                                        native_enum=False)))
         self.assert_compile(schema.CreateTable(t1),
                             "CREATE TABLE sometable (somecolumn "
                             "VARCHAR(1), CHECK (somecolumn IN ('x', "
@@ -1067,4 +1067,3 @@ class EnumSetTest(
 def colspec(c):
     return testing.db.dialect.ddl_compiler(
         testing.db.dialect, None).get_column_specification(c)
-

@@ -7,7 +7,6 @@ import weakref
 
 
 class MockClass(object):
-
     def __init__(self, base, name):
         self._decl_class_registry = base
         tokens = name.split(".")
@@ -207,7 +206,7 @@ class ClsRegistryTest(fixtures.TestBase):
         del f1
         gc_collect()
         assert 'bar' not in \
-            reg['foo']
+               reg['foo']
         assert 'alt' in reg['foo']
 
         del f2

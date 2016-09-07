@@ -23,7 +23,6 @@ from ... import engine
 
 
 class MSExecutionContext_zxjdbc(MSExecutionContext):
-
     _embedded_scope_identity = False
 
     def pre_exec(self):
@@ -45,7 +44,7 @@ class MSExecutionContext_zxjdbc(MSExecutionContext):
             self._lastrowid = int(row[0])
 
         if (self.isinsert or self.isupdate or self.isdelete) and \
-                self.compiled.returning:
+            self.compiled.returning:
             self._result_proxy = engine.FullyBufferedResultProxy(self)
 
         if self._enable_identity_insert:
@@ -65,5 +64,6 @@ class MSDialect_zxjdbc(ZxJDBCConnector, MSDialect):
             int(x)
             for x in connection.connection.dbversion.split('.')
         )
+
 
 dialect = MSDialect_zxjdbc

@@ -9,7 +9,6 @@ class QueuePoolTest(fixtures.TestBase, AssertsExecutionResults):
     __requires__ = 'cpython',
 
     class Connection(object):
-
         def rollback(self):
             pass
 
@@ -50,6 +49,7 @@ class QueuePoolTest(fixtures.TestBase, AssertsExecutionResults):
         def go():
             conn2 = pool.connect()
             return conn2
+
         go()
 
     def test_second_samethread_connect(self):
@@ -59,4 +59,5 @@ class QueuePoolTest(fixtures.TestBase, AssertsExecutionResults):
         @profiling.function_call_count()
         def go():
             return pool.connect()
+
         go()

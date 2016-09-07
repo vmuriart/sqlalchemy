@@ -54,4 +54,5 @@ class MySQLDialect_pymysql(MySQLDialect_mysqldb):
                 exception = exception.args[0]
             return exception.args[0]
 
+
 dialect = MySQLDialect_pymysql

@@ -24,7 +24,9 @@ def _event_key(target, identifier, fn):
         if tgt is not None:
             return _EventKey(target, identifier, fn, tgt)
     else:
-        raise exc.InvalidRequestError("No such event '{0!s}' for target '{1!s}'".format(identifier, target))
+        raise exc.InvalidRequestError(
+            "No such event '{0!s}' for target '{1!s}'".format(identifier,
+                                                              target))
 
 
 def listen(target, identifier, fn, *args, **kw):
@@ -119,9 +121,11 @@ def listens_for(target, identifier, *args, **kw):
         :func:`.listen` - general description of event listening
 
     """
+
     def decorate(fn):
         listen(target, identifier, fn, *args, **kw)
         return fn
+
     return decorate
 
 

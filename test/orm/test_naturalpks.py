@@ -33,9 +33,9 @@ class NaturalPKTest(fixtures.MappedTest):
         fk_args = _backend_specific_fk_args()
 
         Table('users', metadata,
-            Column('username', String(50), primary_key=True),
-            Column('fullname', String(100)),
-            test_needs_fk=True)
+              Column('username', String(50), primary_key=True),
+              Column('fullname', String(100)),
+              test_needs_fk=True)
 
         Table(
             'addresses', metadata,
@@ -90,6 +90,7 @@ class NaturalPKTest(fixtures.MappedTest):
 
         def go():
             assert sess.query(User).get('ed') is u1
+
         self.assert_sql_count(testing.db, go, 0)
 
         assert sess.query(User).get('jack') is None
@@ -148,9 +149,9 @@ class NaturalPKTest(fixtures.MappedTest):
 
     def _test_onetomany(self, passive_updates):
         users, Address, addresses, User = (self.tables.users,
-                                self.classes.Address,
-                                self.tables.addresses,
-                                self.classes.User)
+                                           self.classes.Address,
+                                           self.tables.addresses,
+                                           self.classes.User)
 
         mapper(
             User, users, properties={
@@ -181,9 +182,10 @@ class NaturalPKTest(fixtures.MappedTest):
 
         def go():
             sess.flush()
+
         if not passive_updates:
             # test passive_updates=False;
-            #load addresses, update user, update 2 addresses
+            # load addresses, update user, update 2 addresses
             self.assert_sql_count(testing.db, go, 3)
         else:
             # test passive_updates=True; update user
@@ -217,9 +219,9 @@ class NaturalPKTest(fixtures.MappedTest):
 
         """
         users, Address, addresses, User = (self.tables.users,
-                                self.classes.Address,
-                                self.tables.addresses,
-                                self.classes.User)
+                                           self.classes.Address,
+                                           self.tables.addresses,
+                                           self.classes.User)
 
         with testing.db.begin() as conn:
             conn.execute(users.insert(), username='jack', fullname='jack')
@@ -229,7 +231,7 @@ class NaturalPKTest(fixtures.MappedTest):
         mapper(User, users)
         mapper(Address, addresses, properties={
             'user': relationship(User,
-                    passive_updates=False)
+                                 passive_updates=False)
         })
 
         sess = create_session()
@@ -239,13 +241,14 @@ class NaturalPKTest(fixtures.MappedTest):
 
         def go():
             sess.flush()
+
         self.assert_sql_count(testing.db, go, 2)
 
     def _test_manytoone(self, passive_updates):
         users, Address, addresses, User = (self.tables.users,
-                                self.classes.Address,
-                                self.tables.addresses,
-                                self.classes.User)
+                                           self.classes.Address,
+                                           self.tables.addresses,
+                                           self.classes.User)
 
         mapper(User, users)
         mapper(Address, addresses, properties={
@@ -267,6 +270,7 @@ class NaturalPKTest(fixtures.MappedTest):
 
         def go():
             sess.flush()
+
         if passive_updates:
             self.assert_sql_count(testing.db, go, 1)
         else:
@@ -274,6 +278,7 @@ class NaturalPKTest(fixtures.MappedTest):
 
         def go():
             sess.flush()
+
         self.assert_sql_count(testing.db, go, 0)
 
         assert a1.username == a2.username == 'ed'
@@ -291,9 +296,9 @@ class NaturalPKTest(fixtures.MappedTest):
 
     def _test_onetoone(self, passive_updates):
         users, Address, addresses, User = (self.tables.users,
-                                self.classes.Address,
-                                self.tables.addresses,
-                                self.classes.User)
+                                           self.classes.Address,
+                                           self.tables.addresses,
+                                           self.classes.User)
 
         mapper(
             User, users, properties={
@@ -315,6 +320,7 @@ class NaturalPKTest(fixtures.MappedTest):
 
         def go():
             sess.flush()
+
         if passive_updates:
             sess.expire(u1, ['address'])
             self.assert_sql_count(testing.db, go, 1)
@@ -323,6 +329,7 @@ class NaturalPKTest(fixtures.MappedTest):
 
         def go():
             sess.flush()
+
         self.assert_sql_count(testing.db, go, 0)
 
         sess.expunge_all()
@@ -337,14 +344,14 @@ class NaturalPKTest(fixtures.MappedTest):
 
     def _test_bidirectional(self, passive_updates):
         users, Address, addresses, User = (self.tables.users,
-                                self.classes.Address,
-                                self.tables.addresses,
-                                self.classes.User)
+                                           self.classes.Address,
+                                           self.tables.addresses,
+                                           self.classes.User)
 
         mapper(User, users)
         mapper(Address, addresses, properties={
             'user': relationship(User, passive_updates=passive_updates,
-                            backref='addresses')})
+                                 backref='addresses')})
 
         sess = create_session()
         a1 = Address(email='jack1')
@@ -363,6 +370,7 @@ class NaturalPKTest(fixtures.MappedTest):
 
         def go():
             sess.flush()
+
         if passive_updates:
             self.assert_sql_count(testing.db, go, 1)
         else:
@@ -375,11 +383,12 @@ class NaturalPKTest(fixtures.MappedTest):
             sess.query(Address).all())
 
         u1 = sess.query(User).get('ed')
-        assert len(u1.addresses) == 2    # load addresses
+        assert len(u1.addresses) == 2  # load addresses
         u1.username = 'fred'
 
         def go():
             sess.flush()
+
         # check that the passive_updates is on on the other side
         if passive_updates:
             self.assert_sql_count(testing.db, go, 1)
@@ -402,10 +411,10 @@ class NaturalPKTest(fixtures.MappedTest):
 
     def _test_manytomany(self, passive_updates):
         users, items, Item, User, users_to_items = (self.tables.users,
-                                self.tables.items,
-                                self.classes.Item,
-                                self.classes.User,
-                                self.tables.users_to_items)
+                                                    self.tables.items,
+                                                    self.classes.Item,
+                                                    self.classes.User,
+                                                    self.tables.users_to_items)
 
         mapper(
             User, users, properties={
@@ -439,10 +448,12 @@ class NaturalPKTest(fixtures.MappedTest):
 
         def go():
             sess.flush()
+
         go()
 
         def go():
             sess.flush()
+
         self.assert_sql_count(testing.db, go, 0)
 
         sess.expunge_all()
@@ -471,9 +482,9 @@ class TransientExceptionTesst(_fixtures.FixtureTest):
         """
 
         users, Address, addresses, User = (self.tables.users,
-                                self.classes.Address,
-                                self.tables.addresses,
-                                self.classes.User)
+                                           self.classes.Address,
+                                           self.tables.addresses,
+                                           self.classes.User)
 
         mapper(User, users)
         mapper(Address, addresses, properties={'user': relationship(User)})
@@ -513,7 +524,7 @@ class ReversePKsTest(fixtures.MappedTest):
             Column('status', Integer, autoincrement=False, primary_key=True),
             Column('username', String(50), nullable=False),
             test_needs_acid=True
-            )
+        )
 
     @classmethod
     def setup_classes(cls):
@@ -624,7 +635,7 @@ class SelfReferentialTest(fixtures.MappedTest):
                     backref=sa.orm.backref(
                         'parentnode', remote_side=nodes.c.name,
                         passive_updates=False),
-                    )})
+                )})
 
         sess = Session()
         n1 = Node(name='n1')
@@ -640,7 +651,7 @@ class SelfReferentialTest(fixtures.MappedTest):
         eq_(['new n1', 'new n1', 'new n1'],
             [n.parent
              for n in sess.query(Node).filter(
-                 Node.name.in_(['n11', 'n12', 'n13']))])
+                Node.name.in_(['n11', 'n12', 'n13']))])
 
     def test_one_to_many_on_o2m(self):
         Node, nodes = self.classes.Node, self.tables.nodes
@@ -667,7 +678,7 @@ class SelfReferentialTest(fixtures.MappedTest):
         eq_(['new n1', 'new n1', 'new n1'],
             [n.parent
              for n in sess.query(Node).filter(
-                 Node.name.in_(['n11', 'n12', 'n13']))])
+                Node.name.in_(['n11', 'n12', 'n13']))])
 
     @testing.requires.on_update_cascade
     def test_many_to_one_passive(self):
@@ -699,7 +710,7 @@ class SelfReferentialTest(fixtures.MappedTest):
             ['new n1', 'new n1', 'new n1'],
             [
                 n.parent for n in sess.query(Node).filter(
-                    Node.name.in_(['n11', 'n12', 'n13']))])
+                Node.name.in_(['n11', 'n12', 'n13']))])
 
 
 class NonPKCascadeTest(fixtures.MappedTest):
@@ -748,9 +759,9 @@ class NonPKCascadeTest(fixtures.MappedTest):
 
     def _test_onetomany(self, passive_updates):
         User, Address, users, addresses = (self.classes.User,
-                                self.classes.Address,
-                                self.tables.users,
-                                self.tables.addresses)
+                                           self.classes.Address,
+                                           self.tables.users,
+                                           self.tables.addresses)
 
         mapper(
             User, users, properties={
@@ -789,6 +800,7 @@ class NonPKCascadeTest(fixtures.MappedTest):
 
         def go():
             sess.flush()
+
         if not passive_updates:
             # test passive_updates=False; load addresses,
             #  update user, update 2 addresses (in one executemany)
@@ -829,8 +841,8 @@ class CascadeToFKPKTest(fixtures.MappedTest, testing.AssertsCompiledSQL):
         fk_args = _backend_specific_fk_args()
 
         Table('users', metadata,
-            Column('username', String(50), primary_key=True),
-            test_needs_fk=True)
+              Column('username', String(50), primary_key=True),
+              test_needs_fk=True)
 
         Table(
             'addresses', metadata,
@@ -844,7 +856,6 @@ class CascadeToFKPKTest(fixtures.MappedTest, testing.AssertsCompiledSQL):
 
     @classmethod
     def setup_classes(cls):
-
         class User(cls.Comparable):
             pass
 
@@ -874,9 +885,9 @@ class CascadeToFKPKTest(fixtures.MappedTest, testing.AssertsCompiledSQL):
         """
 
         User, Address, users, addresses = (self.classes.User,
-                                self.classes.Address,
-                                self.tables.users,
-                                self.tables.addresses)
+                                           self.classes.Address,
+                                           self.tables.users,
+                                           self.tables.addresses)
 
         mapper(
             User, users, properties={
@@ -908,9 +919,9 @@ class CascadeToFKPKTest(fixtures.MappedTest, testing.AssertsCompiledSQL):
         """
 
         User, Address, users, addresses = (self.classes.User,
-                                self.classes.Address,
-                                self.tables.users,
-                                self.tables.addresses)
+                                           self.classes.Address,
+                                           self.tables.users,
+                                           self.tables.addresses)
 
         mapper(
             User, users, properties={
@@ -940,9 +951,9 @@ class CascadeToFKPKTest(fixtures.MappedTest, testing.AssertsCompiledSQL):
 
     def _test_change_m2o(self, passive_updates):
         User, Address, users, addresses = (self.classes.User,
-                                self.classes.Address,
-                                self.tables.users,
-                                self.tables.addresses)
+                                           self.classes.Address,
+                                           self.tables.users,
+                                           self.tables.addresses)
 
         mapper(User, users)
         mapper(Address, addresses, properties={
@@ -970,9 +981,9 @@ class CascadeToFKPKTest(fixtures.MappedTest, testing.AssertsCompiledSQL):
 
     def _test_move_m2o(self, passive_updates):
         User, Address, users, addresses = (self.classes.User,
-                                self.classes.Address,
-                                self.tables.users,
-                                self.tables.addresses)
+                                           self.classes.Address,
+                                           self.tables.users,
+                                           self.tables.addresses)
 
         # tests [ticket:1856]
         mapper(User, users)
@@ -992,9 +1003,9 @@ class CascadeToFKPKTest(fixtures.MappedTest, testing.AssertsCompiledSQL):
 
     def test_rowswitch_doesntfire(self):
         User, Address, users, addresses = (self.classes.User,
-                                self.classes.Address,
-                                self.tables.users,
-                                self.tables.addresses)
+                                           self.classes.Address,
+                                           self.tables.users,
+                                           self.tables.addresses)
 
         mapper(User, users)
         mapper(Address, addresses, properties={
@@ -1040,9 +1051,9 @@ class CascadeToFKPKTest(fixtures.MappedTest, testing.AssertsCompiledSQL):
         """
 
         User, Address, users, addresses = (self.classes.User,
-                                self.classes.Address,
-                                self.tables.users,
-                                self.tables.addresses)
+                                           self.classes.Address,
+                                           self.tables.users,
+                                           self.tables.addresses)
 
         mapper(
             User, users, properties={
@@ -1052,7 +1063,7 @@ class CascadeToFKPKTest(fixtures.MappedTest, testing.AssertsCompiledSQL):
 
         sess = create_session()
         a1, a2 = Address(username='ed', email='ed@host1'), \
-            Address(username='ed', email='ed@host2')
+                 Address(username='ed', email='ed@host2')
         u1 = User(username='ed', addresses=[a1, a2])
         sess.add(u1)
         sess.flush()
@@ -1070,7 +1081,7 @@ class CascadeToFKPKTest(fixtures.MappedTest, testing.AssertsCompiledSQL):
         eq_(a2.username, 'jack')
         eq_(
             sa.select([addresses.c.username]).execute().fetchall(),
-            [('jack',), ('jack', )])
+            [('jack',), ('jack',)])
 
 
 class JoinedInheritanceTest(fixtures.MappedTest):
@@ -1106,13 +1117,13 @@ class JoinedInheritanceTest(fixtures.MappedTest):
 
         Table(
             'manager', metadata, Column('name', String(50),
-            ForeignKey('person.name', **fk_args), primary_key=True),
+                                        ForeignKey('person.name', **fk_args),
+                                        primary_key=True),
             Column('paperwork', String(50)), test_needs_fk=True
         )
 
     @classmethod
     def setup_classes(cls):
-
         class Person(cls.Comparable):
             pass
 
@@ -1187,8 +1198,8 @@ class JoinedInheritanceTest(fixtures.MappedTest):
         sess = sa.orm.sessionmaker()()
 
         m1 = Manager(name='dogbert', paperwork='lots')
-        e1, e2 = Engineer(name='dilbert', primary_language='java', boss=m1),\
-            Engineer(name='wally', primary_language='c++', boss=m1)
+        e1, e2 = Engineer(name='dilbert', primary_language='java', boss=m1), \
+                 Engineer(name='wally', primary_language='c++', boss=m1)
         sess.add_all([
             e1, e2, m1
         ])
@@ -1240,7 +1251,6 @@ class JoinedInheritancePKOnFKTest(fixtures.MappedTest):
 
     @classmethod
     def setup_classes(cls):
-
         class Person(cls.Comparable):
             pass
 
@@ -1278,6 +1288,6 @@ class JoinedInheritancePKOnFKTest(fixtures.MappedTest):
     def test_pk_passive(self):
         self._test_pk(True)
 
-    #@testing.requires.non_updating_cascade
+    # @testing.requires.non_updating_cascade
     def test_pk_nonpassive(self):
         self._test_pk(False)

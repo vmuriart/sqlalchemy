@@ -14,20 +14,24 @@ from sqlalchemy.orm import create_session, mapper, relationship, \
 from sqlalchemy.testing import fixtures
 from sqlalchemy.testing import assert_raises, assert_raises_message
 
+
 class Canary(sa.orm.interfaces.AttributeExtension):
     def __init__(self):
         self.data = set()
         self.added = set()
         self.removed = set()
+
     def append(self, obj, value, initiator):
         assert value not in self.added
         self.data.add(value)
         self.added.add(value)
         return value
+
     def remove(self, obj, value, initiator):
         assert value not in self.removed
         self.data.remove(value)
         self.removed.add(value)
+
     def set(self, obj, value, oldvalue, initiator):
         if isinstance(value, str):
             value = CollectionsTest.entity_maker()
@@ -37,12 +41,14 @@ class Canary(sa.orm.interfaces.AttributeExtension):
         self.append(obj, value, None)
         return value
 
+
 class CollectionsTest(fixtures.ORMTest):
     class Entity(object):
         def __init__(self, a=None, b=None, c=None):
             self.a = a
             self.b = b
             self.c = c
+
         def __repr__(self):
             return str((id(self), self.a, self.b, self.c))
 
@@ -77,8 +83,9 @@ class CollectionsTest(fixtures.ORMTest):
         canary = Canary()
         instrumentation.register_class(Foo)
         attributes.register_attribute(Foo, 'attr', uselist=True,
-                                    extension=canary,
-                                   typecallable=typecallable, useobject=True)
+                                      extension=canary,
+                                      typecallable=typecallable,
+                                      useobject=True)
 
         obj = Foo()
         adapter = collections.collection_adapter(obj.attr)
@@ -89,6 +96,7 @@ class CollectionsTest(fixtures.ORMTest):
         def assert_eq():
             self.assert_(to_set(direct) == canary.data)
             self.assert_(set(adapter) == canary.data)
+
         assert_ne = lambda: self.assert_(to_set(direct) != canary.data)
 
         e1, e2 = creator(), creator()
@@ -119,8 +127,9 @@ class CollectionsTest(fixtures.ORMTest):
         canary = Canary()
         instrumentation.register_class(Foo)
         attributes.register_attribute(Foo, 'attr', uselist=True,
-                                    extension=canary,
-                                   typecallable=typecallable, useobject=True)
+                                      extension=canary,
+                                      typecallable=typecallable,
+                                      useobject=True)
 
         obj = Foo()
         adapter = collections.collection_adapter(obj.attr)
@@ -154,7 +163,7 @@ class CollectionsTest(fixtures.ORMTest):
             assert_eq()
 
             if util.reduce(and_, [hasattr(direct, a) for a in
-                             ('__delitem__', 'insert', '__len__')], True):
+                                  ('__delitem__', 'insert', '__len__')], True):
                 values = [creator(), creator(), creator(), creator()]
                 direct[slice(0, 1)] = values
                 control[slice(0, 1)] = values
@@ -173,8 +182,10 @@ class CollectionsTest(fixtures.ORMTest):
                 values = [creator(), creator(), creator()]
                 control[:] = values
                 direct[:] = values
+
                 def invalid():
                     direct[slice(0, 6, 2)] = [creator()]
+
                 assert_raises(ValueError, invalid)
 
         if hasattr(direct, '__delitem__'):
@@ -212,7 +223,6 @@ class CollectionsTest(fixtures.ORMTest):
             assert_eq()
 
         if hasattr(direct, '__setitem__') or hasattr(direct, '__setslice__'):
-
             values = [creator(), creator()]
             direct[:] = values
             control[:] = values
@@ -264,7 +274,6 @@ class CollectionsTest(fixtures.ORMTest):
             direct[0:0] = values
             control[0:0] = values
             assert_eq()
-
 
         if hasattr(direct, '__delitem__') or hasattr(direct, '__delslice__'):
             for i in range(1, 4):
@@ -336,8 +345,9 @@ class CollectionsTest(fixtures.ORMTest):
         canary = Canary()
         instrumentation.register_class(Foo)
         attributes.register_attribute(Foo, 'attr', uselist=True,
-                                    extension=canary,
-                                   typecallable=typecallable, useobject=True)
+                                      extension=canary,
+                                      typecallable=typecallable,
+                                      useobject=True)
 
         obj = Foo()
         direct = obj.attr
@@ -402,29 +412,42 @@ class CollectionsTest(fixtures.ORMTest):
         class ListLike(object):
             def __init__(self):
                 self.data = list()
+
             def append(self, item):
                 self.data.append(item)
+
             def remove(self, item):
                 self.data.remove(item)
+
             def insert(self, index, item):
                 self.data.insert(index, item)
+
             def pop(self, index=-1):
                 return self.data.pop(index)
+
             def extend(self):
                 assert False
+
             def __len__(self):
                 return len(self.data)
+
             def __setitem__(self, key, value):
                 self.data[key] = value
+
             def __getitem__(self, key):
                 return self.data[key]
+
             def __delitem__(self, key):
                 del self.data[key]
+
             def __iter__(self):
                 return iter(self.data)
+
             __hash__ = object.__hash__
+
             def __eq__(self, other):
                 return self.data == other
+
             def __repr__(self):
                 return 'ListLike({0!s})'.format(repr(self.data))
 
@@ -435,6 +458,7 @@ class CollectionsTest(fixtures.ORMTest):
     def test_list_subclass(self):
         class MyList(list):
             pass
+
         self._test_adapter(MyList)
         self._test_list(MyList)
         self._test_list_bulk(MyList)
@@ -444,21 +468,30 @@ class CollectionsTest(fixtures.ORMTest):
         class ListLike(object):
             def __init__(self):
                 self.data = list()
+
             def append(self, item):
                 self.data.append(item)
+
             def remove(self, item):
                 self.data.remove(item)
+
             def insert(self, index, item):
                 self.data.insert(index, item)
+
             def pop(self, index=-1):
                 return self.data.pop(index)
+
             def extend(self):
                 assert False
+
             def __iter__(self):
                 return iter(self.data)
+
             __hash__ = object.__hash__
+
             def __eq__(self, other):
                 return self.data == other
+
             def __repr__(self):
                 return 'ListLike({0!s})'.format(repr(self.data))
 
@@ -470,23 +503,33 @@ class CollectionsTest(fixtures.ORMTest):
     def test_list_emulates(self):
         class ListIsh(object):
             __emulates__ = list
+
             def __init__(self):
                 self.data = list()
+
             def append(self, item):
                 self.data.append(item)
+
             def remove(self, item):
                 self.data.remove(item)
+
             def insert(self, index, item):
                 self.data.insert(index, item)
+
             def pop(self, index=-1):
                 return self.data.pop(index)
+
             def extend(self):
                 assert False
+
             def __iter__(self):
                 return iter(self.data)
+
             __hash__ = object.__hash__
+
             def __eq__(self, other):
                 return self.data == other
+
             def __repr__(self):
                 return 'ListIsh({0!s})'.format(repr(self.data))
 
@@ -505,8 +548,9 @@ class CollectionsTest(fixtures.ORMTest):
         canary = Canary()
         instrumentation.register_class(Foo)
         attributes.register_attribute(Foo, 'attr', uselist=True,
-                                    extension=canary,
-                                   typecallable=typecallable, useobject=True)
+                                      extension=canary,
+                                      typecallable=typecallable,
+                                      useobject=True)
 
         obj = Foo()
         adapter = collections.collection_adapter(obj.attr)
@@ -523,6 +567,7 @@ class CollectionsTest(fixtures.ORMTest):
                 direct.add(item)
                 control.add(item)
             assert_eq()
+
         def zap():
             for item in list(direct):
                 direct.remove(item)
@@ -533,7 +578,6 @@ class CollectionsTest(fixtures.ORMTest):
         e = creator()
         addall(e)
         addall(e)
-
 
         if hasattr(direct, 'remove'):
             e = creator()
@@ -758,7 +802,6 @@ class CollectionsTest(fixtures.ORMTest):
             except TypeError:
                 assert True
 
-
     def _test_set_bulk(self, typecallable, creator=None):
         if creator is None:
             creator = self.entity_maker
@@ -769,8 +812,9 @@ class CollectionsTest(fixtures.ORMTest):
         canary = Canary()
         instrumentation.register_class(Foo)
         attributes.register_attribute(Foo, 'attr', uselist=True,
-                                    extension=canary,
-                                   typecallable=typecallable, useobject=True)
+                                      extension=canary,
+                                      typecallable=typecallable,
+                                      useobject=True)
 
         obj = Foo()
         direct = obj.attr
@@ -814,6 +858,7 @@ class CollectionsTest(fixtures.ORMTest):
     def test_set_subclass(self):
         class MySet(set):
             pass
+
         self._test_adapter(MySet)
         self._test_set(MySet)
         self._test_set_bulk(MySet)
@@ -823,21 +868,30 @@ class CollectionsTest(fixtures.ORMTest):
         class SetLike(object):
             def __init__(self):
                 self.data = set()
+
             def add(self, item):
                 self.data.add(item)
+
             def remove(self, item):
                 self.data.remove(item)
+
             def discard(self, item):
                 self.data.discard(item)
+
             def clear(self):
                 self.data.clear()
+
             def pop(self):
                 return self.data.pop()
+
             def update(self, other):
                 self.data.update(other)
+
             def __iter__(self):
                 return iter(self.data)
+
             __hash__ = object.__hash__
+
             def __eq__(self, other):
                 return self.data == other
 
@@ -849,23 +903,33 @@ class CollectionsTest(fixtures.ORMTest):
     def test_set_emulates(self):
         class SetIsh(object):
             __emulates__ = set
+
             def __init__(self):
                 self.data = set()
+
             def add(self, item):
                 self.data.add(item)
+
             def remove(self, item):
                 self.data.remove(item)
+
             def discard(self, item):
                 self.data.discard(item)
+
             def pop(self):
                 return self.data.pop()
+
             def update(self, other):
                 self.data.update(other)
+
             def __iter__(self):
                 return iter(self.data)
+
             def clear(self):
                 self.data.clear()
+
             __hash__ = object.__hash__
+
             def __eq__(self, other):
                 return self.data == other
 
@@ -884,8 +948,9 @@ class CollectionsTest(fixtures.ORMTest):
         canary = Canary()
         instrumentation.register_class(Foo)
         attributes.register_attribute(Foo, 'attr', uselist=True,
-                                    extension=canary,
-                                   typecallable=typecallable, useobject=True)
+                                      extension=canary,
+                                      typecallable=typecallable,
+                                      useobject=True)
 
         obj = Foo()
         adapter = collections.collection_adapter(obj.attr)
@@ -902,6 +967,7 @@ class CollectionsTest(fixtures.ORMTest):
                 direct.set(item)
                 control[item.a] = item
             assert_eq()
+
         def zap():
             for item in list(adapter):
                 direct.remove(item)
@@ -1006,8 +1072,9 @@ class CollectionsTest(fixtures.ORMTest):
         canary = Canary()
         instrumentation.register_class(Foo)
         attributes.register_attribute(Foo, 'attr', uselist=True,
-                                    extension=canary,
-                                   typecallable=typecallable, useobject=True)
+                                      extension=canary,
+                                      typecallable=typecallable,
+                                      useobject=True)
 
         obj = Foo()
         direct = obj.attr
@@ -1024,10 +1091,9 @@ class CollectionsTest(fixtures.ORMTest):
         self.assert_(obj.attr is not direct)
         self.assert_(obj.attr is not like_me)
         self.assert_(
-                set(collections.collection_adapter(obj.attr)) == set([e2]))
+            set(collections.collection_adapter(obj.attr)) == set([e2]))
         self.assert_(e1 in canary.removed)
         self.assert_(e2 in canary.added)
-
 
         # key validity on bulk assignment is a basic feature of
         # MappedCollection but is not present in basic, @converter-less
@@ -1043,7 +1109,7 @@ class CollectionsTest(fixtures.ORMTest):
             self.assert_(obj.attr is not real_dict)
             self.assert_('badkey' not in obj.attr)
             eq_(set(collections.collection_adapter(obj.attr)),
-                              set([e2]))
+                set([e2]))
             self.assert_(e3 not in canary.added)
         else:
             real_dict = dict(keyignored1=e3)
@@ -1051,7 +1117,7 @@ class CollectionsTest(fixtures.ORMTest):
             self.assert_(obj.attr is not real_dict)
             self.assert_('keyignored1' not in obj.attr)
             eq_(set(collections.collection_adapter(obj.attr)),
-                              set([e3]))
+                set([e3]))
             self.assert_(e2 in canary.removed)
             self.assert_(e3 in canary.added)
 
@@ -1069,15 +1135,15 @@ class CollectionsTest(fixtures.ORMTest):
         assert_raises_message(
             sa_exc.ArgumentError,
             'Type InstrumentedDict must elect an appender '
-                'method to be a collection class',
+            'method to be a collection class',
             self._test_adapter, dict, self.dictable_entity,
-                               to_set=lambda c: set(c.values())
+            to_set=lambda c: set(c.values())
         )
 
         assert_raises_message(
             sa_exc.ArgumentError,
             'Type InstrumentedDict must elect an appender method '
-                'to be a collection class',
+            'to be a collection class',
             self._test_dict, dict
         )
 
@@ -1087,6 +1153,7 @@ class CollectionsTest(fixtures.ORMTest):
             @collection.internally_instrumented
             def set(self, item, _sa_initiator=None):
                 self.__setitem__(item.a, item, _sa_initiator=_sa_initiator)
+
             @collection.remover
             @collection.internally_instrumented
             def _remove(self, item, _sa_initiator=None):
@@ -1125,7 +1192,8 @@ class CollectionsTest(fixtures.ORMTest):
         # tests #2654
         class MyDict(collections.MappedCollection):
             def __init__(self):
-                super(MyDict, self).__init__(lambda value: "k{0:d}".format(value))
+                super(MyDict, self).__init__(
+                    lambda value: "k{0:d}".format(value))
 
             @collection.converter
             def _convert(self, dictlike):
@@ -1139,8 +1207,8 @@ class CollectionsTest(fixtures.ORMTest):
 
         instrumentation.register_class(Foo)
         attributes.register_attribute(Foo, 'attr', uselist=True,
-                                    extension=canary,
-                                   typecallable=MyDict, useobject=True)
+                                      extension=canary,
+                                      typecallable=MyDict, useobject=True)
 
         f = Foo()
         f.attr = {"k1": 1, "k2": 2}
@@ -1158,25 +1226,35 @@ class CollectionsTest(fixtures.ORMTest):
                 current = self.data.get(item.a, None)
                 self.data[item.a] = item
                 return current
+
             @collection.remover
             def _remove(self, item):
                 del self.data[item.a]
+
             def __setitem__(self, key, value):
                 self.data[key] = value
+
             def __getitem__(self, key):
                 return self.data[key]
+
             def __delitem__(self, key):
                 del self.data[key]
+
             def values(self):
                 return list(self.data.values())
+
             def __contains__(self, key):
                 return key in self.data
+
             @collection.iterator
             def itervalues(self):
                 return iter(self.data.values())
+
             __hash__ = object.__hash__
+
             def __eq__(self, other):
                 return self.data == other
+
             def __repr__(self):
                 return 'DictLike({0!s})'.format(repr(self.data))
 
@@ -1189,6 +1267,7 @@ class CollectionsTest(fixtures.ORMTest):
     def test_dict_emulates(self):
         class DictIsh(object):
             __emulates__ = dict
+
             def __init__(self):
                 self.data = dict()
 
@@ -1198,25 +1277,35 @@ class CollectionsTest(fixtures.ORMTest):
                 current = self.data.get(item.a, None)
                 self.data[item.a] = item
                 return current
+
             @collection.remover
             def _remove(self, item):
                 del self.data[item.a]
+
             def __setitem__(self, key, value):
                 self.data[key] = value
+
             def __getitem__(self, key):
                 return self.data[key]
+
             def __delitem__(self, key):
                 del self.data[key]
+
             def values(self):
                 return list(self.data.values())
+
             def __contains__(self, key):
                 return key in self.data
+
             @collection.iterator
             def itervalues(self):
                 return iter(self.data.values())
+
             __hash__ = object.__hash__
+
             def __eq__(self, other):
                 return self.data == other
+
             def __repr__(self):
                 return 'DictIsh({0!s})'.format(repr(self.data))
 
@@ -1236,8 +1325,9 @@ class CollectionsTest(fixtures.ORMTest):
         canary = Canary()
         instrumentation.register_class(Foo)
         attributes.register_attribute(Foo, 'attr', uselist=True,
-                                    extension=canary,
-                                   typecallable=typecallable, useobject=True)
+                                      extension=canary,
+                                      typecallable=typecallable,
+                                      useobject=True)
 
         obj = Foo()
         adapter = collections.collection_adapter(obj.attr)
@@ -1279,21 +1369,27 @@ class CollectionsTest(fixtures.ORMTest):
         class MyCollection(object):
             def __init__(self):
                 self.data = set()
+
             @collection.appender
             def push(self, item):
                 self.data.add(item)
+
             @collection.remover
             def zark(self, item):
                 self.data.remove(item)
+
             @collection.removes_return()
             def maybe_zark(self, item):
                 if item in self.data:
                     self.data.remove(item)
                     return item
+
             @collection.iterator
             def __iter__(self):
                 return iter(self.data)
+
             __hash__ = object.__hash__
+
             def __eq__(self, other):
                 return self.data == other
 
@@ -1305,26 +1401,34 @@ class CollectionsTest(fixtures.ORMTest):
     def test_object_emulates(self):
         class MyCollection2(object):
             __emulates__ = None
+
             def __init__(self):
                 self.data = set()
+
             # looks like a list
             def append(self, item):
                 assert False
+
             @collection.appender
             def push(self, item):
                 self.data.add(item)
+
             @collection.remover
             def zark(self, item):
                 self.data.remove(item)
+
             @collection.removes_return()
             def maybe_zark(self, item):
                 if item in self.data:
                     self.data.remove(item)
                     return item
+
             @collection.iterator
             def __iter__(self):
                 return iter(self.data)
+
             __hash__ = object.__hash__
+
             def __eq__(self, other):
                 return self.data == other
 
@@ -1337,6 +1441,7 @@ class CollectionsTest(fixtures.ORMTest):
         class Custom(object):
             def __init__(self):
                 self.data = []
+
             @collection.appender
             @collection.adds('entity')
             def put(self, entity):
@@ -1370,20 +1475,23 @@ class CollectionsTest(fixtures.ORMTest):
 
         class Foo(object):
             pass
+
         canary = Canary()
         instrumentation.register_class(Foo)
         attributes.register_attribute(Foo, 'attr', uselist=True,
-                                    extension=canary,
-                                   typecallable=Custom, useobject=True)
+                                      extension=canary,
+                                      typecallable=Custom, useobject=True)
 
         obj = Foo()
         adapter = collections.collection_adapter(obj.attr)
         direct = obj.attr
         control = list()
+
         def assert_eq():
             self.assert_(set(direct) == canary.data)
             self.assert_(set(adapter) == canary.data)
             self.assert_(list(direct) == control)
+
         creator = self.entity_maker
 
         e1 = creator()
@@ -1444,7 +1552,7 @@ class CollectionsTest(fixtures.ORMTest):
         creator = self.entity_maker
         instrumentation.register_class(Foo)
         attributes.register_attribute(Foo, 'attr', uselist=True,
-                                extension=canary, useobject=True)
+                                      extension=canary, useobject=True)
 
         obj = Foo()
         col1 = obj.attr
@@ -1470,17 +1578,17 @@ class CollectionsTest(fixtures.ORMTest):
         obj.attr[0] = e3
         self.assert_(e3 in canary.data)
 
-class DictHelpersTest(fixtures.MappedTest):
 
+class DictHelpersTest(fixtures.MappedTest):
     @classmethod
     def define_tables(cls, metadata):
         Table('parents', metadata,
               Column('id', Integer, primary_key=True,
-                        test_needs_autoincrement=True),
+                     test_needs_autoincrement=True),
               Column('label', String(128)))
         Table('children', metadata,
               Column('id', Integer, primary_key=True,
-                        test_needs_autoincrement=True),
+                     test_needs_autoincrement=True),
               Column('parent_id', Integer, ForeignKey('parents.id'),
                      nullable=False),
               Column('a', String(128)),
@@ -1501,14 +1609,14 @@ class DictHelpersTest(fixtures.MappedTest):
 
     def _test_scalar_mapped(self, collection_class):
         parents, children, Parent, Child = (self.tables.parents,
-                                self.tables.children,
-                                self.classes.Parent,
-                                self.classes.Child)
+                                            self.tables.children,
+                                            self.classes.Parent,
+                                            self.classes.Child)
 
         mapper(Child, children)
         mapper(Parent, parents, properties={
             'children': relationship(Child, collection_class=collection_class,
-                                 cascade="all, delete-orphan")})
+                                     cascade="all, delete-orphan")})
 
         p = Parent()
         p.children['foo'] = Child('foo', 'value')
@@ -1520,7 +1628,6 @@ class DictHelpersTest(fixtures.MappedTest):
         session.expunge_all()
 
         p = session.query(Parent).get(pid)
-
 
         eq_(set(p.children.keys()), set(['foo', 'bar']))
         cid = p.children['foo'].id
@@ -1537,48 +1644,47 @@ class DictHelpersTest(fixtures.MappedTest):
         self.assert_(p.children['foo'].id != cid)
 
         self.assert_(
-                len(list(collections.collection_adapter(p.children))) == 2)
+            len(list(collections.collection_adapter(p.children))) == 2)
         session.flush()
         session.expunge_all()
 
         p = session.query(Parent).get(pid)
         self.assert_(
-                len(list(collections.collection_adapter(p.children))) == 2)
+            len(list(collections.collection_adapter(p.children))) == 2)
 
         collections.collection_adapter(p.children).remove_with_event(
             p.children['foo'])
 
         self.assert_(
-                len(list(collections.collection_adapter(p.children))) == 1)
+            len(list(collections.collection_adapter(p.children))) == 1)
         session.flush()
         session.expunge_all()
 
         p = session.query(Parent).get(pid)
         self.assert_(
-                len(list(collections.collection_adapter(p.children))) == 1)
+            len(list(collections.collection_adapter(p.children))) == 1)
 
         del p.children['bar']
         self.assert_(
-                len(list(collections.collection_adapter(p.children))) == 0)
+            len(list(collections.collection_adapter(p.children))) == 0)
         session.flush()
         session.expunge_all()
 
         p = session.query(Parent).get(pid)
         self.assert_(
-                len(list(collections.collection_adapter(p.children))) == 0)
-
+            len(list(collections.collection_adapter(p.children))) == 0)
 
     def _test_composite_mapped(self, collection_class):
         parents, children, Parent, Child = (self.tables.parents,
-                                self.tables.children,
-                                self.classes.Parent,
-                                self.classes.Child)
+                                            self.tables.children,
+                                            self.classes.Parent,
+                                            self.classes.Child)
 
         mapper(Child, children)
         mapper(Parent, parents, properties={
             'children': relationship(Child, collection_class=collection_class,
-                                 cascade="all, delete-orphan")
-            })
+                                     cascade="all, delete-orphan")
+        })
 
         p = Parent()
         p.children[('foo', '1')] = Child('foo', '1', 'value 1')
@@ -1593,7 +1699,7 @@ class DictHelpersTest(fixtures.MappedTest):
         p = session.query(Parent).get(pid)
 
         self.assert_(
-                set(p.children.keys()) == set([('foo', '1'), ('foo', '2')]))
+            set(p.children.keys()) == set([('foo', '1'), ('foo', '2')]))
         cid = p.children[('foo', '1')].id
 
         collections.collection_adapter(p.children).append_with_event(
@@ -1605,11 +1711,11 @@ class DictHelpersTest(fixtures.MappedTest):
         p = session.query(Parent).get(pid)
 
         self.assert_(
-                set(p.children.keys()) == set([('foo', '1'), ('foo', '2')]))
+            set(p.children.keys()) == set([('foo', '1'), ('foo', '2')]))
         self.assert_(p.children[('foo', '1')].id != cid)
 
         self.assert_(
-                len(list(collections.collection_adapter(p.children))) == 2)
+            len(list(collections.collection_adapter(p.children))) == 2)
 
     def test_mapped_collection(self):
         collection_class = collections.mapped_collection(lambda c: c.a)
@@ -1656,7 +1762,6 @@ class DictHelpersTest(fixtures.MappedTest):
                               collections.column_mapped_collection,
                               text('a'))
 
-
     def test_column_mapped_collection(self):
         children = self.tables.children
 
@@ -1676,6 +1781,7 @@ class DictHelpersTest(fixtures.MappedTest):
             def __init__(self):
                 collections.MappedCollection.__init__(self, lambda v: v.a)
                 util.OrderedDict.__init__(self)
+
         collection_class = Ordered
         self._test_scalar_mapped(collection_class)
 
@@ -1684,8 +1790,10 @@ class DictHelpersTest(fixtures.MappedTest):
             def __init__(self, keyfunc):
                 collections.MappedCollection.__init__(self, keyfunc)
                 util.OrderedDict.__init__(self)
+
         collection_class = lambda: Ordered2(lambda v: (v.a, v.b))
         self._test_composite_mapped(collection_class)
+
 
 class ColumnMappedWSerialize(fixtures.MappedTest):
     """test the column_mapped_collection serializer against
@@ -1697,19 +1805,21 @@ class ColumnMappedWSerialize(fixtures.MappedTest):
     @classmethod
     def define_tables(cls, metadata):
         Table('foo', metadata,
-            Column('id', Integer(), primary_key=True),
-            Column('b', String(128))
-        )
+              Column('id', Integer(), primary_key=True),
+              Column('b', String(128))
+              )
         Table('bar', metadata,
-            Column('id', Integer(), primary_key=True),
-            Column('foo_id', Integer, ForeignKey('foo.id')),
-            Column('bat_id', Integer),
-            schema="x"
-        )
+              Column('id', Integer(), primary_key=True),
+              Column('foo_id', Integer, ForeignKey('foo.id')),
+              Column('bat_id', Integer),
+              schema="x"
+              )
+
     @classmethod
     def setup_classes(cls):
         class Foo(cls.Basic):
             pass
+
         class Bar(Foo):
             pass
 
@@ -1757,6 +1867,7 @@ class ColumnMappedWSerialize(fixtures.MappedTest):
                 c3 = loads(dumps(c2))
                 eq_(c3.keyfunc(obj), expected)
 
+
 class CustomCollectionsTest(fixtures.MappedTest):
     """test the integration of collections with mapped classes."""
 
@@ -1764,23 +1875,25 @@ class CustomCollectionsTest(fixtures.MappedTest):
     def define_tables(cls, metadata):
         Table('sometable', metadata,
               Column('col1', Integer, primary_key=True,
-                                            test_needs_autoincrement=True),
+                     test_needs_autoincrement=True),
               Column('data', String(30)))
         Table('someothertable', metadata,
               Column('col1', Integer, primary_key=True,
-                                            test_needs_autoincrement=True),
+                     test_needs_autoincrement=True),
               Column('scol1', Integer,
                      ForeignKey('sometable.col1')),
               Column('data', String(20)))
 
     def test_basic(self):
         someothertable, sometable = self.tables.someothertable, \
-                                            self.tables.sometable
+                                    self.tables.sometable
 
         class MyList(list):
             pass
+
         class Foo(object):
             pass
+
         class Bar(object):
             pass
 
@@ -1795,12 +1908,14 @@ class CustomCollectionsTest(fixtures.MappedTest):
         """test that a 'set' can be used as a collection and can lazyload."""
 
         someothertable, sometable = self.tables.someothertable, \
-                                            self.tables.sometable
+                                    self.tables.sometable
 
         class Foo(object):
             pass
+
         class Bar(object):
             pass
+
         mapper(Foo, sometable, properties={
             'bars': relationship(Bar, collection_class=set)
         })
@@ -1820,17 +1935,19 @@ class CustomCollectionsTest(fixtures.MappedTest):
         """test that a 'dict' can be used as a collection and can lazyload."""
 
         someothertable, sometable = self.tables.someothertable, \
-                                            self.tables.sometable
-
+                                    self.tables.sometable
 
         class Foo(object):
             pass
+
         class Bar(object):
             pass
+
         class AppenderDict(dict):
             @collection.appender
             def set(self, item):
                 self[id(item)] = item
+
             @collection.remover
             def remove(self, item):
                 if id(item) in self:
@@ -1856,18 +1973,18 @@ class CustomCollectionsTest(fixtures.MappedTest):
         collection and can lazyload."""
 
         someothertable, sometable = self.tables.someothertable, \
-                                            self.tables.sometable
-
+                                    self.tables.sometable
 
         class Foo(object):
             pass
+
         class Bar(object):
             def __init__(self, data): self.data = data
 
         mapper(Foo, sometable, properties={
-            'bars':relationship(Bar,
-                collection_class=collections.column_mapped_collection(
-                    someothertable.c.data))
+            'bars': relationship(Bar,
+                                 collection_class=collections.column_mapped_collection(
+                                     someothertable.c.data))
         })
         mapper(Bar, someothertable)
 
@@ -1902,29 +2019,42 @@ class CustomCollectionsTest(fixtures.MappedTest):
         class ListLike(object):
             def __init__(self):
                 self.data = list()
+
             def append(self, item):
                 self.data.append(item)
+
             def remove(self, item):
                 self.data.remove(item)
+
             def insert(self, index, item):
                 self.data.insert(index, item)
+
             def pop(self, index=-1):
                 return self.data.pop(index)
+
             def extend(self):
                 assert False
+
             def __len__(self):
                 return len(self.data)
+
             def __setitem__(self, key, value):
                 self.data[key] = value
+
             def __getitem__(self, key):
                 return self.data[key]
+
             def __delitem__(self, key):
                 del self.data[key]
+
             def __iter__(self):
                 return iter(self.data)
+
             __hash__ = object.__hash__
+
             def __eq__(self, other):
                 return self.data == other
+
             def __repr__(self):
                 return 'ListLike({0!s})'.format(repr(self.data))
 
@@ -1932,10 +2062,11 @@ class CustomCollectionsTest(fixtures.MappedTest):
 
     def _test_list(self, listcls):
         someothertable, sometable = self.tables.someothertable, \
-                                        self.tables.sometable
+                                    self.tables.sometable
 
         class Parent(object):
             pass
+
         class Child(object):
             pass
 
@@ -2056,22 +2187,26 @@ class CustomCollectionsTest(fixtures.MappedTest):
 
     def test_custom(self):
         someothertable, sometable = self.tables.someothertable, \
-                                        self.tables.sometable
+                                    self.tables.sometable
 
         class Parent(object):
             pass
+
         class Child(object):
             pass
 
         class MyCollection(object):
             def __init__(self):
                 self.data = []
+
             @collection.appender
             def append(self, value):
                 self.data.append(value)
+
             @collection.remover
             def remove(self, value):
                 self.data.remove(value)
+
             @collection.iterator
             def __iter__(self):
                 return iter(self.data)
@@ -2125,7 +2260,6 @@ class InstrumentationTest(fixtures.ORMTest):
         collections._instrument_class(Touchy)
 
     def test_name_setup(self):
-
         class Base(object):
             @collection.iterator
             def base_iterate(self, x):
@@ -2143,7 +2277,6 @@ class InstrumentationTest(fixtures.ORMTest):
             def base_remove(self, x):
                 return "base_remove"
 
-
         from sqlalchemy.orm.collections import _instrument_class
         _instrument_class(Base)
 
@@ -2160,6 +2293,7 @@ class InstrumentationTest(fixtures.ORMTest):
             @collection.remover
             def sub_remove(self, x):
                 return "sub_remove"
+
         _instrument_class(Sub)
 
         eq_(Sub._sa_appender(Sub(), 5), "base_append")
@@ -2169,6 +2303,7 @@ class InstrumentationTest(fixtures.ORMTest):
 
     def test_link_event(self):
         canary = []
+
         class Collection(list):
             @collection.linker
             def _on_link(self, obj):
@@ -2179,7 +2314,7 @@ class InstrumentationTest(fixtures.ORMTest):
 
         instrumentation.register_class(Foo)
         attributes.register_attribute(Foo, 'attr', uselist=True,
-                                   typecallable=Collection, useobject=True)
+                                      typecallable=Collection, useobject=True)
 
         f1 = Foo()
         f1.attr.append(3)
@@ -2192,7 +2327,6 @@ class InstrumentationTest(fixtures.ORMTest):
         eq_(canary, [adapter_1, f1.attr._sa_adapter, None])
 
     def test_referenced_by_owner(self):
-
         class Foo(object):
             pass
 
@@ -2208,8 +2342,3 @@ class InstrumentationTest(fixtures.ORMTest):
 
         f1.attr = []
         assert not adapter._referenced_by_owner
-
-
-
-
-

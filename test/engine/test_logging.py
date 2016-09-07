@@ -45,7 +45,7 @@ class LogParamsTest(fixtures.TestBase):
     def test_log_large_list(self):
         self.eng.execute(
             "INSERT INTO foo (data) values (?)",
-            [(str(i), ) for i in range(100)]
+            [(str(i),) for i in range(100)]
         )
         eq_(
             self.buf.buffer[1].message,
@@ -60,7 +60,7 @@ class LogParamsTest(fixtures.TestBase):
 
         self.eng.execute(
             "INSERT INTO foo (data) values (?)",
-            (largeparam, )
+            (largeparam,)
         )
 
         eq_(
@@ -96,7 +96,7 @@ class LogParamsTest(fixtures.TestBase):
 
         self.eng.execute(
             "INSERT INTO foo (data) values (?)",
-            [(lp1, ), (lp2, ), (lp3, )]
+            [(lp1,), (lp2,), (lp3,)]
         )
 
         eq_(
@@ -139,7 +139,7 @@ class LogParamsTest(fixtures.TestBase):
         self.eng.echo = 'debug'
         result = self.eng.execute(
             "SELECT ?",
-            (largeparam, )
+            (largeparam,)
         )
 
         row = result.first()
@@ -207,7 +207,7 @@ class LogParamsTest(fixtures.TestBase):
             "\('98',\), \('99',\)\]",
             lambda: self.eng.execute(
                 "INSERT INTO nonexistent (data) values (?)",
-                [(str(i), ) for i in range(100)]
+                [(str(i),) for i in range(100)]
             )
         )
 
@@ -302,7 +302,8 @@ class LoggingNameTest(fixtures.TestBase):
         for name in [b.name for b in self.buf.buffer]:
             assert name in (
                 'sqlalchemy.engine.base.Engine.{0!s}'.format(eng_name),
-                'sqlalchemy.pool.{0!s}.{1!s}'.format(eng.pool.__class__.__name__, pool_name)
+                'sqlalchemy.pool.{0!s}.{1!s}'.format(
+                    eng.pool.__class__.__name__, pool_name)
             )
 
     def _assert_no_name_in_execute(self, eng):

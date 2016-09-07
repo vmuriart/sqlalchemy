@@ -64,7 +64,7 @@ class LateralTest(fixtures.TablesTest, AssertsCompiledSQL):
     def test_plain_join(self):
         table1 = self.tables.people
         table2 = self.tables.books
-        subq = select([table2.c.book_id]).\
+        subq = select([table2.c.book_id]). \
             where(table2.c.book_owner_id == table1.c.people_id)
 
         # FROM books, people?  isn't this wrong?  No!  Because
@@ -103,10 +103,10 @@ class LateralTest(fixtures.TablesTest, AssertsCompiledSQL):
         table1 = self.tables.people
         table2 = self.tables.books
 
-        subq = select([table2.c.book_id]).\
-            correlate(table1).\
+        subq = select([table2.c.book_id]). \
+            correlate(table1). \
             where(table1.c.people_id == table2.c.book_owner_id).lateral()
-        stmt = select([table1, subq.c.book_id]).\
+        stmt = select([table1, subq.c.book_id]). \
             select_from(table1.join(subq, true()))
 
         self.assert_compile(
@@ -129,6 +129,3 @@ class LateralTest(fixtures.TablesTest, AssertsCompiledSQL):
             "LATERAL generate_series(:generate_series_1, "
             "bookcases.bookcase_shelves) AS anon_1 ON true"
         )
-
-
-

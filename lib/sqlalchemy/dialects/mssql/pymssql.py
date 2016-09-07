@@ -52,7 +52,7 @@ class MSDialect_pymssql(MSDialect):
             # TODO: monkeypatching here is less than ideal
             module.Binary = lambda x: x if hasattr(x, 'decode') else str(x)
 
-        if client_ver < (1, ):
+        if client_ver < (1,):
             util.warn("The pymssql dialect expects at least "
                       "the 1.0 series of the pymssql DBAPI.")
         return module
@@ -92,5 +92,6 @@ class MSDialect_pymssql(MSDialect):
                 return True
         else:
             return False
+
 
 dialect = MSDialect_pymssql

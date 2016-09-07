@@ -317,7 +317,8 @@ class _OracleNumeric(sqltypes.Numeric):
 
         if dialect.supports_native_decimal:
             if self.asdecimal:
-                fstring = "%.{0:d}f".format(self._effective_decimal_return_scale)
+                fstring = "%.{0:d}f".format(
+                    self._effective_decimal_return_scale)
 
                 def to_decimal(value):
                     if value is None:
@@ -332,14 +333,14 @@ class _OracleNumeric(sqltypes.Numeric):
                 if self.precision is None and self.scale is None:
                     return processors.to_float
                 elif not getattr(self, '_is_oracle_number', False) \
-                        and self.scale is not None:
+                    and self.scale is not None:
                     return processors.to_float
                 else:
                     return None
         else:
             # cx_oracle 4 behavior, will assume
             # floats
-            return super(_OracleNumeric, self).\
+            return super(_OracleNumeric, self). \
                 result_processor(dialect, coltype)
 
 
@@ -353,6 +354,7 @@ class _OracleDate(sqltypes.Date):
                 return value.date()
             else:
                 return value
+
         return process
 
 
@@ -367,6 +369,7 @@ class _LOBMixin(object):
                 return value.read()
             else:
                 return value
+
         return process
 
 
@@ -379,14 +382,15 @@ class _NativeUnicodeMixin(object):
                         return value
                     else:
                         return unicode(value)
+
                 return process
             else:
                 return super(
                     _NativeUnicodeMixin, self).bind_processor(dialect)
 
-    # we apply a connection output handler that returns
-    # unicode in all cases, so the "native_unicode" flag
-    # will be set for the default String.result_processor.
+                # we apply a connection output handler that returns
+                # unicode in all cases, so the "native_unicode" flag
+                # will be set for the default String.result_processor.
 
 
 class _OracleChar(_NativeUnicodeMixin, sqltypes.CHAR):
@@ -415,6 +419,7 @@ class _OracleLong(oracle.LONG):
 class _OracleString(_NativeUnicodeMixin, sqltypes.String):
     pass
 
+
 class _OracleEnum(_NativeUnicodeMixin, sqltypes.Enum):
     def bind_processor(self, dialect):
         enum_proc = sqltypes.Enum.bind_processor(self, dialect)
@@ -428,11 +433,12 @@ class _OracleEnum(_NativeUnicodeMixin, sqltypes.Enum):
             if unicode_proc:
                 raw_str = unicode_proc(raw_str)
             return raw_str
+
         return process
 
 
 class _OracleUnicodeText(
-        _LOBMixin, _NativeUnicodeMixin, sqltypes.UnicodeText):
+    _LOBMixin, _NativeUnicodeMixin, sqltypes.UnicodeText):
     def get_dbapi_type(self, dbapi):
         return dbapi.NCLOB
 
@@ -449,6 +455,7 @@ class _OracleUnicodeText(
         else:
             def process(value):
                 return string_processor(lob_processor(value))
+
             return process
 
 
@@ -458,6 +465,7 @@ class _OracleInteger(sqltypes.Integer):
             if val is not None:
                 val = int(val)
             return val
+
         return to_int
 
 
@@ -487,7 +495,7 @@ class OracleCompiler_cx_oracle(OracleCompiler):
     def bindparam_string(self, name, **kw):
         quote = getattr(name, 'quote', None)
         if quote is True or quote is not False and \
-                self.preparer._bindparam_requires_quotes(name):
+            self.preparer._bindparam_requires_quotes(name):
             quoted_name = '"{0!s}"'.format(name)
             self._quoted_bind_names[name] = quoted_name
             return OracleCompiler.bindparam_string(self, quoted_name, **kw)
@@ -496,7 +504,6 @@ class OracleCompiler_cx_oracle(OracleCompiler):
 
 
 class OracleExecutionContext_cx_oracle(OracleExecutionContext):
-
     def pre_exec(self):
         quoted_bind_names = \
             getattr(self.compiled, '_quoted_bind_names', None)
@@ -531,7 +538,7 @@ class OracleExecutionContext_cx_oracle(OracleExecutionContext):
         if len(self.compiled_parameters) == 1:
             for bindparam in self.compiled.binds.values():
                 if bindparam.isoutparam:
-                    dbtype = bindparam.type.dialect_impl(self.dialect).\
+                    dbtype = bindparam.type.dialect_impl(self.dialect). \
                         get_dbapi_type(self.dialect.dbapi)
                     if not hasattr(self, 'out_parameters'):
                         self.out_parameters = {}
@@ -583,7 +590,7 @@ class OracleExecutionContext_cx_oracle(OracleExecutionContext):
                         impl_type = type.dialect_impl(self.dialect)
                         dbapi_type = impl_type.get_dbapi_type(
                             self.dialect.dbapi)
-                        result_processor = impl_type.\
+                        result_processor = impl_type. \
                             result_processor(self.dialect,
                                              dbapi_type)
                         if result_processor is not None:
@@ -595,7 +602,7 @@ class OracleExecutionContext_cx_oracle(OracleExecutionContext):
                                 name].getvalue()
             else:
                 result.out_parameters = dict(
-                                            (k, v.getvalue())
+                    (k, v.getvalue())
                     for k, v in self.out_parameters.items()
                 )
 
@@ -603,7 +610,7 @@ class OracleExecutionContext_cx_oracle(OracleExecutionContext):
 
 
 class OracleExecutionContext_cx_oracle_with_unicode(
-        OracleExecutionContext_cx_oracle):
+    OracleExecutionContext_cx_oracle):
     """Support WITH_UNICODE in Python 2.xx.
 
     WITH_UNICODE allows cx_Oracle's Python 3 unicode handling
@@ -622,7 +629,7 @@ class OracleExecutionContext_cx_oracle_with_unicode(
         self.statement = util.text_type(self.statement)
 
     def _execute_scalar(self, stmt):
-        return super(OracleExecutionContext_cx_oracle_with_unicode, self).\
+        return super(OracleExecutionContext_cx_oracle_with_unicode, self). \
             _execute_scalar(util.text_type(stmt))
 
 
@@ -639,7 +646,7 @@ class ReturningResultProxy(_result.FullyBufferedResultProxy):
         return [
             ("ret_{0:d}".format(i), None)
             for i, col in enumerate(returning)
-        ]
+            ]
 
     def _buffer_rows(self):
         return collections.deque(
@@ -698,7 +705,7 @@ class OracleDialect_cx_oracle(OracleDialect):
         self.arraysize = arraysize
         self.allow_twophase = allow_twophase
         self.supports_timestamp = self.dbapi is None or \
-            hasattr(self.dbapi, 'TIMESTAMP')
+                                  hasattr(self.dbapi, 'TIMESTAMP')
         self.auto_setinputsizes = auto_setinputsizes
         self.auto_convert_lobs = auto_convert_lobs
 
@@ -737,7 +744,7 @@ class OracleDialect_cx_oracle(OracleDialect):
             self._cx_oracle_string_types = set()
             self._cx_oracle_with_unicode = False
         elif util.py3k or (
-                self.cx_oracle_ver >= (5,) and not \
+                    self.cx_oracle_ver >= (5,) and not \
                 hasattr(self.dbapi, 'UNICODE')
         ):
             # cx_Oracle WITH_UNICODE mode.  *only* python
@@ -766,8 +773,8 @@ class OracleDialect_cx_oracle(OracleDialect):
             self._cx_oracle_with_unicode = False
 
         if self.cx_oracle_ver is None or \
-                not self.auto_convert_lobs or \
-                not hasattr(self.dbapi, 'CLOB'):
+            not self.auto_convert_lobs or \
+            not hasattr(self.dbapi, 'CLOB'):
             self.dbapi_type_map = {}
         else:
             # only use this for LOB objects.  using it for strings, dates
@@ -852,7 +859,7 @@ class OracleDialect_cx_oracle(OracleDialect):
             # this almost allows "native decimal" mode.
             if self.supports_native_decimal and \
                     defaultType == cx_Oracle.NUMBER and \
-                    precision and scale > 0:
+                precision and scale > 0:
                 return cursor.var(
                     cx_Oracle.STRING,
                     255,
@@ -865,7 +872,7 @@ class OracleDialect_cx_oracle(OracleDialect):
             # off "native decimal" mode, handlers still needed.
             elif self.supports_native_decimal and \
                     defaultType == cx_Oracle.NUMBER \
-                    and not precision and scale <= 0:
+                and not precision and scale <= 0:
                 return cursor.var(
                     cx_Oracle.STRING,
                     255,
@@ -1005,5 +1012,6 @@ class OracleDialect_cx_oracle(OracleDialect):
 
     def do_recover_twophase(self, connection):
         connection.info.pop('cx_oracle_prepared', None)
+
 
 dialect = OracleDialect_cx_oracle

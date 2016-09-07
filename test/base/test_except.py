@@ -1,6 +1,5 @@
 """Tests exceptions and DB-API exception wrapping."""
 
-
 from sqlalchemy import exc as sa_exceptions
 from sqlalchemy.testing import fixtures
 from sqlalchemy.testing import eq_
@@ -20,7 +19,6 @@ class OperationalError(DatabaseError):
 
 
 class ProgrammingError(DatabaseError):
-
     def __str__(self):
         return '<{0!s}>'.format(self.bogus)
 
@@ -33,6 +31,7 @@ class OutOfSpec(DatabaseError):
 class WrongNameError(DatabaseError):
     pass
 
+
 # but they're going to call it their "IntegrityError"
 IntegrityError = WrongNameError
 
@@ -43,7 +42,6 @@ class SpecificIntegrityError(WrongNameError):
 
 
 class WrapTest(fixtures.TestBase):
-
     def _translating_dialect_fixture(self):
         d = default.DefaultDialect()
         d.dbapi_exception_translation_map = {
@@ -128,8 +126,8 @@ class WrapTest(fixtures.TestBase):
             raise sa_exceptions.DBAPIError.instance(
                 'this is a message',
                 [
-                    (1, ), (1, ), (1, ), (1, ), (1, ), (1, ),
-                    (1, ), (1, ), (1, ), (1, ),
+                    (1,), (1,), (1,), (1,), (1,), (1,),
+                    (1,), (1,), (1,), (1,),
                 ], OperationalError(), DatabaseError)
 
         except sa_exceptions.DBAPIError as exc:
@@ -140,8 +138,8 @@ class WrapTest(fixtures.TestBase):
                 "(1,), (1,), (1,), (1,), (1,), (1,), (1,), (1,), (1,)]]")
         try:
             raise sa_exceptions.DBAPIError.instance('this is a message', [
-                (1, ), (1, ), (1, ), (1, ), (1, ), (1, ), (1, ), (1, ), (1, ),
-                (1, ), (1, ),
+                (1,), (1,), (1,), (1,), (1,), (1,), (1,), (1,), (1,),
+                (1,), (1,),
             ], OperationalError(), DatabaseError)
         except sa_exceptions.DBAPIError as exc:
             eq_(str(exc),

@@ -19,6 +19,7 @@ def eval_eq(clause, testcases=None):
         assert evaluator(obj) == expected_result, \
             "{0!s} != {1!r} for {2!s} with {3!r}".format(
                 evaluator(obj), expected_result, clause, obj)
+
     if testcases:
         for an_obj, result in testcases:
             testeval(an_obj, result)
@@ -134,4 +135,3 @@ class EvaluateTest(fixtures.MappedTest):
             (User(id=None, name='foo'), None),
             (User(id=None, name=None), None),
         ])
-

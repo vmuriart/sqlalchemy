@@ -47,7 +47,7 @@ def py_fallback():
             zero = multiparams[0]
             if isinstance(zero, (list, tuple)):
                 if not zero or hasattr(zero[0], '__iter__') and \
-                        not hasattr(zero[0], 'strip'):
+                    not hasattr(zero[0], 'strip'):
                     # execute(stmt, [{}, {}, {}, ...])
                     # execute(stmt, [(), (), (), ...])
                     return zero
@@ -62,12 +62,14 @@ def py_fallback():
                 return [[zero]]
         else:
             if hasattr(multiparams[0], '__iter__') and \
-                    not hasattr(multiparams[0], 'strip'):
+                not hasattr(multiparams[0], 'strip'):
                 return multiparams
             else:
                 return [multiparams]
 
     return locals()
+
+
 try:
     from sqlalchemy.cutils import _distill_params
 except ImportError:

@@ -53,11 +53,11 @@ class PropertyComparatorTest(fixtures.TestBase, AssertsCompiledSQL):
 
     def test_value(self):
         A = self._fixture()
-        eq_(str(A.value==5), "upper(a.value) = upper(:upper_1)")
+        eq_(str(A.value == 5), "upper(a.value) = upper(:upper_1)")
 
     def test_aliased_value(self):
         A = self._fixture()
-        eq_(str(aliased(A).value==5), "upper(a_1.value) = upper(:upper_1)")
+        eq_(str(aliased(A).value == 5), "upper(a_1.value) = upper(:upper_1)")
 
     def test_query(self):
         A = self._fixture()
@@ -184,7 +184,6 @@ class PropertyExpressionTest(fixtures.TestBase, AssertsCompiledSQL):
             "AND foo(a.value) + bar(a.value) = :param_1)"
         )
 
-
     def test_aliased_expression(self):
         A = self._fixture()
         self.assert_compile(
@@ -281,6 +280,7 @@ class PropertyMirrorTest(fixtures.TestBase, AssertsCompiledSQL):
             def value(self):
                 "This is an instance-level docstring"
                 return self._value
+
         return A
 
     def test_property(self):
@@ -382,7 +382,7 @@ class MethodExpressionTest(fixtures.TestBase, AssertsCompiledSQL):
         A = self._fixture()
         sess = Session()
         self.assert_compile(
-            sess.query(A).filter(A.value(5)=="foo"),
+            sess.query(A).filter(A.value(5) == "foo"),
             "SELECT a.value AS a_value, a.id AS a_id "
             "FROM a WHERE foo(a.value, :foo_1) + :foo_2 = :param_1"
         )
@@ -392,7 +392,7 @@ class MethodExpressionTest(fixtures.TestBase, AssertsCompiledSQL):
         sess = Session()
         a1 = aliased(A)
         self.assert_compile(
-            sess.query(a1).filter(a1.value(5)=="foo"),
+            sess.query(a1).filter(a1.value(5) == "foo"),
             "SELECT a_1.value AS a_1_value, a_1.id AS a_1_id "
             "FROM a AS a_1 WHERE foo(a_1.value, :foo_1) + :foo_2 = :param_1"
         )
@@ -501,7 +501,8 @@ class SpecialObjectTest(fixtures.TestBase, AssertsCompiledSQL):
                 return "{0:2.4f} {1!s}".format(self.amount, self.currency)
 
             def __repr__(self):
-                return "Amount({0!r}, {1!r})".format(self.amount, self.currency)
+                return "Amount({0!r}, {1!r})".format(self.amount,
+                                                     self.currency)
 
         Base = declarative_base()
 
@@ -556,7 +557,7 @@ class SpecialObjectTest(fixtures.TestBase, AssertsCompiledSQL):
         BankAccount, Amount = self.BankAccount, self.Amount
         session = Session()
 
-        query = session.query(BankAccount).\
+        query = session.query(BankAccount). \
             filter(BankAccount.balance == Amount(10000, "cad"))
 
         self.assert_compile(
@@ -572,11 +573,11 @@ class SpecialObjectTest(fixtures.TestBase, AssertsCompiledSQL):
         session = Session()
 
         # alternatively we can do the calc on the DB side.
-        query = session.query(BankAccount).\
+        query = session.query(BankAccount). \
             filter(
-                BankAccount.balance.as_currency("cad") > Amount(9999, "cad")).\
+            BankAccount.balance.as_currency("cad") > Amount(9999, "cad")). \
             filter(
-                BankAccount.balance.as_currency("cad") < Amount(10001, "cad"))
+            BankAccount.balance.as_currency("cad") < Amount(10001, "cad"))
         self.assert_compile(
             query,
             "SELECT bank_account.balance AS bank_account_balance, "
@@ -595,10 +596,10 @@ class SpecialObjectTest(fixtures.TestBase, AssertsCompiledSQL):
         BankAccount = self.BankAccount
         session = Session()
 
-        query = session.query(BankAccount).\
+        query = session.query(BankAccount). \
             filter(
-                BankAccount.balance.as_currency("cad") >
-                BankAccount.balance.as_currency("eur"))
+            BankAccount.balance.as_currency("cad") >
+            BankAccount.balance.as_currency("eur"))
         self.assert_compile(
             query,
             "SELECT bank_account.balance AS bank_account_balance, "
@@ -642,4 +643,3 @@ class SpecialObjectTest(fixtures.TestBase, AssertsCompiledSQL):
         eq_(
             BankAccount.balance.__doc__,
             "Return an Amount view of the current balance.")
-

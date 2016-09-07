@@ -22,7 +22,6 @@ import collections
 import types
 from .. import exc, util
 
-
 _key_to_collection = collections.defaultdict(dict)
 """
 Given an original listen() argument, can locate all
@@ -208,7 +207,8 @@ class _EventKey(object):
 
         if key not in _key_to_collection:
             raise exc.InvalidRequestError(
-                "No listeners found for event {0!s} / {1!r} / {2!s} ".format(self.target, self.identifier, self.fn)
+                "No listeners found for event {0!s} / {1!r} / {2!s} ".format(
+                    self.target, self.identifier, self.fn)
             )
         dispatch_reg = _key_to_collection.pop(key)
 
@@ -232,10 +232,10 @@ class _EventKey(object):
         dispatch_collection = getattr(target.dispatch, identifier)
 
         if insert:
-            dispatch_collection.\
+            dispatch_collection. \
                 for_modify(target.dispatch).insert(self, propagate)
         else:
-            dispatch_collection.\
+            dispatch_collection. \
                 for_modify(target.dispatch).append(self, propagate)
 
     @property

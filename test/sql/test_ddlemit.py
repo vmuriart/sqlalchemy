@@ -6,17 +6,16 @@ from sqlalchemy.testing.mock import Mock
 
 
 class EmitDDLTest(fixtures.TestBase):
-
     def _mock_connection(self, item_exists):
         def has_item(connection, name, schema):
             return item_exists(name)
 
         return Mock(dialect=Mock(
-                    supports_sequences=True,
-                    has_table=Mock(side_effect=has_item),
-                    has_sequence=Mock(side_effect=has_item)
-                    )
-                    )
+            supports_sequences=True,
+            has_table=Mock(side_effect=has_item),
+            has_sequence=Mock(side_effect=has_item)
+        )
+        )
 
     def _mock_create_fixture(self, checkfirst, tables,
                              item_exists=lambda item: False):
@@ -37,7 +36,7 @@ class EmitDDLTest(fixtures.TestBase):
     def _table_fixture(self):
         m = MetaData()
 
-        return (m, ) + tuple(
+        return (m,) + tuple(
             Table('t{0:d}'.format(i), m, Column('x', Integer))
             for i in range(1, 6)
         )
@@ -254,7 +253,8 @@ class EmitDDLTest(fixtures.TestBase):
         for call_ in generator.connection.execute.mock_calls:
             c = call_[1][0]
             assert isinstance(c, ddl_cls)
-            assert c.element in elements, "element {0!r} was not expected".format(c.element)
+            assert c.element in elements, "element {0!r} was not expected".format(
+                c.element)
             elements.remove(c.element)
             if getattr(c, 'include_foreign_key_constraints', None) is not None:
                 elements[:] = [

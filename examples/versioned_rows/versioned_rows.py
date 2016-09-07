@@ -9,6 +9,7 @@ from sqlalchemy.orm.interfaces import SessionExtension
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import attributes
 
+
 class Versioned(object):
     def new_version(self, session):
         # if on SQLA 0.6.1 or earlier,
@@ -22,6 +23,7 @@ class Versioned(object):
         # set 'id' to None.
         # a new PK will be generated on INSERT.
         self.id = None
+
 
 class VersionExtension(SessionExtension):
     def before_flush(self, session, flush_context, instances):
@@ -39,11 +41,13 @@ class VersionExtension(SessionExtension):
             # re-add
             session.add(instance)
 
+
 Base = declarative_base()
 
 engine = create_engine('sqlite://', echo=True)
 
 Session = sessionmaker(engine, extension=[VersionExtension()])
+
 
 # example 1, simple versioning
 
@@ -51,6 +55,7 @@ class Example(Versioned, Base):
     __tablename__ = 'example'
     id = Column(Integer, primary_key=True)
     data = Column(String)
+
 
 Base.metadata.create_all(engine)
 
@@ -63,7 +68,8 @@ e1.data = 'e2'
 session.commit()
 
 assert session.query(Example.id, Example.data).order_by(Example.id).all() == \
-        [(1, 'e1'), (2, 'e2')]
+       [(1, 'e1'), (2, 'e2')]
+
 
 # example 2, versioning with a parent
 
@@ -72,6 +78,7 @@ class Parent(Base):
     id = Column(Integer, primary_key=True)
     child_id = Column(Integer, ForeignKey('child.id'))
     child = relationship("Child", backref=backref('parent', uselist=False))
+
 
 class Child(Versioned, Base):
     __tablename__ = 'child'
@@ -89,6 +96,7 @@ class Child(Versioned, Base):
         # re-add ourselves to the parent
         self.parent.child = self
 
+
 Base.metadata.create_all(engine)
 
 session = Session()
@@ -102,4 +110,4 @@ session.commit()
 
 assert p1.child_id == 2
 assert session.query(Child.id, Child.data).order_by(Child.id).all() == \
-    [(1, 'c1'), (2, 'c2')]
+       [(1, 'c1'), (2, 'c2')]

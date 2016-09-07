@@ -31,10 +31,10 @@ from sqlalchemy.sql import operators as sql_operators
 from sqlalchemy import schema as sa_schema
 from sqlalchemy import util, sql, exc
 
-from sqlalchemy.types import CHAR, VARCHAR, TIME, NCHAR, NVARCHAR,\
-    TEXT, DATE, DATETIME, FLOAT, NUMERIC,\
-    BIGINT, INT, INTEGER, SMALLINT, BINARY,\
-    VARBINARY, DECIMAL, TIMESTAMP, Unicode,\
+from sqlalchemy.types import CHAR, VARCHAR, TIME, NCHAR, NVARCHAR, \
+    TEXT, DATE, DATETIME, FLOAT, NUMERIC, \
+    BIGINT, INT, INTEGER, SMALLINT, BINARY, \
+    VARBINARY, DECIMAL, TIMESTAMP, Unicode, \
     UnicodeText, REAL
 
 RESERVED_WORDS = set([
@@ -106,6 +106,7 @@ class _SybaseUnitypeMixin(object):
                 return str(value)  # decode("ucs-2")
             else:
                 return None
+
         return process
 
 
@@ -182,6 +183,7 @@ class SybaseTypeCompiler(compiler.GenericTypeCompiler):
     def visit_UNIQUEIDENTIFIER(self, type_, **kw):
         return "UNIQUEIDENTIFIER"
 
+
 ischema_names = {
     'bigint': BIGINT,
     'int': INTEGER,
@@ -234,7 +236,6 @@ ischema_names = {
 
 
 class SybaseInspector(reflection.Inspector):
-
     def __init__(self, conn):
         reflection.Inspector.__init__(self, conn)
 
@@ -275,7 +276,7 @@ class SybaseExecutionContext(default.DefaultExecutionContext):
             if self._enable_identity_insert:
                 self.cursor.execute(
                     "SET IDENTITY_INSERT {0!s} ON".format(
-                    self.dialect.identifier_preparer.format_table(tbl)))
+                        self.dialect.identifier_preparer.format_table(tbl)))
 
         if self.isddl:
             # TODO: to enhance this, we can detect "ddl in tran" on the
@@ -300,8 +301,8 @@ class SybaseExecutionContext(default.DefaultExecutionContext):
         if self._enable_identity_insert:
             self.cursor.execute(
                 "SET IDENTITY_INSERT {0!s} OFF".format(
-                self.dialect.identifier_preparer.
-                format_table(self.compiled.statement.table))
+                    self.dialect.identifier_preparer.
+                        format_table(self.compiled.statement.table))
             )
 
     def get_lastrowid(self):
@@ -330,9 +331,9 @@ class SybaseSQLCompiler(compiler.SQLCompiler):
         limit = select._limit
         if limit:
             # if select._limit == 1:
-                # s += "FIRST "
+            # s += "FIRST "
             # else:
-                # s += "TOP %s " % (select._limit,)
+            # s += "TOP %s " % (select._limit,)
             s += "TOP {0!s} ".format(limit)
         offset = select._offset
         if offset:
@@ -373,8 +374,8 @@ class SybaseSQLCompiler(compiler.SQLCompiler):
 class SybaseDDLCompiler(compiler.DDLCompiler):
     def get_column_specification(self, column, **kwargs):
         colspec = self.preparer.format_column(column) + " " + \
-            self.dialect.type_compiler.process(
-                column.type, type_expression=column)
+                  self.dialect.type_compiler.process(
+                      column.type, type_expression=column)
 
         if column.table is None:
             raise exc.CompileError(
@@ -385,10 +386,10 @@ class SybaseDDLCompiler(compiler.DDLCompiler):
         # install a IDENTITY Sequence if we have an implicit IDENTITY column
         if seq_col is column:
             sequence = isinstance(column.default, sa_schema.Sequence) \
-                and column.default
+                       and column.default
             if sequence:
                 start, increment = sequence.start or 1, \
-                    sequence.increment or 1
+                                   sequence.increment or 1
             else:
                 start, increment = 1, 1
             if (start, increment) == (1, 1):
@@ -451,8 +452,8 @@ class SybaseDialect(default.DefaultDialect):
 
     def initialize(self, connection):
         super(SybaseDialect, self).initialize(connection)
-        if self.server_version_info is not None and\
-                self.server_version_info < (15, ):
+        if self.server_version_info is not None and \
+                self.server_version_info < (15,):
             self.max_identifier_length = 30
         else:
             self.max_identifier_length = 255
@@ -547,7 +548,9 @@ class SybaseDialect(default.DefaultDialect):
             # if is_array:
             #     coltype = ARRAY(coltype)
         else:
-            util.warn("Did not recognize type '{0!s}' of column '{1!s}'".format(type_, name))
+            util.warn(
+                "Did not recognize type '{0!s}' of column '{1!s}'".format(
+                    type_, name))
             coltype = sqltypes.NULLTYPE
 
         if default:
@@ -621,7 +624,7 @@ class SybaseDialect(default.DefaultDialect):
                 c.close()
                 table_info = {"name": reftable["name"], "schema": None}
                 if (schema is not None or
-                        reftable["schema"] != self.default_schema_name):
+                            reftable["schema"] != self.default_schema_name):
                     table_info["schema"] = reftable["schema"]
 
                 table_cache[reftable_id] = table_info
@@ -638,7 +641,8 @@ class SybaseDialect(default.DefaultDialect):
             referred_columns = []
             for i in range(1, r["count"] + 1):
                 constrained_columns.append(columns[r["fokey{0:d}".format(i)]])
-                referred_columns.append(reftable_columns[r["refkey{0:d}".format(i)]])
+                referred_columns.append(
+                    reftable_columns[r["refkey{0:d}".format(i)]])
 
             fk_info = {
                 "constrained_columns": constrained_columns,

@@ -36,8 +36,8 @@ class ForeignTableReflectionTest(fixtures.TablesTest, AssertsExecutionResults):
             Column('data', String(30)))
 
         for ddl in [
-            "CREATE SERVER test_server FOREIGN DATA WRAPPER postgres_fdw "
-            "OPTIONS (dbname 'test', host '%s')" % dblink,
+                "CREATE SERVER test_server FOREIGN DATA WRAPPER postgres_fdw "
+                "OPTIONS (dbname 'test', host '%s')" % dblink,
             "CREATE USER MAPPING FOR public \
             SERVER test_server options (user 'scott', password 'tiger')",
             "CREATE FOREIGN TABLE test_foreigntable ( "
@@ -74,7 +74,7 @@ class ForeignTableReflectionTest(fixtures.TablesTest, AssertsExecutionResults):
 
 
 class MaterializedViewReflectionTest(
-        fixtures.TablesTest, AssertsExecutionResults):
+    fixtures.TablesTest, AssertsExecutionResults):
     """Test reflection on materialized views"""
 
     __only_on__ = 'postgresql >= 9.3'
@@ -172,10 +172,10 @@ class DomainReflectionTest(fixtures.TestBase, AssertsExecutionResults):
     def setup_class(cls):
         con = testing.db.connect()
         for ddl in \
-                'CREATE DOMAIN testdomain INTEGER NOT NULL DEFAULT 42', \
-                'CREATE DOMAIN test_schema.testdomain INTEGER DEFAULT 0', \
-                "CREATE TYPE testtype AS ENUM ('test')", \
-                'CREATE DOMAIN enumdomain AS testtype':
+            'CREATE DOMAIN testdomain INTEGER NOT NULL DEFAULT 42', \
+            'CREATE DOMAIN test_schema.testdomain INTEGER DEFAULT 0', \
+            "CREATE TYPE testtype AS ENUM ('test')", \
+            'CREATE DOMAIN enumdomain AS testtype':
             try:
                 con.execute(ddl)
             except exc.DBAPIError as e:
@@ -317,7 +317,8 @@ class ReflectionTest(fixtures.TestBase):
         m = MetaData()
         t = Table('t', m, autoload=True, autoload_with=testing.db)
         eq_(
-            t.c.x.server_default.arg.text, "'{0!s}'::character varying".format((
+            t.c.x.server_default.arg.text,
+            "'{0!s}'::character varying".format((
                 "abcd" * 40))
         )
 
@@ -333,7 +334,7 @@ class ReflectionTest(fixtures.TestBase):
             "nextval('t_id_seq'::regclass)")
         r = t2.insert().execute()
         eq_(r.inserted_primary_key, [1])
-        testing.db.connect().execution_options(autocommit=True).\
+        testing.db.connect().execution_options(autocommit=True). \
             execute('alter table t_id_seq rename to foobar_id_seq'
                     )
         m3 = MetaData(testing.db)
@@ -348,7 +349,7 @@ class ReflectionTest(fixtures.TestBase):
         metadata = self.metadata
         t = Table('t', metadata, Column('id', Integer, primary_key=True))
         metadata.create_all()
-        testing.db.connect().execution_options(autocommit=True).\
+        testing.db.connect().execution_options(autocommit=True). \
             execute('alter table t rename id to t_id')
         m2 = MetaData(testing.db)
         t2 = Table('t', m2, autoload=True)
@@ -368,7 +369,6 @@ class ReflectionTest(fixtures.TestBase):
 
     @testing.provide_metadata
     def test_cross_schema_reflection_one(self):
-
         meta1 = self.metadata
 
         users = Table('users', meta1,
@@ -382,8 +382,8 @@ class ReflectionTest(fixtures.TestBase):
             Column(
                 'remote_user_id', Integer, ForeignKey(
                     users.c.user_id)),
-                Column(
-                    'email_address', String(20)), schema='test_schema')
+            Column(
+                'email_address', String(20)), schema='test_schema')
         meta1.create_all()
         meta2 = MetaData(testing.db)
         addresses = Table('email_addresses', meta2, autoload=True,
@@ -639,7 +639,6 @@ class ReflectionTest(fixtures.TestBase):
         assert testing.db.has_table("A")
 
     def test_uppercase_lowercase_sequence(self):
-
         a_seq = Sequence('a')
         A_seq = Sequence('A')
 
@@ -747,7 +746,7 @@ class ReflectionTest(fixtures.TestBase):
             ind = testing.db.dialect.get_indexes(conn, "t", None)
             eq_(ind, [{'unique': False, 'column_names': ['x'], 'name': 'idx1',
                        'dialect_options':
-                       {"postgresql_with": {"fillfactor": "50"}}}])
+                           {"postgresql_with": {"fillfactor": "50"}}}])
 
             m = MetaData()
             t1 = Table('t', m, autoload_with=conn)
@@ -856,7 +855,7 @@ class ReflectionTest(fixtures.TestBase):
         metadata.create_all()
         inspector = inspect(testing.db)
         fks = inspector.get_foreign_keys('person') + \
-            inspector.get_foreign_keys('company')
+              inspector.get_foreign_keys('company')
         for fk in fks:
             eq_(fk, fk_ref[fk['name']])
 
@@ -1011,9 +1010,7 @@ class ReflectionTest(fixtures.TestBase):
 
 
 class CustomTypeReflectionTest(fixtures.TestBase):
-
     class CustomType(object):
-
         def __init__(self, arg1=None, arg2=None):
             self.arg1 = arg1
             self.arg2 = arg2

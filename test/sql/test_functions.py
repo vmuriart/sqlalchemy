@@ -30,7 +30,7 @@ class CompileTest(fixtures.TestBase, AssertsCompiledSQL):
         functions._registry.clear()
 
     def test_compile(self):
-        for dialect in all_dialects(exclude=('sybase', )):
+        for dialect in all_dialects(exclude=('sybase',)):
             bindtemplate = BIND_TEMPLATES[dialect.paramstyle]
             self.assert_compile(func.current_timestamp(),
                                 "CURRENT_TIMESTAMP", dialect=dialect)
@@ -122,6 +122,7 @@ class CompileTest(fixtures.TestBase, AssertsCompiledSQL):
         def cls1(pk_name):
             class myfunc(GenericFunction):
                 package = pk_name
+
             return myfunc
 
         f1 = cls1("mypackage")
@@ -226,7 +227,8 @@ class CompileTest(fixtures.TestBase, AssertsCompiledSQL):
                  sqltypes.DateTime)
             ]:
                 assert isinstance(fn(*args).type, type_), \
-                    "{0!s} / {1!r} != {2!s}".format(fn(), fn(*args).type, type_)
+                    "{0!s} / {1!r} != {2!s}".format(fn(), fn(*args).type,
+                                                    type_)
 
         assert isinstance(func.concat("foo", "bar").type, sqltypes.String)
 
@@ -294,9 +296,9 @@ class CompileTest(fixtures.TestBase, AssertsCompiledSQL):
             column('name'),
             column('fullname'))
         calculate = select([column('q'), column('z'), column('r')], from_obj=[
-                           func.calculate(
-                               bindparam('x', None), bindparam('y', None)
-                           )])
+            func.calculate(
+                bindparam('x', None), bindparam('y', None)
+            )])
 
         self.assert_compile(select([users], users.c.id > calculate.c.z),
                             "SELECT users.id, users.name, users.fullname "
@@ -311,10 +313,10 @@ class CompileTest(fixtures.TestBase, AssertsCompiledSQL):
 
         self.assert_compile(
             s, "SELECT users.id, users.name, users.fullname "
-            "FROM users, (SELECT q, z, r "
-            "FROM calculate(:x_1, :y_1)) AS c1, (SELECT q, z, r "
-            "FROM calculate(:x_2, :y_2)) AS c2 "
-            "WHERE users.id BETWEEN c1.z AND c2.z", checkparams={
+               "FROM users, (SELECT q, z, r "
+               "FROM calculate(:x_1, :y_1)) AS c1, (SELECT q, z, r "
+               "FROM calculate(:x_2, :y_2)) AS c2 "
+               "WHERE users.id BETWEEN c1.z AND c2.z", checkparams={
                 'y_1': 45, 'x_1': 17, 'y_2': 12, 'x_2': 5})
 
     def test_non_functions(self):
@@ -555,7 +557,6 @@ class CompileTest(fixtures.TestBase, AssertsCompiledSQL):
 
 
 class ReturnTypeTest(fixtures.TestBase):
-
     def test_array_agg(self):
         expr = func.array_agg(column('data', Integer))
         is_(expr.type._type_affinity, ARRAY)
@@ -594,7 +595,6 @@ class ReturnTypeTest(fixtures.TestBase):
 
 
 class ExecuteTest(fixtures.TestBase):
-
     @engines.close_first
     def tearDown(self):
         pass
@@ -667,17 +667,17 @@ class ExecuteTest(fixtures.TestBase):
             assert t.select().execute().first()['value'] == 4
             t2.insert().execute()
             t2.insert(values=dict(value=func.length("one"))).execute()
-            t2.insert(values=dict(value=func.length("asfda") + -19)).\
+            t2.insert(values=dict(value=func.length("asfda") + -19)). \
                 execute(stuff="hi")
 
             res = exec_sorted(select([t2.c.value, t2.c.stuff]))
             eq_(res, [(-14, 'hi'), (3, None), (7, None)])
 
-            t2.update(values=dict(value=func.length("asdsafasd"))).\
+            t2.update(values=dict(value=func.length("asdsafasd"))). \
                 execute(stuff="some stuff")
             assert select([t2.c.value, t2.c.stuff]).execute().fetchall() == \
-                [(9, "some stuff"), (9, "some stuff"),
-                 (9, "some stuff")]
+                   [(9, "some stuff"), (9, "some stuff"),
+                    (9, "some stuff")]
 
             t2.delete().execute()
 
@@ -705,7 +705,7 @@ class ExecuteTest(fixtures.TestBase):
         x = func.current_date(bind=testing.db).execute().scalar()
         y = func.current_date(bind=testing.db).select().execute().scalar()
         z = func.current_date(bind=testing.db).scalar()
-        w = select(['*'], from_obj=[func.current_date(bind=testing.db)]).\
+        w = select(['*'], from_obj=[func.current_date(bind=testing.db)]). \
             scalar()
 
         # construct a column-based FROM object out of a function,

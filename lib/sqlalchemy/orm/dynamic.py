@@ -53,7 +53,7 @@ class DynamicAttributeImpl(attributes.AttributeImpl):
     def __init__(self, class_, key, typecallable,
                  dispatch,
                  target_mapper, order_by, query_class=None, **kw):
-        super(DynamicAttributeImpl, self).\
+        super(DynamicAttributeImpl, self). \
             __init__(class_, key, typecallable, dispatch, **kw)
         self.target_mapper = target_mapper
         self.order_by = order_by
@@ -182,7 +182,7 @@ class DynamicAttributeImpl(attributes.AttributeImpl):
             (attributes.instance_state(x), x)
             for x in
             c.all_items
-        ]
+            ]
 
     def _get_collection_history(self, state, passive=attributes.PASSIVE_OFF):
         if self.key in state.committed_state:
@@ -230,12 +230,13 @@ class AppenderMixin(object):
     def session(self):
         sess = object_session(self.instance)
         if sess is not None and self.autoflush and sess.autoflush \
-                and self.instance in sess:
+            and self.instance in sess:
             sess.flush()
         if not orm_util.has_identity(self.instance):
             return None
         else:
             return sess
+
     session = property(session, lambda s, x: None)
 
     def __iter__(self):
@@ -347,9 +348,9 @@ class CollectionHistory(object):
             deleted = self.deleted_items.intersection(self.unchanged_items)
             unchanged = self.unchanged_items.difference(deleted)
         else:
-            added, unchanged, deleted = self.added_items,\
-                self.unchanged_items,\
-                self.deleted_items
+            added, unchanged, deleted = self.added_items, \
+                                        self.unchanged_items, \
+                                        self.deleted_items
         return attributes.History(
             list(added),
             list(unchanged),

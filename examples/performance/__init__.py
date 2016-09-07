@@ -262,7 +262,8 @@ class Profiler(object):
     @classmethod
     def setup(cls, fn):
         if cls._setup is not None:
-            raise ValueError("setup function already set to {0!s}".format(cls._setup))
+            raise ValueError(
+                "setup function already set to {0!s}".format(cls._setup))
         cls._setup = staticmethod(fn)
         return fn
 
@@ -270,7 +271,8 @@ class Profiler(object):
     def setup_once(cls, fn):
         if cls._setup_once is not None:
             raise ValueError(
-                "setup_once function already set to {0!s}".format(cls._setup_once))
+                "setup_once function already set to {0!s}".format(
+                    cls._setup_once))
         cls._setup_once = staticmethod(fn)
         return fn
 
@@ -285,7 +287,9 @@ class Profiler(object):
         if self._setup_once:
             print("Running setup once...")
             self._setup_once(self.dburl, self.echo, self.num)
-        print("Tests to run: {0!s}".format(", ".join([t.__name__ for t in tests])))
+        print(
+            "Tests to run: {0!s}".format(
+                ", ".join([t.__name__ for t in tests])))
         for test in tests:
             self._run_test(test)
             self.stats[-1].report()
@@ -424,5 +428,3 @@ class TestResult(object):
             os.system("runsnake {0!s}".format(filename))
         finally:
             os.remove(filename)
-
-

@@ -30,6 +30,7 @@ from sqlalchemy import event
 from sqlalchemy import literal_column
 from .dictlike import ProxiedDictMixin
 
+
 class PolymorphicVerticalProperty(object):
     """A key/value pair with polymorphic value storage.
 
@@ -69,6 +70,7 @@ class PolymorphicVerticalProperty(object):
         """A comparator for .value, builds a polymorphic comparison via CASE.
 
         """
+
         def __init__(self, cls):
             self.cls = cls
 
@@ -80,17 +82,22 @@ class PolymorphicVerticalProperty(object):
                     cast(getattr(self.cls, attribute), String)
                 ) for attribute, discriminator in pairs
                 if attribute is not None
-            ]
+                ]
             return case(whens, self.cls.type, null())
+
         def __eq__(self, other):
             return self._case() == cast(other, String)
+
         def __ne__(self, other):
             return self._case() != cast(other, String)
 
     def __repr__(self):
-        return '<{0!s} {1!r}={2!r}>'.format(self.__class__.__name__, self.key, self.value)
+        return '<{0!s} {1!r}={2!r}>'.format(self.__class__.__name__, self.key,
+                                            self.value)
 
-@event.listens_for(PolymorphicVerticalProperty, "mapper_configured", propagate=True)
+
+@event.listens_for(PolymorphicVerticalProperty, "mapper_configured",
+                   propagate=True)
 def on_new_class(mapper, cls_):
     """Look for Column objects with type info in them, and work up
     a lookup table."""
@@ -107,10 +114,12 @@ def on_new_class(mapper, cls_):
             info_dict[discriminator] = (k, discriminator)
     cls_.type_map = info_dict
 
+
 if __name__ == '__main__':
     from sqlalchemy import (Column, Integer, Unicode,
-        ForeignKey, UnicodeText, and_, or_, String, Boolean, cast,
-        null, case, create_engine)
+                            ForeignKey, UnicodeText, and_, or_, String,
+                            Boolean, cast,
+                            null, case, create_engine)
     from sqlalchemy.orm import relationship, Session
     from sqlalchemy.orm.collections import attribute_mapped_collection
     from sqlalchemy.ext.declarative import declarative_base
@@ -134,6 +143,7 @@ if __name__ == '__main__':
         char_value = Column(UnicodeText, info={'type': (str, 'string')})
         boolean_value = Column(Boolean, info={'type': (bool, 'boolean')})
 
+
     class Animal(ProxiedDictMixin, Base):
         """an Animal"""
 
@@ -143,11 +153,13 @@ if __name__ == '__main__':
         name = Column(Unicode(100))
 
         facts = relationship("AnimalFact",
-                    collection_class=attribute_mapped_collection('key'))
+                             collection_class=attribute_mapped_collection(
+                                 'key'))
 
         _proxied = association_proxy("facts", "value",
-                            creator=
-                            lambda key, value: AnimalFact(key=key, value=value))
+                                     creator=
+                                     lambda key, value: AnimalFact(key=key,
+                                                                   value=value))
 
         def __init__(self, name):
             self.name = name
@@ -158,6 +170,7 @@ if __name__ == '__main__':
         @classmethod
         def with_characteristic(self, key, value):
             return self.facts.any(key=key, value=value)
+
 
     engine = create_engine('sqlite://', echo=True)
 
@@ -196,9 +209,9 @@ if __name__ == '__main__':
     session.commit()
 
     q = (session.query(Animal).
-         filter(Animal.facts.any(
-           and_(AnimalFact.key == 'weasel-like',
-                AnimalFact.value == True))))
+        filter(Animal.facts.any(
+        and_(AnimalFact.key == 'weasel-like',
+             AnimalFact.value == True))))
     print('weasel-like animals', q.all())
 
     q = (session.query(Animal).
@@ -206,19 +219,18 @@ if __name__ == '__main__':
     print('weasel-like animals again', q.all())
 
     q = (session.query(Animal).
-           filter(Animal.with_characteristic('poisonous', False)))
+         filter(Animal.with_characteristic('poisonous', False)))
     print('animals with poisonous=False', q.all())
 
     q = (session.query(Animal).
-         filter(or_(
-                    Animal.with_characteristic('poisonous', False),
-                    ~Animal.facts.any(AnimalFact.key == 'poisonous')
-                    )
-                )
-        )
+        filter(or_(
+        Animal.with_characteristic('poisonous', False),
+        ~Animal.facts.any(AnimalFact.key == 'poisonous')
+    )
+    )
+    )
     print('non-poisonous animals', q.all())
 
     q = (session.query(Animal).
          filter(Animal.facts.any(AnimalFact.value == 5)))
     print('any animal with a .value of 5', q.all())
-

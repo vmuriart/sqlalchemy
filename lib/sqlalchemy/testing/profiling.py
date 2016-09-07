@@ -133,22 +133,22 @@ class ProfileStatsFile(object):
 
     def _header(self):
         return (
-            "# %s\n"
-            "# This file is written out on a per-environment basis.\n"
-            "# For each test in aaa_profiling, the corresponding "
-            "function and \n"
-            "# environment is located within this file.  "
-            "If it doesn't exist,\n"
-            "# the test is skipped.\n"
-            "# If a callcount does exist, it is compared "
-            "to what we received. \n"
-            "# assertions are raised if the counts do not match.\n"
-            "# \n"
-            "# To add a new callcount test, apply the function_call_count \n"
-            "# decorator and re-run the tests using the --write-profiles \n"
-            "# option - this file will be rewritten including the new count.\n"
-            "# \n"
-        ) % (self.fname)
+                   "# %s\n"
+                   "# This file is written out on a per-environment basis.\n"
+                   "# For each test in aaa_profiling, the corresponding "
+                   "function and \n"
+                   "# environment is located within this file.  "
+                   "If it doesn't exist,\n"
+                   "# the test is skipped.\n"
+                   "# If a callcount does exist, it is compared "
+                   "to what we received. \n"
+                   "# assertions are raised if the counts do not match.\n"
+                   "# \n"
+                   "# To add a new callcount test, apply the function_call_count \n"
+                   "# decorator and re-run the tests using the --write-profiles \n"
+                   "# option - this file will be rewritten including the new count.\n"
+                   "# \n"
+               ) % (self.fname)
 
     def _read(self):
         try:
@@ -180,7 +180,8 @@ class ProfileStatsFile(object):
             for platform_key in sorted(per_fn):
                 per_platform = per_fn[platform_key]
                 c = ",".join(str(count) for count in per_platform['counts'])
-                profile_f.write("{0!s} {1!s} {2!s}\n".format(test_key, platform_key, c))
+                profile_f.write(
+                    "{0!s} {1!s} {2!s}\n".format(test_key, platform_key, c))
         profile_f.close()
 
 
@@ -199,7 +200,9 @@ def function_call_count(variance=0.05):
         def wrap(*args, **kw):
             with count_functions(variance=variance):
                 return fn(*args, **kw)
+
         return update_wrapper(wrap, fn)
+
     return decorate
 
 
@@ -219,15 +222,15 @@ def count_functions(variance=0.05):
 
     pr = cProfile.Profile()
     pr.enable()
-    #began = time.time()
+    # began = time.time()
     yield
-    #ended = time.time()
+    # ended = time.time()
     pr.disable()
 
-    #s = compat.StringIO()
+    # s = compat.StringIO()
     stats = pstats.Stats(pr, stream=sys.stdout)
 
-    #timespent = ended - began
+    # timespent = ended - began
     callcount = stats.total_calls
 
     expected = _profile_stats.result(callcount)
@@ -261,5 +264,3 @@ def count_functions(variance=0.05):
                     % (
                         callcount, (variance * 100),
                         expected_count, _profile_stats.platform_key))
-
-

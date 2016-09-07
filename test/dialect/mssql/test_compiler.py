@@ -6,10 +6,11 @@ from sqlalchemy.databases import mssql
 from sqlalchemy.dialects.mssql import mxodbc
 from sqlalchemy.testing import fixtures, AssertsCompiledSQL
 from sqlalchemy import sql
-from sqlalchemy import Integer, String, Table, Column, select, MetaData,\
+from sqlalchemy import Integer, String, Table, Column, select, MetaData, \
     update, delete, insert, extract, union, func, PrimaryKeyConstraint, \
     UniqueConstraint, Index, Sequence, literal
 from sqlalchemy import testing
+
 
 class CompileTest(fixtures.TestBase, AssertsCompiledSQL):
     __dialect__ = mssql.dialect()
@@ -54,7 +55,7 @@ class CompileTest(fixtures.TestBase, AssertsCompiledSQL):
                    column("b", Integer),
                    column("c", Integer),
                    )
-        join = t1.join(t2, t1.c.a == t2.c.a).\
+        join = t1.join(t2, t1.c.a == t2.c.a). \
             select().with_hint(t1, 'WITH (NOLOCK)')
         self.assert_compile(
             join,
@@ -81,10 +82,10 @@ class CompileTest(fixtures.TestBase, AssertsCompiledSQL):
             for darg in ("*", "mssql"):
                 self.assert_compile(
                     t.insert().
-                    values(somecolumn="x").
-                    with_hint("WITH (PAGLOCK)",
-                              selectable=targ,
-                              dialect_name=darg),
+                        values(somecolumn="x").
+                        with_hint("WITH (PAGLOCK)",
+                                  selectable=targ,
+                                  dialect_name=darg),
                     "INSERT INTO sometable WITH (PAGLOCK) "
                     "(somecolumn) VALUES (:somecolumn)"
                 )
@@ -95,10 +96,10 @@ class CompileTest(fixtures.TestBase, AssertsCompiledSQL):
             for darg in ("*", "mssql"):
                 self.assert_compile(
                     t.update().where(t.c.somecolumn == "q").
-                    values(somecolumn="x").
-                    with_hint("WITH (PAGLOCK)",
-                              selectable=targ,
-                              dialect_name=darg),
+                        values(somecolumn="x").
+                        with_hint("WITH (PAGLOCK)",
+                                  selectable=targ,
+                                  dialect_name=darg),
                     "UPDATE sometable WITH (PAGLOCK) "
                     "SET somecolumn=:somecolumn "
                     "WHERE sometable.somecolumn = :somecolumn_1"
@@ -108,8 +109,8 @@ class CompileTest(fixtures.TestBase, AssertsCompiledSQL):
         t = table('sometable', column('somecolumn'))
         self.assert_compile(
             t.update().where(t.c.somecolumn == "q").
-            values(somecolumn="x").
-            with_hint("XYZ", "mysql"),
+                values(somecolumn="x").
+                with_hint("XYZ", "mysql"),
             "UPDATE sometable SET somecolumn=:somecolumn "
             "WHERE sometable.somecolumn = :somecolumn_1"
         )
@@ -120,9 +121,9 @@ class CompileTest(fixtures.TestBase, AssertsCompiledSQL):
             for darg in ("*", "mssql"):
                 self.assert_compile(
                     t.delete().where(t.c.somecolumn == "q").
-                    with_hint("WITH (PAGLOCK)",
-                              selectable=targ,
-                              dialect_name=darg),
+                        with_hint("WITH (PAGLOCK)",
+                                  selectable=targ,
+                                  dialect_name=darg),
                     "DELETE FROM sometable WITH (PAGLOCK) "
                     "WHERE sometable.somecolumn = :somecolumn_1"
                 )
@@ -131,8 +132,8 @@ class CompileTest(fixtures.TestBase, AssertsCompiledSQL):
         t = table('sometable', column('somecolumn'))
         self.assert_compile(
             t.delete().
-            where(t.c.somecolumn == "q").
-            with_hint("XYZ", dialect_name="mysql"),
+                where(t.c.somecolumn == "q").
+                with_hint("XYZ", dialect_name="mysql"),
             "DELETE FROM sometable WHERE "
             "sometable.somecolumn = :somecolumn_1"
         )
@@ -143,10 +144,10 @@ class CompileTest(fixtures.TestBase, AssertsCompiledSQL):
         for darg in ("*", "mssql"):
             self.assert_compile(
                 t.update().where(t.c.somecolumn == t2.c.somecolumn).
-                values(somecolumn="x").
-                with_hint("WITH (PAGLOCK)",
-                          selectable=t2,
-                          dialect_name=darg),
+                    values(somecolumn="x").
+                    with_hint("WITH (PAGLOCK)",
+                              selectable=t2,
+                              dialect_name=darg),
                 "UPDATE sometable SET somecolumn=:somecolumn "
                 "FROM sometable, othertable WITH (PAGLOCK) "
                 "WHERE sometable.somecolumn = othertable.somecolumn"
@@ -167,7 +168,7 @@ class CompileTest(fixtures.TestBase, AssertsCompiledSQL):
         )
         stmt = table.update().values(
             val=select([other.c.newval]).
-            where(table.c.sym == other.c.sym).as_scalar())
+                where(table.c.sym == other.c.sym).as_scalar())
 
         self.assert_compile(
             stmt,
@@ -176,7 +177,7 @@ class CompileTest(fixtures.TestBase, AssertsCompiledSQL):
             "WHERE [schema].sometable.sym = [#other].sym)",
         )
 
-        stmt = table.update().values(val=other.c.newval).\
+        stmt = table.update().values(val=other.c.newval). \
             where(table.c.sym == other.c.sym)
         self.assert_compile(
             stmt,
@@ -346,8 +347,8 @@ class CompileTest(fixtures.TestBase, AssertsCompiledSQL):
         s1, s2 = select(
             [t1.c.col3.label('col3'), t1.c.col4.label('col4')],
             t1.c.col2.in_(['t1col2r1', 't1col2r2'])), \
-            select([t2.c.col3.label('col3'), t2.c.col4.label('col4')],
-                   t2.c.col2.in_(['t2col2r2', 't2col2r3']))
+                 select([t2.c.col3.label('col3'), t2.c.col4.label('col4')],
+                        t2.c.col2.in_(['t2col2r2', 't2col2r3']))
         u = union(s1, s2, order_by=['col3', 'col4'])
         self.assert_compile(u,
                             'SELECT t1.col3 AS col3, t1.col4 AS col4 '
@@ -384,7 +385,8 @@ class CompileTest(fixtures.TestBase, AssertsCompiledSQL):
         for field in 'day', 'month', 'year':
             self.assert_compile(
                 select([extract(field, t.c.col1)]),
-                'SELECT DATEPART({0!s}, t.col1) AS anon_1 FROM t'.format(field))
+                'SELECT DATEPART({0!s}, t.col1) AS anon_1 FROM t'.format(
+                    field))
 
     def test_update_returning(self):
         table1 = table(
@@ -764,7 +766,6 @@ class CompileTest(fixtures.TestBase, AssertsCompiledSQL):
 
 
 class SchemaTest(fixtures.TestBase):
-
     def setup(self):
         t = Table('sometable', MetaData(),
                   Column('pk_column', Integer),

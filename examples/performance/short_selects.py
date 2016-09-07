@@ -29,6 +29,7 @@ class Customer(Base):
     y = deferred(Column(Integer))
     z = deferred(Column(Integer))
 
+
 Profiler.init("short_selects", num=10000)
 
 
@@ -40,15 +41,16 @@ def setup_database(dburl, echo, num):
     Base.metadata.create_all(engine)
     sess = Session(engine)
     sess.add_all([
-        Customer(
-            id=i, name='c{0:d}'.format(i), description="c{0:d}".format(i),
-            q=i * 10,
-            p=i * 20,
-            x=i * 30,
-            y=i * 40,
-        )
-        for i in ids
-    ])
+                     Customer(
+                         id=i, name='c{0:d}'.format(i),
+                         description="c{0:d}".format(i),
+                         q=i * 10,
+                         p=i * 20,
+                         x=i * 30,
+                         y=i * 40,
+                     )
+                     for i in ids
+                     ])
     sess.commit()
 
 
@@ -112,7 +114,6 @@ def test_core_reuse_stmt(n):
     stmt = select([Customer.__table__]).where(Customer.id == bindparam('id'))
     with engine.connect() as conn:
         for id_ in random.sample(ids, n):
-
             row = conn.execute(stmt, id=id_).first()
             tuple(row)
 
@@ -123,8 +124,8 @@ def test_core_reuse_stmt_compiled_cache(n):
 
     compiled_cache = {}
     stmt = select([Customer.__table__]).where(Customer.id == bindparam('id'))
-    with engine.connect().\
-            execution_options(compiled_cache=compiled_cache) as conn:
+    with engine.connect(). \
+        execution_options(compiled_cache=compiled_cache) as conn:
         for id_ in random.sample(ids, n):
             row = conn.execute(stmt, id=id_).first()
             tuple(row)

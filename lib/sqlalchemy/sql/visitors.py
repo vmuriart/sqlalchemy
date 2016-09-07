@@ -54,7 +54,7 @@ class VisitableType(type):
 
     def __init__(cls, clsname, bases, clsdict):
         if clsname != 'Visitable' and \
-                hasattr(cls, '__visit_name__'):
+            hasattr(cls, '__visit_name__'):
             _generate_dispatch(cls)
 
         super(VisitableType, cls).__init__(clsname, bases, clsdict)
@@ -204,6 +204,7 @@ class ReplacingCloningVisitor(CloningVisitor):
                 e = v.replace(elem)
                 if e is not None:
                     return e
+
         return replacement_traverse(obj, self.__traverse_options__, replace)
 
 

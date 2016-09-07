@@ -73,7 +73,7 @@ class _UnicodeFixture(_LiteralRoundTripFixture):
 
         eq_(
             row,
-            (self.data, )
+            (self.data,)
         )
         assert isinstance(row[0], util.text_type)
 
@@ -87,7 +87,7 @@ class _UnicodeFixture(_LiteralRoundTripFixture):
                     'unicode_data': self.data,
                 }
                 for i in range(3)
-            ]
+                ]
         )
 
         rows = config.db.execute(
@@ -97,7 +97,7 @@ class _UnicodeFixture(_LiteralRoundTripFixture):
         ).fetchall()
         eq_(
             rows,
-            [(self.data, ) for i in range(3)]
+            [(self.data,) for i in range(3)]
         )
         for row in rows:
             assert isinstance(row[0], util.text_type)
@@ -240,7 +240,7 @@ class _DateFixture(_LiteralRoundTripFixture):
 
         compare = self.compare or self.data
         eq_(row,
-            (compare, ))
+            (compare,))
         assert isinstance(row[0], type(compare))
 
     def test_null(self):
@@ -649,7 +649,7 @@ class JSONTest(_LiteralRoundTripFixture, fixtures.TablesTest):
             ])
         ).first()
 
-        eq_(row, (data_element, ))
+        eq_(row, (data_element,))
 
     def test_round_trip_none_as_sql_null(self):
         col = self.tables.data_table.c['nulldata']
@@ -663,7 +663,7 @@ class JSONTest(_LiteralRoundTripFixture, fixtures.TablesTest):
             eq_(
                 conn.scalar(
                     select([self.tables.data_table.c.name]).
-                    where(col.is_(null()))
+                        where(col.is_(null()))
                 ),
                 "r1"
             )
@@ -687,7 +687,7 @@ class JSONTest(_LiteralRoundTripFixture, fixtures.TablesTest):
             eq_(
                 conn.scalar(
                     select([self.tables.data_table.c.name]).
-                    where(cast(col, String) == 'null')
+                        where(cast(col, String) == 'null')
                 ),
                 "r1"
             )
@@ -711,7 +711,7 @@ class JSONTest(_LiteralRoundTripFixture, fixtures.TablesTest):
             eq_(
                 conn.scalar(
                     select([self.tables.data_table.c.name]).
-                    where(cast(col, String) == 'null')
+                        where(cast(col, String) == 'null')
                 ),
                 "r1"
             )
@@ -829,14 +829,16 @@ class JSONTest(_LiteralRoundTripFixture, fixtures.TablesTest):
         )
         eq_(
             s.query(
-                cast(self.tables.data_table.c.data, String(convert_unicode="force")),
+                cast(self.tables.data_table.c.data,
+                     String(convert_unicode="force")),
                 cast(self.tables.data_table.c.nulldata, String)
             ).filter(self.tables.data_table.c.name == 'd1').first(),
             ("null", None)
         )
         eq_(
             s.query(
-                cast(self.tables.data_table.c.data, String(convert_unicode="force")),
+                cast(self.tables.data_table.c.data,
+                     String(convert_unicode="force")),
                 cast(self.tables.data_table.c.nulldata, String)
             ).filter(self.tables.data_table.c.name == 'd2').first(),
             ("null", None)

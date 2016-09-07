@@ -20,6 +20,7 @@ from .attributes import QueryableAttribute
 from .query import Query
 from sqlalchemy.util.compat import inspect_getargspec
 
+
 class InstrumentationEvents(event.Events):
     """Events related to class instrumentation events.
 
@@ -81,8 +82,8 @@ class InstrumentationEvents(event.Events):
 
         target = weakref.ref(target.class_, remove)
 
-        event_key.\
-            with_dispatch_target(instrumentation._instrumentation_factory).\
+        event_key. \
+            with_dispatch_target(instrumentation._instrumentation_factory). \
             with_wrapper(listen).base_listen(**kw)
 
     @classmethod
@@ -200,6 +201,7 @@ class InstanceEvents(event.Events):
         if not raw:
             def wrap(state, *arg, **kw):
                 return fn(state.obj(), *arg, **kw)
+
             event_key = event_key.with_wrapper(wrap)
 
         event_key.base_listen(propagate=propagate, **kw)
@@ -453,7 +455,7 @@ class _EventsHold(event.RefCollection):
                     if subject is not None:
                         # we are already going through __subclasses__()
                         # so leave generic propagate flag False
-                        event_key.with_dispatch_target(subject).\
+                        event_key.with_dispatch_target(subject). \
                             listen(raw=raw, propagate=False, **kw)
 
     def remove(self, event_key):
@@ -476,7 +478,7 @@ class _EventsHold(event.RefCollection):
                         # populate(), we rely upon _EventsHold for all event
                         # assignment, instead of using the generic propagate
                         # flag.
-                        event_key.with_dispatch_target(subject).\
+                        event_key.with_dispatch_target(subject). \
                             listen(raw=raw, propagate=False)
 
 
@@ -587,7 +589,7 @@ class MapperEvents(event.Events):
 
     @classmethod
     def _listen(
-            cls, event_key, raw=False, retval=False, propagate=False, **kw):
+        cls, event_key, raw=False, retval=False, propagate=False, **kw):
         target, identifier, fn = \
             event_key.dispatch_target, event_key.identifier, \
             event_key._listen_fn
@@ -617,6 +619,7 @@ class MapperEvents(event.Events):
                     return interfaces.EXT_CONTINUE
                 else:
                     return fn(*arg, **kw)
+
             event_key = event_key.with_wrapper(wrap)
 
         if propagate:
@@ -1159,9 +1162,9 @@ class SessionEvents(event.Events):
             target = target.session_factory
             if not isinstance(target, sessionmaker) and \
                 (
-                    not isinstance(target, type) or
-                    not issubclass(target, Session)
-            ):
+                        not isinstance(target, type) or
+                        not issubclass(target, Session)
+                ):
                 raise exc.ArgumentError(
                     "Session event listen on a scoped_session "
                     "requires that its creation callable "
@@ -1847,6 +1850,7 @@ class AttributeEvents(event.Events):
                     return value
                 else:
                     return fn(target, value, *arg)
+
             event_key = event_key.with_wrapper(wrap)
 
         event_key.base_listen(propagate=propagate)
@@ -2133,7 +2137,7 @@ class QueryEvents(event.Events):
 
     @classmethod
     def _listen(
-            cls, event_key, retval=False, **kw):
+        cls, event_key, retval=False, **kw):
         fn = event_key._listen_fn
 
         if not retval:
@@ -2144,6 +2148,7 @@ class QueryEvents(event.Events):
                     return query
                 else:
                     return fn(*arg, **kw)
+
             event_key = event_key.with_wrapper(wrap)
 
         event_key.base_listen(**kw)

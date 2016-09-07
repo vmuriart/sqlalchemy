@@ -52,6 +52,7 @@ class CompileTest(fixtures.TestBase, AssertsExecutionResults):
         @profiling.function_call_count()
         def go():
             t1.update().where(t1.c.c2 == 12).compile(dialect=self.dialect)
+
         go()
 
     def test_select(self):
@@ -64,6 +65,7 @@ class CompileTest(fixtures.TestBase, AssertsExecutionResults):
         def go():
             s = select([t1], t1.c.c2 == t2.c.c1)
             s.compile(dialect=self.dialect)
+
         go()
 
     def test_select_labels(self):
@@ -76,4 +78,5 @@ class CompileTest(fixtures.TestBase, AssertsExecutionResults):
         def go():
             s = select([t1], t1.c.c2 == t2.c.c1).apply_labels()
             s.compile(dialect=self.dialect)
+
         go()

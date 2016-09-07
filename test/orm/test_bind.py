@@ -151,7 +151,7 @@ class BindIntegrationTest(_fixtures.FixtureTest):
         sess.add(u)
         sess.flush()
         assert transaction._connection_for_bind(testing.db, None) \
-            is transaction._connection_for_bind(c, None) is c
+               is transaction._connection_for_bind(c, None) is c
 
         assert_raises_message(sa.exc.InvalidRequestError,
                               'Session already has a Connection '
@@ -200,7 +200,6 @@ class BindIntegrationTest(_fixtures.FixtureTest):
 
 
 class SessionBindTest(fixtures.MappedTest):
-
     @classmethod
     def define_tables(cls, metadata):
         Table('test_table', metadata,
@@ -463,5 +462,3 @@ class GetBindTest(fixtures.MappedTest):
             session.get_bind(self.classes.ConcreteSubClass),
             concrete_sub_bind
         )
-
-

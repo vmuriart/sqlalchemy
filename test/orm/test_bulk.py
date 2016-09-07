@@ -14,7 +14,6 @@ class BulkTest(testing.AssertsExecutionResults):
 
 
 class BulkInsertUpdateTest(BulkTest, _fixtures.FixtureTest):
-
     @classmethod
     def setup_mappers(cls):
         User, Address, Order = cls.classes("User", "Address", "Order")
@@ -25,7 +24,7 @@ class BulkInsertUpdateTest(BulkTest, _fixtures.FixtureTest):
         mapper(Order, o)
 
     def test_bulk_save_return_defaults(self):
-        User, = self.classes("User",)
+        User, = self.classes("User", )
 
         s = Session()
         objects = [
@@ -55,7 +54,7 @@ class BulkInsertUpdateTest(BulkTest, _fixtures.FixtureTest):
         eq_(objects[0].__dict__['id'], 1)
 
     def test_bulk_save_no_defaults(self):
-        User, = self.classes("User",)
+        User, = self.classes("User", )
 
         s = Session()
         objects = [
@@ -77,7 +76,7 @@ class BulkInsertUpdateTest(BulkTest, _fixtures.FixtureTest):
         assert 'id' not in objects[0].__dict__
 
     def test_bulk_save_updated_include_unchanged(self):
-        User, = self.classes("User",)
+        User, = self.classes("User", )
 
         s = Session(expire_on_commit=False)
         objects = [
@@ -106,7 +105,7 @@ class BulkInsertUpdateTest(BulkTest, _fixtures.FixtureTest):
         )
 
     def test_bulk_update(self):
-        User, = self.classes("User",)
+        User, = self.classes("User", )
 
         s = Session(expire_on_commit=False)
         objects = [
@@ -136,7 +135,7 @@ class BulkInsertUpdateTest(BulkTest, _fixtures.FixtureTest):
         )
 
     def test_bulk_insert(self):
-        User, = self.classes("User",)
+        User, = self.classes("User", )
 
         s = Session()
         with self.sql_execution_asserter() as asserter:
@@ -157,7 +156,7 @@ class BulkInsertUpdateTest(BulkTest, _fixtures.FixtureTest):
         )
 
     def test_bulk_insert_render_nulls(self):
-        Order, = self.classes("Order",)
+        Order, = self.classes("Order", )
 
         s = Session()
         with self.sql_execution_asserter() as asserter:

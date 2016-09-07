@@ -20,7 +20,6 @@ from sqlalchemy.util import b
 
 
 class TimeTypeTest(fixtures.TestBase):
-
     def test_result_processor_no_microseconds(self):
         expected = datetime.time(12, 34, 56)
         self._assert_result_processor(expected, '12:34:56')
@@ -46,7 +45,6 @@ class TimeTypeTest(fixtures.TestBase):
 
 
 class MSDateTypeTest(fixtures.TestBase):
-
     def test_result_processor(self):
         expected = datetime.date(2000, 1, 2)
         self._assert_result_processor(expected, '2000-01-02')
@@ -68,9 +66,10 @@ class MSDateTypeTest(fixtures.TestBase):
     def test_extract(self):
         from sqlalchemy import extract
         fivedaysago = datetime.datetime.now() \
-            - datetime.timedelta(days=5)
+                      - datetime.timedelta(days=5)
         for field, exp in ('year', fivedaysago.year), \
-                ('month', fivedaysago.month), ('day', fivedaysago.day):
+                          ('month', fivedaysago.month), (
+                              'day', fivedaysago.day):
             r = testing.db.execute(
                 select([
                     extract(field, fivedaysago)])
@@ -79,7 +78,6 @@ class MSDateTypeTest(fixtures.TestBase):
 
 
 class TypeDDLTest(fixtures.TestBase):
-
     def test_boolean(self):
         "Exercise type specification for boolean type."
 
@@ -94,7 +92,8 @@ class TypeDDLTest(fixtures.TestBase):
         for index, spec in enumerate(columns):
             type_, args, kw, res = spec
             table_args.append(
-                Column('c{0!s}'.format(index), type_(*args, **kw), nullable=None))
+                Column('c{0!s}'.format(index), type_(*args, **kw),
+                       nullable=None))
 
         boolean_table = Table(*table_args)
         dialect = mssql.dialect()
@@ -143,7 +142,8 @@ class TypeDDLTest(fixtures.TestBase):
         for index, spec in enumerate(columns):
             type_, args, kw, res = spec
             table_args.append(
-                Column('c{0!s}'.format(index), type_(*args, **kw), nullable=None))
+                Column('c{0!s}'.format(index), type_(*args, **kw),
+                       nullable=None))
 
         numeric_table = Table(*table_args)
         dialect = mssql.dialect()
@@ -204,7 +204,8 @@ class TypeDDLTest(fixtures.TestBase):
         for index, spec in enumerate(columns):
             type_, args, kw, res = spec
             table_args.append(
-                Column('c{0!s}'.format(index), type_(*args, **kw), nullable=None))
+                Column('c{0!s}'.format(index), type_(*args, **kw),
+                       nullable=None))
 
         charset_table = Table(*table_args)
         dialect = mssql.dialect()
@@ -277,7 +278,8 @@ class TypeDDLTest(fixtures.TestBase):
         for index, spec in enumerate(columns):
             type_, args, kw, res, server_version = spec
             table_args.append(
-                Column('c{0!s}'.format(index), type_(*args, **kw), nullable=None))
+                Column('c{0!s}'.format(index), type_(*args, **kw),
+                       nullable=None))
 
         date_table = Table(*table_args)
         dialect = mssql.dialect()
@@ -352,7 +354,8 @@ class TypeDDLTest(fixtures.TestBase):
             Column('id', Integer, primary_key=True),
             Column('t', spec, nullable=None))
         gen = dialect.ddl_compiler(dialect, schema.CreateTable(t))
-        testing.eq_(gen.get_column_specification(t.c.t), "t {0!s}".format(expected))
+        testing.eq_(gen.get_column_specification(t.c.t),
+                    "t {0!s}".format(expected))
         self.assert_(repr(t.c.t))
 
     def test_money(self):
@@ -364,15 +367,17 @@ class TypeDDLTest(fixtures.TestBase):
         table_args = ['test_mssql_money', metadata]
         for index, spec in enumerate(columns):
             type_, args, kw, res = spec
-            table_args.append(Column('c{0!s}'.format(index), type_(*args, **kw),
-                              nullable=None))
+            table_args.append(
+                Column('c{0!s}'.format(index), type_(*args, **kw),
+                       nullable=None))
         money_table = Table(*table_args)
         dialect = mssql.dialect()
         gen = dialect.ddl_compiler(dialect,
                                    schema.CreateTable(money_table))
         for col in money_table.c:
             index = int(col.name[1:])
-            testing.eq_(gen.get_column_specification(col), '{0!s} {1!s}'.format(col.name, columns[index][3]))
+            testing.eq_(gen.get_column_specification(col),
+                        '{0!s} {1!s}'.format(col.name, columns[index][3]))
             self.assert_(repr(col))
 
     def test_binary(self):
@@ -414,22 +419,25 @@ class TypeDDLTest(fixtures.TestBase):
         table_args = ['test_mssql_binary', metadata]
         for index, spec in enumerate(columns):
             type_, args, kw, res = spec
-            table_args.append(Column('c{0!s}'.format(index), type_(*args, **kw),
-                              nullable=None))
+            table_args.append(
+                Column('c{0!s}'.format(index), type_(*args, **kw),
+                       nullable=None))
         binary_table = Table(*table_args)
         dialect = mssql.dialect()
         gen = dialect.ddl_compiler(dialect,
                                    schema.CreateTable(binary_table))
         for col in binary_table.c:
             index = int(col.name[1:])
-            testing.eq_(gen.get_column_specification(col), '{0!s} {1!s}'.format(col.name, columns[index][3]))
+            testing.eq_(gen.get_column_specification(col),
+                        '{0!s} {1!s}'.format(col.name, columns[index][3]))
             self.assert_(repr(col))
+
 
 metadata = None
 
 
 class TypeRoundTripTest(
-        fixtures.TestBase, AssertsExecutionResults, ComparesTables):
+    fixtures.TestBase, AssertsExecutionResults, ComparesTables):
     __only_on__ = 'mssql'
 
     @classmethod
@@ -506,7 +514,8 @@ class TypeRoundTripTest(
             numeric_table.insert().execute(numericcol=value)
 
         for value in select([numeric_table.c.numericcol]).execute():
-            assert value[0] in test_items, "{0!r} not in test_items".format(value[0])
+            assert value[0] in test_items, "{0!r} not in test_items".format(
+                value[0])
 
     def test_float(self):
         float_table = Table(
@@ -604,8 +613,9 @@ class TypeRoundTripTest(
         for index, spec in enumerate(columns):
             type_, args, kw, res, requires = spec[0:5]
             if requires and \
-                    testing._is_excluded('mssql', *requires) or not requires:
-                c = Column('c{0!s}'.format(index), type_(*args, **kw), nullable=None)
+                testing._is_excluded('mssql', *requires) or not requires:
+                c = Column('c{0!s}'.format(index), type_(*args, **kw),
+                           nullable=None)
                 testing.db.dialect.type_descriptor(c.type)
                 table_args.append(c)
         dates_table = Table(*table_args)
@@ -614,7 +624,8 @@ class TypeRoundTripTest(
             schema.CreateTable(dates_table))
         for col in dates_table.c:
             index = int(col.name[1:])
-            testing.eq_(gen.get_column_specification(col), '{0!s} {1!s}'.format(col.name, columns[index][3]))
+            testing.eq_(gen.get_column_specification(col),
+                        '{0!s} {1!s}'.format(col.name, columns[index][3]))
             self.assert_(repr(col))
         dates_table.create(checkfirst=True)
         reflected_dates = Table('test_mssql_dates',
@@ -648,7 +659,7 @@ class TypeRoundTripTest(
         t.insert().execute(adate=d1, adatetime=d2, atime=t1)
 
         eq_(select([t.c.adate, t.c.atime, t.c.adatetime], t.c.adate
-            == d1).execute().fetchall(), [(d1, t1, d2)])
+                   == d1).execute().fetchall(), [(d1, t1, d2)])
 
     @emits_warning_on('mssql+mxodbc', r'.*does not have any indexes.*')
     @testing.provide_metadata
@@ -693,8 +704,9 @@ class TypeRoundTripTest(
         table_args = ['test_mssql_binary', metadata]
         for index, spec in enumerate(columns):
             type_, args, kw, res = spec
-            table_args.append(Column('c{0!s}'.format(index), type_(*args, **kw),
-                              nullable=None))
+            table_args.append(
+                Column('c{0!s}'.format(index), type_(*args, **kw),
+                       nullable=None))
         binary_table = Table(*table_args)
         metadata.create_all()
         reflected_binary = Table('test_mssql_binary',
@@ -702,14 +714,16 @@ class TypeRoundTripTest(
         for col, spec in zip(reflected_binary.c, columns):
             eq_(
                 str(col.type), spec[3],
-                "column {0!s} {1!s} != {2!s}".format(col.key, str(col.type), spec[3])
+                "column {0!s} {1!s} != {2!s}".format(col.key, str(col.type),
+                                                     spec[3])
             )
             c1 = testing.db.dialect.type_descriptor(col.type).__class__
             c2 = \
                 testing.db.dialect.type_descriptor(
                     binary_table.c[col.name].type).__class__
             assert issubclass(c1, c2), \
-                'column {0!s}: {1!r} is not a subclass of {2!r}'.format(col.key, c1, c2)
+                'column {0!s}: {1!r} is not a subclass of {2!r}'.format(
+                    col.key, c1, c2)
             if binary_table.c[col.name].type.length:
                 testing.eq_(col.type.length,
                             binary_table.c[col.name].type.length)
@@ -790,20 +804,20 @@ class TypeRoundTripTest(
                 eng = \
                     [engines.testing_engine(options={
                         'implicit_returning': False}),
-                     engines.testing_engine(options={
-                         'implicit_returning': True})]
+                        engines.testing_engine(options={
+                            'implicit_returning': True})]
 
             for counter, engine in enumerate(eng):
                 engine.execute(tbl.insert())
                 if 'int_y' in tbl.c:
                     assert engine.scalar(select([tbl.c.int_y])) \
-                        == counter + 1
+                           == counter + 1
                     assert list(
-                        engine.execute(tbl.select()).first()).\
-                        count(counter + 1) == 1
+                        engine.execute(tbl.select()).first()). \
+                               count(counter + 1) == 1
                 else:
                     assert 1 \
-                        not in list(engine.execute(tbl.select()).first())
+                           not in list(engine.execute(tbl.select()).first())
                 engine.execute(tbl.delete())
 
 
@@ -822,12 +836,12 @@ class MonkeyPatchedBinaryTest(fixtures.TestBase):
         result = module.Binary(input)
         eq_(result, expected_result)
 
+
 binary_table = None
 MyPickleType = None
 
 
 class BinaryTest(fixtures.TestBase, AssertsExecutionResults):
-
     """Test the Binary and VarBinary types"""
 
     __only_on__ = 'mssql'
@@ -857,7 +871,8 @@ class BinaryTest(fixtures.TestBase, AssertsExecutionResults):
             'binary_table',
             MetaData(),
             Column('primary_id', Integer, Sequence('binary_id_seq',
-                   optional=True), primary_key=True),
+                                                   optional=True),
+                   primary_key=True),
             Column('data', mssql.MSVarBinary(8000)),
             Column('data_image', mssql.MSImage),
             Column('data_slice', types.BINARY(100)),
@@ -916,15 +931,15 @@ class BinaryTest(fixtures.TestBase, AssertsExecutionResults):
 
         for stmt in \
             binary_table.select(order_by=binary_table.c.primary_id), \
-                text(
-                    'select * from binary_table order by '
-                    'binary_table.primary_id',
-                    typemap=dict(
-                        data=mssql.MSVarBinary(8000),
-                        data_image=mssql.MSImage,
-                        data_slice=types.BINARY(100), pickled=PickleType,
-                        mypickle=MyPickleType),
-                    bind=testing.db):
+            text(
+                'select * from binary_table order by '
+                'binary_table.primary_id',
+                typemap=dict(
+                    data=mssql.MSVarBinary(8000),
+                    data_image=mssql.MSImage,
+                    data_slice=types.BINARY(100), pickled=PickleType,
+                    mypickle=MyPickleType),
+                bind=testing.db):
             with engine.connect() as conn:
                 l = conn.execute(stmt).fetchall()
             eq_(list(stream1), list(l[0]['data']))
@@ -954,15 +969,15 @@ class BinaryTest(fixtures.TestBase, AssertsExecutionResults):
                 data_slice=stream2[0:99], pickled=None)
             for stmt in \
                 binary_table.select(), \
-                    text(
-                        'select * from binary_table',
-                        typemap=dict(
-                            data=mssql.MSVarBinary(8000),
-                            data_image=mssql.MSImage,
-                            data_slice=types.BINARY(100),
-                            pickled=PickleType,
-                            mypickle=MyPickleType),
-                        bind=testing.db):
+                text(
+                    'select * from binary_table',
+                    typemap=dict(
+                        data=mssql.MSVarBinary(8000),
+                        data_image=mssql.MSImage,
+                        data_slice=types.BINARY(100),
+                        pickled=PickleType,
+                        mypickle=MyPickleType),
+                    bind=testing.db):
                 row = conn.execute(stmt).first()
                 eq_(
                     row['pickled'], None

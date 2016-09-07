@@ -19,12 +19,12 @@ except ImportError:
     # assume we're a package, use traditional import
     from . import plugin_base
 
-
 import os
 import sys
 
 from nose.plugins import Plugin
 import nose
+
 fixtures = None
 
 py3k = sys.version_info >= (3, 0)
@@ -45,6 +45,7 @@ class NoseSQLAlchemy(Plugin):
             if callback_:
                 def wrap_(option, opt_str, value, parser):
                     callback_(opt_str, value, parser)
+
                 kw["callback"] = wrap_
             opt(name, **kw)
 
@@ -96,12 +97,12 @@ class NoseSQLAlchemy(Plugin):
 
     def startContext(self, ctx):
         if not isinstance(ctx, type) \
-                or not issubclass(ctx, fixtures.TestBase):
+            or not issubclass(ctx, fixtures.TestBase):
             return
         plugin_base.start_test_class(ctx)
 
     def stopContext(self, ctx):
         if not isinstance(ctx, type) \
-                or not issubclass(ctx, fixtures.TestBase):
+            or not issubclass(ctx, fixtures.TestBase):
             return
         plugin_base.stop_test_class(ctx)

@@ -72,6 +72,7 @@ class CircularDependencyError(SQLAlchemyError):
       see :ref:`use_alter`.
 
     """
+
     def __init__(self, message, cycles, edges, msg=None):
         if msg is None:
             message += " ({0!s})".format(", ".join(repr(s) for s in cycles))
@@ -100,7 +101,8 @@ class UnsupportedCompilationError(CompileError):
 
     def __init__(self, compiler, element_type):
         super(UnsupportedCompilationError, self).__init__(
-            "Compiler {0!r} can't render element of type {1!s}".format(compiler, element_type))
+            "Compiler {0!r} can't render element of type {1!s}".format(
+                compiler, element_type))
 
 
 class IdentifierError(SQLAlchemyError):
@@ -154,6 +156,7 @@ class NoReferencedTableError(NoReferenceError):
     located.
 
     """
+
     def __init__(self, message, tname):
         NoReferenceError.__init__(self, message)
         self.table_name = tname
@@ -167,6 +170,7 @@ class NoReferencedColumnError(NoReferenceError):
     located.
 
     """
+
     def __init__(self, message, tname, cname):
         NoReferenceError.__init__(self, message)
         self.table_name = tname
@@ -205,6 +209,7 @@ class DontWrapMixin(object):
                     raise MyCustomException("invalid!")
 
     """
+
 
 # Moved to orm.exc; compatibility definition installed by orm import until 0.6
 UnmappedColumnError = None
@@ -256,8 +261,8 @@ class StatementError(SQLAlchemyError):
                 params_repr = util._repr_params(self.params, 10)
                 details.append("[parameters: {0!r}]".format(params_repr))
         return ' '.join([
-            "({0!s})".format(det) for det in self.detail
-        ] + details)
+                            "({0!s})".format(det) for det in self.detail
+                            ] + details)
 
     def __unicode__(self):
         return self.__str__()
@@ -295,7 +300,7 @@ class DBAPIError(StatementError):
         # DBAPIError didn't exist.
         if (isinstance(orig, BaseException) and
                 not isinstance(orig, Exception)) or \
-                isinstance(orig, DontWrapMixin):
+            isinstance(orig, DontWrapMixin):
             return orig
 
         if orig is not None:
@@ -303,8 +308,9 @@ class DBAPIError(StatementError):
             # raise a StatementError
             if not isinstance(orig, dbapi_base_err) and statement:
                 return StatementError(
-                    "({0!s}.{1!s}) {2!s}".format(orig.__class__.__module__, orig.__class__.__name__,
-                     orig),
+                    "({0!s}.{1!s}) {2!s}".format(orig.__class__.__module__,
+                                                 orig.__class__.__name__,
+                                                 orig),
                     statement, params, orig
                 )
 
@@ -332,7 +338,7 @@ class DBAPIError(StatementError):
         StatementError.__init__(
             self,
             '({0!s}.{1!s}) {2!s}'.format(
-                orig.__class__.__module__, orig.__class__.__name__, text ),
+                orig.__class__.__module__, orig.__class__.__name__, text),
             statement,
             params,
             orig

@@ -5,18 +5,19 @@ http://www.intelligententerprise.com/001020/celko.jhtml
 """
 
 from sqlalchemy import (create_engine, Column, Integer, String, select, case,
-    func)
+                        func)
 from sqlalchemy.orm import Session, aliased
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import event
 
 Base = declarative_base()
 
+
 class Employee(Base):
     __tablename__ = 'personnel'
     __mapper_args__ = {
         'batch': False  # allows extension to fire for each
-                        # instance before going to the next.
+        # instance before going to the next.
     }
 
     parent = None
@@ -27,7 +28,9 @@ class Employee(Base):
     right = Column("rgt", Integer, nullable=False)
 
     def __repr__(self):
-        return "Employee({0!s}, {1:d}, {2:d})".format(self.emp, self.left, self.right)
+        return "Employee({0!s}, {1:d}, {2:d})".format(self.emp, self.left,
+                                                      self.right)
+
 
 @event.listens_for(Employee, "before_insert")
 def before_insert(mapper, connection, instance):
@@ -44,23 +47,24 @@ def before_insert(mapper, connection, instance):
         connection.execute(
             personnel.update(
                 personnel.c.rgt >= right_most_sibling).values(
-                    lft=case(
-                        [(personnel.c.lft > right_most_sibling,
-                            personnel.c.lft + 2)],
-                        else_=personnel.c.lft
-                    ),
-                    rgt=case(
-                        [(personnel.c.rgt >= right_most_sibling,
-                                personnel.c.rgt + 2)],
-                            else_=personnel.c.rgt
-                      )
+                lft=case(
+                    [(personnel.c.lft > right_most_sibling,
+                      personnel.c.lft + 2)],
+                    else_=personnel.c.lft
+                ),
+                rgt=case(
+                    [(personnel.c.rgt >= right_most_sibling,
+                      personnel.c.rgt + 2)],
+                    else_=personnel.c.rgt
+                )
             )
         )
         instance.left = right_most_sibling
         instance.right = right_most_sibling + 1
 
-    # before_update() would be needed to support moving of nodes
-    # after_delete() would be needed to support removal of nodes.
+        # before_update() would be needed to support moving of nodes
+        # after_delete() would be needed to support removal of nodes.
+
 
 engine = create_engine('sqlite://', echo=True)
 
@@ -90,22 +94,21 @@ print(session.query(Employee).all())
 
 # 1. Find an employee and all their supervisors, no matter how deep the tree.
 ealias = aliased(Employee)
-print(session.query(Employee).\
-            filter(ealias.left.between(Employee.left, Employee.right)).\
-            filter(ealias.emp == 'Eddie').all())
+print(session.query(Employee). \
+      filter(ealias.left.between(Employee.left, Employee.right)). \
+      filter(ealias.emp == 'Eddie').all())
 
-#2. Find the employee and all their subordinates.
+# 2. Find the employee and all their subordinates.
 # (This query has a nice symmetry with the first query.)
-print(session.query(Employee).\
-    filter(Employee.left.between(ealias.left, ealias.right)).\
-    filter(ealias.emp == 'Chuck').all())
+print(session.query(Employee). \
+      filter(Employee.left.between(ealias.left, ealias.right)). \
+      filter(ealias.emp == 'Chuck').all())
 
-#3. Find the level of each node, so you can print the tree
+# 3. Find the level of each node, so you can print the tree
 # as an indented listing.
 for indentation, employee in session.query(
-            func.count(Employee.emp).label('indentation') - 1, ealias).\
-    filter(ealias.left.between(Employee.left, Employee.right)).\
-    group_by(ealias.emp).\
-        order_by(ealias.left):
+        func.count(Employee.emp).label('indentation') - 1, ealias). \
+    filter(ealias.left.between(Employee.left, Employee.right)). \
+    group_by(ealias.emp). \
+    order_by(ealias.left):
     print("    " * indentation + str(employee))
-

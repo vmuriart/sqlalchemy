@@ -122,8 +122,8 @@ class CaseTest(fixtures.TestBase, AssertsCompiledSQL):
                     case(
                         [
                             (
-                                info_table.c.info == 'pk_4_data',
-                                text("'yes'"))],
+                                    info_table.c.info == 'pk_4_data',
+                                    text("'yes'"))],
                         else_=text("'no'"))
                 ]).order_by(info_table.c.info),
 
@@ -132,8 +132,8 @@ class CaseTest(fixtures.TestBase, AssertsCompiledSQL):
                     case(
                         [
                             (
-                                info_table.c.info == 'pk_4_data',
-                                literal_column("'yes'"))],
+                                    info_table.c.info == 'pk_4_data',
+                                    literal_column("'yes'"))],
                         else_=literal_column("'no'")
                     )]
             ).order_by(info_table.c.info),
@@ -141,13 +141,13 @@ class CaseTest(fixtures.TestBase, AssertsCompiledSQL):
         ]:
             if testing.against("firebird"):
                 eq_(s.execute().fetchall(), [
-                    ('no ', ), ('no ', ), ('no ', ), ('yes', ),
-                    ('no ', ), ('no ', ),
+                    ('no ',), ('no ',), ('no ',), ('yes',),
+                    ('no ',), ('no ',),
                 ])
             else:
                 eq_(s.execute().fetchall(), [
-                    ('no', ), ('no', ), ('no', ), ('yes', ),
-                    ('no', ), ('no', ),
+                    ('no',), ('no',), ('no',), ('yes',),
+                    ('no',), ('no',),
                 ])
 
     @testing.fails_on('firebird', 'FIXME: unknown')
@@ -174,7 +174,7 @@ class CaseTest(fixtures.TestBase, AssertsCompiledSQL):
         simple_query = select(
             [
                 case(
-                    {1: 'one', 2: 'two', },
+                    {1: 'one', 2: 'two',},
                     value=info_table.c.pk, else_='other'),
                 info_table.c.pk
             ],

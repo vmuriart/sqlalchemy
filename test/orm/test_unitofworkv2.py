@@ -8,7 +8,7 @@ from sqlalchemy.testing import fixtures, config
 from sqlalchemy import Integer, String, ForeignKey, func, \
     literal, FetchedValue, text, select
 from sqlalchemy.orm import mapper, relationship, backref, \
-    create_session, unitofwork, attributes,\
+    create_session, unitofwork, attributes, \
     Session, exc as orm_exc
 from sqlalchemy.testing.mock import Mock, patch
 from sqlalchemy.testing.assertsql import AllOf, CompiledSQL
@@ -16,7 +16,6 @@ from sqlalchemy import event
 
 
 class AssertsUOW(object):
-
     def _get_test_uow(self, session):
         uow = unitofwork.UOWTransaction(session)
         deleted = set(session._deleted)
@@ -37,12 +36,11 @@ class AssertsUOW(object):
 
 class UOWTest(
     _fixtures.FixtureTest,
-        testing.AssertsExecutionResults, AssertsUOW):
+    testing.AssertsExecutionResults, AssertsUOW):
     run_inserts = None
 
 
 class RudimentaryFlushTest(UOWTest):
-
     def test_one_to_many_save(self):
         users, Address, addresses, User = (self.tables.users,
                                            self.classes.Address,
@@ -158,7 +156,7 @@ class RudimentaryFlushTest(UOWTest):
 
         u1 = User(name='u1')
         a1, a2 = Address(email_address='a1', user=u1), \
-            Address(email_address='a2', user=u1)
+                 Address(email_address='a2', user=u1)
         sess.add_all([a1, a2])
 
         self.assert_sql_execution(
@@ -194,7 +192,7 @@ class RudimentaryFlushTest(UOWTest):
 
         u1 = User(name='u1')
         a1, a2 = Address(email_address='a1', user=u1), \
-            Address(email_address='a2', user=u1)
+                 Address(email_address='a2', user=u1)
         sess.add_all([a1, a2])
         sess.flush()
 
@@ -228,7 +226,7 @@ class RudimentaryFlushTest(UOWTest):
 
         u1 = User(name='u1')
         a1, a2 = Address(email_address='a1', user=u1), \
-            Address(email_address='a2', user=u1)
+                 Address(email_address='a2', user=u1)
         sess.add_all([a1, a2])
         sess.flush()
 
@@ -264,7 +262,7 @@ class RudimentaryFlushTest(UOWTest):
 
         parent = User(name='p1')
         c1, c2 = Address(email_address='c1', parent=parent), \
-            Address(email_address='c2', parent=parent)
+                 Address(email_address='c2', parent=parent)
 
         session = Session()
         session.add_all([c1, c2])
@@ -343,7 +341,7 @@ class RudimentaryFlushTest(UOWTest):
 
         parent = User(name='p1')
         c1, c2 = Address(email_address='c1', parent=parent), \
-            Address(email_address='c2', parent=parent)
+                 Address(email_address='c2', parent=parent)
 
         session = Session()
         session.add_all([c1, c2])
@@ -351,7 +349,7 @@ class RudimentaryFlushTest(UOWTest):
 
         session.flush()
 
-        #pid = parent.id
+        # pid = parent.id
         c1id = c1.id
         c2id = c2.id
 
@@ -406,7 +404,7 @@ class RudimentaryFlushTest(UOWTest):
 
         parent = User(name='p1')
         c1, c2 = Address(email_address='c1', parent=parent), \
-            Address(email_address='c2', parent=parent)
+                 Address(email_address='c2', parent=parent)
 
         session = Session()
         session.add_all([c1, c2])
@@ -414,7 +412,7 @@ class RudimentaryFlushTest(UOWTest):
 
         session.flush()
 
-        #pid = parent.id
+        # pid = parent.id
         c1id = c1.id
         c2id = c2.id
 
@@ -638,7 +636,6 @@ class RudimentaryFlushTest(UOWTest):
 
 
 class SingleCycleTest(UOWTest):
-
     def teardown(self):
         engines.testing_reaper.rollback_all()
         # mysql can't handle delete from nodes
@@ -734,7 +731,7 @@ class SingleCycleTest(UOWTest):
                         {'nodes_id': n3.id, 'parent_id': None},
                         {'nodes_id': n2.id, 'parent_id': None}
                     ]
-                    )
+                )
             ),
             CompiledSQL(
                 "DELETE FROM nodes WHERE nodes.id = :id", lambda ctx: {
@@ -1039,10 +1036,9 @@ class SingleCycleTest(UOWTest):
 
 
 class SingleCyclePlusAttributeTest(
-        fixtures.MappedTest,
-        testing.AssertsExecutionResults,
-        AssertsUOW):
-
+    fixtures.MappedTest,
+    testing.AssertsExecutionResults,
+    AssertsUOW):
     @classmethod
     def define_tables(cls, metadata):
         Table('nodes', metadata,
@@ -1092,7 +1088,6 @@ class SingleCyclePlusAttributeTest(
 
 class SingleCycleM2MTest(fixtures.MappedTest,
                          testing.AssertsExecutionResults, AssertsUOW):
-
     @classmethod
     def define_tables(cls, metadata):
         Table(
@@ -1158,9 +1153,9 @@ class SingleCycleM2MTest(fixtures.MappedTest,
         eq_(
             sess.query(node_to_nodes.c.left_node_id,
                        node_to_nodes.c.right_node_id).
-            order_by(node_to_nodes.c.left_node_id,
-                     node_to_nodes.c.right_node_id).
-            all(),
+                order_by(node_to_nodes.c.left_node_id,
+                         node_to_nodes.c.right_node_id).
+                all(),
             sorted([
                 (n1.id, n2.id), (n1.id, n3.id), (n1.id, n4.id),
                 (n2.id, n3.id), (n2.id, n5.id),
@@ -1233,7 +1228,6 @@ class SingleCycleM2MTest(fixtures.MappedTest,
 
 
 class RowswitchAccountingTest(fixtures.MappedTest):
-
     @classmethod
     def define_tables(cls, metadata):
         Table('parent', metadata,
@@ -1430,7 +1424,6 @@ class RowswitchM2OTest(fixtures.MappedTest):
 
 
 class BasicStaleChecksTest(fixtures.MappedTest):
-
     @classmethod
     def define_tables(cls, metadata):
         Table('parent', metadata,
@@ -1485,10 +1478,10 @@ class BasicStaleChecksTest(fixtures.MappedTest):
                 return self.context.rowcount
 
         with patch.object(
-                config.db.dialect, "supports_sane_multi_rowcount", False):
+            config.db.dialect, "supports_sane_multi_rowcount", False):
             with patch(
-                    "sqlalchemy.engine.result.ResultProxy.rowcount",
-                    rowcount):
+                "sqlalchemy.engine.result.ResultProxy.rowcount",
+                rowcount):
                 Parent, Child = self._fixture()
                 sess = Session()
                 p1 = Parent(id=1, data=2)
@@ -1514,10 +1507,10 @@ class BasicStaleChecksTest(fixtures.MappedTest):
                 return self.context.rowcount
 
         with patch.object(
-                config.db.dialect, "supports_sane_multi_rowcount", False):
+            config.db.dialect, "supports_sane_multi_rowcount", False):
             with patch(
-                    "sqlalchemy.engine.result.ResultProxy.rowcount",
-                    rowcount):
+                "sqlalchemy.engine.result.ResultProxy.rowcount",
+                rowcount):
                 Parent, Child = self._fixture()
                 sess = Session()
                 p1 = Parent(id=1, data=2)
@@ -1546,10 +1539,10 @@ class BasicStaleChecksTest(fixtures.MappedTest):
                 return self.context.rowcount
 
         with patch.object(
-                config.db.dialect, "supports_sane_multi_rowcount", False):
+            config.db.dialect, "supports_sane_multi_rowcount", False):
             with patch(
-                    "sqlalchemy.engine.result.ResultProxy.rowcount",
-                    rowcount):
+                "sqlalchemy.engine.result.ResultProxy.rowcount",
+                rowcount):
                 Parent, Child = self._fixture()
                 sess = Session()
                 p1 = Parent(id=1, data=1)
@@ -1602,7 +1595,6 @@ class BasicStaleChecksTest(fixtures.MappedTest):
 
 
 class BatchInsertsTest(fixtures.MappedTest, testing.AssertsExecutionResults):
-
     @classmethod
     def define_tables(cls, metadata):
         Table('t', metadata,
@@ -1622,6 +1614,7 @@ class BatchInsertsTest(fixtures.MappedTest, testing.AssertsExecutionResults):
 
         class T(fixtures.ComparableEntity):
             pass
+
         mapper(T, t)
         sess = Session()
         sess.add_all([
@@ -1652,8 +1645,8 @@ class BatchInsertsTest(fixtures.MappedTest, testing.AssertsExecutionResults):
             CompiledSQL(
                 "INSERT INTO t (id, data) VALUES (:id, :data)",
                 [{'data': 't3', 'id': 3},
-                    {'data': 't4', 'id': 4},
-                    {'data': 't5', 'id': 5}]
+                 {'data': 't4', 'id': 4},
+                 {'data': 't5', 'id': 5}]
             ),
             CompiledSQL(
                 "INSERT INTO t (id, data) VALUES (:id, lower(:lower_1))",
@@ -1676,7 +1669,6 @@ class BatchInsertsTest(fixtures.MappedTest, testing.AssertsExecutionResults):
 
 
 class LoadersUsingCommittedTest(UOWTest):
-
     """Test that events which occur within a flush()
     get the same attribute loading behavior as on the outside
     of the flush, and that the unit of work itself uses the
@@ -1713,6 +1705,7 @@ class LoadersUsingCommittedTest(UOWTest):
             # if get committed is used to find target.user, then
             # it will be still be u1 instead of u2
             assert target.user.id == target.user_id == u2.id
+
         from sqlalchemy import event
         event.listen(Address, 'before_update', before_update)
 
@@ -1784,6 +1777,7 @@ class LoadersUsingCommittedTest(UOWTest):
                 eq_([a.id for a in target.addresses],
                     [a.id for a in [a1, a2]])
             raise AvoidReferencialError()
+
         from sqlalchemy import event
         event.listen(User, 'before_update', before_update)
 
@@ -2294,6 +2288,7 @@ class EagerDefaultsTest(fixtures.MappedTest):
                 dialect='postgresql'
             )
         )
+
 
 class TypeWoBoolTest(fixtures.MappedTest, testing.AssertsExecutionResults):
     """test support for custom datatypes that return a non-__bool__ value

@@ -37,6 +37,7 @@ from .base import BIT, MySQLDialect, MySQLExecutionContext
 class _ZxJDBCBit(BIT):
     def result_processor(self, dialect, coltype):
         """Converts boolean or byte arrays from MySQL Connector/J to longs."""
+
         def process(value):
             if value is None:
                 return value
@@ -47,6 +48,7 @@ class _ZxJDBCBit(BIT):
                 v = v << 8 | (i & 0xff)
             value = v
             return value
+
         return process
 
 
@@ -113,5 +115,6 @@ class MySQLDialect_zxjdbc(ZxJDBCConnector, MySQLDialect):
             except ValueError:
                 version.append(n)
         return tuple(version)
+
 
 dialect = MySQLDialect_zxjdbc

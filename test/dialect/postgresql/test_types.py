@@ -548,11 +548,11 @@ class NumericInterpretationTest(fixtures.TestBase):
             psycopg2, psycopg2cffi, base
 
         dialects = (pg8000.dialect(), pygresql.dialect(),
-                psycopg2.dialect(), psycopg2cffi.dialect())
+                    psycopg2.dialect(), psycopg2cffi.dialect())
         for dialect in dialects:
             typ = Numeric().dialect_impl(dialect)
             for code in base._INT_TYPES + base._FLOAT_TYPES + \
-                    base._DECIMAL_TYPES:
+                base._DECIMAL_TYPES:
                 proc = typ.result_processor(dialect, code)
                 val = 23.7
                 if proc is not None:
@@ -641,7 +641,6 @@ class TimezoneTest(fixtures.TestBase):
     @testing.fails_on('postgresql+zxjdbc',
                       "XXX: postgresql+zxjdbc doesn't give a tzinfo back")
     def test_with_timezone(self):
-
         # get a date with a tzinfo
 
         somedate = \
@@ -654,14 +653,13 @@ class TimezoneTest(fixtures.TestBase):
         eq_(somedate.tzinfo.utcoffset(somedate),
             row[0].tzinfo.utcoffset(row[0]))
         result = tztable.update(tztable.c.id
-                                == 1).returning(tztable.c.date).\
+                                == 1).returning(tztable.c.date). \
             execute(name='newname'
                     )
         row = result.first()
         assert row[0] >= somedate
 
     def test_without_timezone(self):
-
         # get a date without a tzinfo
 
         somedate = datetime.datetime(2005, 10, 20, 11, 52, 0, )
@@ -672,7 +670,7 @@ class TimezoneTest(fixtures.TestBase):
         eq_(row[0], somedate)
         eq_(row[0].tzinfo, None)
         result = notztable.update(notztable.c.id
-                                  == 1).returning(notztable.c.date).\
+                                  == 1).returning(notztable.c.date). \
             execute(name='newname'
                     )
         row = result.first()
@@ -680,7 +678,6 @@ class TimezoneTest(fixtures.TestBase):
 
 
 class TimePrecisionTest(fixtures.TestBase, AssertsCompiledSQL):
-
     __dialect__ = postgresql.dialect()
     __prefer__ = 'postgresql'
     __backend__ = True
@@ -913,7 +910,6 @@ class ArrayTest(AssertsCompiledSQL, fixtures.TestBase):
 
 
 class ArrayRoundTripTest(fixtures.TablesTest, AssertsExecutionResults):
-
     __only_on__ = 'postgresql'
     __backend__ = True
     __unsupported_on__ = 'postgresql+pg8000', 'postgresql+zxjdbc'
@@ -930,7 +926,7 @@ class ArrayRoundTripTest(fixtures.TablesTest, AssertsExecutionResults):
                 return [
                     [x + 5 for x in v]
                     for v in value
-                ]
+                    ]
 
             def process_result_value(self, value, dialect):
                 if value is None:
@@ -938,7 +934,7 @@ class ArrayRoundTripTest(fixtures.TablesTest, AssertsExecutionResults):
                 return [
                     [x - 7 for x in v]
                     for v in value
-                ]
+                    ]
 
         Table('arrtable', metadata,
               Column('id', Integer, primary_key=True),
@@ -1085,10 +1081,10 @@ class ArrayRoundTripTest(fixtures.TablesTest, AssertsExecutionResults):
     def test_array_comparison(self):
         arrtable = self.tables.arrtable
         arrtable.insert().execute(id=5, intarr=[1, 2, 3],
-                    strarr=[util.u('abc'), util.u('def')])
-        results = select([arrtable.c.id]).\
-                        where(arrtable.c.intarr < [4, 5, 6]).execute()\
-                        .fetchall()
+                                  strarr=[util.u('abc'), util.u('def')])
+        results = select([arrtable.c.id]). \
+            where(arrtable.c.intarr < [4, 5, 6]).execute() \
+            .fetchall()
         eq_(len(results), 1)
         eq_(results[0][0], 5)
 
@@ -1122,7 +1118,7 @@ class ArrayRoundTripTest(fixtures.TablesTest, AssertsExecutionResults):
                 select([
                     postgresql.array([1, 2]) < [3, 4, 5]
                 ])
-                ), True
+            ), True
         )
 
     def test_array_getitem_single_exec(self):
@@ -1146,7 +1142,7 @@ class ArrayRoundTripTest(fixtures.TablesTest, AssertsExecutionResults):
         eq_(
             testing.db.scalar(
                 select([arrtable.c.intarr]).
-                where(arrtable.c.intarr.contains([]))
+                    where(arrtable.c.intarr.contains([]))
             ),
             [4, 5, 6]
         )
@@ -1176,7 +1172,7 @@ class ArrayRoundTripTest(fixtures.TablesTest, AssertsExecutionResults):
         eq_(
             testing.db.scalar(
                 select([arrtable.c.intarr]).
-                where(arrtable.c.intarr.contains(struct([4, 5])))
+                    where(arrtable.c.intarr.contains(struct([4, 5])))
             ),
             [4, 5, 6]
         )
@@ -1197,7 +1193,7 @@ class ArrayRoundTripTest(fixtures.TablesTest, AssertsExecutionResults):
         eq_(
             testing.db.scalar(
                 select([dim_arrtable.c.intarr]).
-                where(dim_arrtable.c.intarr.contains(struct([4, 5])))
+                    where(dim_arrtable.c.intarr.contains(struct([4, 5])))
             ),
             [4, 5, 6]
         )
@@ -1245,7 +1241,7 @@ class ArrayRoundTripTest(fixtures.TablesTest, AssertsExecutionResults):
             eq_(
                 conn.scalar(
                     select([arrtable.c.intarr]).
-                    where(arrtable.c.intarr.overlap([7, 6]))
+                        where(arrtable.c.intarr.overlap([7, 6]))
                 ),
                 [4, 5, 6]
             )
@@ -1260,7 +1256,7 @@ class ArrayRoundTripTest(fixtures.TablesTest, AssertsExecutionResults):
             eq_(
                 conn.scalar(
                     select([arrtable.c.intarr]).
-                    where(postgresql.Any(5, arrtable.c.intarr))
+                        where(postgresql.Any(5, arrtable.c.intarr))
                 ),
                 [4, 5, 6]
             )
@@ -1275,7 +1271,7 @@ class ArrayRoundTripTest(fixtures.TablesTest, AssertsExecutionResults):
             eq_(
                 conn.scalar(
                     select([arrtable.c.intarr]).
-                    where(arrtable.c.intarr.all(4, operator=operators.le))
+                        where(arrtable.c.intarr.all(4, operator=operators.le))
                 ),
                 [4, 5, 6]
             )
@@ -1365,11 +1361,12 @@ class HashableFlagORMTest(fixtures.TestBase):
             __tablename__ = 'a1'
             id = Column(Integer, primary_key=True)
             data = Column(type_)
+
         Base.metadata.create_all(testing.db)
         s = Session(testing.db)
         s.add_all([
-            A(data=elem) for elem in data
-        ])
+                      A(data=elem) for elem in data
+                      ])
         s.commit()
 
         eq_(
@@ -1444,7 +1441,6 @@ class TimestampTest(fixtures.TestBase, AssertsExecutionResults):
 
 
 class SpecialTypesTest(fixtures.TestBase, ComparesTables, AssertsCompiledSQL):
-
     """test DDL and reflection of PG-specific types """
 
     __only_on__ = 'postgresql >= 8.3.0',
@@ -1458,12 +1454,10 @@ class SpecialTypesTest(fixtures.TestBase, ComparesTables, AssertsCompiledSQL):
         # create these types so that we can issue
         # special SQL92 INTERVAL syntax
         class y2m(types.UserDefinedType, postgresql.INTERVAL):
-
             def get_col_spec(self):
                 return "INTERVAL YEAR TO MONTH"
 
         class d2s(types.UserDefinedType, postgresql.INTERVAL):
-
             def get_col_spec(self):
                 return "INTERVAL DAY TO SECOND"
 
@@ -1550,7 +1544,6 @@ class SpecialTypesTest(fixtures.TestBase, ComparesTables, AssertsCompiledSQL):
 
 
 class UUIDTest(fixtures.TestBase):
-
     """Test the bind/return values of the UUID type."""
 
     __only_on__ = 'postgresql >= 8.3'
@@ -1643,7 +1636,7 @@ class UUIDTest(fixtures.TestBase):
         self.conn.execute(utable.insert(), {'data': value2})
         r = self.conn.execute(
             select([utable.c.data]).
-            where(utable.c.data != value1)
+                where(utable.c.data != value1)
         )
         if exp_value2:
             eq_(r.fetchone()[0], exp_value2)
@@ -1682,7 +1675,6 @@ class HStoreTest(AssertsCompiledSQL, fixtures.TestBase):
         )
 
     def test_bind_serialize_default(self):
-
         dialect = postgresql.dialect()
         proc = self.test_table.c.hash.type._cached_bind_processor(dialect)
         eq_(
@@ -1959,7 +1951,7 @@ class HStoreRoundTripTest(fixtures.TablesTest):
     def _assert_data(self, compare):
         data = testing.db.execute(
             select([self.tables.data_table.c.data]).
-            order_by(self.tables.data_table.c.name)
+                order_by(self.tables.data_table.c.name)
         ).fetchall()
         eq_([d for d, in data], compare)
 
@@ -2094,10 +2086,10 @@ class HStoreRoundTripTest(fixtures.TablesTest):
         from sqlalchemy import orm
 
         class Data(object):
-
             def __init__(self, name, data):
                 self.name = name
                 self.data = data
+
         orm.mapper(Data, self.tables.data_table)
         s = orm.Session(testing.db)
         d = Data(name='r1', data={"key1": "value1", "key2": "value2",
@@ -2144,7 +2136,7 @@ class _RangeTypeMixin(object):
         data = testing.db.execute(
             select([self.tables.data_table.c.range])
         ).fetchall()
-        eq_(data, [(self._data_obj(), )])
+        eq_(data, [(self._data_obj(),)])
 
     def test_insert_obj(self):
         testing.db.engine.execute(
@@ -2276,7 +2268,7 @@ class _RangeTypeMixin(object):
         data = testing.db.execute(
             select([range + range])
         ).fetchall()
-        eq_(data, [(self._data_obj(), )])
+        eq_(data, [(self._data_obj(),)])
 
     def test_intersection(self):
         self._test_clause(
@@ -2295,7 +2287,7 @@ class _RangeTypeMixin(object):
         data = testing.db.execute(
             select([range * range])
         ).fetchall()
-        eq_(data, [(self._data_obj(), )])
+        eq_(data, [(self._data_obj(),)])
 
     def test_different(self):
         self._test_clause(
@@ -2314,11 +2306,10 @@ class _RangeTypeMixin(object):
         data = testing.db.execute(
             select([range - range])
         ).fetchall()
-        eq_(data, [(self._data_obj().__class__(empty=True), )])
+        eq_(data, [(self._data_obj().__class__(empty=True),)])
 
 
 class Int4RangeTests(_RangeTypeMixin, fixtures.TablesTest):
-
     _col_type = INT4RANGE
     _col_str = 'INT4RANGE'
     _data_str = '[1,2)'
@@ -2328,7 +2319,6 @@ class Int4RangeTests(_RangeTypeMixin, fixtures.TablesTest):
 
 
 class Int8RangeTests(_RangeTypeMixin, fixtures.TablesTest):
-
     _col_type = INT8RANGE
     _col_str = 'INT8RANGE'
     _data_str = '[9223372036854775806,9223372036854775807)'
@@ -2340,7 +2330,6 @@ class Int8RangeTests(_RangeTypeMixin, fixtures.TablesTest):
 
 
 class NumRangeTests(_RangeTypeMixin, fixtures.TablesTest):
-
     _col_type = NUMRANGE
     _col_str = 'NUMRANGE'
     _data_str = '[1.0,2.0)'
@@ -2352,7 +2341,6 @@ class NumRangeTests(_RangeTypeMixin, fixtures.TablesTest):
 
 
 class DateRangeTests(_RangeTypeMixin, fixtures.TablesTest):
-
     _col_type = DATERANGE
     _col_str = 'DATERANGE'
     _data_str = '[2013-03-23,2013-03-24)'
@@ -2364,7 +2352,6 @@ class DateRangeTests(_RangeTypeMixin, fixtures.TablesTest):
 
 
 class DateTimeRangeTests(_RangeTypeMixin, fixtures.TablesTest):
-
     _col_type = TSRANGE
     _col_str = 'TSRANGE'
     _data_str = '[2013-03-23 14:30,2013-03-23 23:30)'
@@ -2377,7 +2364,6 @@ class DateTimeRangeTests(_RangeTypeMixin, fixtures.TablesTest):
 
 
 class DateTimeTZRangeTests(_RangeTypeMixin, fixtures.TablesTest):
-
     _col_type = TSTZRANGE
     _col_str = 'TSTZRANGE'
 
@@ -2451,7 +2437,7 @@ class JSONTest(AssertsCompiledSQL, fixtures.TestBase):
             col['q'].type._type_affinity, types.JSON
         )
         is_(
-            col[('q', )].type._type_affinity, types.JSON
+            col[('q',)].type._type_affinity, types.JSON
         )
         is_(
             col['q']['p'].type._type_affinity, types.JSON
@@ -2544,7 +2530,7 @@ class JSONRoundTripTest(fixtures.TablesTest):
 
         data = testing.db.execute(
             select([col]).
-            order_by(self.tables.data_table.c.name)
+                order_by(self.tables.data_table.c.name)
         ).fetchall()
         eq_([d for d, in data], compare)
 
@@ -2553,7 +2539,7 @@ class JSONRoundTripTest(fixtures.TablesTest):
 
         data = testing.db.execute(
             select([col]).
-            where(col.is_(null()))
+                where(col.is_(null()))
         ).fetchall()
         eq_([d for d, in data], [None])
 
@@ -2562,7 +2548,7 @@ class JSONRoundTripTest(fixtures.TablesTest):
 
         data = testing.db.execute(
             select([col]).
-            where(cast(col, String) == "null")
+                where(cast(col, String) == "null")
         ).fetchall()
         eq_([d for d, in data], [None])
 
@@ -2614,6 +2600,7 @@ class JSONRoundTripTest(fixtures.TablesTest):
 
                 def pass_(value):
                     return value
+
                 register_default_json(dbapi_connection, loads=pass_)
         elif options:
             engine = engines.testing_engine(options=options)
@@ -2867,7 +2854,6 @@ class JSONRoundTripTest(fixtures.TablesTest):
 
 
 class JSONBTest(JSONTest):
-
     def setup(self):
         metadata = MetaData()
         self.test_table = Table('test_table', metadata,
@@ -2911,7 +2897,7 @@ class JSONBTest(JSONTest):
 
 
 class JSONBRoundTripTest(JSONRoundTripTest):
-    __requires__ = ('postgresql_jsonb', )
+    __requires__ = ('postgresql_jsonb',)
 
     test_type = JSONB
 

@@ -135,7 +135,8 @@ class MySQLTableDefinitionParser(object):
             options.pop(nope, None)
 
         for opt, val in options.items():
-            state.table_options['{0!s}_{1!s}'.format(self.dialect.name, opt)] = val
+            state.table_options[
+                '{0!s}_{1!s}'.format(self.dialect.name, opt)] = val
 
     def _parse_column(self, line, state):
         """Extract column details.
@@ -159,14 +160,18 @@ class MySQLTableDefinitionParser(object):
             util.warn("Unknown column definition {0!r}".format(line))
             return
         if not spec['full']:
-            util.warn("Incomplete reflection of column definition {0!r}".format(line))
+            util.warn(
+                "Incomplete reflection of column definition {0!r}".format(
+                    line))
 
         name, type_, args = spec['name'], spec['coltype'], spec['arg']
 
         try:
             col_type = self.dialect.ischema_names[type_]
         except KeyError:
-            util.warn("Did not recognize type '{0!s}' of column '{1!s}'".format(type_, name))
+            util.warn(
+                "Did not recognize type '{0!s}' of column '{1!s}'".format(
+                    type_, name))
             col_type = sqltypes.NullType
 
         # Column type positional arguments eg. varchar(32)
@@ -249,7 +254,7 @@ class MySQLTableDefinitionParser(object):
                 if 'auto_increment' in default:
                     pass
                 elif (col_type.startswith('timestamp') and
-                      default.startswith('C')):
+                          default.startswith('C')):
                     line.append('DEFAULT')
                     line.append(default)
                 elif default == 'NULL':
@@ -264,9 +269,9 @@ class MySQLTableDefinitionParser(object):
             buffer.append(' '.join(line))
 
         return ''.join([('CREATE TABLE {0!s} (\n'.format(
-                         self.preparer.quote_identifier(table_name))),
-                        ',\n'.join(buffer),
-                        '\n) '])
+            self.preparer.quote_identifier(table_name))),
+            ',\n'.join(buffer),
+            '\n) '])
 
     def _parse_keyexprs(self, identifiers):
         """Unpack '"col"(2),"col" ASC'-ish strings into components."""
@@ -431,6 +436,7 @@ class MySQLTableDefinitionParser(object):
                  r'(?P<val>%s)' %
                  (re.escape(directive), self._optional_equals, regex))
         self._pr_options.append(_pr_compile(regex))
+
 
 _options_of_type_string = ('COMMENT', 'DATA DIRECTORY', 'INDEX DIRECTORY',
                            'PASSWORD', 'CONNECTION')

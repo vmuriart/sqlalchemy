@@ -15,10 +15,10 @@ from sqlalchemy.testing import eq_, is_, assert_raises, \
 from sqlalchemy import testing
 from sqlalchemy.testing import fixtures, AssertsCompiledSQL
 from sqlalchemy import Integer, String, MetaData, Table, Column, select, \
-    func, not_, cast, text, tuple_, exists, update, bindparam,\
-    literal, and_, null, type_coerce, alias, or_, literal_column,\
-    Float, TIMESTAMP, Numeric, Date, Text, union, except_,\
-    intersect, union_all, Boolean, distinct, join, outerjoin, asc, desc,\
+    func, not_, cast, text, tuple_, exists, update, bindparam, \
+    literal, and_, null, type_coerce, alias, or_, literal_column, \
+    Float, TIMESTAMP, Numeric, Date, Text, union, except_, \
+    intersect, union_all, Boolean, distinct, join, outerjoin, asc, desc, \
     over, subquery, case, true, CheckConstraint
 import decimal
 from sqlalchemy.util import u
@@ -129,9 +129,9 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
 
     def test_prefix_constructor(self):
         class Pref(HasPrefixes):
-
             def _generate(self):
                 return self
+
         assert_raises(exc.ArgumentError,
                       Pref().prefix_with,
                       "some prefix", not_a_dialect=True
@@ -330,12 +330,12 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
             use_labels=True
         ).alias('sq')
 
-        sqstring = "SELECT mytable.myid AS mytable_myid, mytable.name AS "\
-            "mytable_name, mytable.description AS mytable_description, "\
-            "myothertable.otherid AS myothertable_otherid, "\
-            "myothertable.othername AS myothertable_othername FROM "\
-            "mytable, myothertable WHERE mytable.myid = :myid_1 AND "\
-            "myothertable.otherid = mytable.myid"
+        sqstring = "SELECT mytable.myid AS mytable_myid, mytable.name AS " \
+                   "mytable_name, mytable.description AS mytable_description, " \
+                   "myothertable.otherid AS myothertable_otherid, " \
+                   "myothertable.othername AS myothertable_othername FROM " \
+                   "mytable, myothertable WHERE mytable.myid = :myid_1 AND " \
+                   "myothertable.otherid = mytable.myid"
 
         self.assert_compile(
             sq.select(),
@@ -391,7 +391,7 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
 
         self.assert_compile(
             select([func.sum(
-                    func.lala(table1.c.myid).label('foo')).label('bar')]),
+                func.lala(table1.c.myid).label('foo')).label('bar')]),
             "SELECT sum(lala(mytable.myid)) AS bar FROM mytable"
         )
 
@@ -472,8 +472,8 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
 
         # using alternate keys.
         a, b, c = Column('a', Integer, key='b'), \
-            Column('b', Integer), \
-            Column('c', Integer, key='a')
+                  Column('b', Integer), \
+                  Column('c', Integer, key='a')
         self.assert_compile(
             select([a, b, c, a, b, c]),
             "SELECT a, b, c", dialect=default.DefaultDialect()
@@ -610,11 +610,11 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
             table1.select(
                 exists().where(
                     table2.c.otherid == table1.c.myid).correlate(table1)).
-            select_from(
+                select_from(
                 table1.join(
                     table2,
                     table1.c.myid == table2.c.otherid)).
-            replace_selectable(
+                replace_selectable(
                 table2,
                 table2.alias()),
             'SELECT mytable.myid, mytable.name, '
@@ -730,13 +730,13 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
             'myothertable WHERE mytable.myid = '
             'myothertable.otherid)')
         self.assert_compile(table1.select(order_by=[
-                            desc(select([table2.c.otherid],
-                                        table1.c.myid == table2.c.otherid))]),
-                            'SELECT mytable.myid, mytable.name, '
-                            'mytable.description FROM mytable ORDER BY '
-                            '(SELECT myothertable.otherid FROM '
-                            'myothertable WHERE mytable.myid = '
-                            'myothertable.otherid) DESC')
+            desc(select([table2.c.otherid],
+                        table1.c.myid == table2.c.otherid))]),
+            'SELECT mytable.myid, mytable.name, '
+            'mytable.description FROM mytable ORDER BY '
+            '(SELECT myothertable.otherid FROM '
+            'myothertable WHERE mytable.myid = '
+            'myothertable.otherid) DESC')
 
     def test_scalar_select(self):
         assert_raises_message(
@@ -819,14 +819,14 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
             s.c.foo
         except exc.InvalidRequestError as err:
             assert str(err) \
-                == 'Scalar Select expression has no columns; use this '\
-                'object directly within a column-level expression.'
+                   == 'Scalar Select expression has no columns; use this ' \
+                      'object directly within a column-level expression.'
         try:
             s.columns.foo
         except exc.InvalidRequestError as err:
             assert str(err) \
-                == 'Scalar Select expression has no columns; use this '\
-                'object directly within a column-level expression.'
+                   == 'Scalar Select expression has no columns; use this ' \
+                      'object directly within a column-level expression.'
 
         zips = table('zips',
                      column('zipcode'),
@@ -838,9 +838,9 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
                        column('nm')
                        )
         zip = '12345'
-        qlat = select([zips.c.latitude], zips.c.zipcode == zip).\
+        qlat = select([zips.c.latitude], zips.c.zipcode == zip). \
             correlate(None).as_scalar()
-        qlng = select([zips.c.longitude], zips.c.zipcode == zip).\
+        qlng = select([zips.c.longitude], zips.c.zipcode == zip). \
             correlate(None).as_scalar()
 
         q = select([places.c.id, places.c.nm, zips.c.zipcode,
@@ -860,9 +860,9 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
                             ':zipcode_3 ORDER BY dist, places.nm')
 
         zalias = zips.alias('main_zip')
-        qlat = select([zips.c.latitude], zips.c.zipcode == zalias.c.zipcode).\
+        qlat = select([zips.c.latitude], zips.c.zipcode == zalias.c.zipcode). \
             as_scalar()
-        qlng = select([zips.c.longitude], zips.c.zipcode == zalias.c.zipcode).\
+        qlng = select([zips.c.longitude], zips.c.zipcode == zalias.c.zipcode). \
             as_scalar()
         q = select([places.c.id, places.c.nm, zalias.c.zipcode,
                     func.latlondist(qlat, qlng).label('dist')],
@@ -1052,7 +1052,7 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
         )
         self.assert_compile(
             select([t]).
-            where(
+                where(
                 and_(
                     or_(
                         or_(t.c.x == 12),
@@ -1197,7 +1197,7 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
         # generative order_by
         self.assert_compile(
             table2.select().order_by(table2.c.otherid).
-            order_by(table2.c.othername.desc()),
+                order_by(table2.c.othername.desc()),
             "SELECT myothertable.otherid, myothertable.othername FROM "
             "myothertable ORDER BY myothertable.otherid, "
             "myothertable.othername DESC"
@@ -1205,8 +1205,8 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
 
         self.assert_compile(
             table2.select().order_by(table2.c.otherid).
-            order_by(table2.c.othername.desc()
-                     ).order_by(None),
+                order_by(table2.c.othername.desc()
+                         ).order_by(None),
             "SELECT myothertable.otherid, myothertable.othername "
             "FROM myothertable"
         )
@@ -1223,7 +1223,7 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
         # generative group by
         self.assert_compile(
             select([table2.c.othername, func.count(table2.c.otherid)]).
-            group_by(table2.c.othername),
+                group_by(table2.c.othername),
             "SELECT myothertable.othername, "
             "count(myothertable.otherid) AS count_1 "
             "FROM myothertable GROUP BY myothertable.othername"
@@ -1231,7 +1231,7 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
 
         self.assert_compile(
             select([table2.c.othername, func.count(table2.c.otherid)]).
-            group_by(table2.c.othername).group_by(None),
+                group_by(table2.c.othername).group_by(None),
             "SELECT myothertable.othername, "
             "count(myothertable.otherid) AS count_1 "
             "FROM myothertable"
@@ -1320,7 +1320,7 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
     def test_prefix(self):
         self.assert_compile(
             table1.select().prefix_with("SQL_CALC_FOUND_ROWS").
-            prefix_with("SQL_SOME_WEIRD_MYSQL_THING"),
+                prefix_with("SQL_SOME_WEIRD_MYSQL_THING"),
             "SELECT SQL_CALC_FOUND_ROWS SQL_SOME_WEIRD_MYSQL_THING "
             "mytable.myid, mytable.name, mytable.description FROM mytable"
         )
@@ -1329,8 +1329,8 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
         self.assert_compile(
             table1.select().prefix_with("SQL_CALC_FOUND_ROWS",
                                         dialect='sqlite').
-            prefix_with("SQL_SOME_WEIRD_MYSQL_THING",
-                        dialect='mysql'),
+                prefix_with("SQL_SOME_WEIRD_MYSQL_THING",
+                            dialect='mysql'),
             "SELECT SQL_SOME_WEIRD_MYSQL_THING "
             "mytable.myid, mytable.name, mytable.description FROM mytable",
             dialect=mysql.dialect()
@@ -1345,6 +1345,7 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
 
         class Compiler(dialect.statement_compiler):
             ansi_bind_rules = True
+
         dialect.statement_compiler = Compiler
 
         self.assert_compile(
@@ -1505,8 +1506,8 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
 
                    from_obj=[join(table1, table2,
                                   table1.c.myid == table2.c.otherid).
-                             outerjoin(table3,
-                                       table1.c.myid == table3.c.userid)]
+                   outerjoin(table3,
+                             table1.c.myid == table3.c.userid)]
                    ),
             "SELECT mytable.myid, mytable.name, mytable.description, "
             "myothertable.otherid, myothertable.othername, "
@@ -1547,24 +1548,24 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
         )
         self.assert_compile(
             query, "SELECT mytable.myid, mytable.name, mytable.description, "
-            "myothertable.otherid, myothertable.othername "
-            "FROM mytable LEFT OUTER JOIN myothertable ON mytable.myid = "
-            "myothertable.otherid WHERE mytable.name = :name_1 OR "
-            "mytable.myid = :myid_1 OR myothertable.othername != :othername_1 "
-            "OR EXISTS (select yay from foo where boo = lar)", )
+                   "myothertable.otherid, myothertable.othername "
+                   "FROM mytable LEFT OUTER JOIN myothertable ON mytable.myid = "
+                   "myothertable.otherid WHERE mytable.name = :name_1 OR "
+                   "mytable.myid = :myid_1 OR myothertable.othername != :othername_1 "
+                   "OR EXISTS (select yay from foo where boo = lar)", )
 
     def test_full_outer_join(self):
         for spec in [
             join(table1, table2, table1.c.myid == table2.c.otherid, full=True),
             outerjoin(
                 table1, table2,
-                table1.c.myid == table2.c.otherid, full=True),
+                    table1.c.myid == table2.c.otherid, full=True),
             table1.join(
                 table2,
-                table1.c.myid == table2.c.otherid, full=True),
+                    table1.c.myid == table2.c.otherid, full=True),
             table1.outerjoin(
                 table2,
-                table1.c.myid == table2.c.otherid, full=True),
+                    table1.c.myid == table2.c.otherid, full=True),
         ]:
             stmt = select([table1]).select_from(spec)
         self.assert_compile(
@@ -1590,12 +1591,12 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
 
         self.assert_compile(
             x, "SELECT mytable.myid, mytable.name, "
-            "mytable.description "
-            "FROM mytable WHERE "
-            "mytable.myid = :myid_1 UNION "
-            "SELECT mytable.myid, mytable.name, mytable.description "
-            "FROM mytable WHERE mytable.myid = :myid_2 "
-            "ORDER BY mytable.myid")
+               "mytable.description "
+               "FROM mytable WHERE "
+               "mytable.myid = :myid_1 UNION "
+               "SELECT mytable.myid, mytable.name, mytable.description "
+               "FROM mytable WHERE mytable.myid = :myid_2 "
+               "ORDER BY mytable.myid")
 
         x = union(
             select([table1]),
@@ -1604,9 +1605,9 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
         x = union(x, select([table1]))
         self.assert_compile(
             x, "(SELECT mytable.myid, mytable.name, mytable.description "
-            "FROM mytable UNION SELECT mytable.myid, mytable.name, "
-            "mytable.description FROM mytable) UNION SELECT mytable.myid,"
-            " mytable.name, mytable.description FROM mytable")
+               "FROM mytable UNION SELECT mytable.myid, mytable.name, "
+               "mytable.description FROM mytable) UNION SELECT mytable.myid,"
+               " mytable.name, mytable.description FROM mytable")
 
         u1 = union(
             select([table1.c.myid, table1.c.name]),
@@ -1615,10 +1616,10 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
         )
         self.assert_compile(
             u1, "SELECT mytable.myid, mytable.name "
-            "FROM mytable UNION SELECT myothertable.otherid, "
-            "myothertable.othername FROM myothertable "
-            "UNION SELECT thirdtable.userid, thirdtable.otherstuff "
-            "FROM thirdtable")
+                "FROM mytable UNION SELECT myothertable.otherid, "
+                "myothertable.othername FROM myothertable "
+                "UNION SELECT thirdtable.userid, thirdtable.otherstuff "
+                "FROM thirdtable")
 
         assert u1.corresponding_column(table2.c.otherid) is u1.c.myid
 
@@ -1869,8 +1870,8 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
                 select(
                     [table1, table2],
                     and_(
-                        table1.c.myid == table2.c.otherid,
-                        table1.c.name == bindparam('mytablename')
+                            table1.c.myid == table2.c.otherid,
+                            table1.c.name == bindparam('mytablename')
                     )),
                 "SELECT mytable.myid, mytable.name, mytable.description, "
                 "myothertable.otherid, myothertable.othername FROM mytable, "
@@ -1911,9 +1912,9 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
             ),
             (
                 select([table1], or_(table1.c.myid ==
-                                     bindparam('myid', unique=True),
+                                         bindparam('myid', unique=True),
                                      table2.c.otherid ==
-                                     bindparam('myid', unique=True))),
+                                         bindparam('myid', unique=True))),
                 "SELECT mytable.myid, mytable.name, mytable.description FROM "
                 "mytable, myothertable WHERE mytable.myid = "
                 ":myid_1 OR myothertable.otherid = :myid_2",
@@ -1924,11 +1925,12 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
                 {'myid_1': 5, 'myid_2': 6}, {'myid_1': 5, 'myid_2': 6}, [5, 6]
             ),
             (
-                bindparam('test', type_=String, required=False) + text("'hi'"),
-                ":test || 'hi'",
-                "? || 'hi'",
-                {'test': None}, [None],
-                {}, {'test': None}, [None]
+                    bindparam('test', type_=String, required=False) + text(
+                    "'hi'"),
+                    ":test || 'hi'",
+                    "? || 'hi'",
+                    {'test': None}, [None],
+                    {}, {'test': None}, [None]
             ),
             (
                 # testing select.params() here - bindparam() objects
@@ -1936,8 +1938,8 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
                 select(
                     [table1],
                     or_(
-                        table1.c.myid == bindparam('myid'),
-                        table2.c.otherid == bindparam('myotherid')
+                            table1.c.myid == bindparam('myid'),
+                            table2.c.otherid == bindparam('myotherid')
                     )).params({'myid': 8, 'myotherid': 7}),
                 "SELECT mytable.myid, mytable.name, mytable.description FROM "
                 "mytable, myothertable WHERE mytable.myid = "
@@ -1950,9 +1952,11 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
             ),
             (
                 select([table1], or_(table1.c.myid ==
-                                     bindparam('myid', value=7, unique=True),
+                                         bindparam('myid', value=7,
+                                                   unique=True),
                                      table2.c.otherid ==
-                                     bindparam('myid', value=8, unique=True))),
+                                         bindparam('myid', value=8,
+                                                   unique=True))),
                 "SELECT mytable.myid, mytable.name, mytable.description FROM "
                 "mytable, myothertable WHERE mytable.myid = "
                 ":myid_1 OR myothertable.otherid = :myid_2",
@@ -1963,7 +1967,6 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
                 {'myid_1': 5, 'myid_2': 6}, {'myid_1': 5, 'myid_2': 6}, [5, 6]
             ),
         ]:
-
             self.assert_compile(stmt, expected_named_stmt,
                                 params=expected_default_params_dict)
             self.assert_compile(stmt, expected_positional_stmt,
@@ -1997,9 +2000,9 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
         s2 = select([table1, s], table1.c.myid == s)
         self.assert_compile(
             s2, "SELECT mytable.myid, mytable.name, mytable.description, "
-            "(SELECT mytable.myid FROM mytable WHERE mytable.myid = "
-            ":myid_1) AS anon_1 FROM mytable WHERE mytable.myid = "
-            "(SELECT mytable.myid FROM mytable WHERE mytable.myid = :myid_1)")
+                "(SELECT mytable.myid FROM mytable WHERE mytable.myid = "
+                ":myid_1) AS anon_1 FROM mytable WHERE mytable.myid = "
+                "(SELECT mytable.myid FROM mytable WHERE mytable.myid = :myid_1)")
         positional = s2.compile(dialect=sqlite.dialect())
 
         pp = positional.params
@@ -2032,7 +2035,8 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
         eq_(len(t.bindparams), total_params)
         c = t.compile()
         pp = c.construct_params(params)
-        eq_(len(set(pp)), total_params, '{0!s} {1!s}'.format(len(set(pp)), len(pp)))
+        eq_(len(set(pp)), total_params,
+            '{0!s} {1!s}'.format(len(set(pp)), len(pp)))
         eq_(len(set(pp.values())), total_params)
 
     def test_bind_as_col(self):
@@ -2492,7 +2496,7 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
              'CAST(mytable.name AS NUMERIC)', 'anon_1'),
             (t1.c.col1, 'col1', 'mytable.col1', None),
             (column('some wacky thing'), 'some wacky thing',
-                '"some wacky thing"', ''),
+             '"some wacky thing"', ''),
             (exprs[3], exprs[3].key, ":param_1", "anon_1")
         ):
             if getattr(col, 'table', None) is not None:
@@ -2507,25 +2511,31 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
                 self.assert_compile(
                     s1, "SELECT {0!s} AS {1!s} FROM mytable".format(expr, lbl))
             else:
-                self.assert_compile(s1, "SELECT {0!s} FROM mytable".format(expr))
+                self.assert_compile(s1,
+                                    "SELECT {0!s} FROM mytable".format(expr))
 
             s1 = select([s1])
             if lbl:
                 self.assert_compile(
-                    s1, "SELECT {0!s} FROM (SELECT {1!s} AS {2!s} FROM mytable)".format(lbl, expr, lbl))
+                    s1,
+                    "SELECT {0!s} FROM (SELECT {1!s} AS {2!s} FROM mytable)".format(
+                        lbl, expr, lbl))
             elif col.table is not None:
                 # sqlite rule labels subquery columns
                 self.assert_compile(
-                    s1, "SELECT {0!s} FROM (SELECT {1!s} AS {2!s} FROM mytable)".format(key, expr, key))
+                    s1,
+                    "SELECT {0!s} FROM (SELECT {1!s} AS {2!s} FROM mytable)".format(
+                        key, expr, key))
             else:
                 self.assert_compile(s1,
-                                    "SELECT {0!s} FROM (SELECT {1!s} FROM mytable)".format(expr, expr))
+                                    "SELECT {0!s} FROM (SELECT {1!s} FROM mytable)".format(
+                                        expr, expr))
 
     def test_hints(self):
         s = select([table1.c.myid]).with_hint(table1, "test hint %(name)s")
 
-        s2 = select([table1.c.myid]).\
-            with_hint(table1, "index(%(name)s idx)", 'oracle').\
+        s2 = select([table1.c.myid]). \
+            with_hint(table1, "index(%(name)s idx)", 'oracle'). \
             with_hint(table1, "WITH HINT INDEX idx", 'sybase')
 
         a1 = table1.alias()
@@ -2534,7 +2544,7 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
         subs4 = select([
             table1, table2
         ]).select_from(
-            table1.join(table2, table1.c.myid == table2.c.otherid)).\
+            table1.join(table2, table1.c.myid == table2.c.otherid)). \
             with_hint(table1, 'hint1')
 
         s4 = select([table3]).select_from(
@@ -2542,14 +2552,14 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
                 subs4,
                 subs4.c.othername == table3.c.otherstuff
             )
-        ).\
+        ). \
             with_hint(table3, 'hint3')
 
         t1 = table('QuotedName', column('col1'))
-        s6 = select([t1.c.col1]).where(t1.c.col1 > 10).\
+        s6 = select([t1.c.col1]).where(t1.c.col1 > 10). \
             with_hint(t1, '%(name)s idx1')
         a2 = t1.alias('SomeName')
-        s7 = select([a2.c.col1]).where(a2.c.col1 > 10).\
+        s7 = select([a2.c.col1]).where(a2.c.col1 > 10). \
             with_hint(a2, '%(name)s idx1')
 
         mysql_d, oracle_d, sybase_d = \
@@ -2561,47 +2571,47 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
             (s, mysql_d,
              "SELECT mytable.myid FROM mytable test hint mytable"),
             (s, oracle_d,
-                "SELECT /*+ test hint mytable */ mytable.myid FROM mytable"),
+             "SELECT /*+ test hint mytable */ mytable.myid FROM mytable"),
             (s, sybase_d,
-                "SELECT mytable.myid FROM mytable test hint mytable"),
+             "SELECT mytable.myid FROM mytable test hint mytable"),
             (s2, mysql_d,
-                "SELECT mytable.myid FROM mytable"),
+             "SELECT mytable.myid FROM mytable"),
             (s2, oracle_d,
-                "SELECT /*+ index(mytable idx) */ mytable.myid FROM mytable"),
+             "SELECT /*+ index(mytable idx) */ mytable.myid FROM mytable"),
             (s2, sybase_d,
-                "SELECT mytable.myid FROM mytable WITH HINT INDEX idx"),
+             "SELECT mytable.myid FROM mytable WITH HINT INDEX idx"),
             (s3, mysql_d,
-                "SELECT mytable_1.myid FROM mytable AS mytable_1 "
-                "index(mytable_1 hint)"),
+             "SELECT mytable_1.myid FROM mytable AS mytable_1 "
+             "index(mytable_1 hint)"),
             (s3, oracle_d,
-                "SELECT /*+ index(mytable_1 hint) */ mytable_1.myid FROM "
-                "mytable mytable_1"),
+             "SELECT /*+ index(mytable_1 hint) */ mytable_1.myid FROM "
+             "mytable mytable_1"),
             (s3, sybase_d,
-                "SELECT mytable_1.myid FROM mytable AS mytable_1 "
-                "index(mytable_1 hint)"),
+             "SELECT mytable_1.myid FROM mytable AS mytable_1 "
+             "index(mytable_1 hint)"),
             (s4, mysql_d,
-                "SELECT thirdtable.userid, thirdtable.otherstuff "
-                "FROM thirdtable "
-                "hint3 INNER JOIN (SELECT mytable.myid, mytable.name, "
-                "mytable.description, myothertable.otherid, "
-                "myothertable.othername FROM mytable hint1 INNER "
-                "JOIN myothertable ON mytable.myid = myothertable.otherid) "
-                "ON othername = thirdtable.otherstuff"),
+             "SELECT thirdtable.userid, thirdtable.otherstuff "
+             "FROM thirdtable "
+             "hint3 INNER JOIN (SELECT mytable.myid, mytable.name, "
+             "mytable.description, myothertable.otherid, "
+             "myothertable.othername FROM mytable hint1 INNER "
+             "JOIN myothertable ON mytable.myid = myothertable.otherid) "
+             "ON othername = thirdtable.otherstuff"),
             (s4, sybase_d,
-                "SELECT thirdtable.userid, thirdtable.otherstuff "
-                "FROM thirdtable "
-                "hint3 JOIN (SELECT mytable.myid, mytable.name, "
-                "mytable.description, myothertable.otherid, "
-                "myothertable.othername FROM mytable hint1 "
-                "JOIN myothertable ON mytable.myid = myothertable.otherid) "
-                "ON othername = thirdtable.otherstuff"),
+             "SELECT thirdtable.userid, thirdtable.otherstuff "
+             "FROM thirdtable "
+             "hint3 JOIN (SELECT mytable.myid, mytable.name, "
+             "mytable.description, myothertable.otherid, "
+             "myothertable.othername FROM mytable hint1 "
+             "JOIN myothertable ON mytable.myid = myothertable.otherid) "
+             "ON othername = thirdtable.otherstuff"),
             (s4, oracle_d,
-                "SELECT /*+ hint3 */ thirdtable.userid, thirdtable.otherstuff "
-                "FROM thirdtable JOIN (SELECT /*+ hint1 */ mytable.myid,"
-                " mytable.name, mytable.description, myothertable.otherid,"
-                " myothertable.othername FROM mytable JOIN myothertable ON"
-                " mytable.myid = myothertable.otherid) ON othername ="
-                " thirdtable.otherstuff"),
+             "SELECT /*+ hint3 */ thirdtable.userid, thirdtable.otherstuff "
+             "FROM thirdtable JOIN (SELECT /*+ hint1 */ mytable.myid,"
+             " mytable.name, mytable.description, myothertable.otherid,"
+             " myothertable.othername FROM mytable JOIN myothertable ON"
+             " mytable.myid = myothertable.otherid) ON othername ="
+             " thirdtable.otherstuff"),
             # TODO: figure out dictionary ordering solution here
             #  (s5, oracle_d,
             #  "SELECT /*+ hint3 */ /*+ hint1 */ thirdtable.userid, "
@@ -2612,8 +2622,8 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
             #  " mytable.myid = myothertable.otherid) ON othername ="
             #  " thirdtable.otherstuff"),
             (s6, oracle_d,
-                """SELECT /*+ "QuotedName" idx1 */ "QuotedName".col1 """
-                """FROM "QuotedName" WHERE "QuotedName".col1 > :col1_1"""),
+             """SELECT /*+ "QuotedName" idx1 */ "QuotedName".col1 """
+             """FROM "QuotedName" WHERE "QuotedName".col1 > :col1_1"""),
             (s7, oracle_d,
              """SELECT /*+ "SomeName" idx1 */ "SomeName".col1 FROM """
              """"QuotedName" "SomeName" WHERE "SomeName".col1 > :col1_1"""),
@@ -2626,8 +2636,8 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
 
     def test_statement_hints(self):
 
-        stmt = select([table1.c.myid]).\
-            with_statement_hint("test hint one").\
+        stmt = select([table1.c.myid]). \
+            with_statement_hint("test hint one"). \
             with_statement_hint("test hint two", 'mysql')
 
         self.assert_compile(
@@ -2654,7 +2664,6 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
 
 
 class UnsupportedTest(fixtures.TestBase):
-
     def test_unsupported_element_str_visit_name(self):
         from sqlalchemy.sql.expression import ClauseElement
 
@@ -2672,7 +2681,6 @@ class UnsupportedTest(fixtures.TestBase):
         from sqlalchemy.sql.expression import ClauseElement
 
         class SomeElement(ClauseElement):
-
             @classmethod
             def __visit_name__(cls):
                 return "some_element"
@@ -2689,6 +2697,7 @@ class UnsupportedTest(fixtures.TestBase):
 
         def myop(x, y):
             pass
+
         binary = BinaryExpression(column("foo"), column("bar"), myop)
         assert_raises_message(
             exc.UnsupportedCompilationError,
@@ -2770,7 +2779,6 @@ class StringifySpecialTest(fixtures.TestBase):
 
 
 class KwargPropagationTest(fixtures.TestBase):
-
     @classmethod
     def setup_class(cls):
         from sqlalchemy.sql.expression import ColumnClause, TableClause
@@ -2804,8 +2812,8 @@ class KwargPropagationTest(fixtures.TestBase):
         self._do_test(self.column == 5)
 
     def test_select(self):
-        s = select([self.column]).select_from(self.table).\
-            where(self.column == self.criterion).\
+        s = select([self.column]).select_from(self.table). \
+            where(self.column == self.criterion). \
             order_by(self.column)
         self._do_test(s)
 
@@ -2830,7 +2838,7 @@ class CRUDTest(fixtures.TestBase, AssertsCompiledSQL):
             literal_binds=True)
 
     def test_update_literal_binds(self):
-        stmt = table1.update().values(name='jack').\
+        stmt = table1.update().values(name='jack'). \
             where(table1.c.name == 'jill')
 
         self.assert_compile(
@@ -2852,7 +2860,7 @@ class CRUDTest(fixtures.TestBase, AssertsCompiledSQL):
             table1,
             values={
                 table1.c.name:
-                text("(select name from mytable where id=mytable.id)")
+                    text("(select name from mytable where id=mytable.id)")
             }
         )
         self.assert_compile(
@@ -2863,21 +2871,21 @@ class CRUDTest(fixtures.TestBase, AssertsCompiledSQL):
         mt = table1.alias()
         u = update(table1, values={
             table1.c.name:
-            select([mt.c.name], mt.c.myid == table1.c.myid)
+                select([mt.c.name], mt.c.myid == table1.c.myid)
         })
         self.assert_compile(
             u, "UPDATE mytable SET name=(SELECT mytable_1.name FROM "
-            "mytable AS mytable_1 WHERE "
-            "mytable_1.myid = mytable.myid)")
+               "mytable AS mytable_1 WHERE "
+               "mytable_1.myid = mytable.myid)")
 
         # test against a regular constructed subquery
         s = select([table2], table2.c.otherid == table1.c.myid)
         u = update(table1, table1.c.name == 'jack', values={table1.c.name: s})
         self.assert_compile(
             u, "UPDATE mytable SET name=(SELECT myothertable.otherid, "
-            "myothertable.othername FROM myothertable WHERE "
-            "myothertable.otherid = mytable.myid) "
-            "WHERE mytable.name = :name_1")
+               "myothertable.othername FROM myothertable WHERE "
+               "myothertable.otherid = mytable.myid) "
+               "WHERE mytable.name = :name_1")
 
         # test a non-correlated WHERE clause
         s = select([table2.c.othername], table2.c.otherid == 7)
@@ -2898,16 +2906,16 @@ class CRUDTest(fixtures.TestBase, AssertsCompiledSQL):
                             "WHERE myothertable.otherid = mytable.myid)")
 
         # test correlated FROM implicit in WHERE and SET clauses
-        u = table1.update().values(name=table2.c.othername)\
-                  .where(table2.c.otherid == table1.c.myid)
+        u = table1.update().values(name=table2.c.othername) \
+            .where(table2.c.otherid == table1.c.myid)
         self.assert_compile(
             u, "UPDATE mytable SET name=myothertable.othername "
-            "FROM myothertable WHERE myothertable.otherid = mytable.myid")
-        u = table1.update().values(name='foo')\
-                  .where(table2.c.otherid == table1.c.myid)
+               "FROM myothertable WHERE myothertable.otherid = mytable.myid")
+        u = table1.update().values(name='foo') \
+            .where(table2.c.otherid == table1.c.myid)
         self.assert_compile(
             u, "UPDATE mytable SET name=:name "
-            "FROM myothertable WHERE myothertable.otherid = mytable.myid")
+               "FROM myothertable WHERE myothertable.otherid = mytable.myid")
 
         self.assert_compile(u,
                             "UPDATE mytable SET name=:name "
@@ -2946,13 +2954,13 @@ class CRUDTest(fixtures.TestBase, AssertsCompiledSQL):
         self.assert_compile(
             u.values(
                 x=3 +
-                bindparam('x')),
+                  bindparam('x')),
             "UPDATE foo SET x=(:param_1 + :x) WHERE foo.x = :x")
 
         self.assert_compile(
             u.values(
                 x=3 +
-                bindparam('x')),
+                  bindparam('x')),
             "UPDATE foo SET x=(:param_1 + :x) WHERE foo.x = :x",
             params={
                 'x': 1})
@@ -2960,7 +2968,7 @@ class CRUDTest(fixtures.TestBase, AssertsCompiledSQL):
         self.assert_compile(
             u.values(
                 x=3 +
-                bindparam('x')),
+                  bindparam('x')),
             "UPDATE foo SET x=(:param_1 + :x), y=:y WHERE foo.x = :x",
             params={
                 'x': 1,
@@ -3005,9 +3013,7 @@ class CRUDTest(fixtures.TestBase, AssertsCompiledSQL):
                 'x2': 1,
                 'y': 2})
 
-
     def test_labels_no_collision(self):
-
         t = table('foo', column('id'), column('foo_id'))
 
         self.assert_compile(
@@ -3031,6 +3037,7 @@ class DDLTest(fixtures.TestBase, AssertsCompiledSQL):
         @compiles(MyType)
         def compile(element, compiler, **kw):
             raise exc.CompileError("Couldn't compile type")
+
         return MyType
 
     def test_reraise_of_column_spec_issue(self):
@@ -3259,14 +3266,14 @@ class SchemaTest(fixtures.TestBase, AssertsCompiledSQL):
                                table4.c.value == 'hi'), use_labels=True)
         self.assert_compile(
             s, "SELECT remote_owner.remotetable.rem_id AS"
-            " remote_owner_remotetable_rem_id, "
-            "remote_owner.remotetable.datatype_id AS"
-            " remote_owner_remotetable_datatype_id, "
-            "remote_owner.remotetable.value "
-            "AS remote_owner_remotetable_value FROM "
-            "remote_owner.remotetable WHERE "
-            "remote_owner.remotetable.datatype_id = :datatype_id_1 AND "
-            "remote_owner.remotetable.value = :value_1")
+               " remote_owner_remotetable_rem_id, "
+               "remote_owner.remotetable.datatype_id AS"
+               " remote_owner_remotetable_datatype_id, "
+               "remote_owner.remotetable.value "
+               "AS remote_owner_remotetable_value FROM "
+               "remote_owner.remotetable WHERE "
+               "remote_owner.remotetable.datatype_id = :datatype_id_1 AND "
+               "remote_owner.remotetable.value = :value_1")
 
         # multi-part schema name
         self.assert_compile(table5.select(),
@@ -3331,7 +3338,7 @@ class SchemaTest(fixtures.TestBase, AssertsCompiledSQL):
 
         self.assert_compile(
             table1.update().where(table1.c.name == 'hi').
-            values(description='foo'),
+                values(description='foo'),
             "UPDATE bar.mytable SET description=:description "
             "WHERE bar.mytable.name = :name_1",
             schema_translate_map=schema_translate_map
@@ -3350,7 +3357,7 @@ class SchemaTest(fixtures.TestBase, AssertsCompiledSQL):
 
         self.assert_compile(
             table4.update().where(table4.c.value == 'hi').
-            values(value='there'),
+                values(value='there'),
             "UPDATE foob.remotetable SET value=:value "
             "WHERE foob.remotetable.value = :value_1",
             schema_translate_map=schema_translate_map
@@ -3648,8 +3655,8 @@ class CorrelateTest(fixtures.TestBase, AssertsCompiledSQL):
 
         self.assert_compile(
             s3, "SELECT t1.a FROM t1 ORDER BY "
-            "(SELECT foo(s.b) AS foo_1 FROM "
-            "(SELECT t2.b AS b FROM t2 WHERE t1.a = t2.a) AS s)")
+                "(SELECT foo(s.b) AS foo_1 FROM "
+                "(SELECT t2.b AS b FROM t2 WHERE t1.a = t2.a) AS s)")
 
     def test_multilevel_froms_correlation(self):
         # new as of #2748
@@ -3664,9 +3671,9 @@ class CorrelateTest(fixtures.TestBase, AssertsCompiledSQL):
         s = select([p]).where(s)
         self.assert_compile(
             s, "SELECT parent.id FROM parent WHERE EXISTS (SELECT * "
-            "FROM (SELECT child.id AS id, child.parent_id AS parent_id, "
-            "child.pos AS pos FROM child WHERE child.parent_id = parent.id "
-            "ORDER BY child.pos LIMIT :param_1) WHERE id = :id_1)")
+               "FROM (SELECT child.id AS id, child.parent_id AS parent_id, "
+               "child.pos AS pos FROM child WHERE child.parent_id = parent.id "
+               "ORDER BY child.pos LIMIT :param_1) WHERE id = :id_1)")
 
     def test_no_contextless_correlate_except(self):
         # new as of #2748
@@ -3675,7 +3682,7 @@ class CorrelateTest(fixtures.TestBase, AssertsCompiledSQL):
         t2 = table('t2', column('y'))
         t3 = table('t3', column('z'))
 
-        s = select([t1]).where(t1.c.x == t2.c.y).\
+        s = select([t1]).where(t1.c.x == t2.c.y). \
             where(t2.c.y == t3.c.z).correlate_except(t1)
         self.assert_compile(
             s,
@@ -3796,7 +3803,6 @@ class CoercionTest(fixtures.TestBase, AssertsCompiledSQL):
 
 
 class ResultMapTest(fixtures.TestBase):
-
     """test the behavior of the 'entry stack' and the determination
     when the result_map needs to be populated.
 
@@ -3888,7 +3894,7 @@ class ResultMapTest(fixtures.TestBase):
         Table('t1', m, astring)
         t2 = Table('t2', m, aint)
 
-        stmt = t2.insert().from_select(['a'], select([astring])).\
+        stmt = t2.insert().from_select(['a'], select([astring])). \
             returning(aint)
         comp = stmt.compile(dialect=postgresql.dialect())
         eq_(

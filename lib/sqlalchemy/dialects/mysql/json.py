@@ -60,7 +60,6 @@ class _FormatTypeMixin(object):
 
 
 class JSONIndexType(_FormatTypeMixin, sqltypes.JSON.JSONIndexType):
-
     def _format_value(self, value):
         if isinstance(value, int):
             value = "$[{0!s}]".format(value)
@@ -73,7 +72,7 @@ class JSONPathType(_FormatTypeMixin, sqltypes.JSON.JSONPathType):
     def _format_value(self, value):
         return "${0!s}".format((
             "".join([
-                "[{0!s}]".format(elem) if isinstance(elem, int)
-                else '."{0!s}"'.format(elem) for elem in value
-            ])
+                        "[{0!s}]".format(elem) if isinstance(elem, int)
+                        else '."{0!s}"'.format(elem) for elem in value
+                        ])
         ))

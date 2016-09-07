@@ -34,10 +34,12 @@ class ZxJDBCConnector(Connector):
 
     def _create_jdbc_url(self, url):
         """Create a JDBC url from a :class:`~sqlalchemy.engine.url.URL`"""
-        return 'jdbc:{0!s}://{1!s}{2!s}/{3!s}'.format(self.jdbc_db_name, url.host,
-                                      url.port is not None
-                                      and ':{0!s}'.format(url.port) or '',
-                                      url.database)
+        return 'jdbc:{0!s}://{1!s}{2!s}/{3!s}'.format(self.jdbc_db_name,
+                                                      url.host,
+                                                      url.port is not None
+                                                      and ':{0!s}'.format(
+                                                          url.port) or '',
+                                                      url.database)
 
     def create_connect_args(self, url):
         opts = self._driver_kwargs()

@@ -37,11 +37,12 @@ def test_flush_no_pk(n):
     session = Session(bind=engine)
     for chunk in range(0, n, 1000):
         session.add_all([
-            Customer(
-                name='customer name {0:d}'.format(i),
-                description='customer description {0:d}'.format(i))
-            for i in range(chunk, chunk + 1000)
-        ])
+                            Customer(
+                                name='customer name {0:d}'.format(i),
+                                description='customer description {0:d}'.format(
+                                    i))
+                            for i in range(chunk, chunk + 1000)
+                            ])
         session.flush()
     session.commit()
 
@@ -51,12 +52,13 @@ def test_bulk_save_return_pks(n):
     """Individual INSERT statements in "bulk", but calling upon last row id"""
     session = Session(bind=engine)
     session.bulk_save_objects([
-        Customer(
-            name='customer name {0:d}'.format(i),
-            description='customer description {0:d}'.format(i)
-        )
-        for i in range(n)
-    ], return_defaults=True)
+                                  Customer(
+                                      name='customer name {0:d}'.format(i),
+                                      description='customer description {0:d}'.format(
+                                          i)
+                                  )
+                                  for i in range(n)
+                                  ], return_defaults=True)
     session.commit()
 
 
@@ -66,12 +68,13 @@ def test_flush_pk_given(n):
     session = Session(bind=engine)
     for chunk in range(0, n, 1000):
         session.add_all([
-            Customer(
-                id=i + 1,
-                name='customer name {0:d}'.format(i),
-                description='customer description {0:d}'.format(i))
-            for i in range(chunk, chunk + 1000)
-        ])
+                            Customer(
+                                id=i + 1,
+                                name='customer name {0:d}'.format(i),
+                                description='customer description {0:d}'.format(
+                                    i))
+                            for i in range(chunk, chunk + 1000)
+                            ])
         session.flush()
     session.commit()
 
@@ -81,12 +84,13 @@ def test_bulk_save(n):
     """Batched INSERT statements via the ORM in "bulk", discarding PKs."""
     session = Session(bind=engine)
     session.bulk_save_objects([
-        Customer(
-            name='customer name {0:d}'.format(i),
-            description='customer description {0:d}'.format(i)
-        )
-        for i in range(n)
-    ])
+                                  Customer(
+                                      name='customer name {0:d}'.format(i),
+                                      description='customer description {0:d}'.format(
+                                          i)
+                                  )
+                                  for i in range(n)
+                                  ])
     session.commit()
 
 
@@ -100,7 +104,7 @@ def test_bulk_insert_mappings(n):
             description='customer description {0:d}'.format(i)
         )
         for i in range(n)
-    ])
+        ])
     session.commit()
 
 
@@ -116,7 +120,7 @@ def test_core_insert(n):
                 description='customer description {0:d}'.format(i)
             )
             for i in range(n)
-        ])
+            ])
 
 
 @Profiler.profile
@@ -127,12 +131,13 @@ def test_dbapi_raw(n):
     cursor = conn.cursor()
     compiled = Customer.__table__.insert().values(
         name=bindparam('name'),
-        description=bindparam('description')).\
+        description=bindparam('description')). \
         compile(dialect=engine.dialect)
 
     if compiled.positional:
         args = (
-            ('customer name {0:d}'.format(i), 'customer description {0:d}'.format(i))
+            ('customer name {0:d}'.format(i),
+             'customer description {0:d}'.format(i))
             for i in range(n))
     else:
         args = (
@@ -149,6 +154,7 @@ def test_dbapi_raw(n):
     )
     conn.commit()
     conn.close()
+
 
 if __name__ == '__main__':
     Profiler.main()

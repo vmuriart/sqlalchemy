@@ -183,7 +183,7 @@ class Load(Generative, MapperOption):
         return path
 
     def __str__(self):
-        return "Load(strategy={0!r})".format(self.strategy )
+        return "Load(strategy={0!r})".format(self.strategy)
 
     def _coerce_strat(self, strategy):
         if strategy is not None:
@@ -192,7 +192,7 @@ class Load(Generative, MapperOption):
 
     @_generative
     def set_relationship_strategy(
-            self, attr, strategy, propagate_to_loaders=True):
+        self, attr, strategy, propagate_to_loaders=True):
         strategy = self._coerce_strat(strategy)
 
         self.propagate_to_loaders = propagate_to_loaders
@@ -262,7 +262,8 @@ class Load(Generative, MapperOption):
 
                 if i == 0 and c_token.endswith(':' + _DEFAULT_TOKEN):
                     return to_chop
-                elif c_token != 'relationship:{0!s}'.format(_WILDCARD_TOKEN) and \
+                elif c_token != 'relationship:{0!s}'.format(
+                    _WILDCARD_TOKEN) and \
                         c_token != p_token.key:
                     return None
 
@@ -301,7 +302,7 @@ class _UnboundLoad(Load):
                 self.propagate_to_loaders = False
             attr = "{0!s}:{1!s}".format(wildcard_key, attr)
 
-        return path + (attr, )
+        return path + (attr,)
 
     def __getstate__(self):
         d = self.__dict__.copy()
@@ -336,13 +337,14 @@ class _UnboundLoad(Load):
             if isinstance(key, util.string_types):
                 # coerce fooload('*') into "default loader strategy"
                 if key == _WILDCARD_TOKEN:
-                    return (_DEFAULT_TOKEN, )
+                    return (_DEFAULT_TOKEN,)
                 # coerce fooload(".*") into "wildcard on default entity"
                 elif key.startswith("." + _WILDCARD_TOKEN):
                     key = key[1:]
                 return key.split(".")
             else:
                 return (key,)
+
         all_tokens = [token for key in keys for token in _split_key(key)]
 
         for token in all_tokens[0:-1]:
@@ -360,12 +362,12 @@ class _UnboundLoad(Load):
     def _chop_path(self, to_chop, path):
         i = -1
         for i, (c_token, (p_mapper, p_prop)) in enumerate(
-                zip(to_chop, path.pairs())):
+            zip(to_chop, path.pairs())):
             if isinstance(c_token, util.string_types):
                 if i == 0 and c_token.endswith(':' + _DEFAULT_TOKEN):
                     return to_chop
                 elif c_token != 'relationship:{0!s}'.format(
-                        _WILDCARD_TOKEN) and c_token != p_prop.key:
+                    _WILDCARD_TOKEN) and c_token != p_prop.key:
                     return None
             elif isinstance(c_token, PropComparator):
                 if c_token.property is not p_prop:
@@ -460,7 +462,7 @@ class _UnboundLoad(Load):
                     raise sa_exc.ArgumentError(
                         "Query has only expression-based entities - "
                         "can't find property named '%s'."
-                        % (token, )
+                        % (token,)
                     )
                 else:
                     raise sa_exc.ArgumentError(
@@ -494,7 +496,7 @@ class _UnboundLoad(Load):
                 raise sa_exc.ArgumentError(
                     "Query has only expression-based entities - "
                     "can't find property named '%s'."
-                    % (token, )
+                    % (token,)
                 )
             else:
                 return None
@@ -508,7 +510,8 @@ class loader_option(object):
         self.name = name = fn.__name__
         self.fn = fn
         if hasattr(Load, name):
-            raise TypeError("Load class already has a {0!s} method.".format((name)))
+            raise TypeError(
+                "Load class already has a {0!s} method.".format((name)))
         setattr(Load, name, fn)
 
         return self
@@ -990,7 +993,7 @@ def defer(loadopt, key):
 
     """
     return loadopt.set_column_strategy(
-        (key, ),
+        (key,),
         {"deferred": True, "instrument": True}
     )
 
@@ -998,7 +1001,7 @@ def defer(loadopt, key):
 @defer._add_unbound_fn
 def defer(key, *addl_attrs):
     return _UnboundLoad._from_keys(
-        _UnboundLoad.defer, (key, ) + addl_attrs, False, {})
+        _UnboundLoad.defer, (key,) + addl_attrs, False, {})
 
 
 @loader_option()
@@ -1037,7 +1040,7 @@ def undefer(loadopt, key):
 
     """
     return loadopt.set_column_strategy(
-        (key, ),
+        (key,),
         {"deferred": False, "instrument": True}
     )
 
@@ -1045,7 +1048,7 @@ def undefer(loadopt, key):
 @undefer._add_unbound_fn
 def undefer(key, *addl_attrs):
     return _UnboundLoad._from_keys(
-        _UnboundLoad.undefer, (key, ) + addl_attrs, False, {})
+        _UnboundLoad.undefer, (key,) + addl_attrs, False, {})
 
 
 @loader_option()

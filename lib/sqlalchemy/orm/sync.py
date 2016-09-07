@@ -40,13 +40,13 @@ def populate(source, source_mapper, dest, dest_mapper,
         # reasons, since we only need this info for a primary key
         # destination.
         if flag_cascaded_pks and l.primary_key and \
-                r.primary_key and \
-                r.references(l):
+            r.primary_key and \
+            r.references(l):
             uowcommit.attributes[("pk_cascaded", dest, r)] = True
 
 
 def bulk_populate_inherit_keys(
-        source_dict, source_mapper, synchronize_pairs):
+    source_dict, source_mapper, synchronize_pairs):
     # a simplified version of populate() used by bulk insert mode
     for l, r in synchronize_pairs:
         try:
@@ -65,9 +65,8 @@ def bulk_populate_inherit_keys(
 def clear(dest, dest_mapper, synchronize_pairs):
     for l, r in synchronize_pairs:
         if r.primary_key and \
-            dest_mapper._get_state_attr_by_column(
-                dest, dest.dict, r) not in orm_util._none_set:
-
+                dest_mapper._get_state_attr_by_column(
+                    dest, dest.dict, r) not in orm_util._none_set:
             raise AssertionError(
                 "Dependency rule tried to blank-out primary key "
                 "column '%s' on instance '%s'" %

@@ -23,7 +23,7 @@ or "table_per_association" instead of this approach.
 """
 from sqlalchemy.ext.declarative import as_declarative, declared_attr
 from sqlalchemy import create_engine, Integer, Column, \
-                    String, and_
+    String, and_
 from sqlalchemy.orm import Session, relationship, foreign, remote, backref
 from sqlalchemy import event
 
@@ -34,10 +34,13 @@ class Base(object):
     and surrogate primary key column.
 
     """
+
     @declared_attr
     def __tablename__(cls):
         return cls.__name__.lower()
+
     id = Column(Integer, primary_key=True)
+
 
 class Address(Base):
     """The Address class.
@@ -68,8 +71,10 @@ class Address(Base):
         return getattr(self, "parent_{0!s}".format(self.discriminator))
 
     def __repr__(self):
-        return "{0!s}(street={1!r}, city={2!r}, zip={3!r})".format(self.__class__.__name__, self.street,
+        return "{0!s}(street={1!r}, city={2!r}, zip={3!r})".format(
+            self.__class__.__name__, self.street,
             self.city, self.zip)
+
 
 class HasAddresses(object):
     """HasAddresses mixin, creates a relationship to
@@ -77,29 +82,37 @@ class HasAddresses(object):
 
     """
 
+
 @event.listens_for(HasAddresses, "mapper_configured", propagate=True)
 def setup_listener(mapper, class_):
     name = class_.__name__
     discriminator = name.lower()
     class_.addresses = relationship(Address,
-                        primaryjoin=and_(
-                                        class_.id == foreign(remote(Address.parent_id)),
+                                    primaryjoin=and_(
+                                        class_.id == foreign(
+                                            remote(Address.parent_id)),
                                         Address.discriminator == discriminator
                                     ),
-                        backref=backref(
-                                "parent_{0!s}".format(discriminator),
-                                primaryjoin=remote(class_.id) == foreign(Address.parent_id)
-                                )
-                        )
+                                    backref=backref(
+                                        "parent_{0!s}".format(discriminator),
+                                        primaryjoin=remote(
+                                            class_.id) == foreign(
+                                            Address.parent_id)
+                                    )
+                                    )
+
     @event.listens_for(class_.addresses, "append")
     def append_address(target, value, initiator):
         value.discriminator = discriminator
 
+
 class Customer(HasAddresses, Base):
     name = Column(String)
 
+
 class Supplier(HasAddresses, Base):
     company_name = Column(String)
+
 
 engine = create_engine('sqlite://', echo=True)
 Base.metadata.create_all(engine)
@@ -111,22 +124,22 @@ session.add_all([
         name='customer 1',
         addresses=[
             Address(
-                    street='123 anywhere street',
-                    city="New York",
-                    zip="10110"),
+                street='123 anywhere street',
+                city="New York",
+                zip="10110"),
             Address(
-                    street='40 main street',
-                    city="San Francisco",
-                    zip="95732")
+                street='40 main street',
+                city="San Francisco",
+                zip="95732")
         ]
     ),
     Supplier(
         company_name="Ace Hammers",
         addresses=[
             Address(
-                    street='2569 west elm',
-                    city="Detroit",
-                    zip="56785")
+                street='2569 west elm',
+                city="Detroit",
+                zip="56785")
         ]
     ),
 ])

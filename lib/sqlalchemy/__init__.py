@@ -54,7 +54,7 @@ from .sql import (
     union_all,
     update,
     within_group,
-    )
+)
 
 from .types import (
     ARRAY,
@@ -100,8 +100,7 @@ from .types import (
     UnicodeText,
     VARBINARY,
     VARCHAR,
-    )
-
+)
 
 from .schema import (
     CheckConstraint,
@@ -124,7 +123,6 @@ from .schema import (
     BLANK_SCHEMA
 )
 
-
 from .inspection import inspect
 from .engine import create_engine, engine_from_config
 
@@ -143,4 +141,6 @@ def __go(lcls):
                      if not (name.startswith('_') or _inspect.ismodule(obj)))
 
     _sa_util.dependencies.resolve_all("sqlalchemy")
+
+
 __go(locals())

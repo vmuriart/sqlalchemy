@@ -289,11 +289,10 @@ class VersioningTest(fixtures.MappedTest):
                 return self.context.rowcount
 
         with patch.object(
-                config.db.dialect, "supports_sane_multi_rowcount", False):
+            config.db.dialect, "supports_sane_multi_rowcount", False):
             with patch(
-                    "sqlalchemy.engine.result.ResultProxy.rowcount",
-                    rowcount):
-
+                "sqlalchemy.engine.result.ResultProxy.rowcount",
+                rowcount):
                 Foo = self.classes.Foo
                 s1 = self._fixture()
                 f1s1 = Foo(value='f1 value')
@@ -563,7 +562,6 @@ class RowSwitchTest(fixtures.MappedTest):
 
     @classmethod
     def setup_classes(cls):
-
         class P(cls.Basic):
             pass
 
@@ -754,7 +752,6 @@ class PlainInheritanceTest(fixtures.MappedTest):
 
     @classmethod
     def setup_classes(cls):
-
         class Base(cls.Basic):
             pass
 
@@ -806,7 +803,6 @@ class InheritanceTwoVersionIdsTest(fixtures.MappedTest):
 
     @classmethod
     def setup_classes(cls):
-
         class Base(cls.Basic):
             pass
 

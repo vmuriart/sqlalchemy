@@ -3,7 +3,7 @@ from sqlalchemy import exc as exceptions, select, MetaData, Integer, or_, \
 from sqlalchemy.engine import default
 from sqlalchemy.sql import table, column
 from sqlalchemy.sql.elements import _truncated_label
-from sqlalchemy.testing import AssertsCompiledSQL, assert_raises, engines,\
+from sqlalchemy.testing import AssertsCompiledSQL, assert_raises, engines, \
     fixtures, eq_
 from sqlalchemy.testing.schema import Table, Column
 
@@ -56,7 +56,7 @@ class MaxIdentTest(fixtures.TestBase, AssertsCompiledSQL):
         on = table1.c.this_is_the_data_column == ta.c.this_is_the_data_column
         self.assert_compile(
             select([table1, ta]).select_from(table1.join(ta, on)).
-            where(ta.c.this_is_the_data_column == 'data3'),
+                where(ta.c.this_is_the_data_column == 'data3'),
             'SELECT '
             'some_large_named_table.this_is_the_primarykey_column, '
             'some_large_named_table.this_is_the_data_column, '
@@ -90,7 +90,8 @@ class MaxIdentTest(fixtures.TestBase, AssertsCompiledSQL):
         table1 = self.table1
         compiled = s.compile(dialect=self._length_fixture())
 
-        assert set(compiled._create_result_map()['some_large_named_table__2'][1]).\
+        assert set(
+            compiled._create_result_map()['some_large_named_table__2'][1]). \
             issuperset(
             [
                 'some_large_named_table_this_is_the_data_column',
@@ -99,7 +100,8 @@ class MaxIdentTest(fixtures.TestBase, AssertsCompiledSQL):
             ]
         )
 
-        assert set(compiled._create_result_map()['some_large_named_table__1'][1]).\
+        assert set(
+            compiled._create_result_map()['some_large_named_table__1'][1]). \
             issuperset(
             [
                 'some_large_named_table_this_is_the_primarykey_column',
@@ -110,7 +112,7 @@ class MaxIdentTest(fixtures.TestBase, AssertsCompiledSQL):
 
     def test_result_map_use_labels(self):
         table1 = self.table1
-        s = table1.select().apply_labels().\
+        s = table1.select().apply_labels(). \
             order_by(table1.c.this_is_the_primarykey_column)
 
         self._assert_labeled_table1_select(s)
@@ -122,26 +124,26 @@ class MaxIdentTest(fixtures.TestBase, AssertsCompiledSQL):
         # generated result map corresponds to the selected table, not the
         # select query
         s = table1.select(use_labels=True,
-                          order_by=[table1.c.this_is_the_primarykey_column]).\
+                          order_by=[table1.c.this_is_the_primarykey_column]). \
             limit(2)
         self._assert_labeled_table1_select(s)
 
     def test_result_map_subquery(self):
         table1 = self.table1
         s = table1.select(
-            table1.c.this_is_the_primarykey_column == 4).\
+            table1.c.this_is_the_primarykey_column == 4). \
             alias('foo')
         s2 = select([s])
         compiled = s2.compile(dialect=self._length_fixture())
         assert \
-            set(compiled._create_result_map()['this_is_the_data_column'][1]).\
-            issuperset(['this_is_the_data_column',
-                        s.c.this_is_the_data_column])
+            set(compiled._create_result_map()['this_is_the_data_column'][1]). \
+                issuperset(['this_is_the_data_column',
+                            s.c.this_is_the_data_column])
         assert \
-            set(compiled._create_result_map()['this_is_the_primarykey__1'][1]).\
-            issuperset(['this_is_the_primarykey_column',
-                        'this_is_the_primarykey__1',
-                        s.c.this_is_the_primarykey_column])
+            set(compiled._create_result_map()['this_is_the_primarykey__1'][1]). \
+                issuperset(['this_is_the_primarykey_column',
+                            'this_is_the_primarykey__1',
+                            s.c.this_is_the_primarykey_column])
 
     def test_result_map_anon_alias(self):
         table1 = self.table1
@@ -170,19 +172,21 @@ class MaxIdentTest(fixtures.TestBase, AssertsCompiledSQL):
             "AS anon_1", dialect=dialect)
 
         compiled = s.compile(dialect=dialect)
-        assert set(compiled._create_result_map()['anon_1_this_is_the_data_3'][1]).\
+        assert set(
+            compiled._create_result_map()['anon_1_this_is_the_data_3'][1]). \
             issuperset([
-                'anon_1_this_is_the_data_3',
-                q.corresponding_column(
-                    table1.c.this_is_the_data_column)
-            ])
+            'anon_1_this_is_the_data_3',
+            q.corresponding_column(
+                table1.c.this_is_the_data_column)
+        ])
 
-        assert set(compiled._create_result_map()['anon_1_this_is_the_prim_1'][1]).\
+        assert set(
+            compiled._create_result_map()['anon_1_this_is_the_prim_1'][1]). \
             issuperset([
-                'anon_1_this_is_the_prim_1',
-                q.corresponding_column(
-                    table1.c.this_is_the_primarykey_column)
-            ])
+            'anon_1_this_is_the_prim_1',
+            q.corresponding_column(
+                table1.c.this_is_the_primarykey_column)
+        ])
 
     def test_column_bind_labels_1(self):
         table1 = self.table1
@@ -206,7 +210,7 @@ class MaxIdentTest(fixtures.TestBase, AssertsCompiledSQL):
             "FROM some_large_named_table WHERE "
             "some_large_named_table.this_is_the_primarykey_column = "
             "%s",
-            checkpositional=(4, ),
+            checkpositional=(4,),
             checkparams={'this_is_the_primarykey__1': 4},
             dialect=self._length_fixture(positional=True)
         )
@@ -313,20 +317,20 @@ class LabelLengthTest(fixtures.TestBase, AssertsCompiledSQL):
         compile_dialect = default.DefaultDialect(label_length=10)
         self.assert_compile(
             x, 'SELECT '
-            'foo.this_1, foo.this_2 '
-            'FROM ('
-            'SELECT '
-            'some_large_named_table.this_is_the_primarykey_column '
-            'AS this_1, '
-            'some_large_named_table.this_is_the_data_column '
-            'AS this_2 '
-            'FROM '
-            'some_large_named_table '
-            'WHERE '
-            'some_large_named_table.this_is_the_primarykey_column '
-            '= :this_1'
-            ') '
-            'AS foo', dialect=compile_dialect)
+               'foo.this_1, foo.this_2 '
+               'FROM ('
+               'SELECT '
+               'some_large_named_table.this_is_the_primarykey_column '
+               'AS this_1, '
+               'some_large_named_table.this_is_the_data_column '
+               'AS this_2 '
+               'FROM '
+               'some_large_named_table '
+               'WHERE '
+               'some_large_named_table.this_is_the_primarykey_column '
+               '= :this_1'
+               ') '
+               'AS foo', dialect=compile_dialect)
 
     def test_adjustable_2(self):
         table1 = self.table1
@@ -338,20 +342,20 @@ class LabelLengthTest(fixtures.TestBase, AssertsCompiledSQL):
         compile_dialect = default.DefaultDialect(label_length=10)
         self.assert_compile(
             x, 'SELECT '
-            'foo.this_1, foo.this_2 '
-            'FROM ('
-            'SELECT '
-            'some_large_named_table.this_is_the_primarykey_column '
-            'AS this_1, '
-            'some_large_named_table.this_is_the_data_column '
-            'AS this_2 '
-            'FROM '
-            'some_large_named_table '
-            'WHERE '
-            'some_large_named_table.this_is_the_primarykey_column '
-            '= :this_1'
-            ') '
-            'AS foo', dialect=compile_dialect)
+               'foo.this_1, foo.this_2 '
+               'FROM ('
+               'SELECT '
+               'some_large_named_table.this_is_the_primarykey_column '
+               'AS this_1, '
+               'some_large_named_table.this_is_the_data_column '
+               'AS this_2 '
+               'FROM '
+               'some_large_named_table '
+               'WHERE '
+               'some_large_named_table.this_is_the_primarykey_column '
+               '= :this_1'
+               ') '
+               'AS foo', dialect=compile_dialect)
 
     def test_adjustable_3(self):
         table1 = self.table1
@@ -363,20 +367,20 @@ class LabelLengthTest(fixtures.TestBase, AssertsCompiledSQL):
 
         self.assert_compile(
             x, 'SELECT '
-            'foo._1, foo._2 '
-            'FROM ('
-            'SELECT '
-            'some_large_named_table.this_is_the_primarykey_column '
-            'AS _1, '
-            'some_large_named_table.this_is_the_data_column '
-            'AS _2 '
-            'FROM '
-            'some_large_named_table '
-            'WHERE '
-            'some_large_named_table.this_is_the_primarykey_column '
-            '= :_1'
-            ') '
-            'AS foo', dialect=compile_dialect)
+               'foo._1, foo._2 '
+               'FROM ('
+               'SELECT '
+               'some_large_named_table.this_is_the_primarykey_column '
+               'AS _1, '
+               'some_large_named_table.this_is_the_data_column '
+               'AS _2 '
+               'FROM '
+               'some_large_named_table '
+               'WHERE '
+               'some_large_named_table.this_is_the_primarykey_column '
+               '= :_1'
+               ') '
+               'AS foo', dialect=compile_dialect)
 
     def test_adjustable_4(self):
         table1 = self.table1
@@ -387,21 +391,21 @@ class LabelLengthTest(fixtures.TestBase, AssertsCompiledSQL):
         compile_dialect = default.DefaultDialect(label_length=10)
         self.assert_compile(
             x, 'SELECT '
-            'anon_1.this_2 AS anon_1, '
-            'anon_1.this_4 AS anon_3 '
-            'FROM ('
-            'SELECT '
-            'some_large_named_table.this_is_the_primarykey_column '
-            'AS this_2, '
-            'some_large_named_table.this_is_the_data_column '
-            'AS this_4 '
-            'FROM '
-            'some_large_named_table '
-            'WHERE '
-            'some_large_named_table.this_is_the_primarykey_column '
-            '= :this_1'
-            ') '
-            'AS anon_1', dialect=compile_dialect)
+               'anon_1.this_2 AS anon_1, '
+               'anon_1.this_4 AS anon_3 '
+               'FROM ('
+               'SELECT '
+               'some_large_named_table.this_is_the_primarykey_column '
+               'AS this_2, '
+               'some_large_named_table.this_is_the_data_column '
+               'AS this_4 '
+               'FROM '
+               'some_large_named_table '
+               'WHERE '
+               'some_large_named_table.this_is_the_primarykey_column '
+               '= :this_1'
+               ') '
+               'AS anon_1', dialect=compile_dialect)
 
     def test_adjustable_5(self):
         table1 = self.table1
@@ -411,27 +415,27 @@ class LabelLengthTest(fixtures.TestBase, AssertsCompiledSQL):
         compile_dialect = default.DefaultDialect(label_length=4)
         self.assert_compile(
             x, 'SELECT '
-            '_1._2 AS _1, '
-            '_1._4 AS _3 '
-            'FROM ('
-            'SELECT '
-            'some_large_named_table.this_is_the_primarykey_column '
-            'AS _2, '
-            'some_large_named_table.this_is_the_data_column '
-            'AS _4 '
-            'FROM '
-            'some_large_named_table '
-            'WHERE '
-            'some_large_named_table.this_is_the_primarykey_column '
-            '= :_1'
-            ') '
-            'AS _1', dialect=compile_dialect)
+               '_1._2 AS _1, '
+               '_1._4 AS _3 '
+               'FROM ('
+               'SELECT '
+               'some_large_named_table.this_is_the_primarykey_column '
+               'AS _2, '
+               'some_large_named_table.this_is_the_data_column '
+               'AS _4 '
+               'FROM '
+               'some_large_named_table '
+               'WHERE '
+               'some_large_named_table.this_is_the_primarykey_column '
+               '= :_1'
+               ') '
+               'AS _1', dialect=compile_dialect)
 
     def test_adjustable_result_schema_column_1(self):
         table1 = self.table1
 
         q = table1.select(
-            table1.c.this_is_the_primarykey_column == 4).apply_labels().\
+            table1.c.this_is_the_primarykey_column == 4).apply_labels(). \
             alias('foo')
 
         dialect = default.DefaultDialect(label_length=10)
@@ -495,7 +499,7 @@ class LabelLengthTest(fixtures.TestBase, AssertsCompiledSQL):
 
         self.assert_compile(
             select([other_table, anon]).
-            select_from(j1).apply_labels(),
+                select_from(j1).apply_labels(),
             'SELECT '
             'other_thirty_characters_table_.id '
             'AS other_thirty_characters__1, '
@@ -563,5 +567,3 @@ class LabelLengthTest(fixtures.TestBase, AssertsCompiledSQL):
             set(compiled._create_result_map()),
             set(['tablename_columnn_1', 'tablename_columnn_2'])
         )
-
-

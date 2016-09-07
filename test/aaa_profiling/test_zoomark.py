@@ -4,10 +4,9 @@ from __future__ import unicode_literals
 
 An adaptation of Robert Brewers' ZooMark speed tests. """
 
-
 import datetime
 from sqlalchemy import Table, Column, Integer, Unicode, Date, \
-    DateTime, Time, Float, Sequence, ForeignKey,  \
+    DateTime, Time, Float, Sequence, ForeignKey, \
     select, join, and_, outerjoin, func
 from sqlalchemy.testing import replay_fixture
 
@@ -15,7 +14,6 @@ ITERATIONS = 1
 
 
 class ZooMarkTest(replay_fixture.ReplayFixtureTest):
-
     """Runs the ZooMark and squawks if method counts vary from the norm."""
 
     __requires__ = 'cpython',
@@ -106,7 +104,7 @@ class ZooMarkTest(replay_fixture.ReplayFixtureTest):
                                    Lifespan=73.5).inserted_primary_key[0]
         engine.execute(Animal.update(Animal.c.ID == leopardid), ZooID=wap,
                        LastEscape=datetime.datetime(
-                           2004, 12, 21, 8, 15, 0, 999907,)
+                           2004, 12, 21, 8, 15, 0, 999907, )
                        )
         engine.execute(
             Animal.insert(),
@@ -157,14 +155,13 @@ class ZooMarkTest(replay_fixture.ReplayFixtureTest):
             return list(engine.execute(select).first())
 
         for x in range(ITERATIONS):
-
             # Zoos
 
             fullobject(Zoo.select(Zoo.c.Name == 'Wild Animal Park'))
             fullobject(Zoo.select(Zoo.c.Founded ==
-                       datetime.date(1935, 9, 13)))
+                                  datetime.date(1935, 9, 13)))
             fullobject(Zoo.select(Zoo.c.Name ==
-                       'Montr\xe9al Biod\xf4me'))
+                                  'Montr\xe9al Biod\xf4me'))
             fullobject(Zoo.select(Zoo.c.Admission == float(60)))
 
             # Animals
@@ -188,9 +185,9 @@ class ZooMarkTest(replay_fixture.ReplayFixtureTest):
             assert len(fulltable(Zoo.select())) == 5
             assert len(fulltable(Animal.select())) == ITERATIONS + 12
             assert len(fulltable(Animal.select(Animal.c.Legs == 4))) \
-                == 4
+                   == 4
             assert len(fulltable(Animal.select(Animal.c.Legs == 2))) \
-                == 5
+                   == 5
             assert len(
                 fulltable(
                     Animal.select(
@@ -198,7 +195,7 @@ class ZooMarkTest(replay_fixture.ReplayFixtureTest):
                             Animal.c.Legs >= 2,
                             Animal.c.Legs < 20)))) == ITERATIONS + 9
             assert len(fulltable(Animal.select(Animal.c.Legs > 10))) \
-                == 2
+                   == 2
             assert len(fulltable(Animal.select(Animal.c.Lifespan
                                                > 70))) == 2
             assert len(fulltable(Animal.select(Animal.c.Species.
@@ -309,7 +306,7 @@ class ZooMarkTest(replay_fixture.ReplayFixtureTest):
                 'Tick': None,
             }
             for species, lifespan in engine.execute(
-                    select([Animal.c.Species, Animal.c.Lifespan])).fetchall():
+                select([Animal.c.Species, Animal.c.Lifespan])).fetchall():
                 assert lifespan == expected[species]
             expected = ['Montr\xe9al Biod\xf4me', 'Wild Animal Park']
             e = select([Zoo.c.Name],
@@ -334,7 +331,6 @@ class ZooMarkTest(replay_fixture.ReplayFixtureTest):
         Zoo = self.metadata.tables['Zoo']
         engine = self.metadata.bind
         for x in range(ITERATIONS):
-
             # Edit
 
             SDZ = engine.execute(Zoo.select(Zoo.c.Name == 'San Diego Zoo'
@@ -356,7 +352,7 @@ class ZooMarkTest(replay_fixture.ReplayFixtureTest):
             # Change it back
 
             engine.execute(Zoo.update(Zoo.c.ID == SDZ['ID'
-                                                      ]), Name='San Diego Zoo',
+            ]), Name='San Diego Zoo',
                            Founded=datetime.date(1935, 9, 13),
                            Opens=datetime.time(9, 0, 0),
                            Admission='0')

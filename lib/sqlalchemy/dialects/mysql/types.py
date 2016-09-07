@@ -32,9 +32,9 @@ class _FloatType(_NumericType, sqltypes.Float):
     def __init__(self, precision=None, scale=None, asdecimal=True, **kw):
         if isinstance(self, (REAL, DOUBLE)) and \
             (
-                (precision is None and scale is not None) or
-                (precision is not None and scale is None)
-        ):
+                    (precision is None and scale is not None) or
+                    (precision is not None and scale is None)
+            ):
             raise exc.ArgumentError(
                 "You must specify both precision and scale or omit "
                 "both altogether.")
@@ -86,7 +86,6 @@ class _MatchType(sqltypes.Float, sqltypes.MatchType):
         # TODO: float arguments?
         sqltypes.Float.__init__(self)
         sqltypes.MatchType.__init__(self)
-
 
 
 class NUMERIC(_NumericType, sqltypes.NUMERIC):
@@ -374,6 +373,7 @@ class BIT(sqltypes.TypeEngine):
                     v = v << 8 | i
                 return v
             return value
+
         return process
 
 
@@ -419,6 +419,7 @@ class TIME(sqltypes.TIME):
                             microsecond=microseconds)
             else:
                 return None
+
         return process
 
 

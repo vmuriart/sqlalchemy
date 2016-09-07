@@ -12,12 +12,12 @@ from ..sql import operators
 class UnevaluatableError(Exception):
     pass
 
+
 _straight_ops = set(getattr(operators, op)
                     for op in ('add', 'mul', 'sub',
                                'div',
                                'mod', 'truediv',
                                'lt', 'le', 'ne', 'gt', 'ge', 'eq'))
-
 
 _notimplemented_ops = set(getattr(operators, op)
                           for op in ('like_op', 'notlike_op', 'ilike_op',
@@ -52,10 +52,10 @@ class EvaluatorCompiler(object):
         if 'parentmapper' in clause._annotations:
             parentmapper = clause._annotations['parentmapper']
             if self.target_cls and not issubclass(
-                    self.target_cls, parentmapper.class_):
+                self.target_cls, parentmapper.class_):
                 raise UnevaluatableError(
                     "Can't evaluate criteria against alternate class {0!s}".format(
-                    parentmapper.class_)
+                        parentmapper.class_)
                 )
             key = parentmapper._columntoproperty[clause].key
         else:
@@ -89,7 +89,7 @@ class EvaluatorCompiler(object):
         else:
             raise UnevaluatableError(
                 "Cannot evaluate clauselist with operator {0!s}".format(
-                clause.operator))
+                    clause.operator))
 
         return evaluate
 
@@ -112,7 +112,8 @@ class EvaluatorCompiler(object):
                 return operator(eval_left(obj), eval_right(obj))
         else:
             raise UnevaluatableError(
-                "Cannot evaluate {0!s} with operator {1!s}".format(type(clause).__name__, clause.operator))
+                "Cannot evaluate {0!s} with operator {1!s}".format(
+                    type(clause).__name__, clause.operator))
         return evaluate
 
     def visit_unary(self, clause):
@@ -123,9 +124,11 @@ class EvaluatorCompiler(object):
                 if value is None:
                     return None
                 return not value
+
             return evaluate
         raise UnevaluatableError(
-            "Cannot evaluate {0!s} with operator {1!s}".format(type(clause).__name__, clause.operator))
+            "Cannot evaluate {0!s} with operator {1!s}".format(
+                type(clause).__name__, clause.operator))
 
     def visit_bindparam(self, clause):
         if clause.callable:

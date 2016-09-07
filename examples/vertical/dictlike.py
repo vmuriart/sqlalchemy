@@ -32,6 +32,7 @@ can be used with many common vertical schemas as-is or with minor adaptations.
 """
 from __future__ import unicode_literals
 
+
 class ProxiedDictMixin(object):
     """Adds obj[key] access to a mapped class.
 
@@ -62,13 +63,14 @@ class ProxiedDictMixin(object):
 
 if __name__ == '__main__':
     from sqlalchemy import (Column, Integer, Unicode,
-        ForeignKey, UnicodeText, and_, create_engine)
+                            ForeignKey, UnicodeText, and_, create_engine)
     from sqlalchemy.orm import relationship, Session
     from sqlalchemy.orm.collections import attribute_mapped_collection
     from sqlalchemy.ext.declarative import declarative_base
     from sqlalchemy.ext.associationproxy import association_proxy
 
     Base = declarative_base()
+
 
     class AnimalFact(Base):
         """A fact about an animal."""
@@ -79,6 +81,7 @@ if __name__ == '__main__':
         key = Column(Unicode(64), primary_key=True)
         value = Column(UnicodeText)
 
+
     class Animal(ProxiedDictMixin, Base):
         """an Animal"""
 
@@ -88,11 +91,13 @@ if __name__ == '__main__':
         name = Column(Unicode(100))
 
         facts = relationship("AnimalFact",
-                    collection_class=attribute_mapped_collection('key'))
+                             collection_class=attribute_mapped_collection(
+                                 'key'))
 
         _proxied = association_proxy("facts", "value",
-                            creator=
-                            lambda key, value: AnimalFact(key=key, value=value))
+                                     creator=
+                                     lambda key, value: AnimalFact(key=key,
+                                                                   value=value))
 
         def __init__(self, name):
             self.name = name
@@ -103,6 +108,7 @@ if __name__ == '__main__':
         @classmethod
         def with_characteristic(self, key, value):
             return self.facts.any(key=key, value=value)
+
 
     engine = create_engine("sqlite://")
     Base.metadata.create_all(engine)
@@ -144,22 +150,19 @@ if __name__ == '__main__':
     session.add(loris)
 
     q = (session.query(Animal).
-         filter(Animal.facts.any(
-           and_(AnimalFact.key == 'color',
-                AnimalFact.value == 'reddish'))))
+        filter(Animal.facts.any(
+        and_(AnimalFact.key == 'color',
+             AnimalFact.value == 'reddish'))))
     print('reddish animals', q.all())
 
-    q = session.query(Animal).\
-            filter(Animal.with_characteristic("color", 'brown'))
+    q = session.query(Animal). \
+        filter(Animal.with_characteristic("color", 'brown'))
     print('brown animals', q.all())
 
-    q = session.query(Animal).\
-           filter(~Animal.with_characteristic("poisonous-part", 'elbows'))
+    q = session.query(Animal). \
+        filter(~Animal.with_characteristic("poisonous-part", 'elbows'))
     print('animals without poisonous-part == elbows', q.all())
 
     q = (session.query(Animal).
          filter(Animal.facts.any(value='somewhat')))
     print('any animal with any .value of "somewhat"', q.all())
-
-
-

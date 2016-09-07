@@ -5,11 +5,12 @@ from sqlalchemy import exc, util
 from sqlalchemy import inspection, inspect
 from sqlalchemy.testing import fixtures
 
+
 class TestFixture(object):
     pass
 
-class TestInspection(fixtures.TestBase):
 
+class TestInspection(fixtures.TestBase):
     def tearDown(self):
         for type_ in list(inspection._registrars):
             if issubclass(type_, TestFixture):
@@ -21,7 +22,7 @@ class TestInspection(fixtures.TestBase):
 
         @inspection._inspects(SomeFoo)
         def insp_somefoo(subject):
-            return {"insp":subject}
+            return {"insp": subject}
 
         somefoo = SomeFoo()
         insp = inspect(somefoo)
@@ -44,6 +45,7 @@ class TestInspection(fixtures.TestBase):
         class SomeFooInspect(object):
             def __init__(self, target):
                 self.target = target
+
         SomeFooInspect = inspection._inspects(SomeFoo)(SomeFooInspect)
 
         somefoo = SomeFoo()

@@ -21,7 +21,6 @@ from sqlalchemy.testing import expect_deprecated
 
 
 class MiscTest(fixtures.TestBase, AssertsExecutionResults, AssertsCompiledSQL):
-
     __only_on__ = 'postgresql'
     __backend__ = True
 
@@ -46,27 +45,27 @@ class MiscTest(fixtures.TestBase, AssertsExecutionResults, AssertsCompiledSQL):
                 execute=Mock(return_value=Mock(scalar=Mock(return_value=res))))
 
         for string, version in [
-                (
-                    'PostgreSQL 8.3.8 on i686-redhat-linux-gnu, compiled by '
-                    'GCC gcc (GCC) 4.1.2 20070925 (Red Hat 4.1.2-33)',
-                    (8, 3, 8)),
-                (
-                    'PostgreSQL 8.5devel on x86_64-unknown-linux-gnu, '
-                    'compiled by GCC gcc (GCC) 4.4.2, 64-bit', (8, 5)),
-                (
-                    'EnterpriseDB 9.1.2.2 on x86_64-unknown-linux-gnu, '
-                    'compiled by gcc (GCC) 4.1.2 20080704 (Red Hat 4.1.2-50), '
-                    '64-bit', (9, 1, 2)),
-                (
-                    '[PostgreSQL 9.2.4 ] VMware vFabric Postgres 9.2.4.0 '
-                    'release build 1080137', (9, 2, 4))]:
+            (
+                'PostgreSQL 8.3.8 on i686-redhat-linux-gnu, compiled by '
+                'GCC gcc (GCC) 4.1.2 20070925 (Red Hat 4.1.2-33)',
+                (8, 3, 8)),
+            (
+                'PostgreSQL 8.5devel on x86_64-unknown-linux-gnu, '
+                'compiled by GCC gcc (GCC) 4.4.2, 64-bit', (8, 5)),
+            (
+                'EnterpriseDB 9.1.2.2 on x86_64-unknown-linux-gnu, '
+                'compiled by gcc (GCC) 4.1.2 20080704 (Red Hat 4.1.2-50), '
+                '64-bit', (9, 1, 2)),
+            (
+                '[PostgreSQL 9.2.4 ] VMware vFabric Postgres 9.2.4.0 '
+                'release build 1080137', (9, 2, 4))]:
             eq_(testing.db.dialect._get_server_version_info(mock_conn(string)),
                 version)
 
     @testing.requires.psycopg2_compatibility
     def test_psycopg2_version(self):
         v = testing.db.dialect.psycopg2_version
-        assert testing.db.dialect.dbapi.__version__.\
+        assert testing.db.dialect.dbapi.__version__. \
             startswith(".".join(str(x) for x in v))
 
     @testing.requires.psycopg2_compatibility
@@ -84,8 +83,8 @@ class MiscTest(fixtures.TestBase, AssertsExecutionResults, AssertsCompiledSQL):
 
     def test_deprecated_dialect_name_still_loads(self):
         with expect_deprecated(
-                "The 'postgres' dialect name "
-                "has been renamed to 'postgresql'"):
+            "The 'postgres' dialect name "
+            "has been renamed to 'postgresql'"):
             dialect = url.URL("postgres").get_dialect()
         is_(dialect, postgresql.dialect)
 
@@ -167,9 +166,10 @@ class MiscTest(fixtures.TestBase, AssertsExecutionResults, AssertsCompiledSQL):
                       "of org.python.core.PyObjectDerived.")
     def test_extract(self):
         fivedaysago = datetime.datetime.now() \
-            - datetime.timedelta(days=5)
+                      - datetime.timedelta(days=5)
         for field, exp in ('year', fivedaysago.year), \
-                ('month', fivedaysago.month), ('day', fivedaysago.day):
+                          ('month', fivedaysago.month), (
+                              'day', fivedaysago.day):
             r = testing.db.execute(
                 select([
                     extract(field, func.now() + datetime.timedelta(days=-5))])

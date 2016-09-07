@@ -132,13 +132,13 @@ class _LW(AbstractKeyedTuple):
 
 class ImmutableContainer(object):
     def _immutable(self, *arg, **kw):
-        raise TypeError("{0!s} object is immutable".format(self.__class__.__name__))
+        raise TypeError(
+            "{0!s} object is immutable".format(self.__class__.__name__))
 
     __delitem__ = __setitem__ = __setattr__ = _immutable
 
 
 class immutabledict(ImmutableContainer, dict):
-
     clear = pop = popitem = setdefault = \
         update = ImmutableContainer._immutable
 
@@ -151,7 +151,7 @@ class immutabledict(ImmutableContainer, dict):
         pass
 
     def __reduce__(self):
-        return immutabledict, (dict(self), )
+        return immutabledict, (dict(self),)
 
     def union(self, d):
         if not d:
@@ -667,14 +667,15 @@ class IdentitySet(object):
         raise TypeError('set objects are unhashable')
 
     def __repr__(self):
-        return '{0!s}({1!r})'.format(type(self).__name__, list(self._members.values()))
+        return '{0!s}({1!r})'.format(type(self).__name__,
+                                     list(self._members.values()))
 
 
 class WeakSequence(object):
     def __init__(self, __elements=()):
         self._storage = [
             weakref.ref(element, self._remove) for element in __elements
-        ]
+            ]
 
     def append(self, item):
         self._storage.append(weakref.ref(item, self._remove))
@@ -729,6 +730,7 @@ class PopulateDict(dict):
         self[key] = val = self.creator(key)
         return val
 
+
 # Define collections that are capable of storing
 # ColumnElement objects as hashable keys/elements.
 # At this point, these are mostly historical, things
@@ -737,7 +739,6 @@ column_set = set
 column_dict = dict
 ordered_column_set = OrderedSet
 populate_column_dict = PopulateDict
-
 
 _getters = PopulateDict(operator.itemgetter)
 
@@ -796,7 +797,7 @@ def to_list(x, default=None):
     if x is None:
         return default
     if not isinstance(x, collections.Iterable) or \
-            isinstance(x, string_types + binary_types):
+        isinstance(x, string_types + binary_types):
         return [x]
     elif isinstance(x, list):
         return x
@@ -932,7 +933,7 @@ _lw_tuples = LRUCache(100)
 
 
 def lightweight_named_tuple(name, fields):
-    hash_ = (name, ) + tuple(fields)
+    hash_ = (name,) + tuple(fields)
     tp_cls = _lw_tuples.get(hash_)
     if tp_cls:
         return tp_cls
@@ -940,9 +941,9 @@ def lightweight_named_tuple(name, fields):
     tp_cls = type(
         name, (_LW,),
         dict([
-            (field, _property_getters[idx])
-            for idx, field in enumerate(fields) if field is not None
-        ] + [('__slots__', ())])
+                 (field, _property_getters[idx])
+                 for idx, field in enumerate(fields) if field is not None
+                 ] + [('__slots__', ())])
     )
 
     tp_cls._real_fields = fields

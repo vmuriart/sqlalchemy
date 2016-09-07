@@ -13,7 +13,6 @@ from sqlalchemy.testing.schema import Table, Column
 
 
 class Employee(object):
-
     def __init__(self, name):
         self.name = name
 
@@ -22,42 +21,39 @@ class Employee(object):
 
 
 class Manager(Employee):
-
     def __init__(self, name, manager_data):
         self.name = name
         self.manager_data = manager_data
 
     def __repr__(self):
         return self.__class__.__name__ + ' ' + self.name + ' ' \
-            + self.manager_data
+               + self.manager_data
 
 
 class Engineer(Employee):
-
     def __init__(self, name, engineer_info):
         self.name = name
         self.engineer_info = engineer_info
 
     def __repr__(self):
         return self.__class__.__name__ + ' ' + self.name + ' ' \
-            + self.engineer_info
+               + self.engineer_info
 
 
 class Hacker(Engineer):
-
     def __init__(
         self,
         name,
         nickname,
         engineer_info,
-        ):
+    ):
         self.name = name
         self.nickname = nickname
         self.engineer_info = engineer_info
 
     def __repr__(self):
         return self.__class__.__name__ + ' ' + self.name + " '" \
-            + self.nickname + "' " + self.engineer_info
+               + self.nickname + "' " + self.engineer_info
 
 
 class Company(object):
@@ -65,22 +61,22 @@ class Company(object):
 
 
 class ConcreteTest(fixtures.MappedTest):
-
     @classmethod
     def define_tables(cls, metadata):
         global managers_table, engineers_table, hackers_table, \
             companies, employees_table
         companies = Table('companies', metadata, Column('id', Integer,
-                          primary_key=True,
-                          test_needs_autoincrement=True), Column('name'
-                          , String(50)))
+                                                        primary_key=True,
+                                                        test_needs_autoincrement=True),
+                          Column('name'
+                                 , String(50)))
         employees_table = Table('employees', metadata,
                                 Column('employee_id', Integer,
-                                primary_key=True,
-                                test_needs_autoincrement=True),
+                                       primary_key=True,
+                                       test_needs_autoincrement=True),
                                 Column('name', String(50)),
                                 Column('company_id', Integer,
-                                ForeignKey('companies.id')))
+                                       ForeignKey('companies.id')))
         managers_table = Table(
             'managers',
             metadata,
@@ -89,7 +85,7 @@ class ConcreteTest(fixtures.MappedTest):
             Column('name', String(50)),
             Column('manager_data', String(50)),
             Column('company_id', Integer, ForeignKey('companies.id')),
-            )
+        )
         engineers_table = Table(
             'engineers',
             metadata,
@@ -98,7 +94,7 @@ class ConcreteTest(fixtures.MappedTest):
             Column('name', String(50)),
             Column('engineer_info', String(50)),
             Column('company_id', Integer, ForeignKey('companies.id')),
-            )
+        )
         hackers_table = Table(
             'hackers',
             metadata,
@@ -108,11 +104,11 @@ class ConcreteTest(fixtures.MappedTest):
             Column('engineer_info', String(50)),
             Column('company_id', Integer, ForeignKey('companies.id')),
             Column('nickname', String(50)),
-            )
+        )
 
     def test_basic(self):
         pjoin = polymorphic_union({'manager': managers_table, 'engineer'
-                                  : engineers_table}, 'type', 'pjoin')
+        : engineers_table}, 'type', 'pjoin')
         employee_mapper = mapper(Employee, pjoin,
                                  polymorphic_on=pjoin.c.type)
         manager_mapper = mapper(Manager, managers_table,
@@ -129,22 +125,22 @@ class ConcreteTest(fixtures.MappedTest):
         session.flush()
         session.expunge_all()
         assert set([repr(x) for x in session.query(Employee)]) \
-            == set(['Engineer Kurt knows how to hack',
-                   'Manager Tom knows how to manage things'])
+               == set(['Engineer Kurt knows how to hack',
+                       'Manager Tom knows how to manage things'])
         assert set([repr(x) for x in session.query(Manager)]) \
-            == set(['Manager Tom knows how to manage things'])
+               == set(['Manager Tom knows how to manage things'])
         assert set([repr(x) for x in session.query(Engineer)]) \
-            == set(['Engineer Kurt knows how to hack'])
+               == set(['Engineer Kurt knows how to hack'])
         manager = session.query(Manager).one()
         session.expire(manager, ['manager_data'])
         eq_(manager.manager_data, 'knows how to manage things')
 
     def test_multi_level_no_base(self):
         pjoin = polymorphic_union({'manager': managers_table, 'engineer'
-                                  : engineers_table, 'hacker'
-                                  : hackers_table}, 'type', 'pjoin')
+        : engineers_table, 'hacker'
+                                   : hackers_table}, 'type', 'pjoin')
         pjoin2 = polymorphic_union({'engineer': engineers_table,
-                                   'hacker': hackers_table}, 'type',
+                                    'hacker': hackers_table}, 'type',
                                    'pjoin2')
         employee_mapper = mapper(Employee, pjoin,
                                  polymorphic_on=pjoin.c.type)
@@ -160,7 +156,7 @@ class ConcreteTest(fixtures.MappedTest):
             inherits=employee_mapper,
             concrete=True,
             polymorphic_identity='engineer',
-            )
+        )
         hacker_mapper = mapper(Hacker, hackers_table,
                                inherits=engineer_mapper, concrete=True,
                                polymorphic_identity='hacker')
@@ -168,15 +164,15 @@ class ConcreteTest(fixtures.MappedTest):
         tom = Manager('Tom', 'knows how to manage things')
 
         assert_raises_message(AttributeError,
-            "does not implement attribute .?'type' at the instance level.",
-            setattr, tom, "type", "sometype")
+                              "does not implement attribute .?'type' at the instance level.",
+                              setattr, tom, "type", "sometype")
 
         jerry = Engineer('Jerry', 'knows how to program')
         hacker = Hacker('Kurt', 'Badass', 'knows how to hack')
 
         assert_raises_message(AttributeError,
-            "does not implement attribute .?'type' at the instance level.",
-            setattr, hacker, "type", "sometype")
+                              "does not implement attribute .?'type' at the instance level.",
+                              setattr, hacker, "type", "sometype")
 
         session.add_all((tom, jerry, hacker))
         session.flush()
@@ -185,13 +181,13 @@ class ConcreteTest(fixtures.MappedTest):
         # expired_attributes collection
 
         assert 'nickname' \
-            not in attributes.instance_state(jerry).expired_attributes
+               not in attributes.instance_state(jerry).expired_attributes
         assert 'name' \
-            not in attributes.instance_state(jerry).expired_attributes
+               not in attributes.instance_state(jerry).expired_attributes
         assert 'name' \
-            not in attributes.instance_state(hacker).expired_attributes
+               not in attributes.instance_state(hacker).expired_attributes
         assert 'nickname' \
-            not in attributes.instance_state(hacker).expired_attributes
+               not in attributes.instance_state(hacker).expired_attributes
 
         def go():
             eq_(jerry.name, 'Jerry')
@@ -200,21 +196,21 @@ class ConcreteTest(fixtures.MappedTest):
         self.assert_sql_count(testing.db, go, 0)
         session.expunge_all()
         assert repr(session.query(Employee).filter(Employee.name
-                    == 'Tom').one()) \
-            == 'Manager Tom knows how to manage things'
+                                                   == 'Tom').one()) \
+               == 'Manager Tom knows how to manage things'
         assert repr(session.query(Manager).filter(Manager.name == 'Tom'
-                    ).one()) == 'Manager Tom knows how to manage things'
+                                                  ).one()) == 'Manager Tom knows how to manage things'
         assert set([repr(x) for x in session.query(Employee).all()]) \
-            == set(['Engineer Jerry knows how to program',
-                   'Manager Tom knows how to manage things',
-                   "Hacker Kurt 'Badass' knows how to hack"])
+               == set(['Engineer Jerry knows how to program',
+                       'Manager Tom knows how to manage things',
+                       "Hacker Kurt 'Badass' knows how to hack"])
         assert set([repr(x) for x in session.query(Manager).all()]) \
-            == set(['Manager Tom knows how to manage things'])
+               == set(['Manager Tom knows how to manage things'])
         assert set([repr(x) for x in session.query(Engineer).all()]) \
-            == set(['Engineer Jerry knows how to program',
-                   "Hacker Kurt 'Badass' knows how to hack"])
+               == set(['Engineer Jerry knows how to program',
+                       "Hacker Kurt 'Badass' knows how to hack"])
         assert set([repr(x) for x in session.query(Hacker).all()]) \
-            == set(["Hacker Kurt 'Badass' knows how to hack"])
+               == set(["Hacker Kurt 'Badass' knows how to hack"])
 
     def test_multi_level_with_base(self):
         pjoin = polymorphic_union({
@@ -222,9 +218,9 @@ class ConcreteTest(fixtures.MappedTest):
             'manager': managers_table,
             'engineer': engineers_table,
             'hacker': hackers_table,
-            }, 'type', 'pjoin')
+        }, 'type', 'pjoin')
         pjoin2 = polymorphic_union({'engineer': engineers_table,
-                                   'hacker': hackers_table}, 'type',
+                                    'hacker': hackers_table}, 'type',
                                    'pjoin2')
         employee_mapper = mapper(Employee, employees_table,
                                  with_polymorphic=('*', pjoin),
@@ -241,7 +237,7 @@ class ConcreteTest(fixtures.MappedTest):
             inherits=employee_mapper,
             concrete=True,
             polymorphic_identity='engineer',
-            )
+        )
         hacker_mapper = mapper(Hacker, hackers_table,
                                inherits=engineer_mapper, concrete=True,
                                polymorphic_identity='hacker')
@@ -264,19 +260,20 @@ class ConcreteTest(fixtures.MappedTest):
         # is not rendered in the statement which is only against
         # Employee's "pjoin"
 
-        assert len(testing.db.execute(session.query(Employee).with_labels().statement).fetchall()) \
-            == 3
+        assert len(testing.db.execute(
+            session.query(Employee).with_labels().statement).fetchall()) \
+               == 3
         assert set([repr(x) for x in session.query(Employee)]) \
-            == set(['Engineer Jerry knows how to program',
-                   'Manager Tom knows how to manage things',
-                   "Hacker Kurt 'Badass' knows how to hack"])
+               == set(['Engineer Jerry knows how to program',
+                       'Manager Tom knows how to manage things',
+                       "Hacker Kurt 'Badass' knows how to hack"])
         assert set([repr(x) for x in session.query(Manager)]) \
-            == set(['Manager Tom knows how to manage things'])
+               == set(['Manager Tom knows how to manage things'])
         assert set([repr(x) for x in session.query(Engineer)]) \
-            == set(['Engineer Jerry knows how to program',
-                   "Hacker Kurt 'Badass' knows how to hack"])
+               == set(['Engineer Jerry knows how to program',
+                       "Hacker Kurt 'Badass' knows how to hack"])
         assert set([repr(x) for x in session.query(Hacker)]) \
-            == set(["Hacker Kurt 'Badass' knows how to hack"])
+               == set(["Hacker Kurt 'Badass' knows how to hack"])
 
     def test_without_default_polymorphic(self):
         pjoin = polymorphic_union({
@@ -284,9 +281,9 @@ class ConcreteTest(fixtures.MappedTest):
             'manager': managers_table,
             'engineer': engineers_table,
             'hacker': hackers_table,
-            }, 'type', 'pjoin')
+        }, 'type', 'pjoin')
         pjoin2 = polymorphic_union({'engineer': engineers_table,
-                                   'hacker': hackers_table}, 'type',
+                                    'hacker': hackers_table}, 'type',
                                    'pjoin2')
         employee_mapper = mapper(Employee, employees_table,
                                  polymorphic_identity='employee')
@@ -309,22 +306,26 @@ class ConcreteTest(fixtures.MappedTest):
         session.add_all((jdoe, tom, jerry, hacker))
         session.flush()
         eq_(len(testing.db.execute(session.query(Employee).with_polymorphic('*'
-            , pjoin,
-            pjoin.c.type).with_labels().statement).fetchall()), 4)
+                                                                            ,
+                                                                            pjoin,
+                                                                            pjoin.c.type).with_labels().statement).fetchall()),
+            4)
         eq_(session.query(Employee).get(jdoe.employee_id), jdoe)
         eq_(session.query(Engineer).get(jerry.employee_id), jerry)
         eq_(set([repr(x) for x in
-            session.query(Employee).with_polymorphic('*', pjoin,
-            pjoin.c.type)]), set(['Employee Jdoe',
-            'Engineer Jerry knows how to program',
-            'Manager Tom knows how to manage things',
-            "Hacker Kurt 'Badass' knows how to hack"]))
+                 session.query(Employee).with_polymorphic('*', pjoin,
+                                                          pjoin.c.type)]),
+            set(['Employee Jdoe',
+                 'Engineer Jerry knows how to program',
+                 'Manager Tom knows how to manage things',
+                 "Hacker Kurt 'Badass' knows how to hack"]))
         eq_(set([repr(x) for x in session.query(Manager)]),
             set(['Manager Tom knows how to manage things']))
         eq_(set([repr(x) for x in
-            session.query(Engineer).with_polymorphic('*', pjoin2,
-            pjoin2.c.type)]), set(['Engineer Jerry knows how to program'
-            , "Hacker Kurt 'Badass' knows how to hack"]))
+                 session.query(Engineer).with_polymorphic('*', pjoin2,
+                                                          pjoin2.c.type)]),
+            set(['Engineer Jerry knows how to program'
+                    , "Hacker Kurt 'Badass' knows how to hack"]))
         eq_(set([repr(x) for x in session.query(Hacker)]),
             set(["Hacker Kurt 'Badass' knows how to hack"]))
 
@@ -332,19 +333,21 @@ class ConcreteTest(fixtures.MappedTest):
         # subquery
 
         eq_(len(testing.db.execute(session.query(Engineer).with_polymorphic('*'
-            , pjoin2,
-            pjoin2.c.type).from_self().statement).fetchall()), 2)
+                                                                            ,
+                                                                            pjoin2,
+                                                                            pjoin2.c.type).from_self().statement).fetchall()),
+            2)
         eq_(set([repr(x) for x in
-            session.query(Engineer).with_polymorphic('*', pjoin2,
-            pjoin2.c.type).from_self()]),
+                 session.query(Engineer).with_polymorphic('*', pjoin2,
+                                                          pjoin2.c.type).from_self()]),
             set(['Engineer Jerry knows how to program',
-            "Hacker Kurt 'Badass' knows how to hack"]))
+                 "Hacker Kurt 'Badass' knows how to hack"]))
 
     def test_relationship(self):
         pjoin = polymorphic_union({'manager': managers_table, 'engineer'
-                                  : engineers_table}, 'type', 'pjoin')
+        : engineers_table}, 'type', 'pjoin')
         mapper(Company, companies, properties={'employees'
-               : relationship(Employee)})
+                                               : relationship(Employee)})
         employee_mapper = mapper(Employee, pjoin,
                                  polymorphic_on=pjoin.c.type)
         manager_mapper = mapper(Manager, managers_table,
@@ -366,47 +369,50 @@ class ConcreteTest(fixtures.MappedTest):
         def go():
             c2 = session.query(Company).get(c.id)
             assert set([repr(x) for x in c2.employees]) \
-                == set(['Engineer Kurt knows how to hack',
-                       'Manager Tom knows how to manage things'])
+                   == set(['Engineer Kurt knows how to hack',
+                           'Manager Tom knows how to manage things'])
 
         self.assert_sql_count(testing.db, go, 2)
         session.expunge_all()
 
         def go():
             c2 = \
-                session.query(Company).options(joinedload(Company.employees)).get(c.id)
+                session.query(Company).options(
+                    joinedload(Company.employees)).get(c.id)
             assert set([repr(x) for x in c2.employees]) \
-                == set(['Engineer Kurt knows how to hack',
-                       'Manager Tom knows how to manage things'])
+                   == set(['Engineer Kurt knows how to hack',
+                           'Manager Tom knows how to manage things'])
 
         self.assert_sql_count(testing.db, go, 1)
 
 
 class PropertyInheritanceTest(fixtures.MappedTest):
-
     @classmethod
     def define_tables(cls, metadata):
         Table('a_table', metadata, Column('id', Integer,
-              primary_key=True, test_needs_autoincrement=True),
+                                          primary_key=True,
+                                          test_needs_autoincrement=True),
               Column('some_dest_id', Integer, ForeignKey('dest_table.id')),
               Column('aname', String(50)))
         Table('b_table', metadata, Column('id', Integer,
-              primary_key=True, test_needs_autoincrement=True),
+                                          primary_key=True,
+                                          test_needs_autoincrement=True),
               Column('some_dest_id', Integer, ForeignKey('dest_table.id')),
               Column('bname', String(50)))
 
         Table('c_table', metadata, Column('id', Integer,
-            primary_key=True, test_needs_autoincrement=True),
-            Column('some_dest_id', Integer, ForeignKey('dest_table.id')),
-            Column('cname', String(50)))
+                                          primary_key=True,
+                                          test_needs_autoincrement=True),
+              Column('some_dest_id', Integer, ForeignKey('dest_table.id')),
+              Column('cname', String(50)))
 
         Table('dest_table', metadata, Column('id', Integer,
-              primary_key=True, test_needs_autoincrement=True),
+                                             primary_key=True,
+                                             test_needs_autoincrement=True),
               Column('name', String(50)))
 
     @classmethod
     def setup_classes(cls):
-
         class A(cls.Comparable):
             pass
 
@@ -421,11 +427,11 @@ class PropertyInheritanceTest(fixtures.MappedTest):
 
     def test_noninherited_warning(self):
         A, B, b_table, a_table, Dest, dest_table = (self.classes.A,
-                                self.classes.B,
-                                self.tables.b_table,
-                                self.tables.a_table,
-                                self.classes.Dest,
-                                self.tables.dest_table)
+                                                    self.classes.B,
+                                                    self.tables.b_table,
+                                                    self.tables.a_table,
+                                                    self.classes.Dest,
+                                                    self.tables.dest_table)
 
         mapper(A, a_table, properties={'some_dest': relationship(Dest)})
         mapper(B, b_table, inherits=A, concrete=True)
@@ -448,24 +454,24 @@ class PropertyInheritanceTest(fixtures.MappedTest):
 
     def test_inheriting(self):
         A, B, b_table, a_table, Dest, dest_table = (self.classes.A,
-                                self.classes.B,
-                                self.tables.b_table,
-                                self.tables.a_table,
-                                self.classes.Dest,
-                                self.tables.dest_table)
+                                                    self.classes.B,
+                                                    self.tables.b_table,
+                                                    self.tables.a_table,
+                                                    self.classes.Dest,
+                                                    self.tables.dest_table)
 
         mapper(A, a_table, properties={
-                'some_dest': relationship(Dest,back_populates='many_a')
-            })
+            'some_dest': relationship(Dest, back_populates='many_a')
+        })
         mapper(B, b_table, inherits=A, concrete=True,
                properties={
-                    'some_dest': relationship(Dest, back_populates='many_b')
-                })
+                   'some_dest': relationship(Dest, back_populates='many_b')
+               })
 
         mapper(Dest, dest_table, properties={
-                    'many_a': relationship(A,back_populates='some_dest'),
-                    'many_b': relationship(B,back_populates='some_dest')
-                })
+            'many_a': relationship(A, back_populates='some_dest'),
+            'many_b': relationship(B, back_populates='some_dest')
+        })
         sess = sessionmaker()()
         dest1 = Dest(name='c1')
         dest2 = Dest(name='c2')
@@ -524,23 +530,21 @@ class PropertyInheritanceTest(fixtures.MappedTest):
         mapper(Dest, dest_table)
         configure_mappers()
 
-
     def test_polymorphic_backref(self):
         """test multiple backrefs to the same polymorphically-loading
         attribute."""
 
         A, C, B, c_table, b_table, a_table, Dest, dest_table = (self.classes.A,
-                                self.classes.C,
-                                self.classes.B,
-                                self.tables.c_table,
-                                self.tables.b_table,
-                                self.tables.a_table,
-                                self.classes.Dest,
-                                self.tables.dest_table)
+                                                                self.classes.C,
+                                                                self.classes.B,
+                                                                self.tables.c_table,
+                                                                self.tables.b_table,
+                                                                self.tables.a_table,
+                                                                self.classes.Dest,
+                                                                self.tables.dest_table)
 
-
-        ajoin = polymorphic_union({'a': a_table, 'b': b_table, 'c':c_table},
-                                'type','ajoin')
+        ajoin = polymorphic_union({'a': a_table, 'b': b_table, 'c': c_table},
+                                  'type', 'ajoin')
         mapper(
             A,
             a_table,
@@ -549,8 +553,8 @@ class PropertyInheritanceTest(fixtures.MappedTest):
             polymorphic_identity='a',
             properties={
                 'some_dest': relationship(Dest, back_populates='many_a')
-                },
-            )
+            },
+        )
         mapper(
             B,
             b_table,
@@ -558,8 +562,8 @@ class PropertyInheritanceTest(fixtures.MappedTest):
             concrete=True,
             polymorphic_identity='b',
             properties={
-                    'some_dest': relationship(Dest, back_populates='many_a')},
-            )
+                'some_dest': relationship(Dest, back_populates='many_a')},
+        )
 
         mapper(
             C,
@@ -568,15 +572,15 @@ class PropertyInheritanceTest(fixtures.MappedTest):
             concrete=True,
             polymorphic_identity='c',
             properties={
-                    'some_dest': relationship(Dest, back_populates='many_a')},
-            )
+                'some_dest': relationship(Dest, back_populates='many_a')},
+        )
 
         mapper(Dest, dest_table, properties={
-                'many_a': relationship(A,
-                            back_populates='some_dest',
-                            order_by=ajoin.c.id)
-                        }
-                )
+            'many_a': relationship(A,
+                                   back_populates='some_dest',
+                                   order_by=ajoin.c.id)
+        }
+               )
 
         sess = sessionmaker()()
         dest1 = Dest(name='c1')
@@ -605,26 +609,27 @@ class PropertyInheritanceTest(fixtures.MappedTest):
             eq_(
                 [
                     Dest(many_a=[A(aname='a1'),
-                                    B(bname='b1'),
-                                    B(bname='b2'),
-                                    C(cname='c1')]),
+                                 B(bname='b1'),
+                                 B(bname='b2'),
+                                 C(cname='c1')]),
                     Dest(many_a=[A(aname='a2'), C(cname='c2')])],
-                sess.query(Dest).options(joinedload(Dest.many_a)).order_by(Dest.id).all())
+                sess.query(Dest).options(joinedload(Dest.many_a)).order_by(
+                    Dest.id).all())
 
         self.assert_sql_count(testing.db, go, 1)
 
     def test_merge_w_relationship(self):
         A, C, B, c_table, b_table, a_table, Dest, dest_table = (self.classes.A,
-                                self.classes.C,
-                                self.classes.B,
-                                self.tables.c_table,
-                                self.tables.b_table,
-                                self.tables.a_table,
-                                self.classes.Dest,
-                                self.tables.dest_table)
+                                                                self.classes.C,
+                                                                self.classes.B,
+                                                                self.tables.c_table,
+                                                                self.tables.b_table,
+                                                                self.tables.a_table,
+                                                                self.classes.Dest,
+                                                                self.tables.dest_table)
 
-        ajoin = polymorphic_union({'a': a_table, 'b': b_table, 'c':c_table},
-                                'type','ajoin')
+        ajoin = polymorphic_union({'a': a_table, 'b': b_table, 'c': c_table},
+                                  'type', 'ajoin')
         mapper(
             A,
             a_table,
@@ -633,8 +638,8 @@ class PropertyInheritanceTest(fixtures.MappedTest):
             polymorphic_identity='a',
             properties={
                 'some_dest': relationship(Dest, back_populates='many_a')
-                },
-            )
+            },
+        )
         mapper(
             B,
             b_table,
@@ -642,8 +647,8 @@ class PropertyInheritanceTest(fixtures.MappedTest):
             concrete=True,
             polymorphic_identity='b',
             properties={
-                    'some_dest': relationship(Dest, back_populates='many_a')},
-            )
+                'some_dest': relationship(Dest, back_populates='many_a')},
+        )
 
         mapper(
             C,
@@ -652,15 +657,15 @@ class PropertyInheritanceTest(fixtures.MappedTest):
             concrete=True,
             polymorphic_identity='c',
             properties={
-                    'some_dest': relationship(Dest, back_populates='many_a')},
-            )
+                'some_dest': relationship(Dest, back_populates='many_a')},
+        )
 
         mapper(Dest, dest_table, properties={
-                'many_a': relationship(A,
-                            back_populates='some_dest',
-                            order_by=ajoin.c.id)
-                        }
-                )
+            'many_a': relationship(A,
+                                   back_populates='some_dest',
+                                   order_by=ajoin.c.id)
+        }
+               )
 
         assert C.some_dest.property.parent is class_mapper(C)
         assert B.some_dest.property.parent is class_mapper(B)
@@ -680,24 +685,27 @@ class PropertyInheritanceTest(fixtures.MappedTest):
         eq_(merged_c1.some_dest.name, 'd2')
         eq_(merged_c1.some_dest_id, c1.some_dest_id)
 
-class ManyToManyTest(fixtures.MappedTest):
 
+class ManyToManyTest(fixtures.MappedTest):
     @classmethod
     def define_tables(cls, metadata):
         Table('base', metadata, Column('id', Integer, primary_key=True,
-              test_needs_autoincrement=True))
+                                       test_needs_autoincrement=True))
         Table('sub', metadata, Column('id', Integer, primary_key=True,
-              test_needs_autoincrement=True))
+                                      test_needs_autoincrement=True))
         Table('base_mtom', metadata, Column('base_id', Integer,
-              ForeignKey('base.id'), primary_key=True),
+                                            ForeignKey('base.id'),
+                                            primary_key=True),
               Column('related_id', Integer, ForeignKey('related.id'),
-              primary_key=True))
+                     primary_key=True))
         Table('sub_mtom', metadata, Column('base_id', Integer,
-              ForeignKey('sub.id'), primary_key=True),
+                                           ForeignKey('sub.id'),
+                                           primary_key=True),
               Column('related_id', Integer, ForeignKey('related.id'),
-              primary_key=True))
+                     primary_key=True))
         Table('related', metadata, Column('id', Integer,
-              primary_key=True, test_needs_autoincrement=True))
+                                          primary_key=True,
+                                          test_needs_autoincrement=True))
 
     @classmethod
     def setup_classes(cls):
@@ -710,28 +718,30 @@ class ManyToManyTest(fixtures.MappedTest):
         class Related(cls.Comparable):
             pass
 
-
     def test_selective_relationships(self):
-        sub, base_mtom, Related, Base, related, sub_mtom, base, Sub = (self.tables.sub,
-                                self.tables.base_mtom,
-                                self.classes.Related,
-                                self.classes.Base,
-                                self.tables.related,
-                                self.tables.sub_mtom,
-                                self.tables.base,
-                                self.classes.Sub)
+        sub, base_mtom, Related, Base, related, sub_mtom, base, Sub = (
+            self.tables.sub,
+            self.tables.base_mtom,
+            self.classes.Related,
+            self.classes.Base,
+            self.tables.related,
+            self.tables.sub_mtom,
+            self.tables.base,
+            self.classes.Sub)
 
         mapper(Base, base, properties={'related': relationship(Related,
-               secondary=base_mtom, backref='bases',
-               order_by=related.c.id)})
+                                                               secondary=base_mtom,
+                                                               backref='bases',
+                                                               order_by=related.c.id)})
         mapper(Sub, sub, inherits=Base, concrete=True,
                properties={'related': relationship(Related,
-               secondary=sub_mtom, backref='subs',
-               order_by=related.c.id)})
+                                                   secondary=sub_mtom,
+                                                   backref='subs',
+                                                   order_by=related.c.id)})
         mapper(Related, related)
         sess = sessionmaker()()
         b1, s1, r1, r2, r3 = Base(), Sub(), Related(), Related(), \
-            Related()
+                             Related()
         b1.related.append(r1)
         b1.related.append(r2)
         s1.related.append(r2)
@@ -743,32 +753,35 @@ class ManyToManyTest(fixtures.MappedTest):
 
 
 class ColKeysTest(fixtures.MappedTest):
-
     @classmethod
     def define_tables(cls, metadata):
         global offices_table, refugees_table
         refugees_table = Table('refugee', metadata, Column('refugee_fid'
-                               , Integer, primary_key=True,
-                               test_needs_autoincrement=True),
+                                                           , Integer,
+                                                           primary_key=True,
+                                                           test_needs_autoincrement=True),
                                Column('refugee_name', String(30),
-                               key='name'))
+                                      key='name'))
         offices_table = Table('office', metadata, Column('office_fid',
-                              Integer, primary_key=True,
-                              test_needs_autoincrement=True),
+                                                         Integer,
+                                                         primary_key=True,
+                                                         test_needs_autoincrement=True),
                               Column('office_name', String(30),
-                              key='name'))
+                                     key='name'))
 
     @classmethod
     def insert_data(cls):
         refugees_table.insert().execute(dict(refugee_fid=1,
-                name='refugee1'), dict(refugee_fid=2, name='refugee2'
-                ))
+                                             name='refugee1'),
+                                        dict(refugee_fid=2, name='refugee2'
+                                             ))
         offices_table.insert().execute(dict(office_fid=1,
-                name='office1'), dict(office_fid=2, name='office2'))
+                                            name='office1'),
+                                       dict(office_fid=2, name='office2'))
 
     def test_keys(self):
         pjoin = polymorphic_union({'refugee': refugees_table, 'office'
-                                  : offices_table}, 'type', 'pjoin')
+        : offices_table}, 'type', 'pjoin')
 
         class Location(object):
             pass
@@ -778,7 +791,6 @@ class ColKeysTest(fixtures.MappedTest):
 
         class Office(Location):
             pass
-
 
         location_mapper = mapper(Location, pjoin,
                                  polymorphic_on=pjoin.c.type,

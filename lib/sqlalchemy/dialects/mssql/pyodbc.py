@@ -109,7 +109,6 @@ import decimal
 
 
 class _ms_numeric_pyodbc(object):
-
     """Turns Decimals with adjusted() < 0 or > 7 into strings.
 
     The routines here are needed for older pyodbc versions
@@ -119,7 +118,7 @@ class _ms_numeric_pyodbc(object):
 
     def bind_processor(self, dialect):
 
-        super_process = super(_ms_numeric_pyodbc, self).\
+        super_process = super(_ms_numeric_pyodbc, self). \
             bind_processor(dialect)
 
         if not dialect._need_decimal_fix:
@@ -127,7 +126,7 @@ class _ms_numeric_pyodbc(object):
 
         def process(value):
             if self.asdecimal and \
-                    isinstance(value, decimal.Decimal):
+                isinstance(value, decimal.Decimal):
 
                 adjusted = value.adjusted()
                 if adjusted < 0:
@@ -139,6 +138,7 @@ class _ms_numeric_pyodbc(object):
                 return super_process(value)
             else:
                 return value
+
         return process
 
     # these routines needed for older versions of pyodbc.
@@ -194,6 +194,7 @@ class _VARBINARY_pyodbc(VARBINARY):
             else:
                 # pyodbc-specific
                 return dialect.dbapi.BinaryNull
+
         return process
 
 
@@ -218,8 +219,8 @@ class MSExecutionContext_pyodbc(MSExecutionContext):
         # don't embed the scope_identity select into an
         # "INSERT .. DEFAULT VALUES"
         if self._select_lastrowid and \
-                self.dialect.use_scope_identity and \
-                len(self.parameters[0]):
+            self.dialect.use_scope_identity and \
+            len(self.parameters[0]):
             self._embedded_scope_identity = True
 
             self.statement += "; select scope_identity()"
@@ -246,7 +247,6 @@ class MSExecutionContext_pyodbc(MSExecutionContext):
 
 
 class MSDialect_pyodbc(PyODBCConnector, MSDialect):
-
     execution_ctx_cls = MSExecutionContext_pyodbc
 
     colspecs = util.update_copy(
@@ -264,9 +264,10 @@ class MSDialect_pyodbc(PyODBCConnector, MSDialect):
             self.description_encoding = params.pop('description_encoding')
         super(MSDialect_pyodbc, self).__init__(**params)
         self.use_scope_identity = self.use_scope_identity and \
-            self.dbapi and \
-            hasattr(self.dbapi.Cursor, 'nextset')
+                                  self.dbapi and \
+                                  hasattr(self.dbapi.Cursor, 'nextset')
         self._need_decimal_fix = self.dbapi and \
-            self._dbapi_version() < (2, 1, 8)
+                                 self._dbapi_version() < (2, 1, 8)
+
 
 dialect = MSDialect_pyodbc

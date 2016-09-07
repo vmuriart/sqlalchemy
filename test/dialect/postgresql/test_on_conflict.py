@@ -9,7 +9,6 @@ from sqlalchemy.dialects.postgresql import insert
 
 
 class OnConflictTest(fixtures.TablesTest):
-
     __only_on__ = 'postgresql >= 9.5',
     __backend__ = True
 
@@ -79,13 +78,13 @@ class OnConflictTest(fixtures.TablesTest):
         with testing.db.connect() as conn:
             conn.execute(
                 insert(users)
-                .on_conflict_do_nothing(
+                    .on_conflict_do_nothing(
                     index_elements=users.primary_key.columns),
                 dict(id=1, name='name1')
             )
             conn.execute(
                 insert(users)
-                .on_conflict_do_nothing(
+                    .on_conflict_do_nothing(
                     index_elements=users.primary_key.columns),
                 dict(id=1, name='name2')
             )
@@ -225,7 +224,7 @@ class OnConflictTest(fixtures.TablesTest):
             conn.execute(i, dict(
                 id=1, name='name2', login_email='name1@gmail.com',
                 lets_index_this='not')
-            )
+                         )
 
             eq_(
                 conn.execute(users.select().where(users.c.id == 1)).fetchall(),
@@ -249,12 +248,12 @@ class OnConflictTest(fixtures.TablesTest):
             conn.execute(i, dict(
                 id=42, name='nameunique',
                 login_email='name2@gmail.com', lets_index_this='unique')
-            )
+                         )
 
             eq_(
                 conn.execute(
                     users.select().
-                    where(users.c.login_email == 'name2@gmail.com')
+                        where(users.c.login_email == 'name2@gmail.com')
                 ).fetchall(),
                 [(42, 'nameunique', 'name2@gmail.com', 'not')]
             )
@@ -278,12 +277,12 @@ class OnConflictTest(fixtures.TablesTest):
             conn.execute(i, dict(
                 id=43, name='nameunique2',
                 login_email='name2@gmail.com', lets_index_this='unique')
-            )
+                         )
 
             eq_(
                 conn.execute(
                     users.select().
-                    where(users.c.login_email == 'name2@gmail.com')
+                        where(users.c.login_email == 'name2@gmail.com')
                 ).fetchall(),
                 [(43, 'nameunique2', 'name2@gmail.com', 'not')]
             )
@@ -298,7 +297,7 @@ class OnConflictTest(fixtures.TablesTest):
             i = i.on_conflict_do_update(
                 index_elements=self.bogus_index.columns,
                 index_where=self.
-                bogus_index.dialect_options['postgresql']['where'],
+                    bogus_index.dialect_options['postgresql']['where'],
                 set_=dict(
                     name=i.excluded.name,
                     login_email=i.excluded.login_email)

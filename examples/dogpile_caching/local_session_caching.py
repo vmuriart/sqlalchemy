@@ -16,6 +16,7 @@ with the basic operation of CachingQuery.
 from dogpile.cache.api import CacheBackend, NO_VALUE
 from dogpile.cache.region import register_backend
 
+
 class ScopedSessionBackend(CacheBackend):
     """A dogpile backend which will cache objects locally on
     the current session.
@@ -54,8 +55,8 @@ class ScopedSessionBackend(CacheBackend):
             sess._cache_dictionary = cache_dict = {}
         return cache_dict
 
-register_backend("sqlalchemy.session", __name__, "ScopedSessionBackend")
 
+register_backend("sqlalchemy.session", __name__, "ScopedSessionBackend")
 
 if __name__ == '__main__':
     from .environment import Session, regions
@@ -76,9 +77,9 @@ if __name__ == '__main__':
 
     # query to load Person by name, with criterion
     # of "person 10"
-    q = Session.query(Person).\
-                    options(FromCache("local_session")).\
-                    filter(Person.name == "person 10")
+    q = Session.query(Person). \
+        options(FromCache("local_session")). \
+        filter(Person.name == "person 10")
 
     # load from DB
     person10 = q.one()

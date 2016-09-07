@@ -7,7 +7,6 @@ from sqlalchemy.testing import AssertsCompiledSQL, fixtures
 
 
 class _DeleteTestBase(object):
-
     @classmethod
     def define_tables(cls, metadata):
         Table('mytable', metadata,
@@ -35,8 +34,8 @@ class DeleteTest(_DeleteTestBase, fixtures.TablesTest, AssertsCompiledSQL):
 
         self.assert_compile(
             table1.delete().
-            where(table1.c.myid == 7).
-            where(table1.c.name == 'somename'),
+                where(table1.c.myid == 7).
+                where(table1.c.name == 'somename'),
             'DELETE FROM mytable '
             'WHERE mytable.myid = :myid_1 '
             'AND mytable.name = :name_1')
@@ -56,8 +55,8 @@ class DeleteTest(_DeleteTestBase, fixtures.TablesTest, AssertsCompiledSQL):
     def test_prefix_with(self):
         table1 = self.tables.mytable
 
-        stmt = table1.delete().\
-            prefix_with('A', 'B', dialect='mysql').\
+        stmt = table1.delete(). \
+            prefix_with('A', 'B', dialect='mysql'). \
             prefix_with('C', 'D')
 
         self.assert_compile(stmt,

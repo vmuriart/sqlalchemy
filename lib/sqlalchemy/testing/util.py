@@ -22,16 +22,20 @@ if jython:
         gc.collect()
         return 0
 
+
     # "lazy" gc, for VM's that don't GC on refcount == 0
     gc_collect = lazy_gc = jython_gc_collect
 elif pypy:
     def pypy_gc_collect(*args):
         gc.collect()
         gc.collect()
+
+
     gc_collect = lazy_gc = pypy_gc_collect
 else:
     # assume CPython - straight gc.collect, lazy_gc() is a pass
     gc_collect = gc.collect
+
 
     def lazy_gc():
         pass
@@ -62,7 +66,7 @@ def round_decimal(value, prec):
     # can also use shift() here but that is 2.6 only
     return (value * decimal.Decimal("1" + "0" * prec)
             ).to_integral(decimal.ROUND_FLOOR) / \
-        pow(10, prec)
+           pow(10, prec)
 
 
 class RandomSet(set):
@@ -215,6 +219,7 @@ def force_drop_names(*names):
         finally:
             drop_all_tables(
                 config.db, inspect(config.db), include_names=names)
+
     return go
 
 
@@ -243,7 +248,7 @@ def drop_all_tables(engine, inspector, schema=None, include_names=None):
 
     with engine.connect() as conn:
         for tname, fkcs in reversed(
-                inspector.get_sorted_table_and_fkc_names(schema=schema)):
+            inspector.get_sorted_table_and_fkc_names(schema=schema)):
             if tname:
                 if include_names is not None and tname not in include_names:
                     continue
@@ -276,5 +281,5 @@ def teardown_events(event_cls):
             return fn(*arg, **kw)
         finally:
             event_cls._clear()
-    return decorate
 
+    return decorate

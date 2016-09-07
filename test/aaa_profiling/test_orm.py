@@ -8,7 +8,6 @@ from sqlalchemy.testing.schema import Table, Column
 
 
 class MergeTest(fixtures.MappedTest):
-
     @classmethod
     def define_tables(cls, metadata):
         Table(
@@ -77,6 +76,7 @@ class MergeTest(fixtures.MappedTest):
         @profiling.function_call_count(variance=0.10)
         def go1():
             return sess2.merge(p1, load=False)
+
         p2 = go1()
 
         # third call, merge object already present. almost no calls.
@@ -84,6 +84,7 @@ class MergeTest(fixtures.MappedTest):
         @profiling.function_call_count(variance=0.10)
         def go2():
             return sess2.merge(p2, load=False)
+
         go2()
 
     def test_merge_load(self):
@@ -101,18 +102,19 @@ class MergeTest(fixtures.MappedTest):
         @profiling.function_call_count()
         def go():
             sess2.merge(p1)
+
         go()
 
         # one more time, count the SQL
 
         def go2():
             sess2.merge(p1)
+
         sess2 = sessionmaker(testing.db)()
         self.assert_sql_count(testing.db, go2, 2)
 
 
 class LoadManyToOneFromIdentityTest(fixtures.MappedTest):
-
     """test overhead associated with many-to-one fetches.
 
     Prior to the refactor of LoadLazyAttribute and
@@ -159,17 +161,18 @@ class LoadManyToOneFromIdentityTest(fixtures.MappedTest):
         parent, child = cls.tables.parent, cls.tables.child
 
         child.insert().execute([
-            {'id': i, 'data': 'c{0:d}'.format(i)}
-            for i in range(1, 251)
-        ])
+                                   {'id': i, 'data': 'c{0:d}'.format(i)}
+                                   for i in range(1, 251)
+                                   ])
         parent.insert().execute([
-            {
-                'id': i,
-                'data': 'p{0:d}c{1:d}'.format(i, (i % 250) + 1),
-                'child_id': (i % 250) + 1
-            }
-            for i in range(1, 1000)
-        ])
+                                    {
+                                        'id': i,
+                                        'data': 'p{0:d}c{1:d}'.format(i, (
+                                            i % 250) + 1),
+                                        'child_id': (i % 250) + 1
+                                    }
+                                    for i in range(1, 1000)
+                                    ])
 
     def test_many_to_one_load_no_identity(self):
         Parent = self.classes.Parent
@@ -181,6 +184,7 @@ class LoadManyToOneFromIdentityTest(fixtures.MappedTest):
         def go():
             for p in parents:
                 p.child
+
         go()
 
     def test_many_to_one_load_identity(self):
@@ -195,11 +199,11 @@ class LoadManyToOneFromIdentityTest(fixtures.MappedTest):
         def go():
             for p in parents:
                 p.child
+
         go()
 
 
 class MergeBackrefsTest(fixtures.MappedTest):
-
     @classmethod
     def define_tables(cls, metadata):
         Table('a', metadata,
@@ -235,9 +239,9 @@ class MergeBackrefsTest(fixtures.MappedTest):
     @classmethod
     def setup_mappers(cls):
         A, B, C, D = cls.classes.A, cls.classes.B, \
-            cls.classes.C, cls.classes.D
+                     cls.classes.C, cls.classes.D
         a, b, c, d = cls.tables.a, cls.tables.b, \
-            cls.tables.c, cls.tables.d
+                     cls.tables.c, cls.tables.d
         mapper(A, a, properties={
             'bs': relationship(B, backref='a'),
             'c': relationship(C, backref='as'),
@@ -250,36 +254,35 @@ class MergeBackrefsTest(fixtures.MappedTest):
     @classmethod
     def insert_data(cls):
         A, B, C, D = cls.classes.A, cls.classes.B, \
-            cls.classes.C, cls.classes.D
+                     cls.classes.C, cls.classes.D
         s = Session()
         s.add_all([
-            A(id=i,
-                bs=[B(id=(i * 5) + j) for j in range(1, 5)],
-                c=C(id=i),
-                ds=[D(id=(i * 5) + j) for j in range(1, 5)]
-              )
-            for i in range(1, 5)
-        ])
+                      A(id=i,
+                        bs=[B(id=(i * 5) + j) for j in range(1, 5)],
+                        c=C(id=i),
+                        ds=[D(id=(i * 5) + j) for j in range(1, 5)]
+                        )
+                      for i in range(1, 5)
+                      ])
         s.commit()
 
     @profiling.function_call_count(variance=.10)
     def test_merge_pending_with_all_pks(self):
         A, B, C, D = self.classes.A, self.classes.B, \
-            self.classes.C, self.classes.D
+                     self.classes.C, self.classes.D
         s = Session()
         for a in [
             A(id=i,
-                bs=[B(id=(i * 5) + j) for j in range(1, 5)],
-                c=C(id=i),
-                ds=[D(id=(i * 5) + j) for j in range(1, 5)]
+              bs=[B(id=(i * 5) + j) for j in range(1, 5)],
+              c=C(id=i),
+              ds=[D(id=(i * 5) + j) for j in range(1, 5)]
               )
             for i in range(1, 5)
-        ]:
+            ]:
             s.merge(a)
 
 
 class DeferOptionsTest(fixtures.MappedTest):
-
     @classmethod
     def define_tables(cls, metadata):
         Table('a', metadata,
@@ -308,11 +311,13 @@ class DeferOptionsTest(fixtures.MappedTest):
         A = cls.classes.A
         s = Session()
         s.add_all([
-            A(id=i,
-                **dict((letter, "{0!s}{1:d}".format(letter, i)) for letter in
-                       ['x', 'y', 'z', 'p', 'q', 'r'])
-              ) for i in range(1, 1001)
-        ])
+                      A(id=i,
+                        **dict(
+                            (letter, "{0!s}{1:d}".format(letter, i)) for letter
+                            in
+                            ['x', 'y', 'z', 'p', 'q', 'r'])
+                        ) for i in range(1, 1001)
+                      ])
         s.commit()
 
     @profiling.function_call_count(variance=.10)
@@ -329,12 +334,11 @@ class DeferOptionsTest(fixtures.MappedTest):
         A = self.classes.A
         s = Session()
         s.query(A).options(
-            *[defer(letter) for letter in ['x', 'y', 'z', 'p', 'q', 'r']]).\
+            *[defer(letter) for letter in ['x', 'y', 'z', 'p', 'q', 'r']]). \
             all()
 
 
 class AttributeOverheadTest(fixtures.MappedTest):
-
     @classmethod
     def define_tables(cls, metadata):
         Table(
@@ -393,6 +397,7 @@ class AttributeOverheadTest(fixtures.MappedTest):
                 c1.parent = None
                 c1.parent = p1
                 del c1.parent
+
         go()
 
     def test_collection_append_remove(self):
@@ -406,6 +411,7 @@ class AttributeOverheadTest(fixtures.MappedTest):
                 p1.children.append(child)
             for child in children:
                 p1.children.remove(child)
+
         go()
 
 
@@ -460,6 +466,7 @@ class SessionTest(fixtures.MappedTest):
         @profiling.function_call_count()
         def go():
             sess.expire_all()
+
         go()
 
 
@@ -493,9 +500,9 @@ class QueryTest(fixtures.MappedTest):
         Parent = self.classes.Parent
         sess = Session()
         sess.add_all([
-            Parent(data1='d1', data2='d2', data3='d3', data4='d4')
-            for i in range(10)
-        ])
+                         Parent(data1='d1', data2='d2', data3='d3', data4='d4')
+                         for i in range(10)
+                         ])
         sess.commit()
         sess.close()
 

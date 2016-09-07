@@ -25,7 +25,7 @@ def mock_connection():
         def execute(*args, **kwargs):
             if conn.explode == 'execute':
                 raise MockDisconnect("Lost the DB connection on execute")
-            elif conn.explode in ('execute_no_disconnect', ):
+            elif conn.explode in ('execute_no_disconnect',):
                 raise MockError(
                     "something broke on execute but we didn't lose the "
                     "connection")
@@ -41,6 +41,7 @@ def mock_connection():
         def close():
             cursor.fetchall = cursor.fetchone = \
                 Mock(side_effect=MockError("cursor closed"))
+
         cursor = Mock(
             execute=Mock(side_effect=execute),
             close=Mock(side_effect=close))
@@ -215,7 +216,7 @@ class MockReconnectTest(fixtures.TestBase):
     def test_invalidate_dont_call_finalizer(self):
         conn = self.db.connect()
         finalizer = mock.Mock()
-        conn.connection._connection_record.\
+        conn.connection._connection_record. \
             finalize_callback.append(finalizer)
         conn.invalidate()
         assert conn.invalidated
@@ -413,11 +414,12 @@ class CursorErrTest(fixtures.TestBase):
                 while True:
                     yield Mock(
                         spec=['cursor', 'commit', 'rollback', 'close'],
-                        cursor=Mock(side_effect=cursor()),)
+                        cursor=Mock(side_effect=cursor()), )
 
             return Mock(
                 Error=DBAPIError, paramstyle='qmark',
                 connect=Mock(side_effect=connect()))
+
         dbapi = MockDBAPI()
 
         from sqlalchemy.engine import default
@@ -425,7 +427,7 @@ class CursorErrTest(fixtures.TestBase):
             get_dialect=lambda: default.DefaultDialect,
             _get_entrypoint=lambda: default.DefaultDialect,
             _instantiate_plugins=lambda kwargs: (),
-            translate_connect_args=lambda: {}, query={},)
+            translate_connect_args=lambda: {}, query={}, )
         eng = testing_engine(
             url, options=dict(module=dbapi, _initialize=initialize))
         eng.pool.logger = Mock()

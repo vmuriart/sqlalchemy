@@ -7,7 +7,7 @@ from sqlalchemy import testing
 from sqlalchemy.util import ue
 from sqlalchemy import util
 from sqlalchemy.testing.assertsql import CursorSQL
-from sqlalchemy import Integer, String, Table, Column, select, MetaData,\
+from sqlalchemy import Integer, String, Table, Column, select, MetaData, \
     func, PrimaryKeyConstraint, desc, Sequence, DDL, ForeignKey, or_, and_
 from sqlalchemy import event
 
@@ -100,9 +100,9 @@ class LegacySchemaAliasingTest(fixtures.TestBase, AssertsCompiledSQL):
 
     def test_union_schema_to_non(self):
         t1, t2 = self.t1, self.t2
-        s = select([t2.c.a, t2.c.b]).apply_labels().\
+        s = select([t2.c.a, t2.c.b]).apply_labels(). \
             union(
-                select([t1.c.a, t1.c.b]).apply_labels()).alias().select()
+            select([t1.c.a, t1.c.b]).apply_labels()).alias().select()
         self._assert_sql(
             s,
             "SELECT anon_1.schema_t2_a, anon_1.schema_t2_b FROM "
@@ -186,7 +186,6 @@ class IdentityInsertTest(fixtures.TestBase, AssertsCompiledSQL):
 
 
 class QueryUnicodeTest(fixtures.TestBase):
-
     __only_on__ = 'mssql'
     __backend__ = True
 
@@ -208,8 +207,8 @@ class QueryUnicodeTest(fixtures.TestBase):
             r = t1.select().execute().first()
             assert isinstance(r[1], util.text_type), \
                 '{0!s} is {1!s} instead of unicode, working on {2!s}'.format(
-                r[1],
-                type(r[1]), meta.bind)
+                    r[1],
+                    type(r[1]), meta.bind)
         finally:
             meta.drop_all()
 
@@ -301,7 +300,7 @@ class QueryTest(testing.AssertsExecutionResults, fixtures.TestBase):
         asserter.assert_(
             CursorSQL(
                 "INSERT INTO t1 (data) VALUES (?)",
-                ("somedata", )
+                ("somedata",)
             ),
             CursorSQL("SELECT @@identity AS lastrowid"),
         )
@@ -347,7 +346,7 @@ class QueryTest(testing.AssertsExecutionResults, fixtures.TestBase):
         asserter.assert_(
             CursorSQL(
                 "INSERT INTO t1 (data) VALUES (?); select scope_identity()",
-                ("somedata", )
+                ("somedata",)
             ),
         )
 
@@ -399,7 +398,7 @@ class QueryTest(testing.AssertsExecutionResults, fixtures.TestBase):
         table.create()
         result = table.insert().values(
             id=1,
-            data=func.lower('SomeString')).\
+            data=func.lower('SomeString')). \
             returning(table.c.id, table.c.data).execute()
         eq_(result.fetchall(), [(1, 'somestring')])
 
@@ -461,7 +460,6 @@ class QueryTest(testing.AssertsExecutionResults, fixtures.TestBase):
 
 
 class Foo(object):
-
     def __init__(self, **kw):
         for k in kw:
             setattr(self, k, kw[k])
@@ -484,7 +482,6 @@ def full_text_search_missing():
 
 
 class MatchTest(fixtures.TestBase, AssertsCompiledSQL):
-
     __only_on__ = 'mssql'
     __skip_if__ = full_text_search_missing,
     __backend__ = True
@@ -506,11 +503,11 @@ class MatchTest(fixtures.TestBase, AssertsCompiledSQL):
         )
         DDL("""CREATE FULLTEXT INDEX
                        ON cattable (description)
-                       KEY INDEX PK_cattable""").\
+                       KEY INDEX PK_cattable"""). \
             execute_at('after-create', matchtable)
         DDL("""CREATE FULLTEXT INDEX
                        ON matchtable (title)
-                       KEY INDEX PK_matchtable""").\
+                       KEY INDEX PK_matchtable"""). \
             execute_at('after-create', matchtable)
         metadata.create_all()
         cattable.insert().execute([{'id': 1, 'description': 'Python'},
@@ -538,8 +535,8 @@ class MatchTest(fixtures.TestBase, AssertsCompiledSQL):
     def test_simple_match(self):
         results = \
             matchtable.select().where(
-                matchtable.c.title.match('python')).\
-            order_by(matchtable.c.id).execute().fetchall()
+                matchtable.c.title.match('python')). \
+                order_by(matchtable.c.id).execute().fetchall()
         eq_([2, 5], [r.id for r in results])
 
     def test_simple_match_with_apostrophe(self):
@@ -565,14 +562,14 @@ class MatchTest(fixtures.TestBase, AssertsCompiledSQL):
         results1 = \
             matchtable.select().where(or_(
                 matchtable.c.title.match('nutshell'),
-                matchtable.c.title.match('ruby'))).\
-            order_by(matchtable.c.id).execute().fetchall()
+                matchtable.c.title.match('ruby'))). \
+                order_by(matchtable.c.id).execute().fetchall()
         eq_([3, 5], [r.id for r in results1])
         results2 = \
             matchtable.select().where(
                 matchtable.c.title.match(
-                    'nutshell OR ruby')).\
-            order_by(matchtable.c.id).execute().fetchall()
+                    'nutshell OR ruby')). \
+                order_by(matchtable.c.id).execute().fetchall()
         eq_([3, 5], [r.id for r in results2])
 
     def test_and_match(self):
@@ -591,6 +588,6 @@ class MatchTest(fixtures.TestBase, AssertsCompiledSQL):
         results = matchtable.select().where(
             and_(cattable.c.id == matchtable.c.category_id,
                  or_(cattable.c.description.match('Ruby'),
-                     matchtable.c.title.match('nutshell')))).\
+                     matchtable.c.title.match('nutshell')))). \
             order_by(matchtable.c.id).execute().fetchall()
         eq_([1, 3, 5], [r.id for r in results])

@@ -31,7 +31,6 @@ import re
 
 
 class MySQLExecutionContext_mysqlconnector(MySQLExecutionContext):
-
     def get_lastrowid(self):
         return self.cursor.lastrowid
 
@@ -40,10 +39,10 @@ class MySQLCompiler_mysqlconnector(MySQLCompiler):
     def visit_mod_binary(self, binary, operator, **kw):
         if self.dialect._mysqlconnector_double_percents:
             return self.process(binary.left, **kw) + " %% " + \
-                self.process(binary.right, **kw)
+                   self.process(binary.right, **kw)
         else:
             return self.process(binary.left, **kw) + " % " + \
-                self.process(binary.right, **kw)
+                   self.process(binary.right, **kw)
 
     def post_process_text(self, text):
         if self.dialect._mysqlconnector_double_percents:
@@ -59,7 +58,6 @@ class MySQLCompiler_mysqlconnector(MySQLCompiler):
 
 
 class MySQLIdentifierPreparer_mysqlconnector(MySQLIdentifierPreparer):
-
     def _escape_identifier(self, value):
         value = value.replace(self.escape_quote, self.escape_to_quote)
         if self.dialect._mysqlconnector_double_percents:
@@ -177,7 +175,7 @@ class MySQLDialect_mysqlconnector(MySQLDialect):
         exceptions = (self.dbapi.OperationalError, self.dbapi.InterfaceError)
         if isinstance(e, exceptions):
             return e.errno in errnos or \
-                "MySQL Connection not available." in str(e)
+                   "MySQL Connection not available." in str(e)
         else:
             return False
 

@@ -578,7 +578,7 @@ def name_for_scalar_relationship(base, local_cls, referred_cls, constraint):
 
 
 def name_for_collection_relationship(
-        base, local_cls, referred_cls, constraint):
+    base, local_cls, referred_cls, constraint):
     """Return the attribute name that should be used to refer from one
     class to another, for a collection reference.
 
@@ -605,7 +605,7 @@ def name_for_collection_relationship(
 
 
 def generate_relationship(
-        base, direction, return_fn, attrname, local_cls, referred_cls, **kw):
+    base, direction, return_fn, attrname, local_cls, referred_cls, **kw):
     """Generate a :func:`.relationship` or :func:`.backref` on behalf of two
     mapped classes.
 
@@ -656,7 +656,8 @@ def generate_relationship(
     elif return_fn is relationship:
         return return_fn(referred_cls, **kw)
     else:
-        raise TypeError("Unknown relationship function: {0!s}".format(return_fn))
+        raise TypeError(
+            "Unknown relationship function: {0!s}".format(return_fn))
 
 
 class AutomapBase(object):
@@ -692,15 +693,15 @@ class AutomapBase(object):
 
     @classmethod
     def prepare(
-            cls,
-            engine=None,
-            reflect=False,
-            schema=None,
-            classname_for_table=classname_for_table,
-            collection_class=list,
-            name_for_scalar_relationship=name_for_scalar_relationship,
-            name_for_collection_relationship=name_for_collection_relationship,
-            generate_relationship=generate_relationship):
+        cls,
+        engine=None,
+        reflect=False,
+        schema=None,
+        classname_for_table=classname_for_table,
+        collection_class=list,
+        name_for_scalar_relationship=name_for_scalar_relationship,
+        name_for_collection_relationship=name_for_collection_relationship,
+        generate_relationship=generate_relationship):
         """Extract mapped classes and relationships from the :class:`.MetaData` and
         perform mappings.
 
@@ -756,7 +757,7 @@ class AutomapBase(object):
         table_to_map_config = dict(
             (m.local_table, m)
             for m in _DeferredMapperConfig.
-            classes_for_base(cls, sort=False)
+                classes_for_base(cls, sort=False)
         )
 
         many_to_many = []
@@ -770,7 +771,7 @@ class AutomapBase(object):
             elif table not in table_to_map_config:
                 mapped_cls = type(
                     classname_for_table(cls, table.name, table),
-                    (cls, ),
+                    (cls,),
                     {"__table__": table}
                 )
                 map_config = _DeferredMapperConfig.config_for_cls(mapped_cls)
@@ -891,7 +892,7 @@ def _relationships_for_fks(automap_base, map_config, table_to_map_config,
             referred_cls = referred_cfg.cls
 
             if local_cls is not referred_cls and issubclass(
-                    local_cls, referred_cls):
+                local_cls, referred_cls):
                 continue
 
             relationship_name = name_for_scalar_relationship(
@@ -972,7 +973,6 @@ def _m2m_relationship(automap_base, lcl_m2m, rem_m2m, m2m_const, table,
                       name_for_scalar_relationship,
                       name_for_collection_relationship,
                       generate_relationship):
-
     map_config = table_to_map_config.get(lcl_m2m, None)
     referred_cfg = table_to_map_config.get(rem_m2m, None)
     if map_config is None or referred_cfg is None:

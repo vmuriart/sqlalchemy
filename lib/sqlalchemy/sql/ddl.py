@@ -56,7 +56,7 @@ class DDLElement(Executable, _DDLCompiles):
 
     """
 
-    _execution_options = Executable.\
+    _execution_options = Executable. \
         _execution_options.union({'autocommit': True})
 
     target = None
@@ -99,7 +99,7 @@ class DDLElement(Executable, _DDLCompiles):
                 "DDL execution skipped, criteria not met.")
 
     @util.deprecated("0.7", "See :class:`.DDLEvents`, as well as "
-                     ":meth:`.DDLElement.execute_if`.")
+                            ":meth:`.DDLElement.execute_if`.")
     def execute_at(self, event_name, target):
         """Link execution of this DDL to the DDL lifecycle of a SchemaItem.
 
@@ -212,7 +212,7 @@ class DDLElement(Executable, _DDLCompiles):
 
     def _should_execute(self, target, bind, **kw):
         if self.on is not None and \
-                not self._should_execute_deprecated(None, target, bind, **kw):
+            not self._should_execute_deprecated(None, target, bind, **kw):
             return False
 
         if isinstance(self.dialect, util.string_types):
@@ -246,8 +246,8 @@ class DDLElement(Executable, _DDLCompiles):
 
     def _check_ddl_on(self, on):
         if (on is not None and
-            (not isinstance(on, util.string_types + (tuple, list, set)) and
-             not util.callable(on))):
+                (not isinstance(on, util.string_types + (tuple, list, set)) and
+                     not util.callable(on))):
             raise exc.ArgumentError(
                 "Expected the name of a database dialect, a tuple "
                 "of names, or a callable for "
@@ -259,6 +259,7 @@ class DDLElement(Executable, _DDLCompiles):
 
     def _set_bind(self, bind):
         self._bind = bind
+
     bind = property(bind, _set_bind)
 
     def _generate(self):
@@ -376,7 +377,7 @@ class DDL(DDLElement):
         if not isinstance(statement, util.string_types):
             raise exc.ArgumentError(
                 "Expected a string or unicode SQL statement, got '{0!r}'".format(
-                statement))
+                    statement))
 
         self.statement = statement
         self.context = context or {}
@@ -464,8 +465,8 @@ class CreateTable(_CreateDropBase):
     __visit_name__ = "create_table"
 
     def __init__(
-            self, element, on=None, bind=None,
-            include_foreign_key_constraints=None):
+        self, element, on=None, bind=None,
+        include_foreign_key_constraints=None):
         """Create a :class:`.CreateTable` construct.
 
         :param element: a :class:`.Table` that's the subject
@@ -667,7 +668,6 @@ class DDLBase(SchemaVisitor):
 
 
 class SchemaGenerator(DDLBase):
-
     def __init__(self, dialect, connection, checkfirst=False,
                  tables=None, **kwargs):
         super(SchemaGenerator, self).__init__(connection, **kwargs)
@@ -683,24 +683,24 @@ class SchemaGenerator(DDLBase):
         if effective_schema:
             self.dialect.validate_identifier(effective_schema)
         return not self.checkfirst or \
-            not self.dialect.has_table(self.connection,
-                                       table.name, schema=effective_schema)
+               not self.dialect.has_table(self.connection,
+                                          table.name, schema=effective_schema)
 
     def _can_create_sequence(self, sequence):
         effective_schema = self.connection.schema_for_object(sequence)
 
         return self.dialect.supports_sequences and \
-            (
-                (not self.dialect.sequences_optional or
-                 not sequence.optional) and
-                (
-                    not self.checkfirst or
-                    not self.dialect.has_sequence(
-                        self.connection,
-                        sequence.name,
-                        schema=effective_schema)
-                )
-            )
+               (
+                   (not self.dialect.sequences_optional or
+                    not sequence.optional) and
+                   (
+                       not self.checkfirst or
+                       not self.dialect.has_sequence(
+                           self.connection,
+                           sequence.name,
+                           schema=effective_schema)
+                   )
+               )
 
     def visit_metadata(self, metadata):
         if self.tables is not None:
@@ -716,7 +716,7 @@ class SchemaGenerator(DDLBase):
 
         event_collection = [
             t for (t, fks) in collection if t is not None
-        ]
+            ]
         metadata.dispatch.before_create(metadata, self.connection,
                                         tables=event_collection,
                                         checkfirst=self.checkfirst,
@@ -741,9 +741,9 @@ class SchemaGenerator(DDLBase):
                                        _ddl_runner=self)
 
     def visit_table(
-            self, table, create_ok=False,
-            include_foreign_key_constraints=None,
-            _is_metadata_operation=False):
+        self, table, create_ok=False,
+        include_foreign_key_constraints=None,
+        _is_metadata_operation=False):
         if not create_ok and not self._can_create_table(table):
             return
 
@@ -792,7 +792,6 @@ class SchemaGenerator(DDLBase):
 
 
 class SchemaDropper(DDLBase):
-
     def __init__(self, dialect, connection, checkfirst=False,
                  tables=None, **kwargs):
         super(SchemaDropper, self).__init__(connection, **kwargs)
@@ -815,7 +814,7 @@ class SchemaDropper(DDLBase):
                     unsorted_tables,
                     filter_fn=lambda constraint: False
                     if not self.dialect.supports_alter
-                    or constraint.name is None
+                       or constraint.name is None
                     else None
                 )
             ))
@@ -841,15 +840,16 @@ class SchemaDropper(DDLBase):
                         err2.args[0],
                         err2.cycles, err2.edges,
                         msg="Can't sort tables for DROP; an "
-                        "unresolvable foreign key "
-                        "dependency exists between tables: %s.  Please ensure "
-                        "that the ForeignKey and ForeignKeyConstraint objects "
-                        "involved in the cycle have "
-                        "names so that they can be dropped using "
-                        "DROP CONSTRAINT."
-                        % (
-                            ", ".join(sorted([t.fullname for t in err2.cycles]))
-                        )
+                            "unresolvable foreign key "
+                            "dependency exists between tables: %s.  Please ensure "
+                            "that the ForeignKey and ForeignKeyConstraint objects "
+                            "involved in the cycle have "
+                            "names so that they can be dropped using "
+                            "DROP CONSTRAINT."
+                            % (
+                                ", ".join(
+                                    sorted([t.fullname for t in err2.cycles]))
+                            )
 
                     )
                 )
@@ -858,11 +858,11 @@ class SchemaDropper(DDLBase):
             s
             for s in metadata._sequences.values()
             if s.column is None and self._can_drop_sequence(s)
-        ]
+            ]
 
         event_collection = [
             t for (t, fks) in collection if t is not None
-        ]
+            ]
 
         metadata.dispatch.before_drop(
             metadata, self.connection, tables=event_collection,
@@ -894,14 +894,14 @@ class SchemaDropper(DDLBase):
     def _can_drop_sequence(self, sequence):
         effective_schema = self.connection.schema_for_object(sequence)
         return self.dialect.supports_sequences and \
-            ((not self.dialect.sequences_optional or
-              not sequence.optional) and
+               ((not self.dialect.sequences_optional or
+                 not sequence.optional) and
                 (not self.checkfirst or
                  self.dialect.has_sequence(
                      self.connection,
                      sequence.name,
                      schema=effective_schema))
-             )
+                )
 
     def visit_index(self, index):
         self.connection.execute(DropIndex(index))
@@ -924,9 +924,9 @@ class SchemaDropper(DDLBase):
 
         table.dispatch.after_drop(
             table, self.connection,
-           checkfirst=self.checkfirst,
-           _ddl_runner=self,
-           _is_metadata_operation=_is_metadata_operation)
+            checkfirst=self.checkfirst,
+            _ddl_runner=self,
+            _is_metadata_operation=_is_metadata_operation)
 
     def visit_foreign_key_constraint(self, constraint):
         if not self.dialect.supports_alter:
@@ -995,11 +995,11 @@ def sort_tables(tables, skip_fn=None, extra_dependencies=None):
         sort_tables_and_constraints(
             tables, filter_fn=_skip_fn, extra_dependencies=extra_dependencies)
         if t is not None
-    ]
+        ]
 
 
 def sort_tables_and_constraints(
-        tables, filter_fn=None, extra_dependencies=None):
+    tables, filter_fn=None, extra_dependencies=None):
     """sort a collection of :class:`.Table`  / :class:`.ForeignKeyConstraint`
     objects.
 
@@ -1095,6 +1095,8 @@ def sort_tables_and_constraints(
         )
 
     return [
-        (table, table.foreign_key_constraints.difference(remaining_fkcs))
-        for table in candidate_sort
-    ] + [(None, list(remaining_fkcs))]
+               (
+                   table,
+                   table.foreign_key_constraints.difference(remaining_fkcs))
+               for table in candidate_sort
+               ] + [(None, list(remaining_fkcs))]

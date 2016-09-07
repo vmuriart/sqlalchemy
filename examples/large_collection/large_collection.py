@@ -1,54 +1,57 @@
-
 from sqlalchemy import (MetaData, Table, Column, Integer, String, ForeignKey,
                         create_engine)
 from sqlalchemy.orm import (mapper, relationship, sessionmaker)
 
-
 meta = MetaData()
 
 org_table = Table('organizations', meta,
-    Column('org_id', Integer, primary_key=True),
-    Column('org_name', String(50), nullable=False, key='name'),
-    mysql_engine='InnoDB')
+                  Column('org_id', Integer, primary_key=True),
+                  Column('org_name', String(50), nullable=False, key='name'),
+                  mysql_engine='InnoDB')
 
 member_table = Table('members', meta,
-    Column('member_id', Integer, primary_key=True),
-    Column('member_name', String(50), nullable=False, key='name'),
-    Column('org_id', Integer,
-                    ForeignKey('organizations.org_id', ondelete="CASCADE")),
-    mysql_engine='InnoDB')
+                     Column('member_id', Integer, primary_key=True),
+                     Column('member_name', String(50), nullable=False,
+                            key='name'),
+                     Column('org_id', Integer,
+                            ForeignKey('organizations.org_id',
+                                       ondelete="CASCADE")),
+                     mysql_engine='InnoDB')
 
 
 class Organization(object):
     def __init__(self, name):
         self.name = name
 
+
 class Member(object):
     def __init__(self, name):
         self.name = name
 
-mapper(Organization, org_table, properties = {
-    'members' : relationship(Member,
-        # Organization.members will be a Query object - no loading
-        # of the entire collection occurs unless requested
-        lazy="dynamic",
 
-        # Member objects "belong" to their parent, are deleted when
-        # removed from the collection
-        cascade="all, delete-orphan",
+mapper(Organization, org_table, properties={
+    'members': relationship(Member,
+                            # Organization.members will be a Query object - no loading
+                            # of the entire collection occurs unless requested
+                            lazy="dynamic",
 
-        # "delete, delete-orphan" cascade does not load in objects on delete,
-        # allows ON DELETE CASCADE to handle it.
-        # this only works with a database that supports ON DELETE CASCADE -
-        # *not* sqlite or MySQL with MyISAM
-        passive_deletes=True,
-    )
+                            # Member objects "belong" to their parent, are deleted when
+                            # removed from the collection
+                            cascade="all, delete-orphan",
+
+                            # "delete, delete-orphan" cascade does not load in objects on delete,
+                            # allows ON DELETE CASCADE to handle it.
+                            # this only works with a database that supports ON DELETE CASCADE -
+                            # *not* sqlite or MySQL with MyISAM
+                            passive_deletes=True,
+                            )
 })
 
 mapper(Member, member_table)
 
 if __name__ == '__main__':
-    engine = create_engine("postgresql://scott:tiger@localhost/test", echo=True)
+    engine = create_engine("postgresql://scott:tiger@localhost/test",
+                           echo=True)
     meta.create_all(engine)
 
     # expire_on_commit=False means the session contents
@@ -85,7 +88,8 @@ if __name__ == '__main__':
     # SQL is only emitted for the head row - the Member rows
     # disappear automatically without the need for additional SQL.
     sess.delete(org)
-    print("-------------------------\nflush three - delete org, delete members in one statement\n")
+    print(
+        "-------------------------\nflush three - delete org, delete members in one statement\n")
     sess.commit()
 
     print("-------------------------\nno Member rows should remain:\n")

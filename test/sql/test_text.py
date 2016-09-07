@@ -3,7 +3,7 @@
 from sqlalchemy.testing import fixtures, AssertsCompiledSQL, eq_, \
     assert_raises_message, expect_warnings, assert_warnings
 from sqlalchemy import text, select, Integer, String, Float, \
-    bindparam, and_, func, literal_column, exc, MetaData, Table, Column,\
+    bindparam, and_, func, literal_column, exc, MetaData, Table, Column, \
     asc, func, desc, union
 from sqlalchemy.types import NullType
 from sqlalchemy.sql import table, column, util as sql_util
@@ -33,7 +33,6 @@ class CompileTest(fixtures.TestBase, AssertsCompiledSQL):
 
 
 class SelectCompositionTest(fixtures.TestBase, AssertsCompiledSQL):
-
     """test the usage of text() implicit within the select() construct
     when strings are passed."""
 
@@ -63,7 +62,7 @@ class SelectCompositionTest(fixtures.TestBase, AssertsCompiledSQL):
         s = s.order_by("column1")
         s.append_from(text("table1"))
         self.assert_compile(s, "SELECT column1, column2 FROM table1 WHERE "
-                            "column1=12 AND column2=19 ORDER BY column1")
+                               "column1=12 AND column2=19 ORDER BY column1")
 
     def test_select_composition_three(self):
         self.assert_compile(
@@ -133,7 +132,7 @@ class SelectCompositionTest(fixtures.TestBase, AssertsCompiledSQL):
     def test_select_bundle_columns(self):
         self.assert_compile(select(
             [table1, table2.c.otherid,
-                text("sysdate()"), text("foo, bar, lala")],
+             text("sysdate()"), text("foo, bar, lala")],
             and_(
                 text("foo.id = foofoo(lala)"),
                 text("datetime(foo) = Today"),
@@ -235,7 +234,7 @@ class BindParamTest(fixtures.TestBase, AssertsCompiledSQL):
     def test_binds_compiled_named(self):
         self.assert_compile(
             text("select * from foo where lala=:bar and hoho=:whee").
-            bindparams(bar=4, whee=7),
+                bindparams(bar=4, whee=7),
             "select * from foo where lala=%(bar)s and hoho=%(whee)s",
             checkparams={'bar': 4, 'whee': 7},
             dialect="postgresql"
@@ -244,7 +243,7 @@ class BindParamTest(fixtures.TestBase, AssertsCompiledSQL):
     def test_binds_compiled_positional(self):
         self.assert_compile(
             text("select * from foo where lala=:bar and hoho=:whee").
-            bindparams(bar=4, whee=7),
+                bindparams(bar=4, whee=7),
             "select * from foo where lala=? and hoho=?",
             checkparams={'bar': 4, 'whee': 7},
             dialect="sqlite"
@@ -293,8 +292,7 @@ class BindParamTest(fixtures.TestBase, AssertsCompiledSQL):
         )
 
     def test_text_in_select_nonfrom(self):
-
-        generate_series = text("generate_series(:x, :y, :z) as s(a)").\
+        generate_series = text("generate_series(:x, :y, :z) as s(a)"). \
             bindparams(x=None, y=None, z=None)
 
         s = select([
@@ -332,11 +330,11 @@ class AsFromTest(fixtures.TestBase, AssertsCompiledSQL):
                      'id',
                      'id'),
                     t.c.id.type),
-                'name': ('name',
-                         (t.c.name._proxies[0],
-                          'name',
-                          'name'),
-                         t.c.name.type)})
+             'name': ('name',
+                      (t.c.name._proxies[0],
+                       'name',
+                       'name'),
+                      t.c.name.type)})
 
     def test_basic_toplevel_resultmap(self):
         t = text("select id, name from user").columns(id=Integer, name=String)
@@ -348,11 +346,11 @@ class AsFromTest(fixtures.TestBase, AssertsCompiledSQL):
                      'id',
                      'id'),
                     t.c.id.type),
-                'name': ('name',
-                         (t.c.name._proxies[0],
-                          'name',
-                          'name'),
-                         t.c.name.type)})
+             'name': ('name',
+                      (t.c.name._proxies[0],
+                       'name',
+                       'name'),
+                      t.c.name.type)})
 
     def test_basic_subquery_resultmap(self):
         t = text("select id, name from user").columns(id=Integer, name=String)
@@ -541,7 +539,7 @@ class TextWarningsTest(fixtures.TestBase, AssertsCompiledSQL):
     def test_from(self):
         self._test(
             select([table1.c.myid]).select_from, "mytable", "mytable",
-            "SELECT mytable.myid FROM mytable, mytable"   # two FROMs
+            "SELECT mytable.myid FROM mytable, mytable"  # two FROMs
         )
 
 
@@ -550,7 +548,7 @@ class OrderByLabelResolutionTest(fixtures.TestBase, AssertsCompiledSQL):
 
     def _test_warning(self, stmt, offending_clause, expected):
         with expect_warnings(
-                "Can't resolve label reference {0!r};".format(offending_clause)):
+            "Can't resolve label reference {0!r};".format(offending_clause)):
             self.assert_compile(
                 stmt,
                 expected
@@ -558,7 +556,7 @@ class OrderByLabelResolutionTest(fixtures.TestBase, AssertsCompiledSQL):
         assert_raises_message(
             exc.SAWarning,
             "Can't resolve label reference {0!r}; converting to text".format(
-            offending_clause),
+                offending_clause),
             stmt.compile
         )
 
@@ -657,7 +655,7 @@ class OrderByLabelResolutionTest(fixtures.TestBase, AssertsCompiledSQL):
         )
 
     def test_order_by_func_label_desc(self):
-        stmt = select([func.foo('bar').label('fb'), table1]).\
+        stmt = select([func.foo('bar').label('fb'), table1]). \
             order_by(desc('fb'))
 
         self.assert_compile(
@@ -679,7 +677,7 @@ class OrderByLabelResolutionTest(fixtures.TestBase, AssertsCompiledSQL):
         stmt = select([column("foo"), column("bar")])
         stmt = select(
             [func.row_number().
-             over(order_by='foo', partition_by='bar')]
+                 over(order_by='foo', partition_by='bar')]
         ).select_from(stmt)
 
         self.assert_compile(
@@ -729,7 +727,7 @@ class OrderByLabelResolutionTest(fixtures.TestBase, AssertsCompiledSQL):
         ta = table1.alias()
         adapter = sql_util.ColumnAdapter(ta, anonymize_labels=True)
 
-        s1 = select([adapter.columns[expr] for expr in exprs]).\
+        s1 = select([adapter.columns[expr] for expr in exprs]). \
             apply_labels().order_by("myid", "t1name", "x")
 
         def go():
@@ -762,7 +760,7 @@ class OrderByLabelResolutionTest(fixtures.TestBase, AssertsCompiledSQL):
         ta = table1.alias()
         adapter = sql_util.ColumnAdapter(ta)
 
-        s1 = select([adapter.columns[expr] for expr in exprs]).\
+        s1 = select([adapter.columns[expr] for expr in exprs]). \
             apply_labels().order_by("myid", "t1name", "x")
 
         # labels are maintained

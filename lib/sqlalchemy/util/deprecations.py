@@ -48,6 +48,7 @@ def deprecated(version, message=None, add_deprecation_to_docstring=True):
         return _decorate_with_warning(
             fn, exc.SADeprecationWarning,
             message % dict(func=fn.__name__), header)
+
     return decorate
 
 
@@ -70,7 +71,8 @@ def pending_deprecation(version, message=None,
     """
 
     if add_deprecation_to_docstring:
-        header = ".. deprecated:: {0!s} (pending) {1!s}".format(version, (message or ''))
+        header = ".. deprecated:: {0!s} (pending) {1!s}".format(version, (
+            message or ''))
     else:
         header = None
 
@@ -81,6 +83,7 @@ def pending_deprecation(version, message=None,
         return _decorate_with_warning(
             fn, exc.SAPendingDeprecationWarning,
             message % dict(func=fn.__name__), header)
+
     return decorate
 
 
@@ -90,6 +93,7 @@ def _sanitize_restructured_text(text):
         if type_ in ("func", "meth"):
             name += "()"
         return name
+
     return re.sub(r'\:(\w+)\:`~?\.?(.+?)`', repl, text)
 
 
@@ -112,6 +116,7 @@ def _decorate_with_warning(func, wtype, message, docstring_header=None):
     decorated = warned(func)
     decorated.__doc__ = doc
     return decorated
+
 
 import textwrap
 

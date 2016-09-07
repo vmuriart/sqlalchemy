@@ -2,8 +2,8 @@
 
 from sqlalchemy.testing import eq_, is_
 from sqlalchemy import Column, Table, DDL, MetaData, TIMESTAMP, \
-    DefaultClause, String, Integer, Text, UnicodeText, SmallInteger,\
-    NCHAR, LargeBinary, DateTime, select, UniqueConstraint, Unicode,\
+    DefaultClause, String, Integer, Text, UnicodeText, SmallInteger, \
+    NCHAR, LargeBinary, DateTime, select, UniqueConstraint, Unicode, \
     BigInteger
 from sqlalchemy import event
 from sqlalchemy import sql
@@ -20,7 +20,8 @@ class TypeReflectionTest(fixtures.TestBase):
 
     @testing.provide_metadata
     def _run_test(self, specs, attributes):
-        columns = [Column('c{0:d}'.format((i + 1)), t[0]) for i, t in enumerate(specs)]
+        columns = [Column('c{0:d}'.format((i + 1)), t[0]) for i, t in
+                   enumerate(specs)]
 
         # Early 5.0 releases seem to report more "general" for columns
         # in a view, e.g. char -> varchar, tinyblob -> mediumblob
@@ -122,8 +123,8 @@ class TypeReflectionTest(fixtures.TestBase):
     def test_integer_types(self):
         specs = []
         for type_ in [
-                mysql.TINYINT, mysql.SMALLINT,
-                mysql.MEDIUMINT, mysql.INTEGER, mysql.BIGINT]:
+            mysql.TINYINT, mysql.SMALLINT,
+            mysql.MEDIUMINT, mysql.INTEGER, mysql.BIGINT]:
             for display_width in [None, 4, 7]:
                 for unsigned in [False, True]:
                     for zerofill in [None, True]:
@@ -168,9 +169,9 @@ class TypeReflectionTest(fixtures.TestBase):
 
     def test_binary_types(self):
         specs = [
-            (LargeBinary(3), mysql.TINYBLOB(), ),
+            (LargeBinary(3), mysql.TINYBLOB(),),
             (LargeBinary(), mysql.BLOB()),
-            (mysql.MSBinary(3), mysql.MSBinary(3), ),
+            (mysql.MSBinary(3), mysql.MSBinary(3),),
             (mysql.MSVarBinary(3), mysql.MSVarBinary(3)),
             (mysql.MSTinyBlob(), mysql.MSTinyBlob()),
             (mysql.MSBlob(), mysql.MSBlob()),
@@ -184,14 +185,13 @@ class TypeReflectionTest(fixtures.TestBase):
     def test_legacy_enum_types(self):
 
         specs = [
-            (mysql.ENUM("''","'fleem'"), mysql.ENUM("''","'fleem'")),  # noqa
+            (mysql.ENUM("''", "'fleem'"), mysql.ENUM("''", "'fleem'")),  # noqa
         ]
 
         self._run_test(specs, ['enums'])
 
 
 class ReflectionTest(fixtures.TestBase, AssertsExecutionResults):
-
     __only_on__ = 'mysql'
     __backend__ = True
 
@@ -222,12 +222,12 @@ class ReflectionTest(fixtures.TestBase, AssertsExecutionResults):
         assert def_table.c.c2.server_default.arg == '0'
         assert def_table.c.c3.server_default.arg == 'abc'
         assert def_table.c.c4.server_default.arg \
-            == '2009-04-05 12:00:00'
+               == '2009-04-05 12:00:00'
         assert str(reflected.c.c1.server_default.arg) == "''"
         assert str(reflected.c.c2.server_default.arg) == "'0'"
         assert str(reflected.c.c3.server_default.arg) == "'abc'"
         assert str(reflected.c.c4.server_default.arg) \
-            == "'2009-04-05 12:00:00'"
+               == "'2009-04-05 12:00:00'"
         assert reflected.c.c5.default is None
         assert reflected.c.c5.server_default is None
         assert reflected.c.c6.default is None
@@ -245,7 +245,7 @@ class ReflectionTest(fixtures.TestBase, AssertsExecutionResults):
         assert str(reflected2.c.c2.server_default.arg) == "'0'"
         assert str(reflected2.c.c3.server_default.arg) == "'abc'"
         assert str(reflected2.c.c4.server_default.arg) \
-            == "'2009-04-05 12:00:00'"
+               == "'2009-04-05 12:00:00'"
         assert reflected.c.c5.default is None
         assert reflected.c.c5.server_default is None
         assert reflected.c.c6.default is None
@@ -399,7 +399,8 @@ class ReflectionTest(fixtures.TestBase, AssertsExecutionResults):
 
     @testing.provide_metadata
     def test_view_reflection(self):
-        Table('x', self.metadata, Column('a', Integer), Column('b', String(50)))
+        Table('x', self.metadata, Column('a', Integer),
+              Column('b', String(50)))
         self.metadata.create_all()
 
         with testing.db.connect() as conn:
@@ -423,10 +424,9 @@ class ReflectionTest(fixtures.TestBase, AssertsExecutionResults):
                 [
                     (col['name'], col['type'].__class__)
                     for col in insp.get_columns(v)
-                ],
+                    ],
                 [('a', mysql.INTEGER), ('b', mysql.VARCHAR)]
             )
-
 
     @testing.exclude('mysql', '<', (5, 0, 0), 'no information_schema support')
     def test_system_views(self):
@@ -473,7 +473,8 @@ class ReflectionTest(fixtures.TestBase, AssertsExecutionResults):
                 {
                     "name": d['name'], "nullable": d['nullable'],
                     "default": d['default']}
-                for d in inspect(testing.db).get_columns("nn_t{0:d}".format(idx))
+                for d in
+                inspect(testing.db).get_columns("nn_t{0:d}".format(idx))
             )
 
         eq_(
@@ -561,14 +562,11 @@ class RawReflectionTest(fixtures.TestBase):
                         'REFERENCES `users` (`id`) '
                         'ON DELETE CASCADE ON UPDATE CASCADE')
         eq_(m.groups(), ('addresses_user_id_fkey', '`user_id`',
-                            '`users`', '`id`', None, 'CASCADE', 'CASCADE'))
-
+                         '`users`', '`id`', None, 'CASCADE', 'CASCADE'))
 
         m = regex.match('  CONSTRAINT `addresses_user_id_fkey` '
                         'FOREIGN KEY (`user_id`) '
                         'REFERENCES `users` (`id`) '
                         'ON DELETE CASCADE ON UPDATE SET NULL')
         eq_(m.groups(), ('addresses_user_id_fkey', '`user_id`',
-                            '`users`', '`id`', None, 'CASCADE', 'SET NULL'))
-
-
+                         '`users`', '`id`', None, 'CASCADE', 'SET NULL'))

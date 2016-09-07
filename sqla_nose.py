@@ -26,7 +26,7 @@ bootstrap_file = os.path.join(
 with open(bootstrap_file) as f:
     code = compile(f.read(), "bootstrap.py", 'exec')
     to_bootstrap = "nose"
-    exec(code, globals(), locals())
+    exec (code, globals(), locals())
 
 from noseplugin import NoseSQLAlchemy
 

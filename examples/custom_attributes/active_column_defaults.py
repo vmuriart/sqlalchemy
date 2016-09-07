@@ -35,6 +35,7 @@ def default_listener(col_attr, default):
     user integrating this feature.
 
     """
+
     @event.listens_for(col_attr, "init_scalar", retval=True, propagate=True)
     def init_scalar(target, value, dict_):
 
@@ -64,7 +65,6 @@ def default_listener(col_attr, default):
 
 
 if __name__ == '__main__':
-
     from sqlalchemy import Column, Integer, DateTime, create_engine
     from sqlalchemy.orm import Session
     from sqlalchemy.ext.declarative import declarative_base
@@ -74,6 +74,7 @@ if __name__ == '__main__':
 
     event.listen(Base, 'mapper_configured', configure_listener, propagate=True)
 
+
     class Widget(Base):
         __tablename__ = 'widget'
 
@@ -81,6 +82,7 @@ if __name__ == '__main__':
 
         radius = Column(Integer, default=30)
         timestamp = Column(DateTime, default=datetime.datetime.now)
+
 
     e = create_engine("sqlite://", echo=True)
     Base.metadata.create_all(e)

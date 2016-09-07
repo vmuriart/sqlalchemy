@@ -185,7 +185,7 @@ class ColumnProperty(StrategizedProperty):
     def do_init(self):
         super(ColumnProperty, self).do_init()
         if len(self.columns) > 1 and \
-                set(self.parent.primary_key).issuperset(self.columns):
+            set(self.parent.primary_key).issuperset(self.columns):
             util.warn(
                 ("On mapper %s, primary key column '%s' is being combined "
                  "with distinct primary key column '%s' in attribute '%s'.  "
@@ -202,7 +202,7 @@ class ColumnProperty(StrategizedProperty):
 
     def _getcommitted(self, state, dict_, column,
                       passive=attributes.PASSIVE_OFF):
-        return state.get_impl(self.key).\
+        return state.get_impl(self.key). \
             get_committed_value(state, dict_, passive=passive)
 
     def merge(self, session, source_state, source_dict, dest_state,

@@ -8,42 +8,53 @@ metadata = MetaData()
 
 # a table to store companies
 companies = Table('companies', metadata,
-   Column('company_id', Integer, primary_key=True),
-   Column('name', String(50)))
+                  Column('company_id', Integer, primary_key=True),
+                  Column('name', String(50)))
 
 employees_table = Table('employees', metadata,
-    Column('employee_id', Integer, primary_key=True),
-    Column('company_id', Integer, ForeignKey('companies.company_id')),
-    Column('name', String(50)),
-    Column('type', String(20)),
-    Column('status', String(20)),
-    Column('engineer_name', String(50)),
-    Column('primary_language', String(50)),
-    Column('manager_name', String(50))
-)
+                        Column('employee_id', Integer, primary_key=True),
+                        Column('company_id', Integer,
+                               ForeignKey('companies.company_id')),
+                        Column('name', String(50)),
+                        Column('type', String(20)),
+                        Column('status', String(20)),
+                        Column('engineer_name', String(50)),
+                        Column('primary_language', String(50)),
+                        Column('manager_name', String(50))
+                        )
 
 
 class Person(object):
     def __init__(self, **kwargs):
         for key, value in kwargs.items():
             setattr(self, key, value)
+
     def __repr__(self):
         return "Ordinary person {0!s}".format(self.name)
+
+
 class Engineer(Person):
     def __repr__(self):
-        return "Engineer %s, status %s, engineer_name %s, "\
-                    "primary_language %s" % \
-                        (self.name, self.status,
-                        self.engineer_name, self.primary_language)
+        return "Engineer %s, status %s, engineer_name %s, " \
+               "primary_language %s" % \
+               (self.name, self.status,
+                self.engineer_name, self.primary_language)
+
+
 class Manager(Person):
     def __repr__(self):
-        return "Manager {0!s}, status {1!s}, manager_name {2!s}".format(self.name, self.status, self.manager_name)
+        return "Manager {0!s}, status {1!s}, manager_name {2!s}".format(
+            self.name, self.status, self.manager_name)
+
+
 class Company(object):
     def __init__(self, **kwargs):
         for key, value in kwargs.items():
             setattr(self, key, value)
+
     def __repr__(self):
         return "Company {0!s}".format(self.name)
+
 
 person_mapper = mapper(Person, employees_table,
                        polymorphic_on=employees_table.c.type,
@@ -57,7 +68,6 @@ mapper(Company, companies, properties={
     'employees': relationship(Person, lazy=True, backref='company')
 })
 
-
 engine = create_engine('sqlite:///', echo=True)
 
 metadata.create_all(engine)
@@ -66,15 +76,17 @@ session = sessionmaker(engine)()
 
 c = Company(name='company1')
 c.employees.append(Manager(name='pointy haired boss', status='AAB',
-                   manager_name='manager1'))
+                           manager_name='manager1'))
 c.employees.append(Engineer(name='dilbert', status='BBA',
-                   engineer_name='engineer1', primary_language='java'))
+                            engineer_name='engineer1',
+                            primary_language='java'))
 c.employees.append(Person(name='joesmith', status='HHH'))
 c.employees.append(Engineer(name='wally', status='CGG',
-                   engineer_name='engineer2', primary_language='python'
-                   ))
+                            engineer_name='engineer2',
+                            primary_language='python'
+                            ))
 c.employees.append(Manager(name='jsmith', status='ABA',
-                   manager_name='manager2'))
+                           manager_name='manager2'))
 session.add(c)
 session.commit()
 

@@ -76,14 +76,14 @@ class InsertExecTest(fixtures.TablesTest):
                 ins = table_.insert()
                 comp = ins.compile(engine, column_keys=list(values))
                 if not set(values).issuperset(
-                        c.key for c in table_.primary_key):
+                    c.key for c in table_.primary_key):
                     is_(bool(comp.returning), True)
 
             result = engine.execute(table_.insert(), **values)
             ret = values.copy()
 
             for col, id in zip(
-                    table_.primary_key, result.inserted_primary_key):
+                table_.primary_key, result.inserted_primary_key):
                 ret[col.key] = id
 
             if result.lastrow_has_defaults():
@@ -209,9 +209,9 @@ class InsertExecTest(fixtures.TablesTest):
         eng = engines.testing_engine()
 
         class ExcCtx(sqlite.base.SQLiteExecutionContext):
-
             def get_lastrowid(self):
                 return 0
+
         eng.dialect.execution_ctx_cls = ExcCtx
         t = Table(
             't', self.metadata, Column('x', Integer, primary_key=True),
@@ -280,7 +280,6 @@ class InsertExecTest(fixtures.TablesTest):
 
 
 class TableInsertTest(fixtures.TablesTest):
-
     """test for consistent insert behavior across dialects
     regarding the inline=True flag, lower-case 't' tables.
 
@@ -324,7 +323,7 @@ class TableInsertTest(fixtures.TablesTest):
         eq_(
             testing.db.execute(
                 self.tables.foo.select().
-                order_by(self.tables.foo.c.id)).fetchall(),
+                    order_by(self.tables.foo.c.id)).fetchall(),
             data)
 
     @testing.requires.sequences

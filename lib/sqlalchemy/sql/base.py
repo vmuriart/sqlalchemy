@@ -9,7 +9,6 @@
 
 """
 
-
 from .. import util, exc
 import itertools
 from .visitors import ClauseVisitor
@@ -231,6 +230,7 @@ class DialectKWArgs(object):
         if dialect_cls.construct_arguments is None:
             return None
         return dict(dialect_cls.construct_arguments)
+
     _kw_registry = util.PopulateDict(_kw_reg_for_dialect)
 
     def _kw_reg_for_dialect_cls(self, dialect_name):
@@ -628,8 +628,8 @@ def _bind_or_error(schemaitem, msg=None):
         else:
             item = '{0!s} object'.format(name)
         if msg is None:
-            msg = "%s is not bound to an Engine or Connection.  "\
-                "Execution can not proceed without a database to execute "\
-                "against." % item
+            msg = "%s is not bound to an Engine or Connection.  " \
+                  "Execution can not proceed without a database to execute " \
+                  "against." % item
         raise exc.UnboundExecutionError(msg)
     return bind

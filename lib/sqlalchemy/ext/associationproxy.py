@@ -236,7 +236,7 @@ class AssociationProxy(interfaces.InspectionAttrInfo):
 
     @util.memoized_property
     def _value_is_scalar(self):
-        return not self._get_property().\
+        return not self._get_property(). \
             mapper.get_property(self.value_attr).uselist
 
     @util.memoized_property
@@ -409,7 +409,7 @@ class AssociationProxy(interfaces.InspectionAttrInfo):
         if self._target_is_object:
             return self._comparator.has(
                 getattr(self.target_class, self.value_attr).
-                has(criterion, **kwargs)
+                    has(criterion, **kwargs)
             )
         else:
             if criterion is not None or kwargs:
@@ -682,6 +682,7 @@ class _AssociationList(_AssociationCollection):
         if not isinstance(n, int):
             return NotImplemented
         return list(self) * n
+
     __rmul__ = __mul__
 
     def __iadd__(self, iterable):
@@ -708,7 +709,8 @@ class _AssociationList(_AssociationCollection):
         return repr(list(self))
 
     def __hash__(self):
-        raise TypeError("{0!s} objects are unhashable".format(type(self).__name__))
+        raise TypeError(
+            "{0!s} objects are unhashable".format(type(self).__name__))
 
     for func_name, func in list(locals().items()):
         if (util.callable(func) and func.__name__ == func_name and
@@ -833,8 +835,9 @@ class _AssociationDict(_AssociationCollection):
 
     def update(self, *a, **kw):
         if len(a) > 1:
-            raise TypeError('update expected at most 1 arguments, got {0:d}'.format(
-                            len(a)))
+            raise TypeError(
+                'update expected at most 1 arguments, got {0:d}'.format(
+                    len(a)))
         elif len(a) == 1:
             seq_or_map = a[0]
             # discern dict from sequence - took the advice from
@@ -859,7 +862,8 @@ class _AssociationDict(_AssociationCollection):
         return dict(self.items())
 
     def __hash__(self):
-        raise TypeError("{0!s} objects are unhashable".format(type(self).__name__))
+        raise TypeError(
+            "{0!s} objects are unhashable".format(type(self).__name__))
 
     for func_name, func in list(locals().items()):
         if (util.callable(func) and func.__name__ == func_name and
@@ -1059,7 +1063,8 @@ class _AssociationSet(_AssociationCollection):
         return repr(set(self))
 
     def __hash__(self):
-        raise TypeError("{0!s} objects are unhashable".format(type(self).__name__))
+        raise TypeError(
+            "{0!s} objects are unhashable".format(type(self).__name__))
 
     for func_name, func in list(locals().items()):
         if (util.callable(func) and func.__name__ == func_name and

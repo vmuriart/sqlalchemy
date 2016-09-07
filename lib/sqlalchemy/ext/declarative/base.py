@@ -67,9 +67,9 @@ def _get_immediate_cls_attr(cls, attrname, strict=False):
     for base in cls.__mro__:
         _is_declarative_inherits = hasattr(base, '_decl_class_registry')
         if attrname in base.__dict__ and (
-            base is cls or
-            ((base in cls.__bases__ if strict else True)
-                and not _is_declarative_inherits)
+                    base is cls or
+                ((base in cls.__bases__ if strict else True)
+                 and not _is_declarative_inherits)
         ):
             return getattr(base, attrname)
     else:
@@ -89,12 +89,11 @@ def _as_declarative(cls, classname, dict_):
 
 
 class _MapperConfig(object):
-
     @classmethod
     def setup_mapping(cls, cls_, classname, dict_):
         defer_map = _get_immediate_cls_attr(
             cls_, '_sa_decl_prepare_nocascade', strict=True) or \
-            hasattr(cls_, '_sa_decl_prepare')
+                    hasattr(cls_, '_sa_decl_prepare')
 
         if defer_map:
             cfg_cls = _DeferredMapperConfig
@@ -158,9 +157,9 @@ class _MapperConfig(object):
 
         for base in cls.__mro__:
             class_mapped = base is not cls and \
-                _declared_mapping_info(base) is not None and \
-                not _get_immediate_cls_attr(
-                    base, '_sa_decl_prepare_nocascade', strict=True)
+                           _declared_mapping_info(base) is not None and \
+                           not _get_immediate_cls_attr(
+                               base, '_sa_decl_prepare_nocascade', strict=True)
 
             if not class_mapped and base is not cls:
                 self._produce_column_copies(base)
@@ -168,8 +167,8 @@ class _MapperConfig(object):
             for name, obj in vars(base).items():
                 if name == '__mapper_args__':
                     if not mapper_args_fn and (
-                        not class_mapped or
-                        isinstance(obj, declarative_props)
+                            not class_mapped or
+                            isinstance(obj, declarative_props)
                     ):
                         # don't even invoke __mapper_args__ until
                         # after we've determined everything about the
@@ -180,18 +179,18 @@ class _MapperConfig(object):
                         mapper_args_fn = lambda: dict(cls.__mapper_args__)
                 elif name == '__tablename__':
                     if not tablename and (
-                        not class_mapped or
-                        isinstance(obj, declarative_props)
+                            not class_mapped or
+                            isinstance(obj, declarative_props)
                     ):
                         tablename = cls.__tablename__
                 elif name == '__table_args__':
                     if not table_args and (
-                        not class_mapped or
-                        isinstance(obj, declarative_props)
+                            not class_mapped or
+                            isinstance(obj, declarative_props)
                     ):
                         table_args = cls.__table_args__
                         if not isinstance(
-                                table_args, (tuple, dict, type(None))):
+                            table_args, (tuple, dict, type(None))):
                             raise exc.ArgumentError(
                                 "__table_args__ value must be a tuple, "
                                 "dict, or None")
@@ -259,8 +258,8 @@ class _MapperConfig(object):
                         "must be declared as @declared_attr callables "
                         "on declarative mixin classes. ")
                 elif name not in dict_ and not (
-                        '__table__' in dict_ and
-                        (obj.name or name) in dict_['__table__'].c
+                            '__table__' in dict_ and
+                            (obj.name or name) in dict_['__table__'].c
                 ):
                     column_copies[obj] = copy_ = obj.copy()
                     copy_._creation_order = obj._creation_order
@@ -414,15 +413,15 @@ class _MapperConfig(object):
             if c is None:
                 continue
             if _declared_mapping_info(c) is not None and \
-                    not _get_immediate_cls_attr(
-                        c, '_sa_decl_prepare_nocascade', strict=True):
+                not _get_immediate_cls_attr(
+                    c, '_sa_decl_prepare_nocascade', strict=True):
                 self.inherits = c
                 break
         else:
             self.inherits = None
 
         if table is None and self.inherits is None and \
-                not _get_immediate_cls_attr(cls, '__no_table__'):
+            not _get_immediate_cls_attr(cls, '__no_table__'):
 
             raise exc.InvalidRequestError(
                 "Class %r does not have a __table__ or __tablename__ "
@@ -556,7 +555,7 @@ class _DeferredMapperConfig(_MapperConfig):
     def has_cls(cls, class_):
         # 2.6 fails on weakref if class_ is an old style class
         return isinstance(class_, type) and \
-            weakref.ref(class_) in cls._configs
+               weakref.ref(class_) in cls._configs
 
     @classmethod
     def config_for_cls(cls, class_):
@@ -645,8 +644,11 @@ def _declarative_constructor(self, **kwargs):
     for k in kwargs:
         if not hasattr(cls_, k):
             raise TypeError(
-                "{0!r} is an invalid keyword argument for {1!s}".format(k, cls_.__name__))
+                "{0!r} is an invalid keyword argument for {1!s}".format(k,
+                                                                        cls_.__name__))
         setattr(self, k, kwargs[k])
+
+
 _declarative_constructor.__name__ = '__init__'
 
 

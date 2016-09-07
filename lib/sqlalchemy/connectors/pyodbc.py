@@ -8,7 +8,6 @@
 from . import Connector
 from .. import util
 
-
 import sys
 import re
 
@@ -66,10 +65,10 @@ class PyODBCConnector(Connector):
             connectors = [util.unquote_plus(keys.pop('odbc_connect'))]
         else:
             dsn_connection = 'dsn' in keys or \
-                ('host' in keys and 'database' not in keys)
+                             ('host' in keys and 'database' not in keys)
             if dsn_connection:
                 connectors = ['dsn={0!s}'.format((keys.pop('host', '') or
-                                          keys.pop('dsn', '')))]
+                                                  keys.pop('dsn', '')))]
             else:
                 port = ''
                 if 'port' in keys and 'port' not in query:
@@ -104,15 +103,16 @@ class PyODBCConnector(Connector):
             # you query a cp1253 encoded database from a latin1 client...
             if 'odbc_autotranslate' in keys:
                 connectors.append("AutoTranslate={0!s}".format(
-                                  keys.pop("odbc_autotranslate")))
+                    keys.pop("odbc_autotranslate")))
 
-            connectors.extend(['{0!s}={1!s}'.format(k, v) for k, v in keys.items()])
+            connectors.extend(
+                ['{0!s}={1!s}'.format(k, v) for k, v in keys.items()])
         return [[";".join(connectors)], connect_args]
 
     def is_disconnect(self, e, connection, cursor):
         if isinstance(e, self.dbapi.ProgrammingError):
             return "The cursor's connection has been closed." in str(e) or \
-                'Attempt to use a closed connection.' in str(e)
+                   'Attempt to use a closed connection.' in str(e)
         elif isinstance(e, self.dbapi.Error):
             return '[08S01]' in str(e)
         else:
@@ -145,14 +145,13 @@ class PyODBCConnector(Connector):
             self.supports_unicode_binds = self._user_supports_unicode_binds
         elif util.py2k:
             self.supports_unicode_binds = (
-                not self.freetds or self.freetds_driver_version >= '0.91'
-            ) and not self.easysoft
+                                              not self.freetds or self.freetds_driver_version >= '0.91'
+                                          ) and not self.easysoft
         else:
             self.supports_unicode_binds = True
 
         # run other initialization which asks for user name, etc.
         super(PyODBCConnector, self).initialize(connection)
-
 
     def _dbapi_version(self):
         if not self.dbapi:

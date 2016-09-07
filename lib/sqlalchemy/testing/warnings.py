@@ -29,6 +29,5 @@ def assert_warnings(fn, warning_msgs, regex=False):
     """
 
     with assertions._expect_warnings(
-            sa_exc.SAWarning, warning_msgs, regex=regex):
+        sa_exc.SAWarning, warning_msgs, regex=regex):
         return fn()
-

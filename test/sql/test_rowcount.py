@@ -5,10 +5,9 @@ from sqlalchemy.testing import eq_
 
 
 class FoundRowsTest(fixtures.TestBase, AssertsExecutionResults):
-
     """tests rowcount functionality"""
 
-    __requires__ = ('sane_rowcount', )
+    __requires__ = ('sane_rowcount',)
     __backend__ = True
 
     @classmethod
@@ -19,9 +18,10 @@ class FoundRowsTest(fixtures.TestBase, AssertsExecutionResults):
         employees_table = Table(
             'employees', metadata, Column(
                 'employee_id', Integer, Sequence(
-                    'employee_id_seq', optional=True), primary_key=True), Column(
+                    'employee_id_seq', optional=True), primary_key=True),
+            Column(
                 'name', String(50)), Column(
-                    'department', String(1)), )
+                'department', String(1)), )
         metadata.create_all()
 
     def setup(self):

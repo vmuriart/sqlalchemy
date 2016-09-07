@@ -1,4 +1,3 @@
-
 from sqlalchemy.testing import eq_, assert_raises, \
     assert_raises_message
 from sqlalchemy.ext import declarative as decl
@@ -39,7 +38,6 @@ class DeclarativeTestBase(fixtures.TestBase,
 
 
 class DeclarativeTest(DeclarativeTestBase):
-
     def test_basic(self):
         class User(Base, fixtures.ComparableEntity):
             __tablename__ = 'users'
@@ -119,9 +117,9 @@ class DeclarativeTest(DeclarativeTestBase):
             user_id = Column('user_id', Integer, ForeignKey('users.id'),
                              key='_user_id')
             user = relationship(
-                    User,
-                    backref=backref("addresses",
-                                    order_by=util.u("Address.email")))
+                User,
+                backref=backref("addresses",
+                                order_by=util.u("Address.email")))
 
         assert Address.user.property.mapper.class_ is User
 
@@ -171,7 +169,7 @@ class DeclarativeTest(DeclarativeTestBase):
             some_data = t.c.data
 
         assert class_mapper(Bar).get_property('some_data').columns[0] \
-            is t.c.data
+               is t.c.data
 
     def test_column_named_twice(self):
         def go():
@@ -181,6 +179,7 @@ class DeclarativeTest(DeclarativeTestBase):
                 id = Column(Integer, primary_key=True)
                 x = Column('x', Integer)
                 y = Column('x', Integer)
+
         assert_raises_message(
             sa.exc.SAWarning,
             "On class 'Foo', Column object 'x' named directly multiple times, "
@@ -215,6 +214,7 @@ class DeclarativeTest(DeclarativeTestBase):
             id = Column(Integer, primary_key=True)
             a_id = Column(Integer, ForeignKey('a.id'))
             a = relationship('a')
+
         assert_raises_message(
             sa.exc.ArgumentError,
             "relationship 'a' expects a class or a mapper "
@@ -232,6 +232,7 @@ class DeclarativeTest(DeclarativeTestBase):
             id = Column(Integer, primary_key=True)
             a_id = Column(Integer, ForeignKey('a.id'))
             a = relationship(A.__table__)
+
         assert_raises_message(
             sa.exc.ArgumentError,
             "relationship 'a' expects a class or a mapper "
@@ -326,7 +327,6 @@ class DeclarativeTest(DeclarativeTestBase):
 
     def test_string_dependency_resolution(self):
         class User(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'users'
             id = Column(Integer, primary_key=True,
                         test_needs_autoincrement=True)
@@ -341,7 +341,6 @@ class DeclarativeTest(DeclarativeTestBase):
                                 foreign_keys='[Address.user_id]'))
 
         class Address(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'addresses'
             id = Column(Integer, primary_key=True,
                         test_needs_autoincrement=True)
@@ -363,7 +362,6 @@ class DeclarativeTest(DeclarativeTestBase):
                 Address(email='def'), Address(email='abc')]))
 
         class Foo(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'foo'
             id = Column(Integer, primary_key=True)
             rel = relationship('User',
@@ -376,7 +374,6 @@ class DeclarativeTest(DeclarativeTestBase):
     def test_string_dependency_resolution_synonym(self):
 
         class User(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'users'
             id = Column(Integer, primary_key=True,
                         test_needs_autoincrement=True)
@@ -392,7 +389,6 @@ class DeclarativeTest(DeclarativeTestBase):
             User(name='ed'))
 
         class Foo(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'foo'
             id = Column(Integer, primary_key=True)
             _user_id = Column(Integer)
@@ -452,7 +448,7 @@ class DeclarativeTest(DeclarativeTestBase):
             d = relationship(
                 "D",
                 secondary="join(B, D, B.d_id == D.id)."
-                "join(C, C.d_id == D.id)",
+                          "join(C, C.d_id == D.id)",
                 primaryjoin="and_(A.b_id == B.id, A.id == C.a_id)",
                 secondaryjoin="D.id == B.d_id",
             )
@@ -474,6 +470,7 @@ class DeclarativeTest(DeclarativeTestBase):
             __tablename__ = 'd'
 
             id = Column(Integer, primary_key=True)
+
         s = Session()
         self.assert_compile(
             s.query(A).join(A.d),
@@ -510,7 +507,6 @@ class DeclarativeTest(DeclarativeTestBase):
             name = Column(String(50))
 
         class Address(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'addresses'
             id = Column(Integer, primary_key=True,
                         test_needs_autoincrement=True)
@@ -530,7 +526,6 @@ class DeclarativeTest(DeclarativeTestBase):
         """test that full tinkery expressions work as written"""
 
         class User(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'users'
             id = Column(Integer, primary_key=True)
             addresses = relationship(
@@ -538,7 +533,6 @@ class DeclarativeTest(DeclarativeTestBase):
                 primaryjoin='User.id==Address.user_id.prop.columns[0]')
 
         class Address(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'addresses'
             id = Column(Integer, primary_key=True)
             user_id = Column(Integer, ForeignKey('users.id'))
@@ -549,15 +543,14 @@ class DeclarativeTest(DeclarativeTestBase):
 
     def test_string_dependency_resolution_module_qualified(self):
         class User(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'users'
             id = Column(Integer, primary_key=True)
             addresses = relationship(
                 '{0!s}.Address'.format(__name__),
-                primaryjoin='{0!s}.User.id=={1!s}.Address.user_id.prop.columns[0]'.format(__name__, __name__))
+                primaryjoin='{0!s}.User.id=={1!s}.Address.user_id.prop.columns[0]'.format(
+                    __name__, __name__))
 
         class Address(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'addresses'
             id = Column(Integer, primary_key=True)
             user_id = Column(Integer, ForeignKey('users.id'))
@@ -569,7 +562,6 @@ class DeclarativeTest(DeclarativeTestBase):
     def test_string_dependency_resolution_in_backref(self):
 
         class User(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'users'
             id = Column(Integer, primary_key=True)
             name = Column(String(50))
@@ -578,7 +570,6 @@ class DeclarativeTest(DeclarativeTestBase):
                                      backref='user')
 
         class Address(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'addresses'
             id = Column(Integer, primary_key=True)
             email = Column(String(50))
@@ -591,18 +582,16 @@ class DeclarativeTest(DeclarativeTestBase):
     def test_string_dependency_resolution_tables(self):
 
         class User(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'users'
             id = Column(Integer, primary_key=True)
             name = Column(String(50))
             props = relationship('Prop', secondary='user_to_prop',
                                  primaryjoin='User.id==user_to_prop.c.u'
-                                 'ser_id',
+                                             'ser_id',
                                  secondaryjoin='user_to_prop.c.prop_id='
-                                 '=Prop.id', backref='users')
+                                               '=Prop.id', backref='users')
 
         class Prop(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'props'
             id = Column(Integer, primary_key=True)
             name = Column(String(50))
@@ -614,13 +603,12 @@ class DeclarativeTest(DeclarativeTestBase):
 
         configure_mappers()
         assert class_mapper(User).get_property('props').secondary \
-            is user_to_prop
+               is user_to_prop
 
     def test_string_dependency_resolution_schemas(self):
         Base = decl.declarative_base()
 
         class User(Base):
-
             __tablename__ = 'users'
             __table_args__ = {'schema': 'fooschema'}
 
@@ -633,7 +621,6 @@ class DeclarativeTest(DeclarativeTestBase):
                 backref='users')
 
         class Prop(Base):
-
             __tablename__ = 'props'
             __table_args__ = {'schema': 'fooschema'}
 
@@ -648,7 +635,7 @@ class DeclarativeTest(DeclarativeTestBase):
         configure_mappers()
 
         assert class_mapper(User).get_property('props').secondary \
-            is user_to_prop
+               is user_to_prop
 
     def test_string_dependency_resolution_annotations(self):
         Base = decl.declarative_base()
@@ -660,7 +647,7 @@ class DeclarativeTest(DeclarativeTestBase):
             children = relationship(
                 "Child",
                 primaryjoin="Parent.name=="
-                "remote(foreign(func.lower(Child.name_upper)))"
+                            "remote(foreign(func.lower(Child.name_upper)))"
             )
 
         class Child(Base):
@@ -694,7 +681,6 @@ class DeclarativeTest(DeclarativeTestBase):
     def test_uncompiled_attributes_in_relationship(self):
 
         class Address(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'addresses'
             id = Column(Integer, primary_key=True,
                         test_needs_autoincrement=True)
@@ -702,7 +688,6 @@ class DeclarativeTest(DeclarativeTestBase):
             user_id = Column(Integer, ForeignKey('users.id'))
 
         class User(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'users'
             id = Column(Integer, primary_key=True,
                         test_needs_autoincrement=True)
@@ -736,13 +721,11 @@ class DeclarativeTest(DeclarativeTestBase):
     def test_nice_dependency_error(self):
 
         class User(Base):
-
             __tablename__ = 'users'
             id = Column('id', Integer, primary_key=True)
             addresses = relationship('Address')
 
         class Address(Base):
-
             __tablename__ = 'addresses'
             id = Column(Integer, primary_key=True)
             foo = sa.orm.column_property(User.id == 5)
@@ -778,9 +761,9 @@ class DeclarativeTest(DeclarativeTestBase):
 
     def test_custom_base(self):
         class MyBase(object):
-
             def foobar(self):
                 return "foobar"
+
         Base = decl.declarative_base(cls=MyBase)
         assert hasattr(Base, 'metadata')
         assert Base().foobar() == "foobar"
@@ -790,13 +773,11 @@ class DeclarativeTest(DeclarativeTestBase):
         # test [ticket:1492]
 
         class Master(Base):
-
             __tablename__ = 'master'
             id = Column(Integer, primary_key=True,
                         test_needs_autoincrement=True)
 
         class Detail(Base):
-
             __tablename__ = 'detail'
             id = Column(Integer, primary_key=True,
                         test_needs_autoincrement=True)
@@ -844,7 +825,6 @@ class DeclarativeTest(DeclarativeTestBase):
     def test_add_prop(self):
 
         class User(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'users'
             id = Column('id', Integer, primary_key=True,
                         test_needs_autoincrement=True)
@@ -853,7 +833,6 @@ class DeclarativeTest(DeclarativeTestBase):
         User.addresses = relationship('Address', backref='user')
 
         class Address(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'addresses'
             id = Column(Integer, primary_key=True,
                         test_needs_autoincrement=True)
@@ -888,6 +867,7 @@ class DeclarativeTest(DeclarativeTestBase):
 
         class ASub(A):
             brap = A.data
+
         assert ASub.brap.property is A.data.property
         assert isinstance(
             ASub.brap.original_property, properties.SynonymProperty)
@@ -908,6 +888,7 @@ class DeclarativeTest(DeclarativeTestBase):
 
         class ASub(A):
             brap = A.b
+
         assert ASub.brap.property is A.b.property
         assert isinstance(
             ASub.brap.original_property, properties.SynonymProperty)
@@ -919,6 +900,7 @@ class DeclarativeTest(DeclarativeTestBase):
             __tablename__ = 'a'
             id = Column('id', Integer, primary_key=True)
             data = Column('data')
+
         A.brap = A.data
         assert A.brap.property is A.data.property
         assert isinstance(A.brap.original_property, properties.SynonymProperty)
@@ -930,6 +912,7 @@ class DeclarativeTest(DeclarativeTestBase):
             id = Column('id', Integer, primary_key=True)
             b_id = Column(Integer, ForeignKey('b.id'))
             b = relationship("B", backref="as_")
+
         A.brap = A.b
 
         class B(Base):
@@ -943,7 +926,6 @@ class DeclarativeTest(DeclarativeTestBase):
     def test_eager_order_by(self):
 
         class Address(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'addresses'
             id = Column('id', Integer, primary_key=True,
                         test_needs_autoincrement=True)
@@ -951,7 +933,6 @@ class DeclarativeTest(DeclarativeTestBase):
             user_id = Column('user_id', Integer, ForeignKey('users.id'))
 
         class User(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'users'
             id = Column('id', Integer, primary_key=True,
                         test_needs_autoincrement=True)
@@ -972,7 +953,6 @@ class DeclarativeTest(DeclarativeTestBase):
     def test_order_by_multi(self):
 
         class Address(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'addresses'
             id = Column('id', Integer, primary_key=True,
                         test_needs_autoincrement=True)
@@ -980,7 +960,6 @@ class DeclarativeTest(DeclarativeTestBase):
             user_id = Column('user_id', Integer, ForeignKey('users.id'))
 
         class User(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'users'
             id = Column('id', Integer, primary_key=True,
                         test_needs_autoincrement=True)
@@ -1001,7 +980,6 @@ class DeclarativeTest(DeclarativeTestBase):
     def test_as_declarative(self):
 
         class User(fixtures.ComparableEntity):
-
             __tablename__ = 'users'
             id = Column('id', Integer, primary_key=True,
                         test_needs_autoincrement=True)
@@ -1009,7 +987,6 @@ class DeclarativeTest(DeclarativeTestBase):
             addresses = relationship('Address', backref='user')
 
         class Address(fixtures.ComparableEntity):
-
             __tablename__ = 'addresses'
             id = Column('id', Integer, primary_key=True,
                         test_needs_autoincrement=True)
@@ -1067,9 +1044,7 @@ class DeclarativeTest(DeclarativeTestBase):
     def test_oops(self):
 
         def define():
-
             class User(Base, fixtures.ComparableEntity):
-
                 __tablename__ = 'users'
                 id = Column('id', Integer, primary_key=True),
                 name = Column('name', String(50))
@@ -1083,7 +1058,6 @@ class DeclarativeTest(DeclarativeTestBase):
     def test_table_args_no_dict(self):
 
         class Foo1(Base):
-
             __tablename__ = 'foo'
             __table_args__ = ForeignKeyConstraint(['id'], ['foo.bar']),
             id = Column('id', Integer, primary_key=True)
@@ -1094,18 +1068,17 @@ class DeclarativeTest(DeclarativeTestBase):
     def test_table_args_type(self):
         def err():
             class Foo1(Base):
-
                 __tablename__ = 'foo'
                 __table_args__ = ForeignKeyConstraint(['id'], ['foo.id'
                                                                ])
                 id = Column('id', Integer, primary_key=True)
+
         assert_raises_message(sa.exc.ArgumentError,
                               '__table_args__ value must be a tuple, ', err)
 
     def test_table_args_none(self):
 
         class Foo2(Base):
-
             __tablename__ = 'foo'
             __table_args__ = None
             id = Column('id', Integer, primary_key=True)
@@ -1115,7 +1088,6 @@ class DeclarativeTest(DeclarativeTestBase):
     def test_table_args_dict_format(self):
 
         class Foo2(Base):
-
             __tablename__ = 'foo'
             __table_args__ = {'mysql_engine': 'InnoDB'}
             id = Column('id', Integer, primary_key=True)
@@ -1124,16 +1096,14 @@ class DeclarativeTest(DeclarativeTestBase):
 
     def test_table_args_tuple_format(self):
         class Foo2(Base):
-
             __tablename__ = 'foo'
             __table_args__ = {'mysql_engine': 'InnoDB'}
             id = Column('id', Integer, primary_key=True)
 
         class Bar(Base):
-
             __tablename__ = 'bar'
             __table_args__ = ForeignKeyConstraint(['id'], ['foo.id']), \
-                {'mysql_engine': 'InnoDB'}
+                             {'mysql_engine': 'InnoDB'}
             id = Column('id', Integer, primary_key=True)
 
         assert Bar.__table__.c.id.references(Foo2.__table__.c.id)
@@ -1142,7 +1112,6 @@ class DeclarativeTest(DeclarativeTestBase):
     def test_expression(self):
 
         class User(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'users'
             id = Column('id', Integer, primary_key=True,
                         test_needs_autoincrement=True)
@@ -1150,7 +1119,6 @@ class DeclarativeTest(DeclarativeTestBase):
             addresses = relationship('Address', backref='user')
 
         class Address(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'addresses'
             id = Column('id', Integer, primary_key=True,
                         test_needs_autoincrement=True)
@@ -1174,7 +1142,6 @@ class DeclarativeTest(DeclarativeTestBase):
 
     def test_useless_declared_attr(self):
         class Address(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'addresses'
             id = Column('id', Integer, primary_key=True,
                         test_needs_autoincrement=True)
@@ -1182,7 +1149,6 @@ class DeclarativeTest(DeclarativeTestBase):
             user_id = Column('user_id', Integer, ForeignKey('users.id'))
 
         class User(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'users'
             id = Column('id', Integer, primary_key=True,
                         test_needs_autoincrement=True)
@@ -1195,7 +1161,7 @@ class DeclarativeTest(DeclarativeTestBase):
                 # one is used, lets have it function as expected...
                 return sa.orm.column_property(
                     sa.select([sa.func.count(Address.id)]).
-                    where(Address.user_id == cls.id))
+                        where(Address.user_id == cls.id))
 
         Base.metadata.create_all()
         u1 = User(name='u1', addresses=[Address(email='one'),
@@ -1231,7 +1197,6 @@ class DeclarativeTest(DeclarativeTestBase):
     def test_column(self):
 
         class User(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'users'
             id = Column('id', Integer, primary_key=True,
                         test_needs_autoincrement=True)
@@ -1252,7 +1217,6 @@ class DeclarativeTest(DeclarativeTestBase):
     def test_column_properties(self):
 
         class Address(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'addresses'
             id = Column(Integer, primary_key=True,
                         test_needs_autoincrement=True)
@@ -1260,7 +1224,6 @@ class DeclarativeTest(DeclarativeTestBase):
             user_id = Column(Integer, ForeignKey('users.id'))
 
         class User(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'users'
             id = Column('id', Integer, primary_key=True,
                         test_needs_autoincrement=True)
@@ -1286,14 +1249,12 @@ class DeclarativeTest(DeclarativeTestBase):
     def test_column_properties_2(self):
 
         class Address(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'addresses'
             id = Column(Integer, primary_key=True)
             email = Column(String(50))
             user_id = Column(Integer, ForeignKey('users.id'))
 
         class User(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'users'
             id = Column('id', Integer, primary_key=True)
             name = Column('name', String(50))
@@ -1310,7 +1271,6 @@ class DeclarativeTest(DeclarativeTestBase):
     def test_deferred(self):
 
         class User(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'users'
             id = Column(Integer, primary_key=True,
                         test_needs_autoincrement=True)
@@ -1331,7 +1291,6 @@ class DeclarativeTest(DeclarativeTestBase):
 
     def test_composite_inline(self):
         class AddressComposite(fixtures.ComparableEntity):
-
             def __init__(self, street, state):
                 self.street = street
                 self.state = state
@@ -1363,7 +1322,6 @@ class DeclarativeTest(DeclarativeTestBase):
 
     def test_composite_separate(self):
         class AddressComposite(fixtures.ComparableEntity):
-
             def __init__(self, street, state):
                 self.street = street
                 self.state = state
@@ -1413,14 +1371,13 @@ class DeclarativeTest(DeclarativeTestBase):
             address_id = addresses.c.id
 
         assert User.__mapper__.get_property('user_id').columns[0] \
-            is users.c.id
+               is users.c.id
         assert User.__mapper__.get_property('user_id').columns[1] \
-            is addresses.c.user_id
+               is addresses.c.user_id
 
     def test_synonym_inline(self):
 
         class User(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'users'
             id = Column('id', Integer, primary_key=True,
                         test_needs_autoincrement=True)
@@ -1449,14 +1406,12 @@ class DeclarativeTest(DeclarativeTestBase):
         from sqlalchemy.orm.properties import ColumnProperty
 
         class CustomCompare(ColumnProperty.Comparator):
-
             __hash__ = None
 
             def __eq__(self, other):
                 return self.__clause_element__() == other + ' FOO'
 
         class User(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'users'
             id = Column('id', Integer, primary_key=True,
                         test_needs_autoincrement=True)
@@ -1474,7 +1429,6 @@ class DeclarativeTest(DeclarativeTestBase):
     def test_synonym_added(self):
 
         class User(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'users'
             id = Column('id', Integer, primary_key=True,
                         test_needs_autoincrement=True)
@@ -1501,7 +1455,6 @@ class DeclarativeTest(DeclarativeTestBase):
     def test_reentrant_compile_via_foreignkey(self):
 
         class User(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'users'
             id = Column('id', Integer, primary_key=True,
                         test_needs_autoincrement=True)
@@ -1509,7 +1462,6 @@ class DeclarativeTest(DeclarativeTestBase):
             addresses = relationship('Address', backref='user')
 
         class Address(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'addresses'
             id = Column('id', Integer, primary_key=True,
                         test_needs_autoincrement=True)
@@ -1539,7 +1491,6 @@ class DeclarativeTest(DeclarativeTestBase):
     def test_relationship_reference(self):
 
         class Address(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'addresses'
             id = Column('id', Integer, primary_key=True,
                         test_needs_autoincrement=True)
@@ -1547,7 +1498,6 @@ class DeclarativeTest(DeclarativeTestBase):
             user_id = Column('user_id', Integer, ForeignKey('users.id'))
 
         class User(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'users'
             id = Column('id', Integer, primary_key=True,
                         test_needs_autoincrement=True)
@@ -1573,14 +1523,12 @@ class DeclarativeTest(DeclarativeTestBase):
     def test_pk_with_fk_init(self):
 
         class Bar(Base):
-
             __tablename__ = 'bar'
             id = sa.Column(sa.Integer, sa.ForeignKey('foo.id'),
                            primary_key=True)
             ex = sa.Column(sa.Integer, primary_key=True)
 
         class Foo(Base):
-
             __tablename__ = 'foo'
             id = sa.Column(sa.Integer, primary_key=True)
             bars = sa.orm.relationship(Bar)
@@ -1613,7 +1561,6 @@ class DeclarativeTest(DeclarativeTestBase):
     def test_synonym_for(self):
 
         class User(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'users'
             id = Column('id', Integer, primary_key=True,
                         test_needs_autoincrement=True)
@@ -1637,7 +1584,6 @@ class DeclarativeTest(DeclarativeTestBase):
     def test_comparable_using(self):
 
         class NameComparator(sa.orm.PropComparator):
-
             @property
             def upperself(self):
                 cls = self.prop.parent.class_
@@ -1653,7 +1599,6 @@ class DeclarativeTest(DeclarativeTestBase):
                 return op(self.upperself, other, **kw)
 
         class User(Base, fixtures.ComparableEntity):
-
             __tablename__ = 'users'
             id = Column('id', Integer, primary_key=True,
                         test_needs_autoincrement=True)
@@ -1663,7 +1608,7 @@ class DeclarativeTest(DeclarativeTestBase):
             @property
             def uc_name(self):
                 return self.name is not None and self.name.upper() \
-                    or None
+                       or None
 
         Base.metadata.create_all()
         sess = create_session()
@@ -1712,6 +1657,7 @@ class DeclarativeTest(DeclarativeTestBase):
         class Test(Base):
             __tablename__ = 'test'
             id = Column(Integer, primary_key=True)
+
         # MARKMARK
         eq_(
             canary.mock_calls,
@@ -1732,7 +1678,6 @@ class DeclarativeTest(DeclarativeTestBase):
 
 
 def _produce_test(inline, stringbased):
-
     class ExplicitJoinTest(fixtures.MappedTest):
 
         @classmethod
@@ -1762,7 +1707,8 @@ def _produce_test(inline, stringbased):
                             backref='addresses')
                     else:
                         user = relationship(User, primaryjoin=User.id
-                                            == user_id, backref='addresses')
+                                                              == user_id,
+                                            backref='addresses')
 
             if not inline:
                 configure_mappers()
@@ -1787,12 +1733,17 @@ def _produce_test(inline, stringbased):
 
             User.__table__.insert().execute(params)
             Address.__table__.insert().execute([
-                dict(list(zip(('id', 'user_id', 'email'), column_values)))
-                for column_values in [
-                    (1, 7, 'jack@bean.com'),
-                    (2, 8, 'ed@wood.com'),
-                    (3, 8, 'ed@bettyboop.com'),
-                    (4, 8, 'ed@lala.com'), (5, 9, 'fred@fred.com')]])
+                                                   dict(list(zip(('id',
+                                                                  'user_id',
+                                                                  'email'),
+                                                                 column_values)))
+                                                   for column_values in [
+                                                       (1, 7, 'jack@bean.com'),
+                                                       (2, 8, 'ed@wood.com'),
+                                                       (3, 8,
+                                                        'ed@bettyboop.com'),
+                                                       (4, 8, 'ed@lala.com'), (
+                        5, 9, 'fred@fred.com')]])
 
         def test_aliased_join(self):
 
@@ -1816,8 +1767,9 @@ def _produce_test(inline, stringbased):
         stringbased and 'String' or 'Literal')
     return ExplicitJoinTest
 
+
 for inline in True, False:
     for stringbased in True, False:
         testclass = _produce_test(inline, stringbased)
-        exec('{0!s} = testclass'.format(testclass.__name__))
+        exec ('{0!s} = testclass'.format(testclass.__name__))
         del testclass

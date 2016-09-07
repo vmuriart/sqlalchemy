@@ -100,7 +100,7 @@ def visit_binary_product(fn, expr):
             # those are just column elements by themselves
             yield element
         elif element.__visit_name__ == 'binary' and \
-                operators.is_comparison(element.operator):
+            operators.is_comparison(element.operator):
             stack.insert(0, element)
             for l in visit(element.left):
                 for r in visit(element.right):
@@ -114,6 +114,7 @@ def visit_binary_product(fn, expr):
             for elem in element.get_children():
                 for e in visit(elem):
                     yield e
+
     list(visit(expr))
 
 
@@ -141,6 +142,7 @@ def find_tables(clause, check_columns=False,
     if check_columns:
         def visit_column(column):
             tables.append(column.table)
+
         _visitors['column'] = visit_column
 
     _visitors['table'] = tables.append
@@ -160,9 +162,9 @@ def unwrap_order_by(clause):
         t = stack.popleft()
         if isinstance(t, ColumnElement) and \
             (
-                not isinstance(t, UnaryExpression) or
-                not operators.is_ordering_modifier(t.modifier)
-        ):
+                    not isinstance(t, UnaryExpression) or
+                    not operators.is_ordering_modifier(t.modifier)
+            ):
             if isinstance(t, _label_reference):
                 t = t.element
             if isinstance(t, (_textual_label_reference)):
@@ -194,18 +196,18 @@ def expand_column_list_from_order_by(collist, order_by):
 
     """
     cols_already_present = set([
-        col.element if col._order_by_label_element is not None
-        else col for col in collist
-    ])
+                                   col.element if col._order_by_label_element is not None
+                                   else col for col in collist
+                                   ])
 
     return [
         col for col in
         chain(*[
             unwrap_order_by(o)
             for o in order_by
-        ])
+            ])
         if col not in cols_already_present
-    ]
+        ]
 
 
 def clause_is_present(clause, search):
@@ -303,7 +305,8 @@ class _repr_base(object):
             segment_length = self.max_chars // 2
             rep = (
                 rep[0:segment_length] +
-                (" ... ({0:d} characters truncated) ... ".format((lenrep - self.max_chars))) +
+                (" ... ({0:d} characters truncated) ... ".format(
+                    (lenrep - self.max_chars))) +
                 rep[-segment_length:]
             )
         return rep
@@ -378,7 +381,8 @@ class _repr_params(_repr_base):
                 elem_type = self._DICT
             else:
                 assert False, \
-                    "Unknown parameter type {0!s}".format((type(multi_params[0])))
+                    "Unknown parameter type {0!s}".format(
+                        (type(multi_params[0])))
 
             elements = ", ".join(
                 self._repr_params(params, elem_type)
@@ -420,14 +424,14 @@ def adapt_criterion_to_null(crit, nulls):
 
     def visit_binary(binary):
         if isinstance(binary.left, BindParameter) \
-                and binary.left._identifying_key in nulls:
+            and binary.left._identifying_key in nulls:
             # reverse order if the NULL is on the left side
             binary.left = binary.right
             binary.right = Null()
             binary.operator = operators.is_
             binary.negate = operators.isnot
         elif isinstance(binary.right, BindParameter) \
-                and binary.right._identifying_key in nulls:
+            and binary.right._identifying_key in nulls:
             binary.right = Null()
             binary.operator = operators.is_
             binary.negate = operators.isnot
@@ -509,7 +513,7 @@ def reduce_columns(columns, *clauses, **kw):
                         raise
                 if fk_col.shares_lineage(c) and \
                     (not only_synonyms or
-                     c.name == col.name):
+                             c.name == col.name):
                     omit.add(col)
                     break
 
@@ -522,9 +526,10 @@ def reduce_columns(columns, *clauses, **kw):
                     for c in reversed(columns):
                         if c.shares_lineage(binary.right) and \
                             (not only_synonyms or
-                             c.name == binary.left.name):
+                                     c.name == binary.left.name):
                             omit.add(c)
                             break
+
         for clause in clauses:
             if clause is not None:
                 visitors.traverse(clause, {}, {'binary': visit_binary})
@@ -549,34 +554,35 @@ def criterion_as_pairs(expression, consider_as_foreign_keys=None,
         if not any_operator and binary.operator is not operators.eq:
             return
         if not isinstance(binary.left, ColumnElement) or \
-                not isinstance(binary.right, ColumnElement):
+            not isinstance(binary.right, ColumnElement):
             return
 
         if consider_as_foreign_keys:
             if binary.left in consider_as_foreign_keys and \
                 (col_is(binary.right, binary.left) or
-                 binary.right not in consider_as_foreign_keys):
+                         binary.right not in consider_as_foreign_keys):
                 pairs.append((binary.right, binary.left))
             elif binary.right in consider_as_foreign_keys and \
                 (col_is(binary.left, binary.right) or
-                 binary.left not in consider_as_foreign_keys):
+                         binary.left not in consider_as_foreign_keys):
                 pairs.append((binary.left, binary.right))
         elif consider_as_referenced_keys:
             if binary.left in consider_as_referenced_keys and \
                 (col_is(binary.right, binary.left) or
-                 binary.right not in consider_as_referenced_keys):
+                         binary.right not in consider_as_referenced_keys):
                 pairs.append((binary.left, binary.right))
             elif binary.right in consider_as_referenced_keys and \
                 (col_is(binary.left, binary.right) or
-                 binary.left not in consider_as_referenced_keys):
+                         binary.left not in consider_as_referenced_keys):
                 pairs.append((binary.right, binary.left))
         else:
             if isinstance(binary.left, Column) and \
-                    isinstance(binary.right, Column):
+                isinstance(binary.right, Column):
                 if binary.left.references(binary.right):
                     pairs.append((binary.right, binary.left))
                 elif binary.right.references(binary.left):
                     pairs.append((binary.left, binary.right))
+
     pairs = []
     visitors.traverse(expression, {}, {'binary': visit_binary})
     return pairs
@@ -639,7 +645,7 @@ class ClauseAdapter(visitors.ReplacingCloningVisitor):
 
     def replace(self, col):
         if isinstance(col, FromClause) and \
-                self.selectable.is_derived_from(col):
+            self.selectable.is_derived_from(col):
             return self.selectable
         elif not isinstance(col, ColumnElement):
             return None
@@ -709,9 +715,9 @@ class ColumnAdapter(ClauseAdapter):
 
         def __getitem__(self, key):
             if (
-                self.parent.include_fn and not self.parent.include_fn(key)
+                    self.parent.include_fn and not self.parent.include_fn(key)
             ) or (
-                self.parent.exclude_fn and self.parent.exclude_fn(key)
+                    self.parent.exclude_fn and self.parent.exclude_fn(key)
             ):
                 if self.parent._wrap:
                     return self.parent._wrap.columns[key]

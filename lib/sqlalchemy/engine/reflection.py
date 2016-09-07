@@ -45,7 +45,7 @@ def cache(fn, self, con, *args, **kw):
         tuple(a for a in args if isinstance(a, util.string_types)),
         tuple((k, v) for k, v in kw.items() if
               isinstance(v,
-                         util.string_types + util.int_types + (float, )
+                         util.string_types + util.int_types + (float,)
                          )
               )
     )
@@ -264,9 +264,9 @@ class Inspector(object):
 
             candidate_sort = list(topological.sort(tuples, tnames))
         return [
-            (tname, fknames_for_table[tname].difference(remaining_fkcs))
-            for tname in candidate_sort
-        ] + [(None, list(remaining_fkcs))]
+                   (tname, fknames_for_table[tname].difference(remaining_fkcs))
+                   for tname in candidate_sort
+                   ] + [(None, list(remaining_fkcs))]
 
     def get_temp_table_names(self):
         """return a list of temporary table names for the current bind.
@@ -375,7 +375,7 @@ class Inspector(object):
         return col_defs
 
     @deprecated('0.7', 'Call to deprecated method get_primary_keys.'
-                '  Use get_pk_constraint instead.')
+                       '  Use get_pk_constraint instead.')
     def get_primary_keys(self, table_name, schema=None, **kw):
         """Return information about primary keys in `table_name`.
 
@@ -587,7 +587,7 @@ class Inspector(object):
         cols_by_orig_name = {}
 
         for col_d in self.get_columns(
-                table_name, schema, **table.dialect_kwargs):
+            table_name, schema, **table.dialect_kwargs):
             found_table = True
 
             self._reflect_column(
@@ -618,7 +618,7 @@ class Inspector(object):
 
     def _reflect_column(
         self, table, col_d, include_columns,
-            exclude_columns, cols_by_orig_name):
+        exclude_columns, cols_by_orig_name):
 
         orig_name = col_d['name']
 
@@ -628,7 +628,7 @@ class Inspector(object):
         # change it
         name = col_d['name']
         if (include_columns and name not in include_columns) \
-                or (exclude_columns and name in exclude_columns):
+            or (exclude_columns and name in exclude_columns):
             return
 
         coltype = col_d['type']
@@ -672,8 +672,8 @@ class Inspector(object):
             colargs.append(sequence)
 
     def _reflect_pk(
-            self, table_name, schema, table,
-            cols_by_orig_name, exclude_columns):
+        self, table_name, schema, table,
+        cols_by_orig_name, exclude_columns):
         pk_cons = self.get_pk_constraint(
             table_name, schema, **table.dialect_kwargs)
         if pk_cons:
@@ -681,7 +681,7 @@ class Inspector(object):
                 cols_by_orig_name[pk]
                 for pk in pk_cons['constrained_columns']
                 if pk in cols_by_orig_name and pk not in exclude_columns
-            ]
+                ]
 
             # update pk constraint name
             table.primary_key.name = pk_cons.get('name')
@@ -691,8 +691,8 @@ class Inspector(object):
             table.primary_key._reload(pk_cols)
 
     def _reflect_fk(
-            self, table_name, schema, table, cols_by_orig_name,
-            exclude_columns, reflection_options):
+        self, table_name, schema, table, cols_by_orig_name,
+        exclude_columns, reflection_options):
         fkeys = self.get_foreign_keys(
             table_name, schema, **table.dialect_kwargs)
         for fkey_d in fkeys:
@@ -703,9 +703,9 @@ class Inspector(object):
                 cols_by_orig_name[c].key
                 if c in cols_by_orig_name else c
                 for c in fkey_d['constrained_columns']
-            ]
+                ]
             if exclude_columns and set(constrained_columns).intersection(
-                    exclude_columns):
+                exclude_columns):
                 continue
             referred_schema = fkey_d['referred_schema']
             referred_table = fkey_d['referred_table']
@@ -739,7 +739,7 @@ class Inspector(object):
 
     def _reflect_indexes(
         self, table_name, schema, table, cols_by_orig_name,
-            include_columns, exclude_columns, reflection_options):
+        include_columns, exclude_columns, reflection_options):
         # Indexes
         indexes = self.get_indexes(table_name, schema)
         for index_d in indexes:
@@ -751,9 +751,10 @@ class Inspector(object):
 
             duplicates = index_d.get('duplicates_constraint')
             if include_columns and \
-                    not set(columns).issubset(include_columns):
+                not set(columns).issubset(include_columns):
                 util.warn(
-                    "Omitting {0!s} key for ({1!s}), key covers omitted columns.".format(flavor, ', '.join(columns)))
+                    "Omitting {0!s} key for ({1!s}), key covers omitted columns.".format(
+                        flavor, ', '.join(columns)))
                 continue
             if duplicates:
                 continue
@@ -780,7 +781,7 @@ class Inspector(object):
 
     def _reflect_unique_constraints(
         self, table_name, schema, table, cols_by_orig_name,
-            include_columns, exclude_columns, reflection_options):
+        include_columns, exclude_columns, reflection_options):
 
         # Unique Constraints
         try:
@@ -794,7 +795,7 @@ class Inspector(object):
             columns = const_d['column_names']
             duplicates = const_d.get('duplicates_index')
             if include_columns and \
-                    not set(columns).issubset(include_columns):
+                not set(columns).issubset(include_columns):
                 util.warn(
                     "Omitting unique constraint key for (%s), "
                     "key covers omitted columns." %
@@ -819,8 +820,8 @@ class Inspector(object):
                 sa_schema.UniqueConstraint(*constrained_cols, name=conname))
 
     def _reflect_check_constraints(
-            self, table_name, schema, table, cols_by_orig_name,
-            include_columns, exclude_columns, reflection_options):
+        self, table_name, schema, table, cols_by_orig_name,
+        include_columns, exclude_columns, reflection_options):
         try:
             constraints = self.get_check_constraints(table_name, schema)
         except NotImplementedError:

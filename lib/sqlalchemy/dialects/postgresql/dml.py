@@ -44,9 +44,9 @@ class Insert(StandardInsert):
 
     @_generative
     def on_conflict_do_update(
-            self,
-            constraint=None, index_elements=None,
-            index_where=None, set_=None, where=None):
+        self,
+        constraint=None, index_elements=None,
+        index_where=None, set_=None, where=None):
         """
         Specifies a DO UPDATE SET action for ON CONFLICT clause.
 
@@ -98,8 +98,8 @@ class Insert(StandardInsert):
 
     @_generative
     def on_conflict_do_nothing(
-            self,
-            constraint=None, index_elements=None, index_where=None):
+        self,
+        constraint=None, index_elements=None, index_where=None):
         """
         Specifies a DO NOTHING action for ON CONFLICT clause.
 
@@ -130,21 +130,22 @@ class Insert(StandardInsert):
             constraint, index_elements, index_where)
         return self
 
+
 insert = public_factory(Insert, '.dialects.postgresql.insert')
 
 
 class OnConflictClause(ClauseElement):
     def __init__(
-            self,
-            constraint=None,
-            index_elements=None,
-            index_where=None):
+        self,
+        constraint=None,
+        index_elements=None,
+        index_where=None):
 
         if constraint is not None:
             if not isinstance(constraint, util.string_types) and \
-                    isinstance(constraint, (
-                        schema.Index, schema.Constraint,
-                        ext.ExcludeConstraint)):
+                isinstance(constraint, (
+                    schema.Index, schema.Constraint,
+                    ext.ExcludeConstraint)):
                 constraint = getattr(constraint, 'name') or constraint
 
         if constraint is not None:
@@ -185,12 +186,12 @@ class OnConflictDoUpdate(OnConflictClause):
     __visit_name__ = 'on_conflict_do_update'
 
     def __init__(
-            self,
-            constraint=None,
-            index_elements=None,
-            index_where=None,
-            set_=None,
-            where=None):
+        self,
+        constraint=None,
+        index_elements=None,
+        index_where=None,
+        set_=None,
+        where=None):
         super(OnConflictDoUpdate, self).__init__(
             constraint=constraint,
             index_elements=index_elements,
@@ -207,5 +208,5 @@ class OnConflictDoUpdate(OnConflictClause):
         self.update_values_to_set = [
             (key, _literal_as_binds(value))
             for key, value in set_.items()
-        ]
+            ]
         self.update_whereclause = where

@@ -1,6 +1,6 @@
 from sqlalchemy.testing import eq_
 from sqlalchemy.orm import mapper, relationship, create_session, \
-    clear_mappers, sessionmaker, aliased,\
+    clear_mappers, sessionmaker, aliased, \
     Session, subqueryload
 from sqlalchemy.orm.mapper import _mapper_registry
 from sqlalchemy.orm.session import _sessions
@@ -90,12 +90,13 @@ def profile_memory(maxtimes=50):
                 if success:
                     break
 
-                # else keep trying until maxtimes
+                    # else keep trying until maxtimes
 
             else:
                 assert False, repr(samples)
 
         return profile
+
     return decorate
 
 
@@ -106,7 +107,6 @@ def assert_no_mappers():
 
 
 class EnsureZeroed(fixtures.ORMTest):
-
     def setup(self):
         _sessions.clear()
         _mapper_registry.clear()
@@ -114,7 +114,6 @@ class EnsureZeroed(fixtures.ORMTest):
 
 
 class MemUsageTest(EnsureZeroed):
-
     __tags__ = 'memory_intensive',
     __requires__ = 'cpython',
     __backend__ = True
@@ -130,6 +129,7 @@ class MemUsageTest(EnsureZeroed):
         @profile_memory(maxtimes=10)
         def go():
             x[-1:] = [Foo(), Foo(), Foo(), Foo(), Foo(), Foo()]
+
         go()
 
     def test_session(self):
@@ -181,6 +181,7 @@ class MemUsageTest(EnsureZeroed):
             for a in alist:
                 sess.delete(a)
             sess.flush()
+
         go()
 
         metadata.drop_all()
@@ -197,6 +198,7 @@ class MemUsageTest(EnsureZeroed):
             sess.close()
             del sess
             del sessmaker
+
         go()
 
     @testing.crashes('sqlite', ':memory: connection not suitable here')
@@ -231,8 +233,8 @@ class MemUsageTest(EnsureZeroed):
         def go():
             engine = engines.testing_engine(
                 options={'logging_name': 'FOO',
-                                         'pool_logging_name': 'BAR',
-                                         'use_reaper': False}
+                         'pool_logging_name': 'BAR',
+                         'use_reaper': False}
             )
             sess = create_session(bind=engine)
 
@@ -261,6 +263,7 @@ class MemUsageTest(EnsureZeroed):
             sess.flush()
             sess.close()
             engine.dispose()
+
         go()
 
         metadata.drop_all()
@@ -276,15 +279,15 @@ class MemUsageTest(EnsureZeroed):
 
         eng = engines.testing_engine()
         for args in (
-            (types.Integer, ),
-            (types.String, ),
-            (types.PickleType, ),
+            (types.Integer,),
+            (types.String,),
+            (types.PickleType,),
             (types.Enum, 'a', 'b', 'c'),
-            (sqlite.DATETIME, ),
+            (sqlite.DATETIME,),
             (postgresql.ENUM, 'a', 'b', 'c'),
-            (types.Interval, ),
-            (postgresql.INTERVAL, ),
-            (mysql.VARCHAR, ),
+            (types.Interval,),
+            (postgresql.INTERVAL,),
+            (mysql.VARCHAR,),
         ):
             @profile_memory()
             def go():
@@ -292,6 +295,7 @@ class MemUsageTest(EnsureZeroed):
                 bp = type_._cached_bind_processor(eng.dialect)
                 rp = type_._cached_result_processor(eng.dialect, 0)
                 bp, rp  # strong reference
+
             go()
 
         assert not eng.dialect._type_memos
@@ -302,7 +306,8 @@ class MemUsageTest(EnsureZeroed):
         wide_table = Table('t', metadata,
                            Column('id', Integer, primary_key=True,
                                   test_needs_autoincrement=True),
-                           *[Column('col{0:d}'.format(i), Integer) for i in range(10)]
+                           *[Column('col{0:d}'.format(i), Integer) for i in
+                             range(10)]
                            )
 
         class Wide(object):
@@ -369,8 +374,10 @@ class MemUsageTest(EnsureZeroed):
             # this warning shouldn't clog up memory.
 
             self.engine.execute(table1.select().where(table1.c.col2
-                                                     == 'foo{0:d}'.format(i[0])))
+                                                      == 'foo{0:d}'.format(
+                i[0])))
             i[0] += 1
+
         try:
             go()
         finally:
@@ -386,6 +393,7 @@ class MemUsageTest(EnsureZeroed):
             util.warn_limited(
                 "memusage warning, param1: %s, param2: %s",
                 (next(counter), next(counter)))
+
         go()
 
     def test_mapper_reset(self):
@@ -489,6 +497,7 @@ class MemUsageTest(EnsureZeroed):
             sess = Session()
             sess.query(B).options(subqueryload(B.as_.of_type(ASub))).all()
             sess.close()
+
         try:
             go()
         finally:
@@ -508,6 +517,7 @@ class MemUsageTest(EnsureZeroed):
         def go():
             ma = sa.inspect(aliased(A))
             m1._path_registry[m1.attrs.foo][ma][m1.attrs.bar]
+
         go()
         clear_mappers()
 
@@ -654,6 +664,7 @@ class MemUsageTest(EnsureZeroed):
             r = e.execute(t.alias().select())
             for row in r:
                 row[t.c.x]
+
         go()
 
     def test_many_discarded_relationships(self):
@@ -668,6 +679,7 @@ class MemUsageTest(EnsureZeroed):
 
         class T1(object):
             pass
+
         t1_mapper = mapper(T1, t1)
 
         @testing.emits_warning()
@@ -675,11 +687,13 @@ class MemUsageTest(EnsureZeroed):
         def go():
             class T2(object):
                 pass
+
             t2_mapper = mapper(T2, t2)
             t1_mapper.add_property("bar", relationship(t2_mapper))
             s1 = Session()
             # this causes the path_registry to be invoked
             s1.query(t1_mapper)._compile_context()
+
         go()
 
     # fails on newer versions of pysqlite due to unusual memory behvior
@@ -716,7 +730,7 @@ class MemUsageTest(EnsureZeroed):
             pass
 
         mapper(Foo, table1, properties={
-               'bars': relationship(mapper(Bar, table2))})
+            'bars': relationship(mapper(Bar, table2))})
         metadata.create_all()
         session = sessionmaker()
 
@@ -726,6 +740,7 @@ class MemUsageTest(EnsureZeroed):
             sess = session()
             sess.query(Foo).join((s, Foo.bars)).all()
             sess.rollback()
+
         try:
             go()
         finally:
@@ -739,6 +754,7 @@ class MemUsageTest(EnsureZeroed):
         def go():
             dialect = SQLiteDialect()
             cast.compile(dialect=dialect)
+
         go()
 
     @testing.requires.cextensions
@@ -746,6 +762,7 @@ class MemUsageTest(EnsureZeroed):
         @profile_memory()
         def go():
             to_decimal_processor_factory({}, 10)
+
         go()
 
     @testing.requires.cextensions
@@ -753,6 +770,7 @@ class MemUsageTest(EnsureZeroed):
         @profile_memory()
         def go():
             to_decimal_processor_factory(decimal.Decimal, 10)(1.2)
+
         go()
 
     @testing.requires.cextensions
@@ -760,4 +778,5 @@ class MemUsageTest(EnsureZeroed):
         @profile_memory()
         def go():
             to_unicode_processor_factory('utf8')
+
         go()

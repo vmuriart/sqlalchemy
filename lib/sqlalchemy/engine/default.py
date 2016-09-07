@@ -176,7 +176,7 @@ class DefaultDialect(interfaces.Dialect):
         if not getattr(self, 'ported_sqla_06', True):
             util.warn(
                 "The {0!s} dialect is not yet ported to the 0.6 format".format(
-                self.name))
+                    self.name))
 
         self.convert_unicode = convert_unicode
         self.encoding = encoding
@@ -253,7 +253,7 @@ class DefaultDialect(interfaces.Dialect):
         self.returns_unicode_strings = self._check_unicode_returns(connection)
 
         if self.description_encoding is not None and \
-                self._check_unicode_description(connection):
+            self._check_unicode_description(connection):
             self._description_decoder = self.description_encoding = None
 
         self.do_rollback(connection.connection)
@@ -359,7 +359,7 @@ class DefaultDialect(interfaces.Dialect):
         return sqltypes.adapt_type(typeobj, self.colspecs)
 
     def reflecttable(
-            self, connection, table, include_columns, exclude_columns):
+        self, connection, table, include_columns, exclude_columns):
         insp = reflection.Inspector.from_engine(connection)
         return insp.reflecttable(table, include_columns, exclude_columns)
 
@@ -370,14 +370,15 @@ class DefaultDialect(interfaces.Dialect):
         """
         return {
             'constrained_columns':
-            self.get_primary_keys(conn, table_name,
-                                  schema=schema, **kw)
+                self.get_primary_keys(conn, table_name,
+                                      schema=schema, **kw)
         }
 
     def validate_identifier(self, ident):
         if len(ident) > self.max_identifier_length:
             raise exc.IdentifierError(
-                "Identifier '{0!s}' exceeds maximum length of {1:d} characters".format(ident, self.max_identifier_length)
+                "Identifier '{0!s}' exceeds maximum length of {1:d} characters".format(
+                    ident, self.max_identifier_length)
             )
 
     def connect(self, *cargs, **cparams):
@@ -421,7 +422,7 @@ class DefaultDialect(interfaces.Dialect):
                 "the existing transaction, or have no effect until "
                 "next transaction")
         self.set_isolation_level(connection.connection, level)
-        connection.connection._connection_record.\
+        connection.connection._connection_record. \
             finalize_callback.append(self.reset_isolation_level)
 
     def do_begin(self, dbapi_connection):
@@ -474,7 +475,6 @@ class DefaultDialect(interfaces.Dialect):
 
 
 class StrCompileDialect(DefaultDialect):
-
     statement_compiler = compiler.StrSQLCompiler
     ddl_compiler = compiler.DDLCompiler
     type_compiler = compiler.StrSQLTypeCompiler
@@ -670,9 +670,10 @@ class DefaultExecutionContext(interfaces.ExecutionContext):
                 self.parameters = parameters
             else:
                 self.parameters = [
-                    dict((dialect._encoder(k)[0], d[k]) for k in d)
-                    for d in parameters
-                ] or [{}]
+                                      dict((dialect._encoder(k)[0], d[k]) for k
+                                           in d)
+                                      for d in parameters
+                                      ] or [{}]
         else:
             self.parameters = [dialect.execute_sequence_format(p)
                                for p in parameters]
@@ -680,7 +681,7 @@ class DefaultExecutionContext(interfaces.ExecutionContext):
         self.executemany = len(parameters) > 1
 
         if not dialect.supports_unicode_statements and \
-                isinstance(statement, util.text_type):
+            isinstance(statement, util.text_type):
             self.unicode_statement = statement
             self.statement = dialect._encoder(statement)[0]
         else:
@@ -751,7 +752,7 @@ class DefaultExecutionContext(interfaces.ExecutionContext):
 
         conn = self.root_connection
         if isinstance(stmt, util.text_type) and \
-                not self.dialect.supports_unicode_statements:
+            not self.dialect.supports_unicode_statements:
             stmt = self.dialect._encoder(stmt)[0]
 
         if self.dialect.positional:
@@ -843,10 +844,10 @@ class DefaultExecutionContext(interfaces.ExecutionContext):
 
     def _setup_crud_result_proxy(self):
         if self.isinsert and \
-                not self.executemany:
+            not self.executemany:
             if not self._is_implicit_returning and \
                 not self.compiled.inline and \
-                    self.dialect.postfetch_lastrowid:
+                self.dialect.postfetch_lastrowid:
 
                 self._setup_ins_pk_from_lastrowid()
 
@@ -897,14 +898,14 @@ class DefaultExecutionContext(interfaces.ExecutionContext):
                 lastrowid if c is autoinc_col else
                 compiled_params.get(key_getter(c), None)
                 for c in table.primary_key
-            ]
+                ]
         else:
             # don't have a usable lastrowid, so
             # do the same as _setup_ins_pk_from_empty
             self.inserted_primary_key = [
                 compiled_params.get(key_getter(c), None)
                 for c in table.primary_key
-            ]
+                ]
 
     def _setup_ins_pk_from_empty(self):
         key_getter = self.compiled._key_getters_for_crud_column[2]
@@ -913,7 +914,7 @@ class DefaultExecutionContext(interfaces.ExecutionContext):
         self.inserted_primary_key = [
             compiled_params.get(key_getter(c), None)
             for c in table.primary_key
-        ]
+            ]
 
     def _setup_ins_pk_from_implicit_returning(self, row):
         key_getter = self.compiled._key_getters_for_crud_column[2]
@@ -925,12 +926,12 @@ class DefaultExecutionContext(interfaces.ExecutionContext):
             for col, value in [
                 (col, compiled_params.get(key_getter(col), None))
                 for col in table.primary_key
+                ]
             ]
-        ]
 
     def lastrow_has_defaults(self):
         return (self.isinsert or self.isupdate) and \
-            bool(self.compiled.postfetch)
+               bool(self.compiled.postfetch)
 
     def set_input_sizes(self, translate=None, exclude_types=None):
         """Given a cursor and ClauseParameters, call the appropriate
@@ -953,10 +954,10 @@ class DefaultExecutionContext(interfaces.ExecutionContext):
             inputsizes = []
             for key in self.compiled.positiontup:
                 typeengine = types[key]
-                dbtype = typeengine.dialect_impl(self.dialect).\
+                dbtype = typeengine.dialect_impl(self.dialect). \
                     get_dbapi_type(self.dialect.dbapi)
                 if dbtype is not None and \
-                        (not exclude_types or dbtype not in exclude_types):
+                    (not exclude_types or dbtype not in exclude_types):
                     inputsizes.append(dbtype)
             try:
                 self.cursor.setinputsizes(*inputsizes)
@@ -967,10 +968,10 @@ class DefaultExecutionContext(interfaces.ExecutionContext):
             inputsizes = {}
             for key in self.compiled.bind_names.values():
                 typeengine = types[key]
-                dbtype = typeengine.dialect_impl(self.dialect).\
+                dbtype = typeengine.dialect_impl(self.dialect). \
                     get_dbapi_type(self.dialect.dbapi)
                 if dbtype is not None and \
-                        (not exclude_types or dbtype not in exclude_types):
+                    (not exclude_types or dbtype not in exclude_types):
                     if translate:
                         key = translate.get(key, key)
                     if not self.dialect.supports_unicode_binds:
@@ -1052,7 +1053,7 @@ class DefaultExecutionContext(interfaces.ExecutionContext):
 
         for c in self.compiled.insert_prefetch:
             if c.default and \
-                    not c.default.is_sequence and c.default.is_scalar:
+                not c.default.is_sequence and c.default.is_scalar:
                 val = c.default.arg
             else:
                 val = self.get_insert_default(c)

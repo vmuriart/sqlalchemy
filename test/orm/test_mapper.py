@@ -107,6 +107,7 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
             @property
             def y(self):
                 return "something else"
+
         m = mapper(Foo, users)
         a1 = aliased(Foo)
 
@@ -123,6 +124,7 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
 
         def boom():
             raise Exception("it broke")
+
         mapper(User, users, properties={
             'addresses': relationship(boom)
         })
@@ -224,7 +226,7 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
         s = create_session()
         a = s.query(Address).from_statement(
             sa.select([addresses.c.id, addresses.c.user_id]).
-            order_by(addresses.c.id)).first()
+                order_by(addresses.c.id)).first()
         eq_(a.user_id, 7)
         eq_(a.id, 1)
         # email address auto-defers
@@ -248,7 +250,6 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
         users, addresses = self.tables.users, self.tables.addresses
 
         class Foo(object):
-
             def __init__(self):
                 pass
 
@@ -267,10 +268,12 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
         this.
 
         """
+
         class Foo(object):
 
             def __init__(self, id):
                 self.id = id
+
         m = MetaData()
         foo_t = Table('foo', m,
                       Column('id', String, primary_key=True)
@@ -396,7 +399,6 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
             "sqlalchemy.orm.attributes.register_attribute_impl",
             side_effect=register_attribute_impl
         ) as some_mock:
-
             mapper(A, users, properties={
                 'bs': relationship(B)
             })
@@ -411,9 +413,8 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
 
         b_calls = [
             c for c in some_mock.mock_calls if c[1][1] == 'bs'
-        ]
+            ]
         eq_(len(b_calls), 3)
-
 
     def test_check_descriptor_as_method(self):
         User, users = self.classes.User, self.tables.users
@@ -421,9 +422,9 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
         m = mapper(User, users)
 
         class MyClass(User):
-
             def foo(self):
                 pass
+
         m._is_userland_descriptor(MyClass.foo)
 
     def test_configure_on_get_props_1(self):
@@ -463,6 +464,7 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
 
         class MyComposite(object):
             pass
+
         for constructor, args in [
             (column_property, (users.c.name,)),
             (relationship, (Address,)),
@@ -527,12 +529,14 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
             def _set_name(self, name):
                 assert_col.append(('set', name))
                 self._name = name
+
             name = property(_get_name, _set_name)
 
             def _uc_name(self):
                 if self._name is None:
                     return None
                 return self._name.upper()
+
             uc_name = property(_uc_name)
             uc_name2 = property(_uc_name)
 
@@ -569,6 +573,7 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
             eq_(u.uc_name, 'JACK')
             eq_(u.uc_name2, 'JACK')
             eq_(assert_col, [('get', 'jack')], str(assert_col))
+
         self.sql_count_(2, go)
 
         u.name = 'ed'
@@ -643,6 +648,7 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
 
         class SubUser(User):
             pass
+
         m = mapper(User, users)
         m2 = mapper(SubUser, addresses, inherits=User, properties={
             'address_id': addresses.c.id
@@ -691,10 +697,10 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
         assert User.x.property.columns[0].element.right is not expr.right
 
         assert User.y.property.columns[0] is not expr2
-        assert User.y.property.columns[0].element.\
-            _raw_columns[0] is users.c.name
-        assert User.y.property.columns[0].element.\
-            _raw_columns[1] is users.c.id
+        assert User.y.property.columns[0].element. \
+                   _raw_columns[0] is users.c.name
+        assert User.y.property.columns[0].element. \
+                   _raw_columns[1] is users.c.id
 
     def test_synonym_replaces_backref(self):
         addresses, users, User = (self.tables.addresses,
@@ -704,7 +710,6 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
         assert_calls = []
 
         class Address(object):
-
             def _get_user(self):
                 assert_calls.append("get")
                 return self._user
@@ -712,6 +717,7 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
             def _set_user(self, user):
                 assert_calls.append("set")
                 self._user = user
+
             user = property(_get_user, _set_user)
 
         # synonym is created against nonexistent prop
@@ -765,11 +771,12 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
 
         class AddressUser(User):
             pass
+
         m1 = mapper(User, users, polymorphic_identity='user')
         m2 = mapper(AddressUser, addresses, inherits=User,
                     polymorphic_identity='address', properties={
-                        'address_id': addresses.c.id
-                    })
+                'address_id': addresses.c.id
+            })
         m3 = mapper(AddressUser, addresses, non_primary=True)
         assert m3._identity_class is m2._identity_class
         eq_(
@@ -783,6 +790,7 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
 
         class MyUser(User):
             pass
+
         m1 = mapper(User, users, polymorphic_on=users.c.name,
                     polymorphic_identity='user')
         assert_raises_message(
@@ -826,6 +834,7 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
 
         class Sub(Base):
             pass
+
         mapper(Base, users)
         assert_raises_message(sa.exc.InvalidRequestError,
                               "Configure a primary mapper first",
@@ -867,7 +876,6 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
             pass
 
         class HasDef(object):
-
             def name(self):
                 pass
 
@@ -885,7 +893,7 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
                          'boss': relationship(
                              Manager, backref=backref('peon'),
                              remote_side=t.c.id)},
-                     exclude_properties=('vendor_id', ))
+                     exclude_properties=('vendor_id',))
 
         mapper(
             Manager, inherits=e_m, polymorphic_identity='manager',
@@ -944,11 +952,12 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
         # very weird.  As of 0.7.4 this re-maps it.
         class Foo(Person):
             pass
+
         assert_props(Empty, ['empty_id'])
 
         mapper(
             Foo, inherits=Person, polymorphic_identity='foo',
-            exclude_properties=('type', ),
+            exclude_properties=('type',),
         )
         assert hasattr(Foo, "type")
         assert Foo.type.property.columns[0] is t.c.type
@@ -966,6 +975,7 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
 
         class A(object):
             pass
+
         mapper(A, t, include_properties=['id'])
         s = Session()
         s.add(A())
@@ -973,9 +983,9 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
 
     def test_we_dont_call_bool(self):
         class NoBoolAllowed(object):
-
             def __bool__(self):
                 raise Exception("nope")
+
         mapper(NoBoolAllowed, self.tables.users)
         u1 = NoBoolAllowed()
         u1.name = "some name"
@@ -986,7 +996,6 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
 
     def test_we_dont_call_eq(self):
         class NoEqAllowed(object):
-
             def __eq__(self, other):
                 raise Exception("nope")
 
@@ -1086,7 +1095,7 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
         mapper(User, users.outerjoin(addresses),
                primary_key=[users.c.id, addresses.c.id],
                properties=dict(
-            address_id=addresses.c.id))
+                   address_id=addresses.c.id))
 
         session = create_session()
         l = session.query(User).order_by(User.id, User.address_id).all()
@@ -1110,7 +1119,7 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
                allow_partial_pks=False,
                primary_key=[users.c.id, addresses.c.id],
                properties=dict(
-            address_id=addresses.c.id))
+                   address_id=addresses.c.id))
 
         session = create_session()
         l = session.query(User).order_by(User.id, User.address_id).all()
@@ -1175,12 +1184,13 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
         mapper(User, users, order_by=users.c.name.desc())
 
         assert "order by users.name desc" in \
-            str(create_session().query(User).statement).lower()
+               str(create_session().query(User).statement).lower()
         assert "order by" not in \
-            str(create_session().query(User).order_by(None).statement).lower()
+               str(create_session().query(User).order_by(
+                   None).statement).lower()
         assert "order by users.name asc" in \
-            str(create_session().query(User).order_by(
-                User.name.asc()).statement).lower()
+               str(create_session().query(User).order_by(
+                   User.name.asc()).statement).lower()
 
         eq_(
             create_session().query(User).all(),
@@ -1307,7 +1317,6 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
             attribute = 123
 
         class User(object):
-
             def _get_name(self):
                 assert_col.append(('get', self.name))
                 return self.name
@@ -1315,6 +1324,7 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
             def _set_name(self, name):
                 assert_col.append(('set', name))
                 self.name = name
+
             uname = extendedproperty(_get_name, _set_name)
 
         mapper(User, users, properties=dict(
@@ -1404,7 +1414,6 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
         assert_col = []
 
         class User(object):
-
             def _get_name(self):
                 assert_col.append(('get', self._name))
                 return self._name
@@ -1412,6 +1421,7 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
             def _set_name(self, name):
                 assert_col.append(('set', name))
                 self._name = name
+
             name = property(_get_name, _set_name)
 
         mapper(Address, addresses)
@@ -1490,6 +1500,7 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
                     if self.name is None:
                         return None
                     return self.name.upper()
+
             if with_explicit_property:
                 args = (UCComparator, User.uc_name)
             else:
@@ -1583,7 +1594,6 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
                                            self.classes.User)
 
         class MyFakeProperty(sa.orm.properties.ColumnProperty):
-
             def post_instrument_class(self, mapper):
                 super(MyFakeProperty, self).post_instrument_class(mapper)
                 configure_mappers()
@@ -1597,7 +1607,6 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
         sa.orm.clear_mappers()
 
         class MyFakeProperty(sa.orm.properties.ColumnProperty):
-
             def post_instrument_class(self, mapper):
                 super(MyFakeProperty, self).post_instrument_class(mapper)
                 configure_mappers()
@@ -1614,7 +1623,6 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
         recon = []
 
         class User(object):
-
             @reconstructor
             def reconstruct(self):
                 recon.append('go')
@@ -1632,21 +1640,18 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
         recon = []
 
         class A(object):
-
             @reconstructor
             def reconstruct(self):
                 assert isinstance(self, A)
                 recon.append('A')
 
         class B(A):
-
             @reconstructor
             def reconstruct(self):
                 assert isinstance(self, B)
                 recon.append('B')
 
         class C(A):
-
             @reconstructor
             def reconstruct(self):
                 assert isinstance(self, C)
@@ -1674,7 +1679,6 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
         recon = []
 
         class Base(object):
-
             @reconstructor
             def reconstruct(self):
                 recon.append('go')
@@ -1749,7 +1753,8 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
         mapper(User, users, properties={
             "addresses": relationship(Address,
                                       primaryjoin=lambda: users.c.id ==
-                                      addresses.__dict__['wrong'].user_id)
+                                                          addresses.__dict__[
+                                                              'wrong'].user_id)
         })
         mapper(Address, addresses)
         assert_raises_message(
@@ -1830,7 +1835,6 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
 
 
 class DocumentTest(fixtures.TestBase):
-
     def test_doc_propagate(self):
         metadata = MetaData()
         t1 = Table('t1', metadata,
@@ -1876,7 +1880,6 @@ class DocumentTest(fixtures.TestBase):
 
 
 class ORMLoggingTest(_fixtures.FixtureTest):
-
     def setup(self):
         self.buf = logging.handlers.BufferingHandler(100)
         for log in [
@@ -1906,7 +1909,6 @@ class ORMLoggingTest(_fixtures.FixtureTest):
 
 
 class OptionsTest(_fixtures.FixtureTest):
-
     def test_synonym_options(self):
         Address, addresses, users, User = (self.classes.Address,
                                            self.tables.addresses,
@@ -1926,6 +1928,7 @@ class OptionsTest(_fixtures.FixtureTest):
                  filter_by(name='jack')).one()
             eq_(u.adlist,
                 [self.static.user_address_result[0].addresses[0]])
+
         self.assert_sql_count(testing.db, go, 1)
 
     def test_eager_options(self):
@@ -1947,6 +1950,7 @@ class OptionsTest(_fixtures.FixtureTest):
 
         def go():
             eq_(l, self.static.user_address_result)
+
         self.sql_count_(0, go)
 
     def test_eager_options_with_limit(self):
@@ -1966,6 +1970,7 @@ class OptionsTest(_fixtures.FixtureTest):
         def go():
             eq_(u.id, 8)
             eq_(len(u.addresses), 3)
+
         self.sql_count_(0, go)
 
         sess.expunge_all()
@@ -1991,6 +1996,7 @@ class OptionsTest(_fixtures.FixtureTest):
         def go():
             eq_(u.id, 8)
             eq_(len(u.addresses), 3)
+
         self.sql_count_(1, go)
 
     def test_eager_degrade(self):
@@ -2007,11 +2013,13 @@ class OptionsTest(_fixtures.FixtureTest):
                                    lazy='joined', order_by=addresses.c.id)))
 
         sess = create_session()
+
         # first test straight eager load, 1 statement
 
         def go():
             l = sess.query(User).order_by(User.id).all()
             eq_(l, self.static.user_address_result)
+
         self.sql_count_(1, go)
 
         sess.expunge_all()
@@ -2025,23 +2033,24 @@ class OptionsTest(_fixtures.FixtureTest):
         def go():
             l = list(sess.query(User).instances(r))
             eq_(l, self.static.user_address_result)
+
         self.sql_count_(4, go)
 
     def test_eager_degrade_deep(self):
         users, Keyword, items, order_items, orders, \
-            Item, User, Address, keywords, item_keywords, Order, addresses = (
-                self.tables.users,
-                self.classes.Keyword,
-                self.tables.items,
-                self.tables.order_items,
-                self.tables.orders,
-                self.classes.Item,
-                self.classes.User,
-                self.classes.Address,
-                self.tables.keywords,
-                self.tables.item_keywords,
-                self.classes.Order,
-                self.tables.addresses)
+        Item, User, Address, keywords, item_keywords, Order, addresses = (
+            self.tables.users,
+            self.classes.Keyword,
+            self.tables.items,
+            self.tables.order_items,
+            self.tables.orders,
+            self.classes.Item,
+            self.classes.User,
+            self.classes.Address,
+            self.tables.keywords,
+            self.tables.item_keywords,
+            self.classes.Order,
+            self.tables.addresses)
 
         # test with a deeper set of eager loads.  when we first load the three
         # users, they will have no addresses or orders.  the number of lazy
@@ -2072,6 +2081,7 @@ class OptionsTest(_fixtures.FixtureTest):
         def go():
             l = sess.query(User).order_by(User.id).all()
             eq_(l, self.static.user_all_result)
+
         self.assert_sql_count(testing.db, go, 1)
 
         sess.expunge_all()
@@ -2083,6 +2093,7 @@ class OptionsTest(_fixtures.FixtureTest):
         def go():
             l = list(sess.query(User).instances(r))
             eq_(l, self.static.user_all_result)
+
         self.assert_sql_count(testing.db, go, 6)
 
     def test_lazy_options(self):
@@ -2104,6 +2115,7 @@ class OptionsTest(_fixtures.FixtureTest):
 
         def go():
             eq_(l, self.static.user_address_result)
+
         self.sql_count_(4, go)
 
     def test_option_propagate(self):
@@ -2129,7 +2141,7 @@ class OptionsTest(_fixtures.FixtureTest):
         oalias = aliased(Order)
         opt1 = sa.orm.joinedload(User.orders, Order.items)
         opt2 = sa.orm.contains_eager(User.orders, Order.items, alias=oalias)
-        u1 = sess.query(User).join(oalias, User.orders).\
+        u1 = sess.query(User).join(oalias, User.orders). \
             options(opt1, opt2).first()
         ustate = attributes.instance_state(u1)
         assert opt1 in ustate.load_options
@@ -2137,21 +2149,20 @@ class OptionsTest(_fixtures.FixtureTest):
 
 
 class DeepOptionsTest(_fixtures.FixtureTest):
-
     @classmethod
     def setup_mappers(cls):
         users, Keyword, items, order_items, Order, Item, User, \
-            keywords, item_keywords, orders = (
-                cls.tables.users,
-                cls.classes.Keyword,
-                cls.tables.items,
-                cls.tables.order_items,
-                cls.classes.Order,
-                cls.classes.Item,
-                cls.classes.User,
-                cls.tables.keywords,
-                cls.tables.item_keywords,
-                cls.tables.orders)
+        keywords, item_keywords, orders = (
+            cls.tables.users,
+            cls.classes.Keyword,
+            cls.tables.items,
+            cls.tables.order_items,
+            cls.classes.Order,
+            cls.classes.Item,
+            cls.classes.User,
+            cls.tables.keywords,
+            cls.tables.item_keywords,
+            cls.tables.orders)
 
         mapper(Keyword, keywords)
 
@@ -2176,6 +2187,7 @@ class DeepOptionsTest(_fixtures.FixtureTest):
 
         def go():
             u[0].orders[1].items[0].keywords[1]
+
         self.assert_sql_count(testing.db, go, 3)
 
     def test_deep_options_2(self):
@@ -2191,6 +2203,7 @@ class DeepOptionsTest(_fixtures.FixtureTest):
 
         def go():
             l[0].orders[1].items[0].keywords[1]
+
         self.sql_count_(0, go)
 
         sess = create_session()
@@ -2200,6 +2213,7 @@ class DeepOptionsTest(_fixtures.FixtureTest):
 
         def go():
             l[0].orders[1].items[0].keywords[1]
+
         self.sql_count_(0, go)
 
     def test_deep_options_3(self):
@@ -2217,6 +2231,7 @@ class DeepOptionsTest(_fixtures.FixtureTest):
 
         def go():
             u[0].orders[1].items[0].keywords[1]
+
         self.sql_count_(0, go)
 
     def test_deep_options_4(self):
@@ -2241,6 +2256,7 @@ class DeepOptionsTest(_fixtures.FixtureTest):
 
         def go():
             u[0].orders[1].items[0].keywords[1]
+
         self.sql_count_(2, go)
 
         sess = create_session()
@@ -2250,16 +2266,15 @@ class DeepOptionsTest(_fixtures.FixtureTest):
 
         def go():
             u[0].orders[1].items[0].keywords[1]
+
         self.sql_count_(2, go)
 
 
 class ComparatorFactoryTest(_fixtures.FixtureTest, AssertsCompiledSQL):
-
     def test_kwarg_accepted(self):
         users, Address = self.tables.users, self.classes.Address
 
         class DummyComposite(object):
-
             def __init__(self, x, y):
                 pass
 
@@ -2275,7 +2290,7 @@ class ComparatorFactoryTest(_fixtures.FixtureTest, AssertsCompiledSQL):
             (composite, DummyComposite, users.c.id, users.c.name),
             (relationship, Address),
             (backref, 'address'),
-            (comparable_property, ),
+            (comparable_property,),
             (dynamic_loader, Address)
         ):
             fn = args[0]
@@ -2292,7 +2307,8 @@ class ComparatorFactoryTest(_fixtures.FixtureTest, AssertsCompiledSQL):
 
             def __eq__(self, other):
                 return func.foobar(self.__clause_element__()) == \
-                    func.foobar(other)
+                       func.foobar(other)
+
         mapper(
             User, users,
             properties={
@@ -2317,8 +2333,8 @@ class ComparatorFactoryTest(_fixtures.FixtureTest, AssertsCompiledSQL):
             __hash__ = None
 
             def __eq__(self, other):
-                return func.foobar(self.__clause_element__()) ==\
-                    func.foobar(other)
+                return func.foobar(self.__clause_element__()) == \
+                       func.foobar(other)
 
         mapper(User, users, properties={
             'name': synonym('_name', map_column=True,
@@ -2350,14 +2366,14 @@ class ComparatorFactoryTest(_fixtures.FixtureTest, AssertsCompiledSQL):
 
             def __eq__(self, other):
                 return func.foobar(self._source_selectable().c.user_id) == \
-                    func.foobar(other.id)
+                       func.foobar(other.id)
 
         class MyFactory2(RelationshipProperty.Comparator):
             __hash__ = None
 
             def __eq__(self, other):
                 return func.foobar(self._source_selectable().c.id) == \
-                    func.foobar(other.user_id)
+                       func.foobar(other.user_id)
 
         mapper(User, users)
         mapper(Address, addresses, properties={
@@ -2366,7 +2382,7 @@ class ComparatorFactoryTest(_fixtures.FixtureTest, AssertsCompiledSQL):
                 backref=backref("addresses", comparator_factory=MyFactory2)
             )
         }
-        )
+               )
 
         # these are kind of nonsensical tests.
         self.assert_compile(Address.user == User(id=5),
@@ -2388,7 +2404,6 @@ class ComparatorFactoryTest(_fixtures.FixtureTest, AssertsCompiledSQL):
 
 
 class SecondaryOptionsTest(fixtures.MappedTest):
-
     """test that the contains_eager() option doesn't bleed
     into a secondary load."""
 
@@ -2432,6 +2447,7 @@ class SecondaryOptionsTest(fixtures.MappedTest):
 
         class Related(cls.Comparable):
             pass
+
         mapper(Base, base, polymorphic_on=base.c.type, properties={
             'related': relationship(Related, uselist=False)
         })
@@ -2484,9 +2500,9 @@ class SecondaryOptionsTest(fixtures.MappedTest):
 
         sess = create_session()
 
-        child1s = sess.query(Child1).\
-            join(Child1.related).\
-            options(sa.orm.contains_eager(Child1.related)).\
+        child1s = sess.query(Child1). \
+            join(Child1.related). \
+            options(sa.orm.contains_eager(Child1.related)). \
             order_by(Child1.id)
 
         def go():
@@ -2498,6 +2514,7 @@ class SecondaryOptionsTest(fixtures.MappedTest):
                     Child1(id=3, related=Related(id=3))
                 ]
             )
+
         self.assert_sql_count(testing.db, go, 1)
 
         c1 = child1s[0]
@@ -2529,6 +2546,7 @@ class SecondaryOptionsTest(fixtures.MappedTest):
                  Child1(id=2, related=Related(id=2)),
                  Child1(id=3, related=Related(id=3))]
             )
+
         self.assert_sql_count(testing.db, go, 1)
 
         c1 = child1s[0]
@@ -2564,6 +2582,7 @@ class SecondaryOptionsTest(fixtures.MappedTest):
                  Child1(id=2, related=Related(id=2)),
                  Child1(id=3, related=Related(id=3))]
             )
+
         self.assert_sql_count(testing.db, go, 4)
 
         c1 = child1s[0]
@@ -2585,7 +2604,6 @@ class SecondaryOptionsTest(fixtures.MappedTest):
 
 
 class DeferredPopulationTest(fixtures.MappedTest):
-
     @classmethod
     def define_tables(cls, metadata):
         Table("thing", metadata,
@@ -2649,7 +2667,7 @@ class DeferredPopulationTest(fixtures.MappedTest):
         Thing = self.classes.Thing
 
         session = create_session()
-        result = session.query(Thing).first()    # noqa
+        result = session.query(Thing).first()  # noqa
         thing = session.query(Thing).options(sa.orm.undefer("name")).first()
         self._test(thing)
 
@@ -2657,7 +2675,7 @@ class DeferredPopulationTest(fixtures.MappedTest):
         Thing, Human = self.classes.Thing, self.classes.Human
 
         session = create_session()
-        human = session.query(Human).options(    # noqa
+        human = session.query(Human).options(  # noqa
             sa.orm.joinedload("thing")).first()
         session.expunge_all()
         thing = session.query(Thing).options(sa.orm.undefer("name")).first()
@@ -2667,7 +2685,7 @@ class DeferredPopulationTest(fixtures.MappedTest):
         Thing, Human = self.classes.Thing, self.classes.Human
 
         session = create_session()
-        human = session.query(Human).options(    # noqa
+        human = session.query(Human).options(  # noqa
             sa.orm.joinedload("thing")).first()
         thing = session.query(Thing).options(sa.orm.undefer("name")).first()
         self._test(thing)
@@ -2697,7 +2715,6 @@ class NoLoadTest(_fixtures.FixtureTest):
     run_deletes = None
 
     def test_o2m_noload(self):
-
         Address, addresses, users, User = (
             self.classes.Address,
             self.tables.addresses,
@@ -2714,6 +2731,7 @@ class NoLoadTest(_fixtures.FixtureTest):
             x = q.filter(User.id == 7).all()
             x[0].addresses
             l[0] = x
+
         self.assert_sql_count(testing.db, go, 1)
 
         self.assert_result(
@@ -2738,6 +2756,7 @@ class NoLoadTest(_fixtures.FixtureTest):
             x = q.filter(User.id == 7).all()
             x[0].addresses
             l[0] = x
+
         self.sql_count_(2, go)
 
         self.assert_result(
@@ -2761,6 +2780,7 @@ class NoLoadTest(_fixtures.FixtureTest):
 
         def go():
             eq_(a1.user, None)
+
         self.sql_count_(0, go)
 
 
@@ -2789,6 +2809,7 @@ class RaiseLoadTest(_fixtures.FixtureTest):
                 "'User.addresses' is not available due to lazy='raise'",
                 lambda: x[0].addresses)
             l[0] = x
+
         self.assert_sql_count(testing.db, go, 1)
 
         self.assert_result(
@@ -2818,6 +2839,7 @@ class RaiseLoadTest(_fixtures.FixtureTest):
                 "'User.addresses' is not available due to lazy='raise'",
                 lambda: x[0].addresses)
             l[0] = x
+
         self.assert_sql_count(testing.db, go, 1)
 
         self.assert_result(
@@ -2843,6 +2865,7 @@ class RaiseLoadTest(_fixtures.FixtureTest):
             x = q.filter(User.id == 7).all()
             x[0].addresses
             l[0] = x
+
         self.sql_count_(2, go)
 
         self.assert_result(
@@ -2874,7 +2897,6 @@ class RaiseLoadTest(_fixtures.FixtureTest):
 
 
 class RequirementsTest(fixtures.MappedTest):
-
     """Tests the contract for user classes."""
 
     @classmethod
@@ -2924,9 +2946,9 @@ class RequirementsTest(fixtures.MappedTest):
             class NoWeakrefSupport(str):
                 pass
 
-            # TODO: is weakref support detectable without an instance?
-            # self.assertRaises(
-            #  sa.exc.ArgumentError, mapper, NoWeakrefSupport, t2)
+                # TODO: is weakref support detectable without an instance?
+                # self.assertRaises(
+                #  sa.exc.ArgumentError, mapper, NoWeakrefSupport, t2)
 
     class _ValueBase(object):
 
@@ -3044,14 +3066,12 @@ class RequirementsTest(fixtures.MappedTest):
                     self.tables.ht1)
 
         class H1(self._ValueBase):
-
             def __init__(self, value, id, h2s):
                 self.value = value
                 self.id = id
                 self.h2s = h2s
 
         class H2(self._ValueBase):
-
             def __init__(self, value, id):
                 self.value = value
                 self.id = id
@@ -3092,7 +3112,6 @@ class RequirementsTest(fixtures.MappedTest):
         ht1 = self.tables.ht1
 
         class H1(object):
-
             def __len__(self):
                 return len(self.get_value())
 
@@ -3101,7 +3120,6 @@ class RequirementsTest(fixtures.MappedTest):
                 return self.value
 
         class H2(object):
-
             def __bool__(self):
                 return bool(self.get_value())
 
@@ -3122,7 +3140,6 @@ class RequirementsTest(fixtures.MappedTest):
 
 
 class IsUserlandTest(fixtures.MappedTest):
-
     @classmethod
     def define_tables(cls, metadata):
         Table('foo', metadata,
@@ -3175,11 +3192,11 @@ class IsUserlandTest(fixtures.MappedTest):
     def test_descriptor(self):
         def somefunc(self):
             return "hi"
+
         self._test(property(somefunc), "hi")
 
 
 class MagicNamesTest(fixtures.MappedTest):
-
     @classmethod
     def define_tables(cls, metadata):
         Table('cartographers', metadata,
@@ -3241,6 +3258,7 @@ class MagicNamesTest(fixtures.MappedTest):
 
             class T(object):
                 pass
+
             assert_raises_message(
                 KeyError,
                 ('%r: requested attribute name conflicts with '

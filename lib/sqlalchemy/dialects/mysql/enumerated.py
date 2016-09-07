@@ -283,7 +283,7 @@ class SET(_EnumeratedValues):
             def process(value):
                 # accept strings and int (actually bitflag) values directly
                 if value is not None and not isinstance(
-                        value, util.int_types + util.string_types):
+                    value, util.int_types + util.string_types):
                     value = ",".join(value)
 
                 if super_convert:

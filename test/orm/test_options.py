@@ -1,7 +1,7 @@
 from sqlalchemy import inspect
 from sqlalchemy.orm import attributes, mapper, relationship, backref, \
     configure_mappers, create_session, synonym, Session, class_mapper, \
-    aliased, column_property, joinedload_all, joinedload, Query,\
+    aliased, column_property, joinedload_all, joinedload, Query, \
     util as orm_util, Load, defer
 from sqlalchemy.orm.query import QueryContext
 from sqlalchemy.orm import strategy_options
@@ -52,7 +52,6 @@ class PathTest(object):
 
 
 class LoadTest(PathTest, QueryTest):
-
     def test_str(self):
         User = self.classes.User
         l = Load(User)
@@ -68,7 +67,8 @@ class LoadTest(PathTest, QueryTest):
 
         l = Load(User)
         eq_(
-            l._generate_path(inspect(User)._path_registry, User.addresses, "relationship"),
+            l._generate_path(inspect(User)._path_registry, User.addresses,
+                             "relationship"),
             self._make_path_registry([User, "addresses", Address])
         )
 
@@ -77,7 +77,8 @@ class LoadTest(PathTest, QueryTest):
 
         l = Load(User)
         eq_(
-            l._generate_path(inspect(User)._path_registry, User.name, "column"),
+            l._generate_path(inspect(User)._path_registry, User.name,
+                             "column"),
             self._make_path_registry([User, "name"])
         )
 
@@ -87,7 +88,8 @@ class LoadTest(PathTest, QueryTest):
 
         l = Load(User)
         eq_(
-            l._generate_path(inspect(User)._path_registry, "addresses", "relationship"),
+            l._generate_path(inspect(User)._path_registry, "addresses",
+                             "relationship"),
             self._make_path_registry([User, "addresses", Address])
         )
 
@@ -108,10 +110,11 @@ class LoadTest(PathTest, QueryTest):
         assert_raises_message(
             sa.exc.ArgumentError,
             "Attribute 'name' of entity 'Mapper|User|users' does "
-                "not refer to a mapped entity",
+            "not refer to a mapped entity",
             l._generate_path, l.path, User.addresses, "relationship"
 
         )
+
     def test_gen_path_attr_entity_invalid_raiseerr(self):
         User = self.classes.User
         Order = self.classes.Order
@@ -133,7 +136,8 @@ class LoadTest(PathTest, QueryTest):
 
         eq_(
             l._generate_path(
-                inspect(User)._path_registry, Order.items, "relationship", False
+                inspect(User)._path_registry, Order.items, "relationship",
+                False
             ),
             None
         )
@@ -164,15 +168,10 @@ class LoadTest(PathTest, QueryTest):
         )
 
 
-
-
 class OptionsTest(PathTest, QueryTest):
-
     def _option_fixture(self, *arg):
         return strategy_options._UnboundLoad._from_keys(
-                    strategy_options._UnboundLoad.joinedload, arg, True, {})
-
-
+            strategy_options._UnboundLoad.joinedload, arg, True, {})
 
     def test_get_path_one_level_string(self):
         User = self.classes.User
@@ -202,9 +201,9 @@ class OptionsTest(PathTest, QueryTest):
         q = sess.query(User)
         opt = self._option_fixture('email_address', 'id')
         q = sess.query(Address)._with_current_path(
-                orm_util.PathRegistry.coerce([inspect(User),
-                        inspect(User).attrs.addresses])
-            )
+            orm_util.PathRegistry.coerce([inspect(User),
+                                          inspect(User).attrs.addresses])
+        )
         self._assert_path_result(opt, q, [])
 
     def test_get_path_one_level_with_unrelated(self):
@@ -217,8 +216,8 @@ class OptionsTest(PathTest, QueryTest):
 
     def test_path_multilevel_string(self):
         Item, User, Order = (self.classes.Item,
-                                self.classes.User,
-                                self.classes.Order)
+                             self.classes.User,
+                             self.classes.Order)
 
         sess = Session()
         q = sess.query(User)
@@ -232,8 +231,8 @@ class OptionsTest(PathTest, QueryTest):
 
     def test_path_multilevel_attribute(self):
         Item, User, Order = (self.classes.Item,
-                                self.classes.User,
-                                self.classes.Order)
+                             self.classes.User,
+                             self.classes.Order)
 
         sess = Session()
         q = sess.query(User)
@@ -247,13 +246,13 @@ class OptionsTest(PathTest, QueryTest):
 
     def test_with_current_matching_string(self):
         Item, User, Order = (self.classes.Item,
-                                self.classes.User,
-                                self.classes.Order)
+                             self.classes.User,
+                             self.classes.Order)
 
         sess = Session()
         q = sess.query(Item)._with_current_path(
-                self._make_path_registry([User, 'orders', Order, 'items'])
-            )
+            self._make_path_registry([User, 'orders', Order, 'items'])
+        )
 
         opt = self._option_fixture("orders.items.keywords")
         self._assert_path_result(opt, q, [
@@ -262,13 +261,13 @@ class OptionsTest(PathTest, QueryTest):
 
     def test_with_current_matching_attribute(self):
         Item, User, Order = (self.classes.Item,
-                                self.classes.User,
-                                self.classes.Order)
+                             self.classes.User,
+                             self.classes.Order)
 
         sess = Session()
         q = sess.query(Item)._with_current_path(
-                self._make_path_registry([User, 'orders', Order, 'items'])
-            )
+            self._make_path_registry([User, 'orders', Order, 'items'])
+        )
 
         opt = self._option_fixture(User.orders, Order.items, Item.keywords)
         self._assert_path_result(opt, q, [
@@ -277,13 +276,13 @@ class OptionsTest(PathTest, QueryTest):
 
     def test_with_current_nonmatching_string(self):
         Item, User, Order = (self.classes.Item,
-                                self.classes.User,
-                                self.classes.Order)
+                             self.classes.User,
+                             self.classes.Order)
 
         sess = Session()
         q = sess.query(Item)._with_current_path(
-                self._make_path_registry([User, 'orders', Order, 'items'])
-            )
+            self._make_path_registry([User, 'orders', Order, 'items'])
+        )
 
         opt = self._option_fixture("keywords")
         self._assert_path_result(opt, q, [])
@@ -293,13 +292,13 @@ class OptionsTest(PathTest, QueryTest):
 
     def test_with_current_nonmatching_attribute(self):
         Item, User, Order = (self.classes.Item,
-                                self.classes.User,
-                                self.classes.Order)
+                             self.classes.User,
+                             self.classes.Order)
 
         sess = Session()
         q = sess.query(Item)._with_current_path(
-                self._make_path_registry([User, 'orders', Order, 'items'])
-            )
+            self._make_path_registry([User, 'orders', Order, 'items'])
+        )
 
         opt = self._option_fixture(Item.keywords)
         self._assert_path_result(opt, q, [])
@@ -311,8 +310,10 @@ class OptionsTest(PathTest, QueryTest):
         Dingaling, Address = self.classes.Dingaling, self.classes.Address
 
         sess = Session()
+
         class SubAddr(Address):
             pass
+
         mapper(SubAddr, inherits=Address, properties={
             'flub': relationship(Dingaling)
         })
@@ -326,8 +327,10 @@ class OptionsTest(PathTest, QueryTest):
         Dingaling, Address = self.classes.Dingaling, self.classes.Address
 
         sess = Session()
+
         class SubAddr(Address):
             pass
+
         mapper(SubAddr, inherits=Address, properties={
             'flub': relationship(Dingaling)
         })
@@ -341,8 +344,10 @@ class OptionsTest(PathTest, QueryTest):
         Dingaling, Address = self.classes.Dingaling, self.classes.Address
 
         sess = Session()
+
         class SubAddr(Address):
             pass
+
         mapper(SubAddr, inherits=Address, properties={
             'flub': relationship(Dingaling)
         })
@@ -351,18 +356,21 @@ class OptionsTest(PathTest, QueryTest):
         opt = self._option_fixture(SubAddr.user)
 
         self._assert_path_result(opt, q,
-                [(Address, inspect(Address).attrs.user)])
+                                 [(Address, inspect(Address).attrs.user)])
 
     def test_of_type(self):
         User, Address = self.classes.User, self.classes.Address
 
         sess = Session()
+
         class SubAddr(Address):
             pass
+
         mapper(SubAddr, inherits=Address)
 
         q = sess.query(User)
-        opt = self._option_fixture(User.addresses.of_type(SubAddr), SubAddr.user)
+        opt = self._option_fixture(User.addresses.of_type(SubAddr),
+                                   SubAddr.user)
 
         u_mapper = inspect(User)
         a_mapper = inspect(Address)
@@ -373,24 +381,28 @@ class OptionsTest(PathTest, QueryTest):
 
     def test_of_type_plus_level(self):
         Dingaling, User, Address = (self.classes.Dingaling,
-                                self.classes.User,
-                                self.classes.Address)
+                                    self.classes.User,
+                                    self.classes.Address)
 
         sess = Session()
+
         class SubAddr(Address):
             pass
+
         mapper(SubAddr, inherits=Address, properties={
             'flub': relationship(Dingaling)
         })
 
         q = sess.query(User)
-        opt = self._option_fixture(User.addresses.of_type(SubAddr), SubAddr.flub)
+        opt = self._option_fixture(User.addresses.of_type(SubAddr),
+                                   SubAddr.flub)
 
         u_mapper = inspect(User)
         sa_mapper = inspect(SubAddr)
         self._assert_path_result(opt, q, [
             (u_mapper, u_mapper.attrs.addresses),
-            (u_mapper, u_mapper.attrs.addresses, sa_mapper, sa_mapper.attrs.flub)
+            (u_mapper, u_mapper.attrs.addresses, sa_mapper,
+             sa_mapper.attrs.flub)
         ])
 
     def test_aliased_single(self):
@@ -408,8 +420,8 @@ class OptionsTest(PathTest, QueryTest):
         sess = Session()
         ualias = aliased(User)
         q = sess.query(ualias)._with_current_path(
-                        self._make_path_registry([Address, 'user'])
-                )
+            self._make_path_registry([Address, 'user'])
+        )
         opt = self._option_fixture(Address.user, ualias.addresses)
         self._assert_path_result(opt, q, [(inspect(ualias), 'addresses')])
 
@@ -419,8 +431,8 @@ class OptionsTest(PathTest, QueryTest):
         sess = Session()
         ualias = aliased(User)
         q = sess.query(User)._with_current_path(
-                        self._make_path_registry([Address, 'user'])
-                )
+            self._make_path_registry([Address, 'user'])
+        )
         opt = self._option_fixture(Address.user, ualias.addresses)
         self._assert_path_result(opt, q, [])
 
@@ -430,8 +442,8 @@ class OptionsTest(PathTest, QueryTest):
         sess = Session()
         ualias = aliased(User)
         q = sess.query(ualias)._with_current_path(
-                        self._make_path_registry([Address, 'user'])
-                )
+            self._make_path_registry([Address, 'user'])
+        )
         opt = self._option_fixture(Address.user, User.addresses)
         self._assert_path_result(opt, q, [])
 
@@ -466,8 +478,8 @@ class OptionsTest(PathTest, QueryTest):
         opt = self._option_fixture(User.orders)
         sess = Session()
         q = sess.query(Item)._with_current_path(
-                        self._make_path_registry([User, 'orders', Order, 'items'])
-                )
+            self._make_path_registry([User, 'orders', Order, 'items'])
+        )
         self._assert_path_result(opt, q, [])
 
     def test_chained(self):
@@ -478,9 +490,9 @@ class OptionsTest(PathTest, QueryTest):
         q = sess.query(User)
         opt = self._option_fixture(User.orders).joinedload("items")
         self._assert_path_result(opt, q, [
-                (User, 'orders'),
-                (User, 'orders', Order, "items")
-            ])
+            (User, 'orders'),
+            (User, 'orders', Order, "items")
+        ])
 
     def test_chained_plus_dotted(self):
         User = self.classes.User
@@ -490,10 +502,10 @@ class OptionsTest(PathTest, QueryTest):
         q = sess.query(User)
         opt = self._option_fixture("orders.items").joinedload("keywords")
         self._assert_path_result(opt, q, [
-                (User, 'orders'),
-                (User, 'orders', Order, "items"),
-                (User, 'orders', Order, "items", Item, "keywords")
-            ])
+            (User, 'orders'),
+            (User, 'orders', Order, "items"),
+            (User, 'orders', Order, "items", Item, "keywords")
+        ])
 
     def test_chained_plus_multi(self):
         User = self.classes.User
@@ -501,12 +513,13 @@ class OptionsTest(PathTest, QueryTest):
         Item = self.classes.Item
         sess = Session()
         q = sess.query(User)
-        opt = self._option_fixture(User.orders, Order.items).joinedload("keywords")
+        opt = self._option_fixture(User.orders, Order.items).joinedload(
+            "keywords")
         self._assert_path_result(opt, q, [
-                (User, 'orders'),
-                (User, 'orders', Order, "items"),
-                (User, 'orders', Order, "items", Item, "keywords")
-            ])
+            (User, 'orders'),
+            (User, 'orders', Order, "items"),
+            (User, 'orders', Order, "items", Item, "keywords")
+        ])
 
 
 class OptionsNoPropTest(_fixtures.FixtureTest):
@@ -554,26 +567,26 @@ class OptionsNoPropTest(_fixtures.FixtureTest):
         Item = self.classes.Item
 
         message = \
-            "Query has only expression-based entities - "\
+            "Query has only expression-based entities - " \
             "can't find property named 'keywords'."
         self._assert_eager_with_just_column_exception(Item.id,
-                'keywords', message)
+                                                      'keywords', message)
 
     def test_option_with_column_PropComparator(self):
         Item = self.classes.Item
 
         self._assert_eager_with_just_column_exception(Item.id,
-                Item.keywords,
-                "Query has only expression-based entities "
-                "- can't find property named 'keywords'."
-                )
+                                                      Item.keywords,
+                                                      "Query has only expression-based entities "
+                                                      "- can't find property named 'keywords'."
+                                                      )
 
     def test_option_against_nonexistent_PropComparator(self):
         Item = self.classes.Item
         Keyword = self.classes.Keyword
         self._assert_eager_with_entity_exception(
             [Keyword],
-            (joinedload(Item.keywords), ),
+            (joinedload(Item.keywords),),
             r"Can't find property 'keywords' on any entity specified "
             r"in this Query.  Note the full path from root "
             r"\(Mapper\|Keyword\|keywords\) to target entity must be specified."
@@ -583,7 +596,7 @@ class OptionsNoPropTest(_fixtures.FixtureTest):
         Item = self.classes.Item
         self._assert_eager_with_entity_exception(
             [Item],
-            (joinedload("foo"), ),
+            (joinedload("foo"),),
             r"Can't find property named 'foo' on the mapped "
             r"entity Mapper\|Item\|items in this Query."
         )
@@ -592,7 +605,7 @@ class OptionsNoPropTest(_fixtures.FixtureTest):
         Item = self.classes.Item
         self._assert_eager_with_entity_exception(
             [Item],
-            (joinedload("keywords.foo"), ),
+            (joinedload("keywords.foo"),),
             r"Can't find property named 'foo' on the mapped entity "
             r"Mapper\|Keyword\|keywords in this Query."
         )
@@ -601,31 +614,31 @@ class OptionsNoPropTest(_fixtures.FixtureTest):
         Item = self.classes.Item
         self._assert_eager_with_entity_exception(
             [Item],
-            (joinedload_all("keywords.foo"), ),
+            (joinedload_all("keywords.foo"),),
             r"Can't find property named 'foo' on the mapped entity "
             r"Mapper\|Keyword\|keywords in this Query."
         )
 
     @testing.fails_if(lambda: True,
-        "PropertyOption doesn't yet check for relation/column on end result")
+                      "PropertyOption doesn't yet check for relation/column on end result")
     def test_option_against_non_relation_basestring(self):
         Item = self.classes.Item
         Keyword = self.classes.Keyword
         self._assert_eager_with_entity_exception(
             [Keyword, Item],
-            (joinedload_all("keywords"), ),
+            (joinedload_all("keywords"),),
             r"Attribute 'keywords' of entity 'Mapper\|Keyword\|keywords' "
             "does not refer to a mapped entity"
         )
 
     @testing.fails_if(lambda: True,
-            "PropertyOption doesn't yet check for relation/column on end result")
+                      "PropertyOption doesn't yet check for relation/column on end result")
     def test_option_against_multi_non_relation_basestring(self):
         Item = self.classes.Item
         Keyword = self.classes.Keyword
         self._assert_eager_with_entity_exception(
             [Keyword, Item],
-            (joinedload_all("keywords"), ),
+            (joinedload_all("keywords"),),
             r"Attribute 'keywords' of entity 'Mapper\|Keyword\|keywords' "
             "does not refer to a mapped entity"
         )
@@ -634,7 +647,7 @@ class OptionsNoPropTest(_fixtures.FixtureTest):
         Item = self.classes.Item
         self._assert_eager_with_entity_exception(
             [Item],
-            (joinedload_all("id", "keywords"), ),
+            (joinedload_all("id", "keywords"),),
             r"Attribute 'id' of entity 'Mapper\|Item\|items' does not "
             r"refer to a mapped entity"
         )
@@ -644,7 +657,7 @@ class OptionsNoPropTest(_fixtures.FixtureTest):
         Keyword = self.classes.Keyword
         self._assert_eager_with_entity_exception(
             [Keyword, Item],
-            (joinedload_all("id", "keywords"), ),
+            (joinedload_all("id", "keywords"),),
             r"Attribute 'id' of entity 'Mapper\|Keyword\|keywords' "
             "does not refer to a mapped entity"
         )
@@ -654,7 +667,7 @@ class OptionsNoPropTest(_fixtures.FixtureTest):
         Keyword = self.classes.Keyword
         self._assert_eager_with_entity_exception(
             [Keyword, Item],
-            (joinedload_all("description"), ),
+            (joinedload_all("description"),),
             r"Can't find property named 'description' on the mapped "
             r"entity Mapper\|Keyword\|keywords in this Query."
         )
@@ -664,7 +677,7 @@ class OptionsNoPropTest(_fixtures.FixtureTest):
         Keyword = self.classes.Keyword
         self._assert_eager_with_entity_exception(
             [Keyword.id, Item.id],
-            (joinedload_all("keywords"), ),
+            (joinedload_all("keywords"),),
             r"Query has only expression-based entities - can't find property "
             "named 'keywords'."
         )
@@ -674,7 +687,7 @@ class OptionsNoPropTest(_fixtures.FixtureTest):
         Keyword = self.classes.Keyword
         self._assert_eager_with_entity_exception(
             [Keyword, Item],
-            (joinedload_all(Keyword.id, Item.keywords), ),
+            (joinedload_all(Keyword.id, Item.keywords),),
             r"Attribute 'id' of entity 'Mapper\|Keyword\|keywords' "
             "does not refer to a mapped entity"
         )
@@ -684,7 +697,7 @@ class OptionsNoPropTest(_fixtures.FixtureTest):
         Keyword = self.classes.Keyword
         self._assert_eager_with_entity_exception(
             [Keyword, Item],
-            (joinedload_all(Keyword.keywords, Item.keywords), ),
+            (joinedload_all(Keyword.keywords, Item.keywords),),
             r"Attribute 'keywords' of entity 'Mapper\|Keyword\|keywords' "
             "does not refer to a mapped entity"
         )
@@ -694,7 +707,7 @@ class OptionsNoPropTest(_fixtures.FixtureTest):
         Keyword = self.classes.Keyword
         self._assert_eager_with_entity_exception(
             [Keyword.id, Item.id],
-            (joinedload_all(Keyword.keywords, Item.keywords), ),
+            (joinedload_all(Keyword.keywords, Item.keywords),),
             r"Query has only expression-based entities - "
             "can't find property named 'keywords'."
         )
@@ -704,7 +717,7 @@ class OptionsNoPropTest(_fixtures.FixtureTest):
         Keyword = self.classes.Keyword
         self._assert_eager_with_entity_exception(
             [Item],
-            (joinedload_all(Keyword), ),
+            (joinedload_all(Keyword),),
             r"mapper option expects string key or list of attributes"
         )
 
@@ -712,7 +725,7 @@ class OptionsNoPropTest(_fixtures.FixtureTest):
         User = self.classes.User
         self._assert_eager_with_entity_exception(
             [User],
-            (joinedload_all(User.addresses, User.orders), ),
+            (joinedload_all(User.addresses, User.orders),),
             r"Attribute 'User.orders' does not link "
             "from element 'Mapper|Address|addresses'"
         )
@@ -722,7 +735,7 @@ class OptionsNoPropTest(_fixtures.FixtureTest):
         Order = self.classes.Order
         self._assert_eager_with_entity_exception(
             [User],
-            (joinedload_all(User.addresses, User.orders.of_type(Order)), ),
+            (joinedload_all(User.addresses, User.orders.of_type(Order)),),
             r"Attribute 'User.orders' does not link "
             "from element 'Mapper|Address|addresses'"
         )
@@ -730,9 +743,9 @@ class OptionsNoPropTest(_fixtures.FixtureTest):
     @classmethod
     def setup_mappers(cls):
         users, User, addresses, Address, orders, Order = (
-                    cls.tables.users, cls.classes.User,
-                    cls.tables.addresses, cls.classes.Address,
-                    cls.tables.orders, cls.classes.Order)
+            cls.tables.users, cls.classes.User,
+            cls.tables.addresses, cls.classes.Address,
+            cls.tables.orders, cls.classes.Order)
         mapper(User, users, properties={
             'addresses': relationship(Address),
             'orders': relationship(Order)
@@ -740,34 +753,34 @@ class OptionsNoPropTest(_fixtures.FixtureTest):
         mapper(Address, addresses)
         mapper(Order, orders)
         keywords, items, item_keywords, Keyword, Item = (cls.tables.keywords,
-                                cls.tables.items,
-                                cls.tables.item_keywords,
-                                cls.classes.Keyword,
-                                cls.classes.Item)
+                                                         cls.tables.items,
+                                                         cls.tables.item_keywords,
+                                                         cls.classes.Keyword,
+                                                         cls.classes.Item)
         mapper(Keyword, keywords, properties={
             "keywords": column_property(keywords.c.name + "some keyword")
         })
         mapper(Item, items,
                properties=dict(keywords=relationship(Keyword,
-               secondary=item_keywords)))
+                                                     secondary=item_keywords)))
 
     def _assert_option(self, entity_list, option):
         Item = self.classes.Item
 
-        q = create_session().query(*entity_list).\
-                            options(joinedload(option))
+        q = create_session().query(*entity_list). \
+            options(joinedload(option))
         key = ('loader', (inspect(Item), inspect(Item).attrs.keywords))
         assert key in q._attributes
 
     def _assert_eager_with_entity_exception(self, entity_list, options,
-                                message):
+                                            message):
         assert_raises_message(sa.exc.ArgumentError,
-                                message,
+                              message,
                               create_session().query(*entity_list).options,
                               *options)
 
     def _assert_eager_with_just_column_exception(self, column,
-            eager_option, message):
+                                                 eager_option, message):
         assert_raises_message(sa.exc.ArgumentError, message,
                               create_session().query(column).options,
                               joinedload(eager_option))
@@ -781,7 +794,7 @@ class LocalOptsTest(PathTest, QueryTest):
         @strategy_options.loader_option()
         def some_col_opt_only(loadopt, key, opts):
             return loadopt.set_column_strategy(
-                (key, ),
+                (key,),
                 None,
                 opts,
                 opts_only=True
@@ -790,7 +803,7 @@ class LocalOptsTest(PathTest, QueryTest):
         @strategy_options.loader_option()
         def some_col_opt_strategy(loadopt, key, opts):
             return loadopt.set_column_strategy(
-                (key, ),
+                (key,),
                 {"deferred": True, "instrument": True},
                 opts
             )

@@ -81,7 +81,6 @@ from sqlalchemy.sql import compiler
 from sqlalchemy.types import (BIGINT, BLOB, DATE, FLOAT, INTEGER, NUMERIC,
                               SMALLINT, TEXT, TIME, TIMESTAMP, Integer)
 
-
 RESERVED_WORDS = set([
     "active", "add", "admin", "after", "all", "alter", "and", "any", "as",
     "asc", "ascending", "at", "auto", "avg", "before", "begin", "between",
@@ -153,7 +152,9 @@ class _FBDateTime(sqltypes.DateTime):
                 return datetime.datetime(value.year, value.month, value.day)
             else:
                 return value
+
         return process
+
 
 colspecs = {
     sqltypes.DateTime: _FBDateTime
@@ -207,7 +208,7 @@ class FBTypeCompiler(compiler.GenericTypeCompiler):
         if not type_.length:
             raise exc.CompileError(
                 "VARCHAR requires a length on dialect {0!s}".format(
-                self.dialect.name))
+                    self.dialect.name))
         basic = super(FBTypeCompiler, self).visit_VARCHAR(type_, **kw)
         return self._extend_string(type_, basic)
 
@@ -243,20 +244,20 @@ class FBCompiler(sql.compiler.SQLCompiler):
 
     def visit_alias(self, alias, asfrom=False, **kwargs):
         if self.dialect._version_two:
-            return super(FBCompiler, self).\
+            return super(FBCompiler, self). \
                 visit_alias(alias, asfrom=asfrom, **kwargs)
         else:
             # Override to not use the AS keyword which FB 1.5 does not like
             if asfrom:
                 alias_name = isinstance(alias.name,
                                         expression._truncated_label) and \
-                    self._truncated_identifier("alias",
-                                               alias.name) or alias.name
+                             self._truncated_identifier("alias",
+                                                        alias.name) or alias.name
 
                 return self.process(
                     alias.original, asfrom=asfrom, **kwargs) + \
-                    " " + \
-                    self.preparer.format_alias(alias, alias_name)
+                       " " + \
+                       self.preparer.format_alias(alias, alias_name)
             else:
                 return self.process(alias.original, **kwargs)
 
@@ -265,7 +266,8 @@ class FBCompiler(sql.compiler.SQLCompiler):
         start = self.process(func.clauses.clauses[1])
         if len(func.clauses.clauses) > 2:
             length = self.process(func.clauses.clauses[2])
-            return "SUBSTRING({0!s} FROM {1!s} FOR {2!s})".format(s, start, length)
+            return "SUBSTRING({0!s} FROM {1!s} FOR {2!s})".format(s, start,
+                                                                  length)
         else:
             return "SUBSTRING({0!s} FROM {1!s})".format(s, start)
 
@@ -301,9 +303,11 @@ class FBCompiler(sql.compiler.SQLCompiler):
 
         result = ""
         if select._limit_clause is not None:
-            result += "FIRST {0!s} ".format(self.process(select._limit_clause, **kw))
+            result += "FIRST {0!s} ".format(
+                self.process(select._limit_clause, **kw))
         if select._offset_clause is not None:
-            result += "SKIP {0!s} ".format(self.process(select._offset_clause, **kw))
+            result += "SKIP {0!s} ".format(
+                self.process(select._offset_clause, **kw))
         if select._distinct:
             result += "DISTINCT "
         return result
@@ -317,7 +321,7 @@ class FBCompiler(sql.compiler.SQLCompiler):
         columns = [
             self._label_select_column(None, c, True, False, {})
             for c in expression._select_iterables(returning_cols)
-        ]
+            ]
 
         return 'RETURNING ' + ', '.join(columns)
 
@@ -372,7 +376,7 @@ class FBExecutionContext(default.DefaultExecutionContext):
 
         return self._execute_scalar(
             "SELECT gen_id({0!s}, 1) FROM rdb$database".format(
-            self.dialect.identifier_preparer.format_sequence(seq)),
+                self.dialect.identifier_preparer.format_sequence(seq)),
             type_
         )
 
@@ -413,10 +417,10 @@ class FBDialect(default.DefaultDialect):
     def initialize(self, connection):
         super(FBDialect, self).initialize(connection)
         self._version_two = ('firebird' in self.server_version_info and
-                             self.server_version_info >= (2, )
+                             self.server_version_info >= (2,)
                              ) or \
                             ('interbase' in self.server_version_info and
-                                self.server_version_info >= (6, )
+                             self.server_version_info >= (6,)
                              )
 
         if not self._version_two:
@@ -428,7 +432,7 @@ class FBDialect(default.DefaultDialect):
             }
 
         self.implicit_returning = self._version_two and \
-            self.__dict__.get('implicit_returning', True)
+                                  self.__dict__.get('implicit_returning', True)
 
     def normalize_name(self, name):
         # Remove trailing spaces: FB uses a CHAR() type,
@@ -437,7 +441,7 @@ class FBDialect(default.DefaultDialect):
         if name is None:
             return None
         elif name.upper() == name and \
-                not self.identifier_preparer._requires_quotes(name.lower()):
+            not self.identifier_preparer._requires_quotes(name.lower()):
             return name.lower()
         else:
             return name
@@ -446,7 +450,7 @@ class FBDialect(default.DefaultDialect):
         if name is None:
             return None
         elif name.lower() == name and \
-                not self.identifier_preparer._requires_quotes(name.lower()):
+            not self.identifier_preparer._requires_quotes(name.lower()):
             return name.upper()
         else:
             return name
@@ -609,7 +613,9 @@ class FBDialect(default.DefaultDialect):
             colspec = row['ftype'].rstrip()
             coltype = self.ischema_names.get(colspec)
             if coltype is None:
-                util.warn("Did not recognize type '{0!s}' of column '{1!s}'".format(colspec, name))
+                util.warn(
+                    "Did not recognize type '{0!s}' of column '{1!s}'".format(
+                        colspec, name))
                 coltype = sqltypes.NULLTYPE
             elif issubclass(coltype, Integer) and row['fprec'] != 0:
                 coltype = NUMERIC(
@@ -636,7 +642,7 @@ class FBDialect(default.DefaultDialect):
                 # (see also http://tracker.firebirdsql.org/browse/CORE-356)
                 defexpr = row['fdefault'].lstrip()
                 assert defexpr[:8].rstrip().upper() == \
-                    'DEFAULT', "Unrecognized default value: {0!s}".format( \
+                       'DEFAULT', "Unrecognized default value: {0!s}".format( \
                     defexpr)
                 defvalue = defexpr[8:].strip()
                 if defvalue == 'NULL':

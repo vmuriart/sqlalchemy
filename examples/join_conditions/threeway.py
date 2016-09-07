@@ -39,6 +39,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
+
 class First(Base):
     __tablename__ = 'first'
 
@@ -46,13 +47,16 @@ class First(Base):
     partition_key = Column(String)
 
     def __repr__(self):
-        return ("First({0!s}, {1!s})".format(self.first_id, self.partition_key))
+        return (
+            "First({0!s}, {1!s})".format(self.first_id, self.partition_key))
+
 
 class Second(Base):
     __tablename__ = 'second'
 
     first_id = Column(Integer, primary_key=True)
     other_id = Column(Integer, primary_key=True)
+
 
 class Partitioned(Base):
     __tablename__ = 'partitioned'
@@ -61,24 +65,26 @@ class Partitioned(Base):
     partition_key = Column(String, primary_key=True)
 
     def __repr__(self):
-        return ("Partitioned({0!s}, {1!s})".format(self.other_id, self.partition_key))
+        return (
+            "Partitioned({0!s}, {1!s})".format(self.other_id,
+                                               self.partition_key))
 
 
 j = join(Partitioned, Second, Partitioned.other_id == Second.other_id)
 
 partitioned_second = mapper(Partitioned, j, non_primary=True, properties={
-        # note we need to disambiguate columns here - the join()
-        # will provide them as j.c.<tablename>_<colname> for access,
-        # but they retain their real names in the mapping
-        "other_id": [j.c.partitioned_other_id, j.c.second_other_id],
-    })
+    # note we need to disambiguate columns here - the join()
+    # will provide them as j.c.<tablename>_<colname> for access,
+    # but they retain their real names in the mapping
+    "other_id": [j.c.partitioned_other_id, j.c.second_other_id],
+})
 
 First.partitioned = relationship(
-                            partitioned_second,
-                            primaryjoin=and_(
-                                First.partition_key == partitioned_second.c.partition_key,
-                                First.first_id == foreign(partitioned_second.c.first_id)
-                            ), innerjoin=True)
+    partitioned_second,
+    primaryjoin=and_(
+        First.partition_key == partitioned_second.c.partition_key,
+        First.first_id == foreign(partitioned_second.c.first_id)
+    ), innerjoin=True)
 
 # when using any database other than SQLite, we will get a nested
 # join, e.g. "first JOIN (partitioned JOIN second ON ..) ON ..".

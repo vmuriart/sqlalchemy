@@ -39,7 +39,6 @@ class LastrowidTest(fixtures.TablesTest):
         )
 
     def test_autoincrement_on_insert(self):
-
         config.db.execute(
             self.tables.autoinc_pk.insert(),
             data="some data"
@@ -47,7 +46,6 @@ class LastrowidTest(fixtures.TablesTest):
         self._assert_round_trip(self.tables.autoinc_pk, config.db)
 
     def test_last_inserted_id(self):
-
         r = config.db.execute(
             self.tables.autoinc_pk.insert(),
             data="some data"
@@ -135,7 +133,7 @@ class InsertBehaviorTest(fixtures.TablesTest):
 
         r = config.db.execute(
             self.tables.autoinc_pk.select().
-            where(self.tables.autoinc_pk.c.id != None)
+                where(self.tables.autoinc_pk.c.id != None)
         )
 
         assert len(r.fetchall())
@@ -154,18 +152,18 @@ class InsertBehaviorTest(fixtures.TablesTest):
 
         config.db.execute(
             table.insert(inline=True).
-            from_select(("id", "data",),
-                        select([table.c.id + 5, table.c.data]).
-                        where(table.c.data.in_(["data2", "data3"]))
-                        ),
+                from_select(("id", "data",),
+                            select([table.c.id + 5, table.c.data]).
+                            where(table.c.data.in_(["data2", "data3"]))
+                            ),
         )
 
         eq_(
             config.db.execute(
                 select([table.c.data]).order_by(table.c.data)
             ).fetchall(),
-            [("data1", ), ("data2", ), ("data2", ),
-                ("data3", ), ("data3", )]
+            [("data1",), ("data2",), ("data2",),
+             ("data3",), ("data3",)]
         )
 
     @requirements.insert_from_select
@@ -182,10 +180,10 @@ class InsertBehaviorTest(fixtures.TablesTest):
 
         config.db.execute(
             table.insert(inline=True).
-            from_select(("id", "data",),
-                        select([table.c.id + 5, table.c.data]).
-                        where(table.c.data.in_(["data2", "data3"]))
-                        ),
+                from_select(("id", "data",),
+                            select([table.c.id + 5, table.c.data]).
+                            where(table.c.data.in_(["data2", "data3"]))
+                            ),
         )
 
         eq_(
@@ -193,7 +191,7 @@ class InsertBehaviorTest(fixtures.TablesTest):
                 select([table]).order_by(table.c.data, table.c.id)
             ).fetchall(),
             [(1, 'data1', 5, 4), (2, 'data2', 5, 4),
-                (7, 'data2', 5, 4), (3, 'data3', 5, 4), (8, 'data3', 5, 4)]
+             (7, 'data2', 5, 4), (3, 'data3', 5, 4), (8, 'data3', 5, 4)]
         )
 
 
@@ -246,7 +244,6 @@ class ReturningTest(fixtures.TablesTest):
         eq_(fetched_pk, pk)
 
     def test_autoincrement_on_insert_implcit_returning(self):
-
         config.db.execute(
             self.tables.autoinc_pk.insert(),
             data="some data"
@@ -254,7 +251,6 @@ class ReturningTest(fixtures.TablesTest):
         self._assert_round_trip(self.tables.autoinc_pk, config.db)
 
     def test_last_inserted_id_implicit_returning(self):
-
         r = config.db.execute(
             self.tables.autoinc_pk.insert(),
             data="some data"

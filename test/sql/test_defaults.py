@@ -55,7 +55,7 @@ class DDLTest(fixtures.TestBase, AssertsCompiledSQL):
         t = Table('t', m, Column(
             'x', Integer,
             server_default=literal_column('a') + literal_column('b'))
-        )
+                  )
         self.assert_compile(
             CreateTable(t),
             "CREATE TABLE t (x INTEGER DEFAULT a + b)"
@@ -66,7 +66,7 @@ class DDLTest(fixtures.TestBase, AssertsCompiledSQL):
         t = Table('t', m, Column(
             'x', Integer,
             server_default=literal('a') + literal('b'))
-        )
+                  )
         self.assert_compile(
             CreateTable(t),
             "CREATE TABLE t (x INTEGER DEFAULT 'a' || 'b')"
@@ -78,7 +78,7 @@ class DDLTest(fixtures.TestBase, AssertsCompiledSQL):
         t = Table('t', m, Column(
             'x', ARRAY(Integer),
             server_default=array([1, 2, 3]))
-        )
+                  )
         self.assert_compile(
             CreateTable(t),
             "CREATE TABLE t (x INTEGER[] DEFAULT ARRAY[1, 2, 3])",
@@ -237,7 +237,7 @@ class DefaultTest(fixtures.TestBase):
 
     def test_bad_arg_signature(self):
         ex_msg = "ColumnDefault Python function takes zero " \
-            "or one positional arguments"
+                 "or one positional arguments"
 
         def fn1(x, y):
             pass
@@ -246,14 +246,13 @@ class DefaultTest(fixtures.TestBase):
             pass
 
         class fn3(object):
-
             def __init__(self, x, y):
                 pass
 
         class FN4(object):
-
             def __call__(self, x, y):
                 pass
+
         fn4 = FN4()
 
         for fn in fn1, fn2, fn3, fn4:
@@ -273,34 +272,32 @@ class DefaultTest(fixtures.TestBase):
 
         def fn4(x=1, y=2, z=3):
             eq_(x, 1)
+
         fn5 = list
 
         class fn6a(object):
-
             def __init__(self, x):
                 eq_(x, "context")
 
         class fn6b(object):
-
             def __init__(self, x, y=3):
                 eq_(x, "context")
 
         class FN7(object):
-
             def __call__(self, x):
                 eq_(x, "context")
+
         fn7 = FN7()
 
         class FN8(object):
-
             def __call__(self, x, y=3):
                 eq_(x, "context")
+
         fn8 = FN8()
 
         for fn in fn1, fn2, fn3, fn4, fn5, fn6a, fn6b, fn7, fn8:
             c = sa.ColumnDefault(fn)
             c.arg("context")
-
 
     @testing.fails_on('firebird', 'Data type unknown')
     def test_standalone(self):
@@ -492,7 +489,7 @@ class DefaultTest(fixtures.TestBase):
     def test_updatemany(self):
         # MySQL-Python 1.2.2 breaks functions in execute_many :(
         if (testing.against('mysql+mysqldb') and
-                testing.db.dialect.dbapi.version_info[:3] == (1, 2, 2)):
+                    testing.db.dialect.dbapi.version_info[:3] == (1, 2, 2)):
             return
 
         t.insert().execute({}, {}, {})
@@ -566,7 +563,7 @@ class CTEDefaultTest(fixtures.TablesTest):
         with testing.db.connect() as conn:
             if a == 'delete':
                 conn.execute(q.insert().values(y=10, z=1))
-                cte = q.delete().\
+                cte = q.delete(). \
                     where(q.c.z == 1).returning(q.c.z).cte('c')
                 expected = None
             elif a == "insert":
@@ -574,7 +571,7 @@ class CTEDefaultTest(fixtures.TablesTest):
                 expected = (2, 10)
             elif a == "update":
                 conn.execute(q.insert().values(x=5, y=10, z=1))
-                cte = q.update().\
+                cte = q.update(). \
                     where(q.c.z == 1).values(x=7).returning(q.c.z).cte('c')
                 expected = (7, 5)
             elif a == "select":
@@ -594,8 +591,8 @@ class CTEDefaultTest(fixtures.TablesTest):
                     p.c.s, cte.c.z)
             elif b == "update":
                 conn.execute(p.insert().values(s=1))
-                stmt = p.update().values(t=5).\
-                    where(p.c.s == cte.c.z).\
+                stmt = p.update().values(t=5). \
+                    where(p.c.s == cte.c.z). \
                     returning(p.c.u, cte.c.z)
             eq_(
                 conn.execute(stmt).fetchall(),
@@ -622,8 +619,8 @@ class CTEDefaultTest(fixtures.TablesTest):
     def test_select_in_insert(self):
         self._test_a_in_b("select", "insert")
 
-    # TODO: updates / inserts can be run in one statement w/ CTE ?
-    # deletes?
+        # TODO: updates / inserts can be run in one statement w/ CTE ?
+        # deletes?
 
 
 class PKDefaultTest(fixtures.TablesTest):
@@ -833,6 +830,7 @@ class AutoIncrementTest(fixtures.TablesTest):
             # mysql in legacy mode fails on second row
             nonai.insert().execute(data='row 1')
             nonai.insert().execute(data='row 2')
+
         assert_raises_message(
             sa.exc.CompileError,
             ".*has no Python-side or server-side default.*",
@@ -894,31 +892,31 @@ class SequenceDDLTest(fixtures.TestBase, testing.AssertsCompiledSQL):
 
         self.assert_compile(
             CreateSequence(Sequence(
-                            'foo_seq', increment=2, start=0, minvalue=0)),
+                'foo_seq', increment=2, start=0, minvalue=0)),
             "CREATE SEQUENCE foo_seq INCREMENT BY 2 START WITH 0 MINVALUE 0",
         )
 
         self.assert_compile(
             CreateSequence(Sequence(
-                            'foo_seq', increment=2, start=1, maxvalue=5)),
+                'foo_seq', increment=2, start=1, maxvalue=5)),
             "CREATE SEQUENCE foo_seq INCREMENT BY 2 START WITH 1 MAXVALUE 5",
         )
 
         self.assert_compile(
             CreateSequence(Sequence(
-                            'foo_seq', increment=2, start=1, nomaxvalue=True)),
+                'foo_seq', increment=2, start=1, nomaxvalue=True)),
             "CREATE SEQUENCE foo_seq INCREMENT BY 2 START WITH 1 NO MAXVALUE",
         )
 
         self.assert_compile(
             CreateSequence(Sequence(
-                            'foo_seq', increment=2, start=0, nominvalue=True)),
+                'foo_seq', increment=2, start=0, nominvalue=True)),
             "CREATE SEQUENCE foo_seq INCREMENT BY 2 START WITH 0 NO MINVALUE",
         )
 
         self.assert_compile(
             CreateSequence(Sequence(
-                            'foo_seq', start=1, maxvalue=10, cycle=True)),
+                'foo_seq', start=1, maxvalue=10, cycle=True)),
             "CREATE SEQUENCE foo_seq START WITH 1 MAXVALUE 10 CYCLE",
         )
 
@@ -1004,7 +1002,7 @@ class SequenceExecTest(fixtures.TestBase):
             testing.db.execute(
                 t1.select().where(t1.c.x > s.next_value())
             ).fetchall(),
-            [(300, ), (301, )]
+            [(300,), (301,)]
         )
 
     @testing.provide_metadata
@@ -1070,14 +1068,14 @@ class SequenceTest(fixtures.TestBase, testing.AssertsCompiledSQL):
     @testing.fails_on('firebird', 'no FB support for start/increment')
     def test_start_increment(self):
         for seq in (
-                Sequence('foo_seq'),
-                Sequence('foo_seq', start=8),
-                Sequence('foo_seq', increment=5)):
+            Sequence('foo_seq'),
+            Sequence('foo_seq', start=8),
+            Sequence('foo_seq', increment=5)):
             seq.create(testing.db)
             try:
                 values = [
                     testing.db.execute(seq) for i in range(3)
-                ]
+                    ]
                 start = seq.start or 1
                 inc = seq.increment or 1
                 assert values == list(range(start, start + inc * 3, inc))
@@ -1186,6 +1184,7 @@ class SequenceTest(fixtures.TestBase, testing.AssertsCompiledSQL):
         result = testing.db.execute(t.insert())
         eq_(result.inserted_primary_key, [1])
 
+
 cartitems = sometable = metadata = None
 
 
@@ -1256,7 +1255,6 @@ class TableBoundSequenceTest(fixtures.TestBase):
 
 
 class SpecialTypePKTest(fixtures.TestBase):
-
     """test process_result_value in conjunction with primary key columns.
 
     Also tests that "autoincrement" checks are against
@@ -1329,7 +1327,7 @@ class SpecialTypePKTest(fixtures.TestBase):
         self._run_test(Sequence('foo_seq'))
 
     def test_server_default(self):
-        self._run_test(server_default='1',)
+        self._run_test(server_default='1', )
 
     def test_server_default_no_autoincrement(self):
         self._run_test(server_default='1', autoincrement=False)
@@ -1532,7 +1530,7 @@ class InsertFromSelectTest(fixtures.TestBase):
 
         sel = select([data.c.x, data.c.y])
 
-        ins = table.insert().\
+        ins = table.insert(). \
             from_select(["x", "y"], sel)
         testing.db.execute(ins)
 
@@ -1559,7 +1557,7 @@ class InsertFromSelectTest(fixtures.TestBase):
 
         sel = select([data.c.x, data.c.y])
 
-        ins = table.insert().\
+        ins = table.insert(). \
             from_select(["x", "y"], sel)
         testing.db.execute(ins)
 

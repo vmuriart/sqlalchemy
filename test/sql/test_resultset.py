@@ -84,7 +84,7 @@ class ResultProxyTest(fixtures.TablesTest):
         rp = users.select().execute().first()
 
         eq_(rp, rp)
-        is_(not(rp != rp), True)
+        is_(not (rp != rp), True)
 
         equal = (7, 'jack')
 
@@ -96,6 +96,7 @@ class ResultProxyTest(fixtures.TablesTest):
         def endless():
             while True:
                 yield 1
+
         ne_(rp, endless())
         ne_(endless(), rp)
 
@@ -212,7 +213,6 @@ class ResultProxyTest(fixtures.TablesTest):
         row = result.first()
 
         class unprintable(object):
-
             def __str__(self):
                 raise ValueError("nope")
 
@@ -313,7 +313,7 @@ class ResultProxyTest(fixtures.TablesTest):
             select([
                 column('user_id'), column('user_name')
             ]).select_from(table('users')).
-            where(text('user_id=2'))
+                where(text('user_id=2'))
         ).first()
 
         eq_(r.user_id, 2)
@@ -410,7 +410,7 @@ class ResultProxyTest(fixtures.TablesTest):
         r = text(
             'select users.user_id AS "users.user_id", '
             'users.user_name AS "users.user_name" '
-            'from users', bind=testing.db).\
+            'from users', bind=testing.db). \
             execution_options(sqlite_raw_colnames=True).execute().first()
         eq_(r['users.user_id'], 1)
         eq_(r['users.user_name'], "john")
@@ -712,7 +712,7 @@ class ResultProxyTest(fixtures.TablesTest):
         # in 0.8, both columns are present so it's True;
         # but when they're fetched you'll get the ambiguous error.
         users.insert().execute(user_id=1, user_name='john')
-        result = select([users.c.user_id, addresses.c.user_id]).\
+        result = select([users.c.user_id, addresses.c.user_id]). \
             select_from(users.outerjoin(addresses)).execute()
         row = result.first()
 
@@ -727,7 +727,7 @@ class ResultProxyTest(fixtures.TablesTest):
         users.insert().execute(user_id=1, user_name='john')
         result = select(
             [users.c.user_id,
-                type_coerce(users.c.user_id, Integer).label('foo')]).execute()
+             type_coerce(users.c.user_id, Integer).label('foo')]).execute()
         row = result.first()
         eq_(
             row[users.c.user_id], 1
@@ -822,7 +822,7 @@ class ResultProxyTest(fixtures.TablesTest):
                 users.c.user_id,
                 users.c.user_name.label(None),
                 func.count(literal_column('1'))]).
-            group_by(users.c.user_id, users.c.user_name)
+                group_by(users.c.user_id, users.c.user_name)
         )
 
         eq_(
@@ -941,7 +941,6 @@ class ResultProxyTest(fixtures.TablesTest):
         from sqlalchemy.engine import RowProxy
 
         class MyList(object):
-
             def __init__(self, l):
                 self.l = l
 
@@ -952,7 +951,7 @@ class ResultProxyTest(fixtures.TablesTest):
                 return list.__getitem__(self.l, i)
 
         proxy = RowProxy(object(), MyList(['value']), [None], {
-                         'key': (None, None, 0), 0: (None, None, 0)})
+            'key': (None, None, 0), 0: (None, None, 0)})
         eq_(list(proxy), ['value'])
         eq_(proxy[0], 'value')
         eq_(proxy['key'], 'value')
@@ -977,7 +976,7 @@ class ResultProxyTest(fixtures.TablesTest):
         metadata.create_all(engine)
 
         with patch.object(
-                engine.dialect.execution_ctx_cls, "rowcount") as mock_rowcount:
+            engine.dialect.execution_ctx_cls, "rowcount") as mock_rowcount:
             mock_rowcount.__get__ = Mock()
             engine.execute(t.insert(),
                            {'data': 'd1'},
@@ -988,7 +987,7 @@ class ResultProxyTest(fixtures.TablesTest):
 
             eq_(
                 engine.execute(t.select()).fetchall(),
-                [('d1', ), ('d2', ), ('d3', )]
+                [('d1',), ('d2',), ('d3',)]
             )
             eq_(len(mock_rowcount.__get__.mock_calls), 0)
 
@@ -1111,7 +1110,6 @@ class ResultProxyTest(fixtures.TablesTest):
                 r.close()
 
 
-
 class KeyTargetingTest(fixtures.TablesTest):
     run_inserts = 'once'
     run_deletes = None
@@ -1147,12 +1145,14 @@ class KeyTargetingTest(fixtures.TablesTest):
 
         if testing.requires.schemas.enabled:
             cls.tables[
-                '{0!s}.wschema'.format(testing.config.test_schema)].insert().execute(
+                '{0!s}.wschema'.format(
+                    testing.config.test_schema)].insert().execute(
                 dict(b="a1", q="c1"))
 
     @testing.requires.schemas
     def test_keyed_accessor_wschema(self):
-        keyed1 = self.tables['{0!s}.wschema'.format(testing.config.test_schema)]
+        keyed1 = self.tables[
+            '{0!s}.wschema'.format(testing.config.test_schema)]
         row = testing.db.execute(keyed1.select()).first()
 
         eq_(row.b, "a1")
@@ -1408,8 +1408,8 @@ class PositionalTextTest(fixtures.TablesTest):
         stmt = text("select a, b from text1").columns(c1, c2, c3, c4)
 
         with assertions.expect_warnings(
-                r"Number of columns in textual SQL \(4\) is "
-                "smaller than number of columns requested \(2\)"):
+            r"Number of columns in textual SQL \(4\) is "
+            "smaller than number of columns requested \(2\)"):
             result = testing.db.execute(stmt)
 
         row = result.first()
@@ -1516,7 +1516,7 @@ class PositionalTextTest(fixtures.TablesTest):
 
 
 class AlternateResultProxyTest(fixtures.TablesTest):
-    __requires__ = ('sqlite', )
+    __requires__ = ('sqlite',)
 
     @classmethod
     def setup_bind(cls):
@@ -1535,16 +1535,16 @@ class AlternateResultProxyTest(fixtures.TablesTest):
     def insert_data(cls):
         cls.engine.execute(cls.tables.test.insert(), [
             {'x': i, 'y': "t_{0:d}".format(i)} for i in range(1, 12)
-        ])
+            ])
 
     @contextmanager
     def _proxy_fixture(self, cls):
         self.table = self.tables.test
 
         class ExcCtx(default.DefaultExecutionContext):
-
             def get_result_proxy(self):
                 return cls(self)
+
         self.patcher = patch.object(
             self.engine.dialect, "execution_ctx_cls", ExcCtx)
         with self.patcher:
@@ -1679,7 +1679,7 @@ class AlternateResultProxyTest(fixtures.TablesTest):
             with self.engine.connect() as conn:
                 conn.execute(self.table.insert(), [
                     {'x': i, 'y': "t_{0:d}".format(i)} for i in range(15, 1200)
-                ])
+                    ])
                 result = conn.execute(self.table.select())
                 checks = {
                     0: 5, 1: 10, 9: 20, 135: 250, 274: 500,
@@ -1698,7 +1698,7 @@ class AlternateResultProxyTest(fixtures.TablesTest):
             with self.engine.connect() as conn:
                 conn.execute(self.table.insert(), [
                     {'x': i, 'y': "t_{0:d}".format(i)} for i in range(15, 1200)
-                ])
+                    ])
                 result = conn.execution_options(max_row_buffer=27).execute(
                     self.table.select()
                 )
@@ -1709,4 +1709,3 @@ class AlternateResultProxyTest(fixtures.TablesTest):
                         len(result._BufferedRowResultProxy__rowbuffer),
                         27
                     )
-

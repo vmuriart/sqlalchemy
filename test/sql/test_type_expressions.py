@@ -1,14 +1,13 @@
-from sqlalchemy import Table, Column, String, func, MetaData, select, TypeDecorator, cast
+from sqlalchemy import Table, Column, String, func, MetaData, select, \
+    TypeDecorator, cast
 from sqlalchemy.testing import fixtures, AssertsCompiledSQL
 from sqlalchemy import testing
 from sqlalchemy.testing import eq_
 
 
 class _ExprFixture(object):
-
     def _fixture(self):
         class MyString(String):
-
             def bind_expression(self, bindvalue):
                 return func.lower(bindvalue)
 
@@ -120,15 +119,14 @@ class DerivedTest(_ExprFixture, fixtures.TestBase, AssertsCompiledSQL):
         s3 = j.select()
         self.assert_compile(
             s3, "SELECT anon_1.x, lower(anon_1.y) AS y, anon_2.x, "
-            "lower(anon_2.y) AS y "
-            "FROM (SELECT test_table.x AS x, test_table.y AS y "
-            "FROM test_table) AS anon_1 JOIN (SELECT "
-            "test_table.x AS x, test_table.y AS y "
-            "FROM test_table) AS anon_2 ON anon_1.x = anon_2.x")
+                "lower(anon_2.y) AS y "
+                "FROM (SELECT test_table.x AS x, test_table.y AS y "
+                "FROM test_table) AS anon_1 JOIN (SELECT "
+                "test_table.x AS x, test_table.y AS y "
+                "FROM test_table) AS anon_2 ON anon_1.x = anon_2.x")
 
 
 class RoundTripTestBase(object):
-
     def test_round_trip(self):
         testing.db.execute(
             self.tables.test_table.insert(),
@@ -152,7 +150,7 @@ class RoundTripTestBase(object):
         eq_(
             testing.db.execute(
                 select([self.tables.test_table]).
-                order_by(self.tables.test_table.c.y)
+                    order_by(self.tables.test_table.c.y)
             ).fetchall(),
             [
                 ("X1", "Y1"),
@@ -211,11 +209,9 @@ class RoundTripTestBase(object):
 
 
 class StringRoundTripTest(fixtures.TablesTest, RoundTripTestBase):
-
     @classmethod
     def define_tables(cls, metadata):
         class MyString(String):
-
             def bind_expression(self, bindvalue):
                 return func.lower(bindvalue)
 
@@ -232,7 +228,6 @@ class StringRoundTripTest(fixtures.TablesTest, RoundTripTestBase):
 
 
 class TypeDecRoundTripTest(fixtures.TablesTest, RoundTripTestBase):
-
     @classmethod
     def define_tables(cls, metadata):
         class MyString(TypeDecorator):
@@ -259,7 +254,6 @@ class ReturningTest(fixtures.TablesTest):
     @classmethod
     def define_tables(cls, metadata):
         class MyString(String):
-
             def column_expression(self, col):
                 return func.lower(col)
 

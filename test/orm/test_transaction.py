@@ -11,6 +11,7 @@ from sqlalchemy.testing.util import gc_collect
 from test.orm._fixtures import FixtureTest
 from sqlalchemy import inspect
 
+
 class SessionTransactionTest(FixtureTest):
     run_inserts = None
     __backend__ = True
@@ -416,6 +417,7 @@ class SessionTransactionTest(FixtureTest):
         @event.listens_for(sess, "after_flush_postexec")
         def add_another_user(session, ctx):
             session.add(User(name='x'))
+
         sess.add(User(name='x'))
         assert_raises_message(
             orm_exc.FlushError,
@@ -447,6 +449,7 @@ class SessionTransactionTest(FixtureTest):
         @event.listens_for(sess, "after_commit")
         def go(session):
             session.execute("select 1")
+
         assert_raises_message(
             sa_exc.InvalidRequestError,
             "This session is in 'committed' state; no further "
@@ -537,7 +540,7 @@ class SessionTransactionTest(FixtureTest):
             [
                 mock.call.contextual_connect(),
                 mock.call.contextual_connect().
-                execution_options(isolation_level='FOO'),
+                    execution_options(isolation_level='FOO'),
                 mock.call.contextual_connect().execution_options().begin()
             ]
         )
@@ -550,8 +553,8 @@ class SessionTransactionTest(FixtureTest):
         sess = Session(bind=bind)
         sess.execute("select 1")
         with expect_warnings(
-                "Connection is already established for the "
-                "given bind; execution_options ignored"):
+            "Connection is already established for the "
+            "given bind; execution_options ignored"):
             sess.connection(execution_options={'isolation_level': 'FOO'})
 
     def test_warning_on_using_inactive_session_new(self):
@@ -563,6 +566,7 @@ class SessionTransactionTest(FixtureTest):
 
         def go():
             sess.rollback()
+
         assert_warnings(go,
                         ["Session's state has been changed on a "
                          "non-active transaction - this state "
@@ -577,6 +581,7 @@ class SessionTransactionTest(FixtureTest):
 
         def go():
             sess.rollback()
+
         assert_warnings(go,
                         ["Session's state has been changed on a "
                          "non-active transaction - this state "
@@ -591,6 +596,7 @@ class SessionTransactionTest(FixtureTest):
 
         def go():
             sess.rollback()
+
         assert_warnings(go,
                         ["Session's state has been changed on a "
                          "non-active transaction - this state "
@@ -668,7 +674,7 @@ class SessionTransactionTest(FixtureTest):
 
         with expect_warnings(".*during handling of a previous exception.*"):
             session.begin_nested()
-            savepoint = session.\
+            savepoint = session. \
                 connection()._Connection__transaction._savepoint
 
             # force the savepoint to disappear
@@ -742,7 +748,6 @@ class FixtureDataTest(_LocalFixture):
 
 
 class CleanSavepointTest(FixtureTest):
-
     """test the behavior for [ticket:2452] - rollback on begin_nested()
     only expires objects tracked as being modified in that transaction.
 
@@ -772,9 +777,9 @@ class CleanSavepointTest(FixtureTest):
 
     @testing.requires.savepoints
     def test_rollback_ignores_clean_on_savepoint(self):
-
         def update_fn(s, u2):
             u2.name = 'u2modified'
+
         self._run_test(update_fn)
 
     @testing.requires.savepoints
@@ -784,6 +789,7 @@ class CleanSavepointTest(FixtureTest):
         def update_fn(s, u2):
             s.query(User).filter_by(name='u2').update(
                 dict(name='u2modified'), synchronize_session='evaluate')
+
         self._run_test(update_fn)
 
     @testing.requires.savepoints
@@ -794,6 +800,7 @@ class CleanSavepointTest(FixtureTest):
             s.query(User).filter_by(name='u2').update(
                 dict(name='u2modified'),
                 synchronize_session='fetch')
+
         self._run_test(update_fn)
 
 
@@ -812,7 +819,7 @@ class ContextManagerTest(FixtureTest):
 
         def go():
             with sess.begin_nested():
-                sess.add(User())   # name can't be null
+                sess.add(User())  # name can't be null
                 sess.flush()
 
         # and not InvalidRequestError
@@ -848,6 +855,7 @@ class ContextManagerTest(FixtureTest):
         def go():
             with sess.begin():
                 sess.add(User())  # name can't be null
+
         assert_raises(
             sa_exc.DBAPIError,
             go
@@ -1163,6 +1171,7 @@ class SavepointTest(_LocalFixture):
             eq_(
                 s.query(User.name).order_by(User.id).all(),
                 [('edward',), ('jackward',), ('wendy',), ('foo',)])
+
         self.assert_sql_count(testing.db, go, 1)
 
         s.commit()
@@ -1375,7 +1384,7 @@ class AccountingFlagsTest(_LocalFixture):
         sess.commit()
 
         assert testing.db.execute(select([users.c.name])).fetchall() == \
-            [('edwardo',)]
+               [('edwardo',)]
         assert u1.name == 'edwardo'
 
         sess.delete(u1)
@@ -1400,7 +1409,7 @@ class AccountingFlagsTest(_LocalFixture):
 
         sess.begin()
         assert testing.db.execute(select([users.c.name])).fetchall() == \
-            [('ed',)]
+               [('ed',)]
 
 
 class AutoCommitTest(_LocalFixture):
@@ -1454,7 +1463,7 @@ class AutoCommitTest(_LocalFixture):
         assert u1 in sess
         eq_(
             sess.query(User.name).order_by(User.name).all(),
-            [('ed', ), ('fred',)]
+            [('ed',), ('fred',)]
         )
 
     def test_accounting_commit_fails_delete(self):

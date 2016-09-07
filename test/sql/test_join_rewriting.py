@@ -10,9 +10,7 @@ from sqlalchemy import util
 from sqlalchemy.engine import default
 from sqlalchemy import testing
 
-
 m = MetaData()
-
 
 a = Table('a', m,
           Column('id', Integer, primary_key=True)
@@ -72,7 +70,6 @@ a_to_b_key = Table('a_to_b_key', m,
 
 
 class _JoinRewriteTestBase(AssertsCompiledSQL):
-
     def _test(self, s, assert_):
         self.assert_compile(
             s,
@@ -107,9 +104,9 @@ class _JoinRewriteTestBase(AssertsCompiledSQL):
         # TODO: do this test also with individual cols, things change
         # lots based on how you go with this
 
-        s = select([a, b, c], use_labels=True).\
-            select_from(j2).\
-            where(b.c.id == 2).\
+        s = select([a, b, c], use_labels=True). \
+            select_from(j2). \
+            where(b.c.id == 2). \
             where(c.c.id == 3).order_by(a.c.id, b.c.id, c.c.id)
 
         self._test(s, self._a_bc)
@@ -118,7 +115,7 @@ class _JoinRewriteTestBase(AssertsCompiledSQL):
         j1 = b_key.join(a_to_b_key)
         j2 = a.join(j1)
 
-        s = select([a, b_key.c.bid], use_labels=True).\
+        s = select([a, b_key.c.bid], use_labels=True). \
             select_from(j2)
 
         self._test(s, self._a_bkeyassoc)
@@ -130,7 +127,7 @@ class _JoinRewriteTestBase(AssertsCompiledSQL):
         j1 = bkey_alias.join(a_to_b_key_alias)
         j2 = a.join(j1)
 
-        s = select([a, bkey_alias.c.bid], use_labels=True).\
+        s = select([a, bkey_alias.c.bid], use_labels=True). \
             select_from(j2)
 
         self._test(s, self._a_bkeyassoc_aliased)
@@ -140,11 +137,11 @@ class _JoinRewriteTestBase(AssertsCompiledSQL):
         j2 = b.join(j1)
         j3 = a.join(j2)
 
-        s = select([a, b, c, d], use_labels=True).\
-            select_from(j3).\
-            where(b.c.id == 2).\
-            where(c.c.id == 3).\
-            where(d.c.id == 4).\
+        s = select([a, b, c, d], use_labels=True). \
+            select_from(j3). \
+            where(b.c.id == 2). \
+            where(c.c.id == 3). \
+            where(d.c.id == 4). \
             order_by(a.c.id, b.c.id, c.c.id, d.c.id)
 
         self._test(
@@ -162,7 +159,7 @@ class _JoinRewriteTestBase(AssertsCompiledSQL):
         a_a = a.alias()
         j4 = a_a.join(j2)
 
-        s = select([a, a_a, b, c, j2], use_labels=True).\
+        s = select([a, a_a, b, c, j2], use_labels=True). \
             select_from(j3).select_from(j4).order_by(j2.c.b_id)
 
         self._test(
@@ -185,7 +182,7 @@ class _JoinRewriteTestBase(AssertsCompiledSQL):
                     b_alias.c.id,
                     b_alias.c.a_id,
                     exists().select_from(c).
-                    where(c.c.b_id == b_alias.c.id).label(None)],
+                   where(c.c.b_id == b_alias.c.id).label(None)],
                    use_labels=True).select_from(j2)
 
         self._test(
@@ -268,7 +265,6 @@ class _JoinRewriteTestBase(AssertsCompiledSQL):
 
 
 class JoinRewriteTest(_JoinRewriteTestBase, fixtures.TestBase):
-
     """test rendering of each join with right-nested rewritten as
     aliased SELECT statements.."""
 
@@ -410,8 +406,8 @@ class JoinRewriteTest(_JoinRewriteTestBase, fixtures.TestBase):
 
 
 class JoinPlainTest(_JoinRewriteTestBase, fixtures.TestBase):
-
     """test rendering of each join with normal nesting."""
+
     @util.classproperty
     def __dialect__(cls):
         dialect = default.DefaultDialect()
@@ -522,7 +518,6 @@ class JoinPlainTest(_JoinRewriteTestBase, fixtures.TestBase):
 
 
 class JoinNoUseLabelsTest(_JoinRewriteTestBase, fixtures.TestBase):
-
     @util.classproperty
     def __dialect__(cls):
         dialect = default.DefaultDialect()
@@ -634,7 +629,6 @@ class JoinNoUseLabelsTest(_JoinRewriteTestBase, fixtures.TestBase):
 
 
 class JoinExecTest(_JoinRewriteTestBase, fixtures.TestBase):
-
     """invoke the SQL on the current backend to ensure compatibility"""
 
     __backend__ = True
@@ -661,7 +655,7 @@ class JoinExecTest(_JoinRewriteTestBase, fixtures.TestBase):
 
     @testing.skip_if("oracle", "oracle's cranky")
     @testing.skip_if("mssql", "can't query EXISTS in the columns "
-                     "clause w/o subquery")
+                              "clause w/o subquery")
     def test_a_atobalias_balias_c_w_exists(self):
         super(JoinExecTest, self).test_a_atobalias_balias_c_w_exists()
 
@@ -675,7 +669,6 @@ class JoinExecTest(_JoinRewriteTestBase, fixtures.TestBase):
 
 
 class DialectFlagTest(fixtures.TestBase, AssertsCompiledSQL):
-
     def test_dialect_flag(self):
         d1 = default.DefaultDialect(supports_right_nested_joins=True)
         d2 = default.DefaultDialect(supports_right_nested_joins=False)
@@ -683,7 +676,7 @@ class DialectFlagTest(fixtures.TestBase, AssertsCompiledSQL):
         j1 = b.join(c)
         j2 = a.join(j1)
 
-        s = select([a, b, c], use_labels=True).\
+        s = select([a, b, c], use_labels=True). \
             select_from(j2)
 
         self.assert_compile(
@@ -695,9 +688,9 @@ class DialectFlagTest(fixtures.TestBase, AssertsCompiledSQL):
             dialect=d1)
         self.assert_compile(
             s, "SELECT a.id AS a_id, anon_1.b_id AS b_id, "
-            "anon_1.b_a_id AS b_a_id, "
-            "anon_1.c_id AS c_id, anon_1.c_b_id AS c_b_id "
-            "FROM a JOIN (SELECT b.id AS b_id, b.a_id AS b_a_id, "
-            "c.id AS c_id, "
-            "c.b_id AS c_b_id FROM b JOIN c ON b.id = c.b_id) AS anon_1 "
-            "ON a.id = anon_1.b_a_id", dialect=d2)
+               "anon_1.b_a_id AS b_a_id, "
+               "anon_1.c_id AS c_id, anon_1.c_b_id AS c_b_id "
+               "FROM a JOIN (SELECT b.id AS b_id, b.a_id AS b_a_id, "
+               "c.id AS c_id, "
+               "c.b_id AS c_b_id FROM b JOIN c ON b.id = c.b_id) AS anon_1 "
+               "ON a.id = anon_1.b_a_id", dialect=d2)

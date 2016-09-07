@@ -7,7 +7,6 @@ from sqlalchemy.testing import is_
 
 
 class TestCoreInspection(fixtures.TestBase):
-
     def test_table(self):
         t = Table('t', MetaData(),
                   Column('x', Integer)

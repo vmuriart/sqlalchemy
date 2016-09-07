@@ -22,16 +22,20 @@ from sqlalchemy.ext.declarative import as_declarative, declared_attr
 from sqlalchemy import create_engine, Integer, Column, String, ForeignKey
 from sqlalchemy.orm import Session, relationship
 
+
 @as_declarative()
 class Base(object):
     """Base class which provides automated table name
     and surrogate primary key column.
 
     """
+
     @declared_attr
     def __tablename__(cls):
         return cls.__name__.lower()
+
     id = Column(Integer, primary_key=True)
+
 
 class Address(object):
     """Define columns that will be present in each
@@ -47,14 +51,17 @@ class Address(object):
     zip = Column(String)
 
     def __repr__(self):
-        return "{0!s}(street={1!r}, city={2!r}, zip={3!r})".format(self.__class__.__name__, self.street,
+        return "{0!s}(street={1!r}, city={2!r}, zip={3!r})".format(
+            self.__class__.__name__, self.street,
             self.city, self.zip)
+
 
 class HasAddresses(object):
     """HasAddresses mixin, creates a new Address class
     for each parent.
 
     """
+
     @declared_attr
     def addresses(cls):
         cls.Address = type(
@@ -62,19 +69,23 @@ class HasAddresses(object):
             (Address, Base,),
             dict(
                 __tablename__="{0!s}_address".format(
-                            cls.__tablename__),
+                    cls.__tablename__),
                 parent_id=Column(Integer,
-                            ForeignKey("{0!s}.id".format(cls.__tablename__))),
+                                 ForeignKey(
+                                     "{0!s}.id".format(cls.__tablename__))),
                 parent=relationship(cls)
             )
         )
         return relationship(cls.Address)
 
+
 class Customer(HasAddresses, Base):
     name = Column(String)
 
+
 class Supplier(HasAddresses, Base):
     company_name = Column(String)
+
 
 engine = create_engine('sqlite://', echo=True)
 Base.metadata.create_all(engine)
@@ -86,22 +97,22 @@ session.add_all([
         name='customer 1',
         addresses=[
             Customer.Address(
-                    street='123 anywhere street',
-                    city="New York",
-                    zip="10110"),
+                street='123 anywhere street',
+                city="New York",
+                zip="10110"),
             Customer.Address(
-                    street='40 main street',
-                    city="San Francisco",
-                    zip="95732")
+                street='40 main street',
+                city="San Francisco",
+                zip="95732")
         ]
     ),
     Supplier(
         company_name="Ace Hammers",
         addresses=[
             Supplier.Address(
-                    street='2569 west elm',
-                    city="Detroit",
-                    zip="56785")
+                street='2569 west elm',
+                city="Detroit",
+                zip="56785")
         ]
     ),
 ])

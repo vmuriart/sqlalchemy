@@ -56,7 +56,7 @@ class safe_reraise(object):
         # see #2703 for notes
         if type_ is None:
             exc_type, exc_value, exc_tb = self._exc_info
-            self._exc_info = None   # remove potential circular references
+            self._exc_info = None  # remove potential circular references
             compat.reraise(exc_type, exc_value, exc_tb)
         else:
             if not compat.py3k and self._exc_info and self._exc_info[1]:
@@ -66,7 +66,7 @@ class safe_reraise(object):
                     "An exception has occurred during handling of a "
                     "previous exception.  The previous exception "
                     "is:\n %s %s\n" % (self._exc_info[0], self._exc_info[1]))
-            self._exc_info = None   # remove potential circular references
+            self._exc_info = None  # remove potential circular references
             compat.reraise(type_, value, traceback)
 
 
@@ -96,7 +96,8 @@ def _unique_symbols(used, *bases):
                 yield sym
                 break
         else:
-            raise NameError("exhausted namespace for symbol base {0!s}".format(base))
+            raise NameError(
+                "exhausted namespace for symbol base {0!s}".format(base))
 
 
 def map_bits(fn, n):
@@ -131,11 +132,12 @@ def {name!s}({args!s}):
         decorated.__defaults__ = getattr(fn, 'im_func', fn).__defaults__
         decorated.__wrapped__ = fn
         return update_wrapper(decorated, fn)
+
     return update_wrapper(decorate, target)
 
 
 def _exec_code_in_env(code, env, fn_name):
-    exec(code, env)
+    exec (code, env)
     return env[fn_name]
 
 
@@ -149,15 +151,15 @@ def public_factory(target, location):
     if isinstance(target, type):
         fn = target.__init__
         callable_ = target
-        doc = "Construct a new :class:`.%s` object. \n\n"\
-            "This constructor is mirrored as a public API function; "\
-            "see :func:`~%s` "\
-            "for a full usage and argument description." % (
-                target.__name__, location, )
+        doc = "Construct a new :class:`.%s` object. \n\n" \
+              "This constructor is mirrored as a public API function; " \
+              "see :func:`~%s` " \
+              "for a full usage and argument description." % (
+                  target.__name__, location,)
     else:
         fn = callable_ = target
-        doc = "This function is mirrored; see :func:`~%s` "\
-            "for a description of arguments." % location
+        doc = "This function is mirrored; see :func:`~%s` " \
+              "for a description of arguments." % location
 
     location_name = location.split(".")[-1]
     spec = compat.inspect_getfullargspec(fn)
@@ -169,7 +171,7 @@ def {name!s}({args!s}):
     return cls({apply_kw!s})
 """.format(**metadata)
     env = {'cls': callable_, 'symbol': symbol}
-    exec(code, env)
+    exec (code, env)
     decorated = env[location_name]
     decorated.__doc__ = fn.__doc__
     decorated.__module__ = "sqlalchemy" + location.rsplit(".", 1)[0]
@@ -181,7 +183,6 @@ def {name!s}({args!s}):
 
 
 class PluginLoader(object):
-
     def __init__(self, group, auto_fn=None):
         self.group = group
         self.impls = {}
@@ -203,7 +204,7 @@ class PluginLoader(object):
             pass
         else:
             for impl in pkg_resources.iter_entry_points(
-                    self.group, name):
+                self.group, name):
                 self.impls[name] = impl.load
                 return impl.load()
 
@@ -216,6 +217,7 @@ class PluginLoader(object):
             for token in modulepath.split(".")[1:]:
                 mod = getattr(mod, token)
             return getattr(mod, objname)
+
         self.impls[name] = load
 
 
@@ -238,7 +240,7 @@ def get_cls_kwargs(cls, _set=None):
     ctr = cls.__dict__.get('__init__', False)
 
     has_init = ctr and isinstance(ctr, types.FunctionType) and \
-        isinstance(ctr.__code__, types.CodeType)
+               isinstance(ctr.__code__, types.CodeType)
 
     if has_init:
         names, has_kw = inspect_func_args(ctr)
@@ -259,6 +261,7 @@ def get_cls_kwargs(cls, _set=None):
 try:
     # TODO: who doesn't have this constant?
     from inspect import CO_VARKEYWORDS
+
 
     def inspect_func_args(fn):
         co = fn.__code__
@@ -484,15 +487,16 @@ def generic_repr(obj, additional_kw=(), to_inspect=None, omit_kwarg=()):
                     pos_args.extend(_args[1:])
             else:
                 kw_args.update([
-                    (arg, missing) for arg in _args[1:-default_len]
-                ])
+                                   (arg, missing) for arg in
+                                   _args[1:-default_len]
+                                   ])
 
             if default_len:
                 kw_args.update([
-                    (arg, default)
-                    for arg, default
-                    in zip(_args[-default_len:], defaults)
-                ])
+                                   (arg, default)
+                                   for arg, default
+                                   in zip(_args[-default_len:], defaults)
+                                   ])
     output = []
 
     output.extend(repr(getattr(obj, arg, None)) for arg in pos_args)
@@ -583,7 +587,7 @@ def class_hierarchy(cls):
                 continue
         else:
             if c.__module__ == '__builtin__' or not hasattr(
-                    c, '__subclasses__'):
+                c, '__subclasses__'):
                 continue
 
         for s in [_ for _ in c.__subclasses__() if _ not in hier]:
@@ -736,7 +740,7 @@ def as_interface(obj, cls=None, methods=None, required=None):
         return AnonymousInterface
 
     raise TypeError("dictionary does not contain required keys {0!s}".format(
-                    ', '.join(required - found)))
+        ', '.join(required - found)))
 
 
 class memoized_property(object):
@@ -777,6 +781,7 @@ def memoized_instancemethod(fn):
         memo.__doc__ = fn.__doc__
         self.__dict__[fn.__name__] = memo
         return result
+
     return update_wrapper(oneshot, fn)
 
 
@@ -833,6 +838,7 @@ class MemoizedSlots(object):
                 memo.__doc__ = fn.__doc__
                 setattr(self, key, memo)
                 return result
+
             oneshot.__doc__ = fn.__doc__
             return oneshot
         else:
@@ -849,6 +855,7 @@ def dependency_for(modulename):
         mod = getattr(mod, tokens[-1])
         setattr(mod, obj.__name__, obj)
         return obj
+
     return decorate
 
 
@@ -957,12 +964,14 @@ class dependencies(object):
 
         def __getattr__(self, key):
             if key == 'module':
-                raise ImportError("Could not resolve module {0!s}".format(self._full_path))
+                raise ImportError(
+                    "Could not resolve module {0!s}".format(self._full_path))
             try:
                 attr = getattr(self.module, key)
             except AttributeError:
                 raise AttributeError(
-                    "Module {0!s} has no attribute '{1!s}'".format(self._full_path, key)
+                    "Module {0!s} has no attribute '{1!s}'".format(
+                        self._full_path, key)
                 )
             self.__dict__[key] = attr
             return attr
@@ -986,11 +995,13 @@ def bool_or_str(*text):
     boolean, or one of a set of "alternate" string values.
 
     """
+
     def bool_or_value(obj):
         if obj in text:
             return obj
         else:
             return asbool(obj)
+
     return bool_or_value
 
 
@@ -1084,10 +1095,13 @@ def assert_arg_type(arg, argtype, name):
     else:
         if isinstance(argtype, tuple):
             raise exc.ArgumentError(
-                "Argument '{0!s}' is expected to be one of type {1!s}, got '{2!s}'".format(name, ' or '.join("'{0!s}'".format(a) for a in argtype), type(arg)))
+                "Argument '{0!s}' is expected to be one of type {1!s}, got '{2!s}'".format(
+                    name, ' or '.join("'{0!s}'".format(a) for a in argtype),
+                    type(arg)))
         else:
             raise exc.ArgumentError(
-                "Argument '{0!s}' is expected to be of type '{1!s}', got '{2!s}'".format(name, argtype, type(arg)))
+                "Argument '{0!s}' is expected to be of type '{1!s}', got '{2!s}'".format(
+                    name, argtype, type(arg)))
 
 
 def dictlike_iteritems(dictlike):
@@ -1111,6 +1125,7 @@ def dictlike_iteritems(dictlike):
         def iterator():
             for key in dictlike.iterkeys():
                 yield key, getter(key)
+
         return iterator()
     elif hasattr(dictlike, 'keys'):
         return iter((key, getter(key)) for key in dictlike.keys())
@@ -1184,6 +1199,7 @@ class _symbol(int):
 
     def __repr__(self):
         return "symbol({0!r})".format(self.name)
+
 
 _symbol.__name__ = 'symbol'
 
@@ -1270,11 +1286,15 @@ class _hash_limit_string(compat.text_type):
 
 
     """
+
     def __new__(cls, value, num, args):
         interpolated = (value % args) + \
-            (" (this warning may be suppressed after {0:d} occurrences)".format(num))
+                       (
+                           " (this warning may be suppressed after {0:d} occurrences)".format(
+                               num))
         self = super(_hash_limit_string, cls).__new__(cls, interpolated)
-        self._hash = hash("{0!s}_{1:d}".format(value, hash(interpolated) % num))
+        self._hash = hash(
+            "{0!s}_{1:d}".format(value, hash(interpolated) % num))
         return self
 
     def __hash__(self):
@@ -1343,15 +1363,16 @@ def chop_traceback(tb, exclude_prefix=_UNITTEST_RE, exclude_suffix=_SQLA_RE):
         end -= 1
     return tb[start:end + 1]
 
+
 NoneType = type(None)
 
 
 def attrsetter(attrname):
     code = \
-        "def set(obj, value):"\
+        "def set(obj, value):" \
         "    obj.%s = value" % attrname
     env = locals().copy()
-    exec(code, env)
+    exec (code, env)
     return env['set']
 
 
@@ -1360,6 +1381,7 @@ class EnsureKWArgType(type):
     don't already.
 
     """
+
     def __init__(cls, clsname, bases, clsdict):
         fn_reg = cls.ensure_kwarg
         if fn_reg:
@@ -1377,6 +1399,7 @@ class EnsureKWArgType(type):
 
         def wrap(*arg, **kw):
             return fn(*arg)
+
         return update_wrapper(wrap, fn)
 
 

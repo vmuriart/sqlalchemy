@@ -110,10 +110,11 @@ def _deep_annotate(element, annotations, exclude=None):
     Elements within the exclude collection will be cloned but not annotated.
 
     """
+
     def clone(elem):
         if exclude and \
-                hasattr(elem, 'proxy_set') and \
-                elem.proxy_set.intersection(exclude):
+            hasattr(elem, 'proxy_set') and \
+            elem.proxy_set.intersection(exclude):
             newelem = elem._clone()
         elif annotations != elem._annotations:
             newelem = elem._annotate(annotations)

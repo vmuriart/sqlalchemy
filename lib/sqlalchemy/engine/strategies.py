@@ -143,10 +143,11 @@ class DefaultEngineStrategy(EngineStrategy):
                 "Invalid argument(s) %s sent to create_engine(), "
                 "using configuration %s/%s/%s.  Please check that the "
                 "keyword arguments are appropriate for this combination "
-                "of components." % (','.join("'{0!s}'".format(k) for k in kwargs),
-                                    dialect.__class__.__name__,
-                                    pool.__class__.__name__,
-                                    engineclass.__name__))
+                "of components." % (
+                    ','.join("'{0!s}'".format(k) for k in kwargs),
+                    dialect.__class__.__name__,
+                    pool.__class__.__name__,
+                    engineclass.__name__))
 
         engine = engineclass(pool, dialect, u, **engine_args)
 
@@ -168,6 +169,7 @@ class DefaultEngineStrategy(EngineStrategy):
                                     _has_events=False)
                 c._execution_options = util.immutabledict()
                 dialect.initialize(c)
+
             event.listen(pool, 'first_connect', first_connect, once=True)
 
         dialect_cls.engine_created(engine)
@@ -186,6 +188,7 @@ class PlainEngineStrategy(DefaultEngineStrategy):
     name = 'plain'
     engine_cls = base.Engine
 
+
 PlainEngineStrategy()
 
 
@@ -194,6 +197,7 @@ class ThreadLocalEngineStrategy(DefaultEngineStrategy):
 
     name = 'threadlocal'
     engine_cls = threadlocal.TLEngine
+
 
 ThreadLocalEngineStrategy()
 
@@ -268,5 +272,6 @@ class MockEngineStrategy(EngineStrategy):
 
         def execute(self, object, *multiparams, **params):
             raise NotImplementedError()
+
 
 MockEngineStrategy()

@@ -21,9 +21,8 @@ from .selectable import SelectBase, Alias, Selectable, ScalarSelect
 
 def _boolean_compare(expr, op, obj, negate=None, reverse=False,
                      _python_is_types=(util.NoneType, bool),
-                     result_type = None,
+                     result_type=None,
                      **kwargs):
-
     if result_type is None:
         result_type = type_api.BOOLEANTYPE
 
@@ -33,7 +32,7 @@ def _boolean_compare(expr, op, obj, negate=None, reverse=False,
         # this comes out to "== / != true/false" or "1/0" if those
         # constants aren't supported and works on all platforms
         if op in (operators.eq, operators.ne) and \
-                isinstance(obj, (bool, True_, False_)):
+            isinstance(obj, (bool, True_, False_)):
             return BinaryExpression(expr,
                                     _literal_as_text(obj),
                                     op,
@@ -234,6 +233,7 @@ def _between_impl(expr, op, cleft, cright, **kw):
 def _collate_impl(expr, op, other, **kw):
     return collate(expr, other)
 
+
 # a mapping of operators with the method they use, along with
 # their negated operator for comparison operators
 operator_lookup = {
@@ -247,8 +247,8 @@ operator_lookup = {
     "mod": (_binary_operate,),
     "truediv": (_binary_operate,),
     "custom_op": (_binary_operate,),
-    "json_path_getitem_op": (_binary_operate, ),
-    "json_getitem_op": (_binary_operate, ),
+    "json_path_getitem_op": (_binary_operate,),
+    "json_getitem_op": (_binary_operate,),
     "concat_op": (_binary_operate,),
     "lt": (_boolean_compare, operators.ge),
     "le": (_boolean_compare, operators.gt),
@@ -277,8 +277,8 @@ operator_lookup = {
     "match_op": (_match_impl,),
     "notmatch_op": (_match_impl,),
     "distinct_op": (_distinct_impl,),
-    "between_op": (_between_impl, ),
-    "notbetween_op": (_between_impl, ),
+    "between_op": (_between_impl,),
+    "notbetween_op": (_between_impl,),
     "neg": (_neg_impl,),
     "getitem": (_getitem_impl,),
     "lshift": (_unsupported_impl,),
@@ -290,7 +290,7 @@ operator_lookup = {
 def _check_literal(expr, operator, other, bindparam_type=None):
     if isinstance(other, (ColumnElement, TextClause)):
         if isinstance(other, BindParameter) and \
-                other.type._isnull:
+            other.type._isnull:
             other = other._clone()
             other.type = expr.type
         return other
@@ -305,4 +305,3 @@ def _check_literal(expr, operator, other, bindparam_type=None):
         return expr._bind_param(operator, other, type_=bindparam_type)
     else:
         return other
-

@@ -92,7 +92,7 @@ class InstanceLogger(object):
         # if echo flag is enabled and no handlers,
         # add a handler to the list
         if self._echo_map[echo] <= logging.INFO \
-           and not self.logger.handlers:
+            and not self.logger.handlers:
             _add_default_handler(self.logger)
 
     #
@@ -175,11 +175,11 @@ def instance_logger(instance, echoflag=None):
 
     if instance.logging_name:
         name = "{0!s}.{1!s}.{2!s}".format(instance.__class__.__module__,
-                             instance.__class__.__name__,
-                             instance.logging_name)
+                                          instance.__class__.__name__,
+                                          instance.logging_name)
     else:
         name = "{0!s}.{1!s}".format(instance.__class__.__module__,
-                          instance.__class__.__name__)
+                                    instance.__class__.__name__)
 
     instance._echo = echoflag
 

@@ -156,6 +156,7 @@ class Operators(object):
 
         def against(other):
             return operator(self, other)
+
         return against
 
     def operate(self, op, *other, **kwargs):
@@ -214,8 +215,8 @@ class custom_op(object):
     __name__ = 'custom_op'
 
     def __init__(
-            self, opstring, precedence=0, is_comparison=False,
-            natural_self_precedent=False):
+        self, opstring, precedence=0, is_comparison=False,
+        natural_self_precedent=False):
         self.opstring = opstring
         self.precedence = precedence
         self.is_comparison = is_comparison
@@ -223,7 +224,7 @@ class custom_op(object):
 
     def __eq__(self, other):
         return isinstance(other, custom_op) and \
-            other.opstring == self.opstring
+               other.opstring == self.opstring
 
     def __hash__(self):
         return id(self)
@@ -884,7 +885,7 @@ _comparison = set([eq, ne, lt, gt, ge, le, between_op, like_op])
 
 def is_comparison(op):
     return op in _comparison or \
-        isinstance(op, custom_op) and op.is_comparison
+           isinstance(op, custom_op) and op.is_comparison
 
 
 def is_commutative(op):
@@ -898,7 +899,8 @@ def is_ordering_modifier(op):
 
 def is_natural_self_precedent(op):
     return op in _natural_self_precedent or \
-        isinstance(op, custom_op) and op.natural_self_precedent
+           isinstance(op, custom_op) and op.natural_self_precedent
+
 
 _mirror = {
     gt: lt,
@@ -925,7 +927,6 @@ _natural_self_precedent = _associative.union([
 parenthesize (a op b).
 
 """
-
 
 _asbool = util.symbol('_asbool', canonical=-10)
 _smallest = util.symbol('_smallest', canonical=-100)

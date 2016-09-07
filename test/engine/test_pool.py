@@ -124,7 +124,7 @@ class PoolTest(PoolTestBase):
         conn = testing.db.raw_connection()
         cursor = conn.cursor()
         cursor.execute(str(select([1], bind=testing.db)))
-        expected = [(1, )]
+        expected = [(1,)]
         for row in cursor:
             eq_(row, expected.pop(0))
 
@@ -158,9 +158,9 @@ class PoolTest(PoolTestBase):
         for p in pool.QueuePool(creator=dbapi.connect,
                                 pool_size=3, max_overflow=-1,
                                 use_threadlocal=True), \
-            pool.SingletonThreadPool(
-                creator=dbapi.connect,
-                use_threadlocal=True):
+                 pool.SingletonThreadPool(
+                     creator=dbapi.connect,
+                     use_threadlocal=True):
             c1 = p.connect()
             c2 = p.connect()
             self.assert_(c1 is c2)
@@ -249,6 +249,7 @@ class PoolDialectTest(PoolTestBase):
             def do_close(self, dbapi_connection):
                 canary.append('CL')
                 dbapi_connection.close()
+
         return PoolDialect(), canary
 
     def _do_test(self, pool_cls, assertion):
@@ -310,6 +311,7 @@ class PoolEventsTest(PoolTestBase):
 
         def checkout(*arg, **kw):
             canary.append('checkout')
+
         event.listen(p, 'checkout', checkout)
 
         return p, canary
@@ -320,6 +322,7 @@ class PoolEventsTest(PoolTestBase):
 
         def checkin(*arg, **kw):
             canary.append('checkin')
+
         event.listen(p, 'checkin', checkin)
 
         return p, canary
@@ -330,6 +333,7 @@ class PoolEventsTest(PoolTestBase):
 
         def reset(*arg, **kw):
             canary.append('reset')
+
         event.listen(p, 'reset', reset)
 
         return p, canary
@@ -725,8 +729,8 @@ class DeprecatedPoolListenerTest(PoolTestBase):
                 eq_(len(self.checked_in), cin)
 
             def assert_in(
-                    self, item, in_conn, in_fconn,
-                    in_cout, in_cin):
+                self, item, in_conn, in_fconn,
+                in_cout, in_cin):
                 eq_((item in self.connected), in_conn)
                 eq_((item in self.first_connected), in_fconn)
                 eq_((item in self.checked_out), in_cout)
@@ -745,7 +749,8 @@ class DeprecatedPoolListenerTest(PoolTestBase):
                 self.first_connected.append(con)
 
             def inst_checkout(self, con, record, proxy):
-                print("checkout({0!s}, {1!s}, {2!s})".format(con, record, proxy))
+                print(
+                    "checkout({0!s}, {1!s}, {2!s})".format(con, record, proxy))
                 assert con is not None
                 assert record is not None
                 assert proxy is not None
@@ -942,7 +947,6 @@ class DeprecatedPoolListenerTest(PoolTestBase):
 
 
 class QueuePoolTest(PoolTestBase):
-
     def test_queuepool_del(self):
         self._do_testqueuepool(useclose=False)
 
@@ -956,7 +960,7 @@ class QueuePoolTest(PoolTestBase):
 
         def status(pool):
             return pool.size(), pool.checkedin(), pool.overflow(), \
-                pool.checkedout()
+                   pool.checkedout()
 
         c1 = p.connect()
         self.assert_(status(p) == (3, 0, -2, 1))
@@ -1054,10 +1058,12 @@ class QueuePoolTest(PoolTestBase):
 
         assert len(timeouts) > 0
         for t in timeouts:
-            assert t >= 3, "Not all timeouts were >= 3 seconds {0!r}".format(timeouts)
+            assert t >= 3, "Not all timeouts were >= 3 seconds {0!r}".format(
+                timeouts)
             # normally, the timeout should under 4 seconds,
             # but on a loaded down buildbot it can go up.
-            assert t < 14, "Not all timeouts were < 14 seconds {0!r}".format(timeouts)
+            assert t < 14, "Not all timeouts were < 14 seconds {0!r}".format(
+                timeouts)
 
     def _test_overflow(self, thread_count, max_overflow):
         gc_collect()
@@ -1085,6 +1091,7 @@ class QueuePoolTest(PoolTestBase):
                     del con
                 except tsa.exc.TimeoutError:
                     pass
+
         threads = []
         for i in range(thread_count):
             th = threading.Thread(target=whammy)
@@ -1176,8 +1183,8 @@ class QueuePoolTest(PoolTestBase):
         eq_(
             dbapi.connect().operation.mock_calls,
             [call("success_one"), call("success_two"),
-                call("overflow_two"), call("overflow_three"),
-                call("overflow_one")]
+             call("overflow_two"), call("overflow_three"),
+             call("overflow_one")]
         )
 
     @testing.requires.threading_with_mock
@@ -1267,8 +1274,8 @@ class QueuePoolTest(PoolTestBase):
             return fairy
 
         with patch(
-                "sqlalchemy.pool._ConnectionRecord.checkout",
-                _decorate_existing_checkout):
+            "sqlalchemy.pool._ConnectionRecord.checkout",
+            _decorate_existing_checkout):
             conn = p.connect()
             is_(conn._connection_record.connection, None)
         conn.close()
@@ -1283,6 +1290,7 @@ class QueuePoolTest(PoolTestBase):
         def creator():
             canary.append(1)
             return dbapi.connect()
+
         p1 = pool.QueuePool(
             creator=creator,
             pool_size=1, timeout=None,
@@ -1298,7 +1306,7 @@ class QueuePoolTest(PoolTestBase):
 
         threads = []
         for i in range(5):
-            t = threading.Thread(target=waiter, args=(p1, ))
+            t = threading.Thread(target=waiter, args=(p1,))
             t.start()
             threads.append(t)
         time.sleep(.5)
@@ -1514,12 +1522,13 @@ class QueuePoolTest(PoolTestBase):
 
         def assert_no_wr_callback(
             connection, connection_record,
-                pool, ref, echo, fairy=None):
+            pool, ref, echo, fairy=None):
             if fairy is None:
                 raise AssertionError(
                     "finalize fairy was called as a weakref callback")
             return finalize_fairy(
                 connection, connection_record, pool, ref, echo, fairy)
+
         return patch.object(
             pool, '_finalize_fairy', assert_no_wr_callback)
 
@@ -1601,7 +1610,7 @@ class QueuePoolTest(PoolTestBase):
             [
                 c for c in p._pool.queue
                 if c.connection is not None
-            ]
+                ]
         )
 
         dbapi.shutdown(False)
@@ -1652,7 +1661,7 @@ class QueuePoolTest(PoolTestBase):
             [
                 c for c in p._pool.queue
                 if c.connection is not None
-            ]
+                ]
         )
 
         dbapi.shutdown(False)
@@ -1699,6 +1708,7 @@ class QueuePoolTest(PoolTestBase):
 
         def creator():
             return slow_closing_connection.connect()
+
         p1 = TrackQueuePool(creator=creator, pool_size=20)
 
         from sqlalchemy import create_engine
@@ -1725,7 +1735,7 @@ class QueuePoolTest(PoolTestBase):
         # connections
         threads = []
         for conn in conns:
-            t = threading.Thread(target=attempt, args=(conn, ))
+            t = threading.Thread(target=attempt, args=(conn,))
             t.start()
             threads.append(t)
 
@@ -1918,7 +1928,6 @@ class ResetOnReturnTest(PoolTestBase):
 
 
 class SingletonThreadPoolTest(PoolTestBase):
-
     @testing.requires.threading_with_mock
     def test_cleanup(self):
         self._test_cleanup(False)
@@ -1939,6 +1948,7 @@ class SingletonThreadPoolTest(PoolTestBase):
             # the mock iterator isn't threadsafe...
             with lock:
                 return dbapi.connect()
+
         p = pool.SingletonThreadPool(creator=creator, pool_size=3)
 
         if strong_refs:
@@ -2020,6 +2030,7 @@ class StaticPoolTest(PoolTestBase):
 
         def creator():
             return dbapi.connect('foo.db')
+
         p = pool.StaticPool(creator)
         p2 = p.recreate()
         assert p._creator is p2._creator

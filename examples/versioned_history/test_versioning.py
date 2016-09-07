@@ -178,7 +178,7 @@ class TestVersioning(TestCase, AssertsCompiledSQL):
         eq_(
             sess.query(SomeClassHistory.boole).order_by(
                 SomeClassHistory.id).all(),
-            [(True, ), (None, )]
+            [(True,), (None,)]
         )
 
         eq_(sc.version, 3)
@@ -351,7 +351,6 @@ class TestVersioning(TestCase, AssertsCompiledSQL):
         self.assert_compile(
             q,
 
-
             "SELECT "
 
             "subsubtable_history.id AS subsubtable_history_id, "
@@ -396,7 +395,7 @@ class TestVersioning(TestCase, AssertsCompiledSQL):
         eq_(
             sess.query(SubSubHistory).all(),
             [SubSubHistory(name='ss1', subdata1='sd1',
-                                subdata2='sd2', type='subsub', version=1)]
+                           subdata2='sd2', type='subsub', version=1)]
         )
         eq_(ssc, SubSubClass(
             name='ss1', subdata1='sd11',
@@ -458,7 +457,6 @@ class TestVersioning(TestCase, AssertsCompiledSQL):
                 'polymorphic_identity': 'base'}
 
         class SubClass(BaseClass):
-
             subname = Column(String(50), unique=True)
             __mapper_args__ = {'polymorphic_identity': 'sub'}
 
@@ -527,7 +525,6 @@ class TestVersioning(TestCase, AssertsCompiledSQL):
         assert sc.version == 3
 
     def test_relationship(self):
-
         class SomeRelated(self.Base, ComparableEntity):
             __tablename__ = 'somerelated'
 
@@ -577,7 +574,6 @@ class TestVersioning(TestCase, AssertsCompiledSQL):
         assert sc.version == 3
 
     def test_backref_relationship(self):
-
         class SomeRelated(self.Base, ComparableEntity):
             __tablename__ = 'somerelated'
 
@@ -616,7 +612,6 @@ class TestVersioning(TestCase, AssertsCompiledSQL):
         assert sc.version == 1
 
     def test_create_double_flush(self):
-
         class SomeClass(Versioned, self.Base, ComparableEntity):
             __tablename__ = 'sometable'
 

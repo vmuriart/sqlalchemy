@@ -47,6 +47,7 @@ class Edge(Base):
         self.lower_node = n1
         self.higher_node = n2
 
+
 engine = create_engine('sqlite://', echo=True)
 Base.metadata.create_all(engine)
 
@@ -80,4 +81,3 @@ assert [x for x in n3.higher_neighbors()] == [n6]
 assert [x for x in n3.lower_neighbors()] == [n1]
 assert [x for x in n2.lower_neighbors()] == [n1]
 assert [x for x in n2.higher_neighbors()] == [n1, n5, n7]
-

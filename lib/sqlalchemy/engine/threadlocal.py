@@ -19,7 +19,6 @@ import weakref
 
 
 class TLConnection(base.Connection):
-
     def __init__(self, *arg, **kw):
         super(TLConnection, self).__init__(*arg, **kw)
         self.__opencount = 0
@@ -98,20 +97,20 @@ class TLEngine(base.Engine):
 
     def prepare(self):
         if not hasattr(self._connections, 'trans') or \
-                not self._connections.trans:
+            not self._connections.trans:
             return
         self._connections.trans[-1].prepare()
 
     def commit(self):
         if not hasattr(self._connections, 'trans') or \
-                not self._connections.trans:
+            not self._connections.trans:
             return
         trans = self._connections.trans.pop(-1)
         trans.commit()
 
     def rollback(self):
         if not hasattr(self._connections, 'trans') or \
-                not self._connections.trans:
+            not self._connections.trans:
             return
         trans = self._connections.trans.pop(-1)
         trans.rollback()
@@ -123,8 +122,8 @@ class TLEngine(base.Engine):
     @property
     def closed(self):
         return not hasattr(self._connections, 'conn') or \
-            self._connections.conn() is None or \
-            self._connections.conn().closed
+               self._connections.conn() is None or \
+               self._connections.conn().closed
 
     def close(self):
         if not self.closed:

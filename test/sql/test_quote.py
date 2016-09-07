@@ -3,7 +3,8 @@ from sqlalchemy import sql, schema
 from sqlalchemy.sql import compiler
 from sqlalchemy.testing import fixtures, AssertsCompiledSQL, eq_
 from sqlalchemy import testing
-from sqlalchemy.sql.elements import quoted_name, _truncated_label, _anonymous_label
+from sqlalchemy.sql.elements import quoted_name, _truncated_label, \
+    _anonymous_label
 from sqlalchemy.testing.util import picklers
 
 
@@ -71,11 +72,11 @@ class QuoteExecTest(fixtures.TestBase):
         else:
             testing.db.execute("CREATE TABLE tab1 (id INTEGER)")
         testing.db.execute('CREATE TABLE {0!s} (id INTEGER)'.format(
-                           preparer.quote_identifier("tab2")))
+            preparer.quote_identifier("tab2")))
         testing.db.execute('CREATE TABLE {0!s} (id INTEGER)'.format(
-                           preparer.quote_identifier("TAB3")))
+            preparer.quote_identifier("TAB3")))
         testing.db.execute('CREATE TABLE {0!s} (id INTEGER)'.format(
-                           preparer.quote_identifier("TAB4")))
+            preparer.quote_identifier("TAB4")))
 
         t1 = Table('tab1', self.metadata,
                    Column('id', Integer, primary_key=True),
@@ -121,7 +122,7 @@ class QuoteExecTest(fixtures.TestBase):
             table1.c.a123
         ]
         result = select(columns).execute().fetchall()
-        assert(result == [(1, 2, 3, 4), (2, 2, 3, 4), (4, 3, 2, 1)])
+        assert (result == [(1, 2, 3, 4), (2, 2, 3, 4), (4, 3, 2, 1)])
 
         columns = [
             table2.c.d123,
@@ -129,7 +130,7 @@ class QuoteExecTest(fixtures.TestBase):
             table2.c.MixedCase
         ]
         result = select(columns).execute().fetchall()
-        assert(result == [(1, 2, 3), (2, 2, 3), (4, 3, 2)])
+        assert (result == [(1, 2, 3), (2, 2, 3), (4, 3, 2)])
 
     def test_use_labels(self):
         table1.insert().execute(
@@ -148,7 +149,7 @@ class QuoteExecTest(fixtures.TestBase):
             table1.c.a123
         ]
         result = select(columns, use_labels=True).execute().fetchall()
-        assert(result == [(1, 2, 3, 4), (2, 2, 3, 4), (4, 3, 2, 1)])
+        assert (result == [(1, 2, 3, 4), (2, 2, 3, 4), (4, 3, 2, 1)])
 
         columns = [
             table2.c.d123,
@@ -156,7 +157,7 @@ class QuoteExecTest(fixtures.TestBase):
             table2.c.MixedCase
         ]
         result = select(columns, use_labels=True).execute().fetchall()
-        assert(result == [(1, 2, 3), (2, 2, 3), (4, 3, 2)])
+        assert (result == [(1, 2, 3), (2, 2, 3), (4, 3, 2)])
 
 
 class QuoteTest(fixtures.TestBase, AssertsCompiledSQL):
@@ -423,7 +424,6 @@ class QuoteTest(fixtures.TestBase, AssertsCompiledSQL):
                             )
 
     def test_subquery_four(self):
-
         # Not lower case names, quotes off, should not quote
         metadata = MetaData()
         t1 = Table('T1', metadata,
@@ -677,7 +677,6 @@ class QuoteTest(fixtures.TestBase, AssertsCompiledSQL):
 
 
 class PreparerTest(fixtures.TestBase):
-
     """Test the db-agnostic quoting services of IdentifierPreparer."""
 
     def test_unformat(self):
@@ -702,7 +701,6 @@ class PreparerTest(fixtures.TestBase):
     def test_unformat_custom(self):
 
         class Custom(compiler.IdentifierPreparer):
-
             def __init__(self, dialect):
                 super(Custom, self).__init__(
                     dialect, initial_quote='`', final_quote='`')
@@ -733,7 +731,6 @@ class PreparerTest(fixtures.TestBase):
 
 
 class QuotedIdentTest(fixtures.TestBase):
-
     def test_concat_quotetrue(self):
         q1 = quoted_name("x", True)
         self._assert_not_quoted("y" + q1)

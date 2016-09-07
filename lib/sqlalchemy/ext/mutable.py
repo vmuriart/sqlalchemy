@@ -614,8 +614,8 @@ class MutableComposite(MutableBase):
 
             prop = object_mapper(parent).get_property(key)
             for value, attr_name in zip(
-                    self.__composite_values__(),
-                    prop._attribute_keys):
+                self.__composite_values__(),
+                prop._attribute_keys):
                 setattr(parent, attr_name, value)
 
 
@@ -627,8 +627,11 @@ def _setup_composite_listener():
                     issubclass(prop.composite_class, MutableComposite)):
                 prop.composite_class._listen_on_attribute(
                     getattr(class_, prop.key), False, class_)
+
     if not event.contains(Mapper, "mapper_configured", _listen_for_type):
         event.listen(Mapper, 'mapper_configured', _listen_for_type)
+
+
 _setup_composite_listener()
 
 
@@ -882,4 +885,4 @@ class MutableSet(Mutable, set):
         self.update(state)
 
     def __reduce_ex__(self, proto):
-        return (self.__class__, (list(self), ))
+        return (self.__class__, (list(self),))

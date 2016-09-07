@@ -1,10 +1,12 @@
 import warnings
+
 warnings.filterwarnings("ignore", r".*Decimal objects natively")
 
 # speed up cdecimal if available
 try:
     import cdecimal
     import sys
+
     sys.modules['decimal'] = cdecimal
 except ImportError:
     pass
@@ -22,6 +24,7 @@ from decimal import Decimal
 
 Base = declarative_base()
 
+
 class Employee(Base):
     __tablename__ = 'employee'
 
@@ -31,6 +34,7 @@ class Employee(Base):
 
     __mapper_args__ = {'polymorphic_on': type}
 
+
 class Boss(Employee):
     __tablename__ = 'boss'
 
@@ -38,6 +42,7 @@ class Boss(Employee):
     golf_average = Column(Numeric)
 
     __mapper_args__ = {'polymorphic_identity': 'boss'}
+
 
 class Grunt(Employee):
     __tablename__ = 'grunt'
@@ -48,9 +53,10 @@ class Grunt(Employee):
     employer_id = Column(Integer, ForeignKey('boss.id'))
 
     employer = relationship("Boss", backref="employees",
-                                primaryjoin=Boss.id == employer_id)
+                            primaryjoin=Boss.id == employer_id)
 
     __mapper_args__ = {'polymorphic_identity': 'grunt'}
+
 
 if os.path.exists('orm2010.db'):
     os.remove('orm2010.db')
@@ -62,6 +68,7 @@ Base.metadata.create_all(engine)
 
 sess = Session(engine)
 
+
 def runit(status, factor=1, query_runs=5):
     num_bosses = 100 * factor
     num_grunts = num_bosses * 100
@@ -72,7 +79,7 @@ def runit(status, factor=1, query_runs=5):
             golf_average=Decimal(random.randint(40, 150))
         )
         for i in range(num_bosses)
-    ]
+        ]
 
     sess.add_all(bosses)
     status("Added {0:d} boss objects".format(num_bosses))
@@ -83,7 +90,7 @@ def runit(status, factor=1, query_runs=5):
             savings=Decimal(random.randint(5000000, 15000000) / 100)
         )
         for i in range(num_grunts)
-    ]
+        ]
     status("Added {0:d} grunt objects".format(num_grunts))
 
     while grunts:
@@ -92,9 +99,9 @@ def runit(status, factor=1, query_runs=5):
         # handful of bosses
         batch_size = 100
         batch_num = (num_grunts - len(grunts)) / batch_size
-        boss = sess.query(Boss).\
-                    filter_by(name="Boss {0:d}".format(batch_num)).\
-                    first()
+        boss = sess.query(Boss). \
+            filter_by(name="Boss {0:d}".format(batch_num)). \
+            first()
         for grunt in grunts[0:batch_size]:
             grunt.employer = boss
 
@@ -113,13 +120,14 @@ def runit(status, factor=1, query_runs=5):
         # and their bosses' stats.
         for grunt in sess.query(Grunt):
             report.append((
-                            grunt.name,
-                            grunt.savings,
-                            grunt.employer.name,
-                            grunt.employer.golf_average
-                        ))
+                grunt.name,
+                grunt.savings,
+                grunt.employer.name,
+                grunt.employer.golf_average
+            ))
 
         sess.close()  # close out the session
+
 
 def run_with_profile(runsnake=False, dump=False):
     import cProfile
@@ -135,15 +143,18 @@ def run_with_profile(runsnake=False, dump=False):
     cProfile.runctx('runit(status)', globals(), locals(), filename)
     stats = pstats.Stats(filename)
 
-    counts_by_methname = dict((key[2], stats.stats[key][0]) for key in stats.stats)
+    counts_by_methname = dict(
+        (key[2], stats.stats[key][0]) for key in stats.stats)
 
     print("SQLA Version: {0!s}".format(__version__))
     print("Total calls {0:d}".format(stats.total_calls))
     print("Total cpu seconds: {0:.2f}".format(stats.total_tt))
-    print('Total execute calls: {0:d}'.format(counts_by_methname["<method 'execute' of 'sqlite3.Cursor' "
-                             "objects>"]))
-    print('Total executemany calls: {0:d}'.format(counts_by_methname.get("<method 'executemany' of 'sqlite3.Cursor' "
-                             "objects>", 0)))
+    print('Total execute calls: {0:d}'.format(
+        counts_by_methname["<method 'execute' of 'sqlite3.Cursor' "
+                           "objects>"]))
+    print('Total executemany calls: {0:d}'.format(
+        counts_by_methname.get("<method 'executemany' of 'sqlite3.Cursor' "
+                               "objects>", 0)))
 
     if dump:
         stats.sort_stats('time', 'calls')
@@ -163,16 +174,17 @@ def run_with_time():
     runit(status, 10)
     print("Total time: {0:d}".format((time.time() - now)))
 
+
 if __name__ == '__main__':
     import argparse
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--profile', action='store_true',
-                help='run shorter test suite w/ cprofilng')
+                        help='run shorter test suite w/ cprofilng')
     parser.add_argument('--dump', action='store_true',
-                help='dump full call profile (implies --profile)')
+                        help='dump full call profile (implies --profile)')
     parser.add_argument('--runsnake', action='store_true',
-                help='invoke runsnakerun (implies --profile)')
+                        help='invoke runsnakerun (implies --profile)')
 
     args = parser.parse_args()
 

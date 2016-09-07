@@ -15,10 +15,12 @@ from sqlalchemy.testing.schema import Table, Column
 from sqlalchemy.testing.mock import Mock, call
 from sqlalchemy.testing.assertions import expect_warnings
 
+
 class DictCollection(dict):
     @collection.appender
     def append(self, obj):
         self[obj.foo] = obj
+
     @collection.remover
     def remove(self, obj):
         del self[obj.foo]
@@ -35,12 +37,15 @@ class ListCollection(list):
 class ObjectCollection(object):
     def __init__(self):
         self.values = list()
+
     @collection.appender
     def append(self, obj):
         self.values.append(obj)
+
     @collection.remover
     def remove(self, obj):
         self.values.remove(obj)
+
     def __iter__(self):
         return iter(self.values)
 
@@ -80,7 +85,7 @@ class _CollectionOperations(fixtures.TestBase):
 
         mapper(Parent, parents_table, properties={
             '_children': relationship(Child, lazy='joined',
-                                  collection_class=collection_class)})
+                                      collection_class=collection_class)})
         mapper(Child, children_table)
 
         metadata.create_all()
@@ -253,6 +258,7 @@ class _CollectionOperations(fixtures.TestBase):
             assert False
         except TypeError:
             assert True
+
 
 class DefaultTest(_CollectionOperations):
     collection_class = None
@@ -462,7 +468,6 @@ class SetTest(_CollectionOperations):
 
         assert_raises(TypeError, set, [p1.children])
 
-
     def test_set_comparisons(self):
         Parent, Child = self.Parent, self.Child
 
@@ -474,21 +479,20 @@ class SetTest(_CollectionOperations):
                       set(['a']), set(['a', 'b']),
                       set(['c', 'd']), set(['e', 'f', 'g']),
                       set()):
-
             eq_(p1.children.union(other),
-                             control.union(other))
+                control.union(other))
             eq_(p1.children.difference(other),
-                             control.difference(other))
+                control.difference(other))
             eq_((p1.children - other),
-                             (control - other))
+                (control - other))
             eq_(p1.children.intersection(other),
-                             control.intersection(other))
+                control.intersection(other))
             eq_(p1.children.symmetric_difference(other),
-                             control.symmetric_difference(other))
+                control.symmetric_difference(other))
             eq_(p1.children.issubset(other),
-                             control.issubset(other))
+                control.issubset(other))
             eq_(p1.children.issuperset(other),
-                             control.issuperset(other))
+                control.issuperset(other))
 
             self.assert_((p1.children == other) == (control == other))
             self.assert_((p1.children != other) == (control != other))
@@ -517,7 +521,8 @@ class SetTest(_CollectionOperations):
                     try:
                         self.assert_(p.children == control)
                     except:
-                        print('Test {0!s}.{1!s}({2!s}):'.format(set(base), op, other))
+                        print('Test {0!s}.{1!s}({2!s}):'.format(set(base), op,
+                                                                other))
                         print('want', repr(control))
                         print('got', repr(p.children))
                         raise
@@ -527,7 +532,8 @@ class SetTest(_CollectionOperations):
                     try:
                         self.assert_(p.children == control)
                     except:
-                        print('Test {0!s}.{1!s}({2!s}):'.format(base, op, other))
+                        print(
+                            'Test {0!s}.{1!s}({2!s}):'.format(base, op, other))
                         print('want', repr(control))
                         print('got', repr(p.children))
                         raise
@@ -544,13 +550,15 @@ class SetTest(_CollectionOperations):
                     p.children = base[:]
                     control = set(base[:])
 
-                    exec("p.children {0!s} other".format(op))
-                    exec("control {0!s} other".format(op))
+                    exec ("p.children {0!s} other".format(op))
+                    exec ("control {0!s} other".format(op))
 
                     try:
                         self.assert_(p.children == control)
                     except:
-                        print('Test {0!s} {1!s} {2!s}:'.format(set(base), op, other))
+                        print(
+                            'Test {0!s} {1!s} {2!s}:'.format(set(base), op,
+                                                             other))
                         print('want', repr(control))
                         print('got', repr(p.children))
                         raise
@@ -560,7 +568,8 @@ class SetTest(_CollectionOperations):
                     try:
                         self.assert_(p.children == control)
                     except:
-                        print('Test {0!s} {1!s} {2!s}:'.format(base, op, other))
+                        print(
+                            'Test {0!s} {1!s} {2!s}:'.format(base, op, other))
                         print('want', repr(control))
                         print('got', repr(p.children))
                         raise
@@ -568,6 +577,7 @@ class SetTest(_CollectionOperations):
 
 class CustomSetTest(SetTest):
     collection_class = SetCollection
+
 
 class CustomObjectTest(_CollectionOperations):
     collection_class = ObjectCollection
@@ -590,6 +600,7 @@ class CustomObjectTest(_CollectionOperations):
             TypeError,
             p.children.__getitem__, 1
         )
+
 
 class ProxyFactoryTest(ListTest):
     def setup(self):
@@ -614,7 +625,7 @@ class ProxyFactoryTest(ListTest):
                 creator,
                 value_attr,
                 parent,
-                ):
+            ):
                 getter, setter = parent._default_getset(lazy_collection)
                 _AssociationList.__init__(
                     self,
@@ -623,13 +634,13 @@ class ProxyFactoryTest(ListTest):
                     getter,
                     setter,
                     parent,
-                    )
+                )
 
         class Parent(object):
             children = association_proxy('_children', 'name',
-                        proxy_factory=CustomProxy,
-                        proxy_bulk_set=CustomProxy.extend
-                    )
+                                         proxy_factory=CustomProxy,
+                                         proxy_bulk_set=CustomProxy.extend
+                                         )
 
             def __init__(self, name):
                 self.name = name
@@ -640,7 +651,7 @@ class ProxyFactoryTest(ListTest):
 
         mapper(Parent, parents_table, properties={
             '_children': relationship(Child, lazy='joined',
-                                  collection_class=list)})
+                                      collection_class=list)})
         mapper(Child, children_table)
 
         metadata.create_all()
@@ -688,7 +699,7 @@ class ScalarTest(fixtures.TestBase):
 
         mapper(Parent, parents_table, properties={
             'child': relationship(Child, lazy='joined',
-                              backref='parent', uselist=False)})
+                                  backref='parent', uselist=False)})
         mapper(Child, children_table)
 
         metadata.create_all()
@@ -767,19 +778,20 @@ class ScalarTest(fixtures.TestBase):
         metadata = self.metadata
 
         a = Table('a', metadata,
-                Column('id', Integer, primary_key=True),
-                Column('name', String(50))
-            )
+                  Column('id', Integer, primary_key=True),
+                  Column('name', String(50))
+                  )
         a2b = Table('a2b', metadata,
-            Column('id', Integer, primary_key=True),
-            Column('id_a', Integer, ForeignKey('a.id')),
-            Column('id_b', Integer, ForeignKey('b.id')),
-            Column('name', String(50))
-        )
+                    Column('id', Integer, primary_key=True),
+                    Column('id_a', Integer, ForeignKey('a.id')),
+                    Column('id_b', Integer, ForeignKey('b.id')),
+                    Column('name', String(50))
+                    )
         b = Table('b', metadata,
-            Column('id', Integer, primary_key=True),
-            Column('name', String(50))
-        )
+                  Column('id', Integer, primary_key=True),
+                  Column('name', String(50))
+                  )
+
         class A(object):
             a2b_name = association_proxy("a2b_single", "name")
             b_single = association_proxy("a2b_single", "b")
@@ -806,17 +818,19 @@ class ScalarTest(fixtures.TestBase):
     def test_custom_getset(self):
         metadata = MetaData()
         p = Table('p', metadata,
-                              Column('id', Integer, primary_key=True),
-                              Column('cid', Integer, ForeignKey('c.id')))
+                  Column('id', Integer, primary_key=True),
+                  Column('cid', Integer, ForeignKey('c.id')))
         c = Table('c', metadata,
-                               Column('id', Integer, primary_key=True),
-                               Column('foo', String(128)))
+                  Column('id', Integer, primary_key=True),
+                  Column('foo', String(128)))
 
         get = Mock()
         set_ = Mock()
+
         class Parent(object):
             foo = association_proxy('child', 'foo',
-                    getset_factory=lambda cc, parent: (get, set_))
+                                    getset_factory=lambda cc, parent: (
+                                        get, set_))
 
         class Child(object):
             def __init__(self, foo):
@@ -832,7 +846,6 @@ class ScalarTest(fixtures.TestBase):
         eq_(p1.foo, get(child))
         p1.foo = "y"
         eq_(set_.mock_calls, [call(child, "y")])
-
 
 
 class LazyLoadTest(fixtures.TestBase):
@@ -861,7 +874,6 @@ class LazyLoadTest(fixtures.TestBase):
             def __init__(self, name):
                 self.name = name
 
-
         mapper(Child, children_table)
         metadata.create_all()
 
@@ -885,7 +897,7 @@ class LazyLoadTest(fixtures.TestBase):
 
         mapper(Parent, self.table, properties={
             '_children': relationship(Child, lazy='select',
-                                  collection_class=list)})
+                                      collection_class=list)})
 
         p = Parent('p')
         p.children = ['a', 'b', 'c']
@@ -903,7 +915,7 @@ class LazyLoadTest(fixtures.TestBase):
 
         mapper(Parent, self.table, properties={
             '_children': relationship(Child, lazy='joined',
-                                  collection_class=list)})
+                                      collection_class=list)})
 
         p = Parent('p')
         p.children = ['a', 'b', 'c']
@@ -918,7 +930,7 @@ class LazyLoadTest(fixtures.TestBase):
 
         mapper(Parent, self.table, properties={
             '_children': relationship(Child, lazy='select',
-                                  collection_class=list)})
+                                      collection_class=list)})
 
         p = Parent('p')
         p.children = ['a', 'b', 'c']
@@ -935,7 +947,6 @@ class LazyLoadTest(fixtures.TestBase):
         mapper(Parent, self.table, properties={
             '_children': relationship(Child, lazy='select', uselist=False)})
 
-
         p = Parent('p')
         p.children = 'value'
 
@@ -950,7 +961,6 @@ class LazyLoadTest(fixtures.TestBase):
         mapper(Parent, self.table, properties={
             '_children': relationship(Child, lazy='joined', uselist=False)})
 
-
         p = Parent('p')
         p.children = 'value'
 
@@ -964,29 +974,32 @@ class Parent(object):
     def __init__(self, name):
         self.name = name
 
+
 class Child(object):
     def __init__(self, name):
         self.name = name
+
 
 class KVChild(object):
     def __init__(self, name, value):
         self.name = name
         self.value = value
 
-class ReconstitutionTest(fixtures.TestBase):
 
+class ReconstitutionTest(fixtures.TestBase):
     def setup(self):
         metadata = MetaData(testing.db)
         parents = Table('parents', metadata, Column('id', Integer,
-                        primary_key=True,
-                        test_needs_autoincrement=True), Column('name',
-                        String(30)))
+                                                    primary_key=True,
+                                                    test_needs_autoincrement=True),
+                        Column('name',
+                               String(30)))
         children = Table('children', metadata, Column('id', Integer,
-                         primary_key=True,
-                         test_needs_autoincrement=True),
+                                                      primary_key=True,
+                                                      test_needs_autoincrement=True),
                          Column('parent_id', Integer,
-                         ForeignKey('parents.id')), Column('name',
-                         String(30)))
+                                ForeignKey('parents.id')), Column('name',
+                                                                  String(30)))
         metadata.create_all()
         parents.insert().execute(name='p1')
         self.metadata = metadata
@@ -1037,13 +1050,13 @@ class ReconstitutionTest(fixtures.TestBase):
         assert r1.kids == ['c1', 'c2']
 
         # can't do this without parent having a cycle
-        #r2 = pickle.loads(pickle.dumps(p.kids))
-        #assert r2 == ['c1', 'c2']
+        # r2 = pickle.loads(pickle.dumps(p.kids))
+        # assert r2 == ['c1', 'c2']
 
     def test_pickle_set(self):
         mapper(Parent, self.parents,
                properties=dict(children=relationship(Child,
-               collection_class=set)))
+                                                     collection_class=set)))
         mapper(Child, self.children)
         p = Parent('p1')
         p.kids.update(['c1', 'c2'])
@@ -1051,14 +1064,16 @@ class ReconstitutionTest(fixtures.TestBase):
         assert r1.kids == set(['c1', 'c2'])
 
         # can't do this without parent having a cycle
-        #r2 = pickle.loads(pickle.dumps(p.kids))
-        #assert r2 == set(['c1', 'c2'])
+        # r2 = pickle.loads(pickle.dumps(p.kids))
+        # assert r2 == set(['c1', 'c2'])
 
     def test_pickle_dict(self):
         mapper(Parent, self.parents,
                properties=dict(children=relationship(KVChild,
-               collection_class=
-                    collections.mapped_collection(PickleKeyFunc('name')))))
+                                                     collection_class=
+                                                     collections.mapped_collection(
+                                                         PickleKeyFunc(
+                                                             'name')))))
         mapper(KVChild, self.children)
         p = Parent('p1')
         p.kids.update({'c1': 'v1', 'c2': 'v2'})
@@ -1067,8 +1082,9 @@ class ReconstitutionTest(fixtures.TestBase):
         assert r1.kids == {'c1': 'c1', 'c2': 'c2'}
 
         # can't do this without parent having a cycle
-        #r2 = pickle.loads(pickle.dumps(p.kids))
-        #assert r2 == {'c1': 'c1', 'c2': 'c2'}
+        # r2 = pickle.loads(pickle.dumps(p.kids))
+        # assert r2 == {'c1': 'c1', 'c2': 'c2'}
+
 
 class PickleKeyFunc(object):
     def __init__(self, name):
@@ -1076,6 +1092,7 @@ class PickleKeyFunc(object):
 
     def __call__(self, obj):
         return getattr(obj, self.name)
+
 
 class ComparatorTest(fixtures.MappedTest, AssertsCompiledSQL):
     __dialect__ = 'default'
@@ -1088,27 +1105,28 @@ class ComparatorTest(fixtures.MappedTest, AssertsCompiledSQL):
     @classmethod
     def define_tables(cls, metadata):
         Table('userkeywords', metadata,
-          Column('keyword_id', Integer, ForeignKey('keywords.id'), primary_key=True),
-          Column('user_id', Integer, ForeignKey('users.id')),
-          Column('value', String(50))
-        )
+              Column('keyword_id', Integer, ForeignKey('keywords.id'),
+                     primary_key=True),
+              Column('user_id', Integer, ForeignKey('users.id')),
+              Column('value', String(50))
+              )
         Table('users', metadata,
-            Column('id', Integer,
-              primary_key=True, test_needs_autoincrement=True),
-            Column('name', String(64)),
-            Column('singular_id', Integer, ForeignKey('singular.id'))
-        )
+              Column('id', Integer,
+                     primary_key=True, test_needs_autoincrement=True),
+              Column('name', String(64)),
+              Column('singular_id', Integer, ForeignKey('singular.id'))
+              )
         Table('keywords', metadata,
-            Column('id', Integer,
-              primary_key=True, test_needs_autoincrement=True),
-            Column('keyword', String(64)),
-            Column('singular_id', Integer, ForeignKey('singular.id'))
-        )
+              Column('id', Integer,
+                     primary_key=True, test_needs_autoincrement=True),
+              Column('keyword', String(64)),
+              Column('singular_id', Integer, ForeignKey('singular.id'))
+              )
         Table('singular', metadata,
-            Column('id', Integer,
-              primary_key=True, test_needs_autoincrement=True),
-            Column('value', String(50))
-        )
+              Column('id', Integer,
+                     primary_key=True, test_needs_autoincrement=True),
+              Column('value', String(50))
+              )
 
     @classmethod
     def setup_classes(cls):
@@ -1119,7 +1137,8 @@ class ComparatorTest(fixtures.MappedTest, AssertsCompiledSQL):
             # o2m -> m2o
             # uselist -> nonuselist
             keywords = association_proxy('user_keywords', 'keyword',
-                    creator=lambda k: UserKeyword(keyword=k))
+                                         creator=lambda k: UserKeyword(
+                                             keyword=k))
 
             # m2o -> o2m
             # nonuselist -> uselist
@@ -1152,14 +1171,14 @@ class ComparatorTest(fixtures.MappedTest, AssertsCompiledSQL):
     @classmethod
     def setup_mappers(cls):
         users, Keyword, UserKeyword, singular, \
-            userkeywords, User, keywords, Singular = (cls.tables.users,
-                                cls.classes.Keyword,
-                                cls.classes.UserKeyword,
-                                cls.tables.singular,
-                                cls.tables.userkeywords,
-                                cls.classes.User,
-                                cls.tables.keywords,
-                                cls.classes.Singular)
+        userkeywords, User, keywords, Singular = (cls.tables.users,
+                                                  cls.classes.Keyword,
+                                                  cls.classes.UserKeyword,
+                                                  cls.tables.singular,
+                                                  cls.tables.userkeywords,
+                                                  cls.classes.User,
+                                                  cls.tables.keywords,
+                                                  cls.classes.Singular)
 
         mapper(User, users, properties={
             'singular': relationship(Singular)
@@ -1179,22 +1198,22 @@ class ComparatorTest(fixtures.MappedTest, AssertsCompiledSQL):
     @classmethod
     def insert_data(cls):
         UserKeyword, User, Keyword, Singular = (cls.classes.UserKeyword,
-                                cls.classes.User,
-                                cls.classes.Keyword,
-                                cls.classes.Singular)
+                                                cls.classes.User,
+                                                cls.classes.Keyword,
+                                                cls.classes.Singular)
 
         session = sessionmaker()()
         words = (
             'quick', 'brown',
             'fox', 'jumped', 'over',
             'the', 'lazy',
-            )
+        )
         for ii in range(16):
             user = User('user{0:d}'.format(ii))
 
             if ii % 2 == 0:
                 user.singular = Singular(value=("singular{0:d}".format(ii))
-                                        if ii % 4 == 0 else None)
+                if ii % 4 == 0 else None)
             session.add(user)
             for jj in words[(ii % len(words)):((ii + 3) % len(words))]:
                 k = Keyword(jj)
@@ -1243,84 +1262,84 @@ class ComparatorTest(fixtures.MappedTest, AssertsCompiledSQL):
         UserKeyword, User = self.classes.UserKeyword, self.classes.User
 
         self._equivalent(self.session.query(User).
-                    filter(User.keywords.any(keyword='jumped'
-                         )),
+                         filter(User.keywords.any(keyword='jumped'
+                                                  )),
                          self.session.query(User).filter(
-                                User.user_keywords.any(
-                            UserKeyword.keyword.has(keyword='jumped'
-                         ))))
+                             User.user_keywords.any(
+                                 UserKeyword.keyword.has(keyword='jumped'
+                                                         ))))
 
     def test_filter_has_kwarg_nul_nul(self):
         UserKeyword, Keyword = self.classes.UserKeyword, self.classes.Keyword
 
         self._equivalent(self.session.query(Keyword).
-                    filter(Keyword.user.has(name='user2'
-                         )),
+                         filter(Keyword.user.has(name='user2'
+                                                 )),
                          self.session.query(Keyword).
-                            filter(Keyword.user_keyword.has(
-                            UserKeyword.user.has(name='user2'
-                         ))))
+                         filter(Keyword.user_keyword.has(
+                             UserKeyword.user.has(name='user2'
+                                                  ))))
 
     def test_filter_has_kwarg_nul_ul(self):
         User, Singular = self.classes.User, self.classes.Singular
 
         self._equivalent(
-            self.session.query(User).\
-                        filter(User.singular_keywords.any(keyword='jumped')),
-            self.session.query(User).\
-                        filter(
-                            User.singular.has(
-                                Singular.keywords.any(keyword='jumped')
-                            )
-                        )
+            self.session.query(User). \
+                filter(User.singular_keywords.any(keyword='jumped')),
+            self.session.query(User). \
+                filter(
+                User.singular.has(
+                    Singular.keywords.any(keyword='jumped')
+                )
+            )
         )
 
     def test_filter_any_criterion_ul_nul(self):
         UserKeyword, User, Keyword = (self.classes.UserKeyword,
-                                self.classes.User,
-                                self.classes.Keyword)
+                                      self.classes.User,
+                                      self.classes.Keyword)
 
         self._equivalent(self.session.query(User).
-                    filter(User.keywords.any(Keyword.keyword
-                         == 'jumped')),
+                         filter(User.keywords.any(Keyword.keyword
+                                                  == 'jumped')),
                          self.session.query(User).
-                            filter(User.user_keywords.any(
-                            UserKeyword.keyword.has(Keyword.keyword
-                         == 'jumped'))))
+                         filter(User.user_keywords.any(
+                             UserKeyword.keyword.has(Keyword.keyword
+                                                     == 'jumped'))))
 
     def test_filter_has_criterion_nul_nul(self):
         UserKeyword, User, Keyword = (self.classes.UserKeyword,
-                                self.classes.User,
-                                self.classes.Keyword)
+                                      self.classes.User,
+                                      self.classes.Keyword)
 
         self._equivalent(self.session.query(Keyword).
-                filter(Keyword.user.has(User.name == 'user2')),
+                         filter(Keyword.user.has(User.name == 'user2')),
                          self.session.query(Keyword).
-                            filter(Keyword.user_keyword.has(
-                                UserKeyword.user.has(User.name == 'user2'))))
+                         filter(Keyword.user_keyword.has(
+                             UserKeyword.user.has(User.name == 'user2'))))
 
     def test_filter_any_criterion_nul_ul(self):
         User, Keyword, Singular = (self.classes.User,
-                                self.classes.Keyword,
-                                self.classes.Singular)
+                                   self.classes.Keyword,
+                                   self.classes.Singular)
 
         self._equivalent(
             self.session.query(User).
-                        filter(User.singular_keywords.any(
-                            Keyword.keyword == 'jumped')),
+                filter(User.singular_keywords.any(
+                Keyword.keyword == 'jumped')),
             self.session.query(User).
-                        filter(
-                            User.singular.has(
-                                Singular.keywords.any(Keyword.keyword == 'jumped')
-                            )
-                        )
+                filter(
+                User.singular.has(
+                    Singular.keywords.any(Keyword.keyword == 'jumped')
+                )
+            )
         )
 
     def test_filter_contains_ul_nul(self):
         User = self.classes.User
 
         self._equivalent(self.session.query(User).
-        filter(User.keywords.contains(self.kw)),
+                         filter(User.keywords.contains(self.kw)),
                          self.session.query(User).
                          filter(User.user_keywords.any(keyword=self.kw)))
 
@@ -1328,15 +1347,15 @@ class ComparatorTest(fixtures.MappedTest, AssertsCompiledSQL):
         User, Singular = self.classes.User, self.classes.Singular
 
         with expect_warnings(
-                "Got None for value of column keywords.singular_id;"):
+            "Got None for value of column keywords.singular_id;"):
             self._equivalent(
                 self.session.query(User).filter(
-                                User.singular_keywords.contains(self.kw)
+                    User.singular_keywords.contains(self.kw)
                 ),
                 self.session.query(User).filter(
-                                User.singular.has(
-                                    Singular.keywords.contains(self.kw)
-                                )
+                    User.singular.has(
+                        Singular.keywords.contains(self.kw)
+                    )
                 ),
             )
 
@@ -1344,45 +1363,46 @@ class ComparatorTest(fixtures.MappedTest, AssertsCompiledSQL):
         Keyword = self.classes.Keyword
 
         self._equivalent(self.session.query(Keyword).filter(Keyword.user
-                         == self.u),
+                                                            == self.u),
                          self.session.query(Keyword).
                          filter(Keyword.user_keyword.has(user=self.u)))
 
     def test_filter_ne_nul_nul(self):
         Keyword = self.classes.Keyword
 
-        self._equivalent(self.session.query(Keyword).filter(Keyword.user != self.u),
-                         self.session.query(Keyword).
-                            filter(
-                                    Keyword.user_keyword.has(Keyword.user != self.u)
-                            )
-                        )
+        self._equivalent(
+            self.session.query(Keyword).filter(Keyword.user != self.u),
+            self.session.query(Keyword).
+                filter(
+                Keyword.user_keyword.has(Keyword.user != self.u)
+            )
+        )
 
     def test_filter_eq_null_nul_nul(self):
         UserKeyword, Keyword = self.classes.UserKeyword, self.classes.Keyword
 
         self._equivalent(
-                self.session.query(Keyword).filter(Keyword.user == None),
-                self.session.query(Keyword).
-                            filter(
-                                or_(
-                                    Keyword.user_keyword.has(UserKeyword.user == None),
-                                    Keyword.user_keyword == None
-                                )
+            self.session.query(Keyword).filter(Keyword.user == None),
+            self.session.query(Keyword).
+                filter(
+                or_(
+                    Keyword.user_keyword.has(UserKeyword.user == None),
+                    Keyword.user_keyword == None
+                )
 
-                            )
-                        )
+            )
+        )
 
     def test_filter_ne_null_nul_nul(self):
         UserKeyword, Keyword = self.classes.UserKeyword, self.classes.Keyword
 
         self._equivalent(
-                self.session.query(Keyword).filter(Keyword.user != None),
-                self.session.query(Keyword).
-                            filter(
-                                Keyword.user_keyword.has(UserKeyword.user != None),
-                            )
-                        )
+            self.session.query(Keyword).filter(Keyword.user != None),
+            self.session.query(Keyword).
+                filter(
+                Keyword.user_keyword.has(UserKeyword.user != None),
+            )
+        )
 
     def test_filter_eq_None_nul(self):
         User = self.classes.User
@@ -1391,11 +1411,11 @@ class ComparatorTest(fixtures.MappedTest, AssertsCompiledSQL):
         self._equivalent(
             self.session.query(User).filter(User.singular_value == None),
             self.session.query(User).filter(
-                    or_(
-                        User.singular.has(Singular.value == None),
-                        User.singular == None
-                    )
+                or_(
+                    User.singular.has(Singular.value == None),
+                    User.singular == None
                 )
+            )
         )
 
     def test_filter_ne_value_nul(self):
@@ -1403,10 +1423,11 @@ class ComparatorTest(fixtures.MappedTest, AssertsCompiledSQL):
         Singular = self.classes.Singular
 
         self._equivalent(
-            self.session.query(User).filter(User.singular_value != "singular4"),
             self.session.query(User).filter(
-                        User.singular.has(Singular.value != "singular4"),
-                )
+                User.singular_value != "singular4"),
+            self.session.query(User).filter(
+                User.singular.has(Singular.value != "singular4"),
+            )
         )
 
     def test_filter_eq_value_nul(self):
@@ -1414,10 +1435,11 @@ class ComparatorTest(fixtures.MappedTest, AssertsCompiledSQL):
         Singular = self.classes.Singular
 
         self._equivalent(
-            self.session.query(User).filter(User.singular_value == "singular4"),
             self.session.query(User).filter(
-                        User.singular.has(Singular.value == "singular4"),
-                )
+                User.singular_value == "singular4"),
+            self.session.query(User).filter(
+                User.singular.has(Singular.value == "singular4"),
+            )
         )
 
     def test_filter_ne_None_nul(self):
@@ -1427,8 +1449,8 @@ class ComparatorTest(fixtures.MappedTest, AssertsCompiledSQL):
         self._equivalent(
             self.session.query(User).filter(User.singular_value != None),
             self.session.query(User).filter(
-                        User.singular.has(Singular.value != None),
-                )
+                User.singular.has(Singular.value != None),
+            )
         )
 
     def test_has_nul(self):
@@ -1440,8 +1462,8 @@ class ComparatorTest(fixtures.MappedTest, AssertsCompiledSQL):
         self._equivalent(
             self.session.query(User).filter(User.singular_value.has()),
             self.session.query(User).filter(
-                        User.singular.has(),
-                )
+                User.singular.has(),
+            )
         )
 
     def test_nothas_nul(self):
@@ -1453,8 +1475,8 @@ class ComparatorTest(fixtures.MappedTest, AssertsCompiledSQL):
         self._equivalent(
             self.session.query(User).filter(~User.singular_value.has()),
             self.session.query(User).filter(
-                        ~User.singular.has(),
-                )
+                ~User.singular.has(),
+            )
         )
 
     def test_has_criterion_nul(self):
@@ -1484,38 +1506,38 @@ class ComparatorTest(fixtures.MappedTest, AssertsCompiledSQL):
         Keyword = self.classes.Keyword
 
         assert_raises(exc.InvalidRequestError,
-                lambda: Keyword.user.contains(self.u))
+                      lambda: Keyword.user.contains(self.u))
 
     def test_filter_scalar_any_fails_nul_nul(self):
         Keyword = self.classes.Keyword
 
         assert_raises(exc.InvalidRequestError,
-                lambda: Keyword.user.any(name='user2'))
+                      lambda: Keyword.user.any(name='user2'))
 
     def test_filter_collection_has_fails_ul_nul(self):
         User = self.classes.User
 
         assert_raises(exc.InvalidRequestError,
-                lambda: User.keywords.has(keyword='quick'))
+                      lambda: User.keywords.has(keyword='quick'))
 
     def test_filter_collection_eq_fails_ul_nul(self):
         User = self.classes.User
 
         assert_raises(exc.InvalidRequestError,
-                lambda: User.keywords == self.kw)
+                      lambda: User.keywords == self.kw)
 
     def test_filter_collection_ne_fails_ul_nul(self):
         User = self.classes.User
 
         assert_raises(exc.InvalidRequestError,
-                lambda: User.keywords != self.kw)
+                      lambda: User.keywords != self.kw)
 
     def test_join_separate_attr(self):
         User = self.classes.User
         self.assert_compile(
             self.session.query(User).join(
-                        User.keywords.local_attr,
-                        User.keywords.remote_attr),
+                User.keywords.local_attr,
+                User.keywords.remote_attr),
             "SELECT users.id AS users_id, users.name AS users_name, "
             "users.singular_id AS users_singular_id "
             "FROM users JOIN userkeywords ON users.id = "
@@ -1527,13 +1549,14 @@ class ComparatorTest(fixtures.MappedTest, AssertsCompiledSQL):
         User = self.classes.User
         self.assert_compile(
             self.session.query(User).join(
-                        *User.keywords.attr),
+                *User.keywords.attr),
             "SELECT users.id AS users_id, users.name AS users_name, "
             "users.singular_id AS users_singular_id "
             "FROM users JOIN userkeywords ON users.id = "
             "userkeywords.user_id JOIN keywords ON keywords.id = "
             "userkeywords.keyword_id"
         )
+
 
 class DictOfTupleUpdateTest(fixtures.TestBase):
     def setup(self):
@@ -1548,9 +1571,11 @@ class DictOfTupleUpdateTest(fixtures.TestBase):
         m = MetaData()
         a = Table('a', m, Column('id', Integer, primary_key=True))
         b = Table('b', m, Column('id', Integer, primary_key=True),
-                    Column('aid', Integer, ForeignKey('a.id')))
+                  Column('aid', Integer, ForeignKey('a.id')))
         mapper(A, a, properties={
-            'orig': relationship(B, collection_class=attribute_mapped_collection('key'))
+            'orig': relationship(B,
+                                 collection_class=attribute_mapped_collection(
+                                     'key'))
         })
         mapper(B, b)
         self.A = A

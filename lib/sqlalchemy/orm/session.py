@@ -6,7 +6,6 @@
 # the MIT License: http://www.opensource.org/licenses/mit-license.php
 """Provides the Session class and related utilities."""
 
-
 import weakref
 from .. import util, sql, engine, exc as sa_exc
 from ..sql import util as sql_util, expression
@@ -240,13 +239,14 @@ class SessionTransaction(object):
         current = self
         result = ()
         while current:
-            result += (current, )
+            result += (current,)
             if current._parent is upto:
                 break
             elif current._parent is None:
                 raise sa_exc.InvalidRequestError(
-                    "Transaction {0!s} is not on the active transaction list".format((
-                        upto)))
+                    "Transaction {0!s} is not on the active transaction list".format(
+                        (
+                            upto)))
             else:
                 current = current._parent
 
@@ -436,8 +436,7 @@ class SessionTransaction(object):
         sess = self.session
 
         if not rollback_err and sess._enable_transaction_accounting and \
-                not sess._is_clean():
-
+            not sess._is_clean():
             # if items were added, deleted, or mutated
             # here, we need to re-restore the snapshot
             util.warn(
@@ -472,7 +471,7 @@ class SessionTransaction(object):
         self.session.transaction = self._parent
         if self._parent is None:
             for connection, transaction, autoclose in \
-                    set(self._connections.values()):
+                set(self._connections.values()):
                 if invalidate:
                     connection.invalidate()
                 if autoclose:
@@ -663,7 +662,7 @@ class Session(_SessionClassMethods):
             self._identity_cls = identity.StrongInstanceDict
         self.identity_map = self._identity_cls()
 
-        self._new = {}   # InstanceState->object, strong refs object
+        self._new = {}  # InstanceState->object, strong refs object
         self._deleted = {}  # same
         self.bind = bind
         self.__binds = {}
@@ -1123,8 +1122,8 @@ class Session(_SessionClassMethods):
         except sa_exc.NoInspectionAvailable:
             if not isinstance(key, type):
                 raise exc.ArgumentError(
-                            "Not acceptable bind target: {0!s}".format(
-                            key))
+                    "Not acceptable bind target: {0!s}".format(
+                        key))
             else:
                 self.__binds[key] = bind
         else:
@@ -1136,8 +1135,8 @@ class Session(_SessionClassMethods):
                     self.__binds[selectable] = bind
             else:
                 raise exc.ArgumentError(
-                            "Not acceptable bind target: {0!s}".format(
-                            key))
+                    "Not acceptable bind target: {0!s}".format(
+                        key))
 
     def bind_mapper(self, mapper, bind):
         """Associate a :class:`.Mapper` with a "bind", e.g. a :class:`.Engine`
@@ -1259,8 +1258,9 @@ class Session(_SessionClassMethods):
             context.append('SQL expression')
 
         raise sa_exc.UnboundExecutionError(
-            "Could not locate a bind configured on {0!s} or this Session".format((
-                ', '.join(context))))
+            "Could not locate a bind configured on {0!s} or this Session".format(
+                (
+                    ', '.join(context))))
 
     def query(self, *entities, **kwargs):
         """Return a new :class:`.Query` object corresponding to this
@@ -1355,13 +1355,13 @@ class Session(_SessionClassMethods):
         self._expire_state(state, attribute_names)
 
         if loading.load_on_ident(
-                self.query(object_mapper(instance)),
-                state.key, refresh_state=state,
-                lockmode=lockmode,
-                only_load_props=attribute_names) is None:
+            self.query(object_mapper(instance)),
+            state.key, refresh_state=state,
+            lockmode=lockmode,
+            only_load_props=attribute_names) is None:
             raise sa_exc.InvalidRequestError(
                 "Could not refresh instance '{0!s}'".format(
-                instance_str(instance)))
+                    instance_str(instance)))
 
     def expire_all(self):
         """Expires all persistent instances within this Session.
@@ -1460,7 +1460,7 @@ class Session(_SessionClassMethods):
             state._detach(self)
 
     @util.deprecated("0.7", "The non-weak-referencing identity map "
-                     "feature is no longer needed.")
+                            "feature is no longer needed.")
     def prune(self):
         """Remove unreferenced instances cached in the identity map.
 
@@ -1488,7 +1488,7 @@ class Session(_SessionClassMethods):
         if state.session_id is not self.hash_key:
             raise sa_exc.InvalidRequestError(
                 "Instance {0!s} is not present in this Session".format(
-                state_str(state)))
+                    state_str(state)))
 
         cascaded = list(state.manager.mapper.cascade_iterator(
             'expunge', state))
@@ -1522,8 +1522,8 @@ class Session(_SessionClassMethods):
                 instance_key = mapper._identity_key_from_state(state)
 
                 if _none_set.intersection(instance_key[1]) and \
-                        not mapper.allow_partial_pks or \
-                        _none_set.issuperset(instance_key[1]):
+                    not mapper.allow_partial_pks or \
+                    _none_set.issuperset(instance_key[1]):
                     raise exc.FlushError(
                         "Instance %s has a NULL identity key.  If this is an "
                         "auto-generated value, check that the database table "
@@ -1624,9 +1624,9 @@ class Session(_SessionClassMethods):
 
         mapper = _state_mapper(state)
         for o, m, st_, dct_ in mapper.cascade_iterator(
-                'save-update',
-                state,
-                halt_on=self._contains_state):
+            'save-update',
+            state,
+            halt_on=self._contains_state):
             self._save_or_update_impl(st_)
 
     def delete(self, instance):
@@ -1651,7 +1651,7 @@ class Session(_SessionClassMethods):
             if head:
                 raise sa_exc.InvalidRequestError(
                     "Instance '{0!s}' is not persisted".format(
-                    state_str(state)))
+                        state_str(state)))
             else:
                 return
 
@@ -1788,9 +1788,9 @@ class Session(_SessionClassMethods):
             new_instance = True
 
         elif key_is_persistent and (
-            not _none_set.intersection(key[1]) or
-            (mapper.allow_partial_pks and
-             not _none_set.issuperset(key[1]))):
+                not _none_set.intersection(key[1]) or
+                (mapper.allow_partial_pks and
+                     not _none_set.issuperset(key[1]))):
             merged = self.query(mapper.class_).get(key[1])
         else:
             merged = None
@@ -1866,7 +1866,7 @@ class Session(_SessionClassMethods):
         if not self.identity_map.contains_state(state):
             raise sa_exc.InvalidRequestError(
                 "Instance '{0!s}' is not persistent within this Session".format(
-                state_str(state)))
+                    state_str(state)))
 
     def _save_impl(self, state):
         if state.key is not None:
@@ -1886,7 +1886,7 @@ class Session(_SessionClassMethods):
         if state.key is None:
             raise sa_exc.InvalidRequestError(
                 "Instance '{0!s}' is not persisted".format(
-                state_str(state)))
+                    state_str(state)))
 
         if state._deleted:
             if revert_deletion:
@@ -2076,8 +2076,8 @@ class Session(_SessionClassMethods):
 
     def _is_clean(self):
         return not self.identity_map.check_modified() and \
-            not self._deleted and \
-            not self._new
+               not self._deleted and \
+               not self._new
 
     def _flush(self, objects=None):
 
@@ -2183,7 +2183,7 @@ class Session(_SessionClassMethods):
                 transaction.rollback(_capture_exception=True)
 
     def bulk_save_objects(
-            self, objects, return_defaults=False, update_changed_only=True):
+        self, objects, return_defaults=False, update_changed_only=True):
         """Perform a bulk save of the given list of objects.
 
         The bulk save feature allows mapped objects to be used as the
@@ -2264,7 +2264,7 @@ class Session(_SessionClassMethods):
                 return_defaults, update_changed_only, False)
 
     def bulk_insert_mappings(
-            self, mapper, mappings, return_defaults=False, render_nulls=False):
+        self, mapper, mappings, return_defaults=False, render_nulls=False):
         """Perform a bulk insert of the given list of mapping dictionaries.
 
         The bulk insert feature allows plain Python dictionaries to be used as
@@ -2405,8 +2405,8 @@ class Session(_SessionClassMethods):
             mapper, mappings, True, False, False, False, False)
 
     def _bulk_save_mappings(
-            self, mapper, mappings, isupdate, isstates,
-            return_defaults, update_changed_only, render_nulls):
+        self, mapper, mappings, isupdate, isstates,
+        return_defaults, update_changed_only, render_nulls):
         mapper = _class_to_mapper(mapper)
         self._flushing = True
 
@@ -2505,8 +2505,8 @@ class Session(_SessionClassMethods):
         for attr in state.manager.attributes:
             if \
                     (
-                        not include_collections and
-                        hasattr(attr.impl, 'get_collection')
+                            not include_collections and
+                            hasattr(attr.impl, 'get_collection')
                     ) or not hasattr(attr.impl, 'get_history'):
                 continue
 

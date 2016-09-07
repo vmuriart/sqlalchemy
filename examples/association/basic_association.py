@@ -15,11 +15,12 @@ of "items", with a particular price paid associated with each "item".
 from datetime import datetime
 
 from sqlalchemy import (create_engine, MetaData, Table, Column, Integer,
-    String, DateTime, Float, ForeignKey, and_)
+                        String, DateTime, Float, ForeignKey, and_)
 from sqlalchemy.orm import mapper, relationship, Session
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
+
 
 class Order(Base):
     __tablename__ = 'order'
@@ -28,10 +29,11 @@ class Order(Base):
     customer_name = Column(String(30), nullable=False)
     order_date = Column(DateTime, nullable=False, default=datetime.now())
     order_items = relationship("OrderItem", cascade="all, delete-orphan",
-                            backref='order')
+                               backref='order')
 
     def __init__(self, customer_name):
         self.customer_name = customer_name
+
 
 class Item(Base):
     __tablename__ = 'item'
@@ -45,8 +47,9 @@ class Item(Base):
 
     def __repr__(self):
         return 'Item({0!r}, {1!r})'.format(
-                    self.description, self.price
-                )
+            self.description, self.price
+        )
+
 
 class OrderItem(Base):
     __tablename__ = 'orderitem'
@@ -57,7 +60,9 @@ class OrderItem(Base):
     def __init__(self, item, price=None):
         self.item = item
         self.price = price or item.price
+
     item = relationship(Item, lazy='joined')
+
 
 if __name__ == '__main__':
     engine = create_engine('sqlite://')

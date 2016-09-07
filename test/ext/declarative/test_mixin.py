@@ -18,7 +18,6 @@ Base = None
 
 
 class DeclarativeTestBase(fixtures.TestBase, testing.AssertsExecutionResults):
-
     def setup(self):
         global Base
         Base = decl.declarative_base(testing.db)
@@ -30,11 +29,9 @@ class DeclarativeTestBase(fixtures.TestBase, testing.AssertsExecutionResults):
 
 
 class DeclarativeMixinTest(DeclarativeTestBase):
-
     def test_simple(self):
 
         class MyMixin(object):
-
             id = Column(Integer, primary_key=True,
                         test_needs_autoincrement=True)
 
@@ -42,7 +39,6 @@ class DeclarativeMixinTest(DeclarativeTestBase):
                 return 'bar' + str(self.id)
 
         class MyModel(Base, MyMixin):
-
             __tablename__ = 'test'
             name = Column(String(100), nullable=False, index=True)
 
@@ -59,12 +55,10 @@ class DeclarativeMixinTest(DeclarativeTestBase):
     def test_unique_column(self):
 
         class MyMixin(object):
-
             id = Column(Integer, primary_key=True)
             value = Column(String, unique=True)
 
         class MyModel(Base, MyMixin):
-
             __tablename__ = 'test'
 
         assert MyModel.__table__.c.value.unique
@@ -72,7 +66,6 @@ class DeclarativeMixinTest(DeclarativeTestBase):
     def test_hierarchical_bases(self):
 
         class MyMixinParent:
-
             id = Column(Integer, primary_key=True,
                         test_needs_autoincrement=True)
 
@@ -80,11 +73,9 @@ class DeclarativeMixinTest(DeclarativeTestBase):
                 return 'bar' + str(self.id)
 
         class MyMixin(MyMixinParent):
-
             baz = Column(String(100), nullable=False, index=True)
 
         class MyModel(Base, MyMixin):
-
             __tablename__ = 'test'
             name = Column(String(100), nullable=False, index=True)
 
@@ -135,7 +126,6 @@ class DeclarativeMixinTest(DeclarativeTestBase):
 
         def go():
             class MyModel(Base, MyRelMixin):
-
                 __tablename__ = 'foo'
 
         assert_raises(sa.exc.InvalidRequestError, go)
@@ -161,10 +151,10 @@ class DeclarativeMixinTest(DeclarativeTestBase):
     def test_table_name_inherited(self):
 
         class MyMixin:
-
             @declared_attr
             def __tablename__(cls):
                 return cls.__name__.lower()
+
             id = Column(Integer, primary_key=True)
 
         class MyModel(Base, MyMixin):
@@ -174,10 +164,10 @@ class DeclarativeMixinTest(DeclarativeTestBase):
 
     def test_classproperty_still_works(self):
         class MyMixin(object):
-
             @classproperty
             def __tablename__(cls):
                 return cls.__name__.lower()
+
             id = Column(Integer, primary_key=True)
 
         class MyModel(Base, MyMixin):
@@ -188,10 +178,10 @@ class DeclarativeMixinTest(DeclarativeTestBase):
     def test_table_name_not_inherited(self):
 
         class MyMixin:
-
             @declared_attr
             def __tablename__(cls):
                 return cls.__name__.lower()
+
             id = Column(Integer, primary_key=True)
 
         class MyModel(Base, MyMixin):
@@ -202,13 +192,11 @@ class DeclarativeMixinTest(DeclarativeTestBase):
     def test_table_name_inheritance_order(self):
 
         class MyMixin1:
-
             @declared_attr
             def __tablename__(cls):
                 return cls.__name__.lower() + '1'
 
         class MyMixin2:
-
             @declared_attr
             def __tablename__(cls):
                 return cls.__name__.lower() + '2'
@@ -221,7 +209,6 @@ class DeclarativeMixinTest(DeclarativeTestBase):
     def test_table_name_dependent_on_subclass(self):
 
         class MyHistoryMixin:
-
             @declared_attr
             def __tablename__(cls):
                 return cls.parent_name + '_changelog'
@@ -246,7 +233,6 @@ class DeclarativeMixinTest(DeclarativeTestBase):
     def test_table_args_inherited_descriptor(self):
 
         class MyMixin:
-
             @declared_attr
             def __table_args__(cls):
                 return {'info': cls.__name__}
@@ -308,12 +294,12 @@ class DeclarativeMixinTest(DeclarativeTestBase):
         See [ticket:2472].
 
         """
+
         class Person(Base):
             __tablename__ = 'person'
             id = Column(Integer, primary_key=True)
 
         class Mixin(object):
-
             @declared_attr
             def target_id(cls):
                 return cls.__table__.c.get(
@@ -326,11 +312,9 @@ class DeclarativeMixinTest(DeclarativeTestBase):
                 return relationship("Other")
 
         class Engineer(Mixin, Person):
-
             """single table inheritance"""
 
         class Manager(Mixin, Person):
-
             """single table inheritance"""
 
         class Other(Base):
@@ -423,6 +407,7 @@ class DeclarativeMixinTest(DeclarativeTestBase):
                 id = Column(Integer, ForeignKey('test.id'), primary_key=True)
                 specific_id = Column(Integer, ForeignKey('sub.id'))
                 type_ = relationship("Specific")
+
         assert_raises_message(
             sa.exc.ArgumentError, "column 'foob' conflicts with property", go
         )
@@ -481,6 +466,7 @@ class DeclarativeMixinTest(DeclarativeTestBase):
 
         class Base(MyMixin):
             pass
+
         Base = declarative_base(cls=Base)
 
         class MyModel(Base):
@@ -544,7 +530,7 @@ class DeclarativeMixinTest(DeclarativeTestBase):
 
         configure_mappers()
         assert class_mapper(Person).polymorphic_on \
-            is Person.__table__.c.type
+               is Person.__table__.c.type
         eq_(class_mapper(Engineer).polymorphic_identity, 'Engineer')
 
     def test_mapper_args_declared_attr_two(self):
@@ -572,21 +558,18 @@ class DeclarativeMixinTest(DeclarativeTestBase):
 
         configure_mappers()
         assert class_mapper(Person).polymorphic_on \
-            is Person.__table__.c.type
+               is Person.__table__.c.type
         eq_(class_mapper(Engineer).polymorphic_identity, 'Engineer')
 
     def test_table_args_composite(self):
 
         class MyMixin1:
-
             __table_args__ = {'info': {'baz': 'bob'}}
 
         class MyMixin2:
-
             __table_args__ = {'info': {'foo': 'bar'}}
 
         class MyModel(Base, MyMixin1, MyMixin2):
-
             __tablename__ = 'test'
 
             @declared_attr
@@ -596,6 +579,7 @@ class DeclarativeMixinTest(DeclarativeTestBase):
                 info.update(MyMixin1.__table_args__['info'])
                 info.update(MyMixin2.__table_args__['info'])
                 return args
+
             id = Column(Integer, primary_key=True)
 
         eq_(MyModel.__table__.info, {'foo': 'bar', 'baz': 'bob'})
@@ -603,11 +587,9 @@ class DeclarativeMixinTest(DeclarativeTestBase):
     def test_mapper_args_inherited(self):
 
         class MyMixin:
-
             __mapper_args__ = {'always_refresh': True}
 
         class MyModel(Base, MyMixin):
-
             __tablename__ = 'test'
             id = Column(Integer, primary_key=True)
 
@@ -637,12 +619,10 @@ class DeclarativeMixinTest(DeclarativeTestBase):
     def test_mapper_args_polymorphic_on_inherited(self):
 
         class MyMixin:
-
             type_ = Column(String(50))
             __mapper_args__ = {'polymorphic_on': type_}
 
         class MyModel(Base, MyMixin):
-
             __tablename__ = 'test'
             id = Column(Integer, primary_key=True)
 
@@ -653,11 +633,9 @@ class DeclarativeMixinTest(DeclarativeTestBase):
     def test_mapper_args_overridden(self):
 
         class MyMixin:
-
             __mapper_args__ = dict(always_refresh=True)
 
         class MyModel(Base, MyMixin):
-
             __tablename__ = 'test'
             __mapper_args__ = dict(always_refresh=False)
             id = Column(Integer, primary_key=True)
@@ -667,16 +645,13 @@ class DeclarativeMixinTest(DeclarativeTestBase):
     def test_mapper_args_composite(self):
 
         class MyMixin1:
-
             type_ = Column(String(50))
             __mapper_args__ = {'polymorphic_on': type_}
 
         class MyMixin2:
-
             __mapper_args__ = {'always_refresh': True}
 
         class MyModel(Base, MyMixin1, MyMixin2):
-
             __tablename__ = 'test'
 
             @declared_attr
@@ -689,6 +664,7 @@ class DeclarativeMixinTest(DeclarativeTestBase):
                     args['polymorphic_identity'] = cls.__name__
 
                 return args
+
             id = Column(Integer, primary_key=True)
 
         class MySubModel(MyModel):
@@ -705,7 +681,6 @@ class DeclarativeMixinTest(DeclarativeTestBase):
 
     def test_mapper_args_property(self):
         class MyModel(Base):
-
             @declared_attr
             def __tablename__(cls):
                 return cls.__name__.lower()
@@ -719,6 +694,7 @@ class DeclarativeMixinTest(DeclarativeTestBase):
                 args = {}
                 args['polymorphic_identity'] = cls.__name__
                 return args
+
             id = Column(Integer, primary_key=True)
 
         class MySubModel(MyModel):
@@ -740,7 +716,6 @@ class DeclarativeMixinTest(DeclarativeTestBase):
         """test the @declared_attr approach from a custom base."""
 
         class Base(object):
-
             @declared_attr
             def __tablename__(cls):
                 return cls.__name__.lower()
@@ -770,44 +745,39 @@ class DeclarativeMixinTest(DeclarativeTestBase):
     def test_single_table_no_propagation(self):
 
         class IdColumn:
-
             id = Column(Integer, primary_key=True)
 
         class Generic(Base, IdColumn):
-
             __tablename__ = 'base'
             discriminator = Column('type', String(50))
             __mapper_args__ = dict(polymorphic_on=discriminator)
             value = Column(Integer())
 
         class Specific(Generic):
-
             __mapper_args__ = dict(polymorphic_identity='specific')
 
         assert Specific.__table__ is Generic.__table__
         eq_(list(Generic.__table__.c.keys()), ['id', 'type', 'value'])
         assert class_mapper(Specific).polymorphic_on \
-            is Generic.__table__.c.type
+               is Generic.__table__.c.type
         eq_(class_mapper(Specific).polymorphic_identity, 'specific')
 
     def test_joined_table_propagation(self):
 
         class CommonMixin:
-
             @declared_attr
             def __tablename__(cls):
                 return cls.__name__.lower()
+
             __table_args__ = {'mysql_engine': 'InnoDB'}
             timestamp = Column(Integer)
             id = Column(Integer, primary_key=True)
 
         class Generic(Base, CommonMixin):
-
             discriminator = Column('python_type', String(50))
             __mapper_args__ = dict(polymorphic_on=discriminator)
 
         class Specific(Generic):
-
             __mapper_args__ = dict(polymorphic_identity='specific')
             id = Column(Integer, ForeignKey('generic.id'),
                         primary_key=True)
@@ -823,27 +793,24 @@ class DeclarativeMixinTest(DeclarativeTestBase):
     def test_some_propagation(self):
 
         class CommonMixin:
-
             @declared_attr
             def __tablename__(cls):
                 return cls.__name__.lower()
+
             __table_args__ = {'mysql_engine': 'InnoDB'}
             timestamp = Column(Integer)
 
         class BaseType(Base, CommonMixin):
-
             discriminator = Column('type', String(50))
             __mapper_args__ = dict(polymorphic_on=discriminator)
             id = Column(Integer, primary_key=True)
             value = Column(Integer())
 
         class Single(BaseType):
-
             __tablename__ = None
             __mapper_args__ = dict(polymorphic_identity='type1')
 
         class Joined(BaseType):
-
             __mapper_args__ = dict(polymorphic_identity='type2')
             id = Column(Integer, ForeignKey('basetype.id'),
                         primary_key=True)
@@ -920,7 +887,6 @@ class DeclarativeMixinTest(DeclarativeTestBase):
     def test_non_propagating_mixin(self):
 
         class NoJoinedTableNameMixin:
-
             @declared_attr
             def __tablename__(cls):
                 if decl.has_inherited_table(cls):
@@ -928,43 +894,38 @@ class DeclarativeMixinTest(DeclarativeTestBase):
                 return cls.__name__.lower()
 
         class BaseType(Base, NoJoinedTableNameMixin):
-
             discriminator = Column('type', String(50))
             __mapper_args__ = dict(polymorphic_on=discriminator)
             id = Column(Integer, primary_key=True)
             value = Column(Integer())
 
         class Specific(BaseType):
-
             __mapper_args__ = dict(polymorphic_identity='specific')
 
         eq_(BaseType.__table__.name, 'basetype')
         eq_(list(BaseType.__table__.c.keys()), ['type', 'id', 'value'])
         assert Specific.__table__ is BaseType.__table__
         assert class_mapper(Specific).polymorphic_on \
-            is BaseType.__table__.c.type
+               is BaseType.__table__.c.type
         eq_(class_mapper(Specific).polymorphic_identity, 'specific')
 
     def test_non_propagating_mixin_used_for_joined(self):
 
         class TableNameMixin:
-
             @declared_attr
             def __tablename__(cls):
                 if decl.has_inherited_table(cls) and TableNameMixin \
-                        not in cls.__bases__:
+                    not in cls.__bases__:
                     return None
                 return cls.__name__.lower()
 
         class BaseType(Base, TableNameMixin):
-
             discriminator = Column('type', String(50))
             __mapper_args__ = dict(polymorphic_on=discriminator)
             id = Column(Integer, primary_key=True)
             value = Column(Integer())
 
         class Specific(BaseType, TableNameMixin):
-
             __mapper_args__ = dict(polymorphic_identity='specific')
             id = Column(Integer, ForeignKey('basetype.id'),
                         primary_key=True)
@@ -977,18 +938,15 @@ class DeclarativeMixinTest(DeclarativeTestBase):
     def test_single_back_propagate(self):
 
         class ColumnMixin:
-
             timestamp = Column(Integer)
 
         class BaseType(Base):
-
             __tablename__ = 'foo'
             discriminator = Column('type', String(50))
             __mapper_args__ = dict(polymorphic_on=discriminator)
             id = Column(Integer, primary_key=True)
 
         class Specific(BaseType, ColumnMixin):
-
             __mapper_args__ = dict(polymorphic_identity='specific')
 
         eq_(list(BaseType.__table__.c.keys()), ['type', 'id', 'timestamp'])
@@ -996,11 +954,9 @@ class DeclarativeMixinTest(DeclarativeTestBase):
     def test_table_in_model_and_same_column_in_mixin(self):
 
         class ColumnMixin:
-
             data = Column(Integer)
 
         class Model(Base, ColumnMixin):
-
             __table__ = Table('foo', Base.metadata,
                               Column('data', Integer),
                               Column('id', Integer, primary_key=True))
@@ -1017,9 +973,7 @@ class DeclarativeMixinTest(DeclarativeTestBase):
             tada = Column(Integer)
 
         def go():
-
             class Model(Base, ColumnMixin):
-
                 __table__ = Table('foo', Base.metadata,
                                   Column('data', Integer),
                                   Column('id', Integer, primary_key=True))
@@ -1039,9 +993,7 @@ class DeclarativeMixinTest(DeclarativeTestBase):
             tada = Column('foobar', Integer)
 
         def go():
-
             class Model(Base, ColumnMixin):
-
                 __table__ = Table('foo', Base.metadata,
                                   Column('data', Integer),
                                   Column('tada', Integer),
@@ -1055,11 +1007,9 @@ class DeclarativeMixinTest(DeclarativeTestBase):
     def test_table_in_model_overrides_different_typed_column_in_mixin(self):
 
         class ColumnMixin:
-
             data = Column(String)
 
         class Model(Base, ColumnMixin):
-
             __table__ = Table('foo', Base.metadata,
                               Column('data', Integer),
                               Column('id', Integer, primary_key=True))
@@ -1073,17 +1023,14 @@ class DeclarativeMixinTest(DeclarativeTestBase):
     def test_mixin_column_ordering(self):
 
         class Foo(object):
-
             col1 = Column(Integer)
             col3 = Column(Integer)
 
         class Bar(object):
-
             col2 = Column(Integer)
             col4 = Column(Integer)
 
         class Model(Base, Foo, Bar):
-
             id = Column(Integer, primary_key=True)
             __tablename__ = 'model'
 
@@ -1092,7 +1039,6 @@ class DeclarativeMixinTest(DeclarativeTestBase):
 
     def test_honor_class_mro_one(self):
         class HasXMixin(object):
-
             @declared_attr
             def x(self):
                 return Column(Integer)
@@ -1109,7 +1055,6 @@ class DeclarativeMixinTest(DeclarativeTestBase):
 
     def test_honor_class_mro_two(self):
         class HasXMixin(object):
-
             @declared_attr
             def x(self):
                 return Column(Integer)
@@ -1129,7 +1074,6 @@ class DeclarativeMixinTest(DeclarativeTestBase):
 
     def test_arbitrary_attrs_one(self):
         class HasMixin(object):
-
             @declared_attr
             def some_attr(cls):
                 return cls.__name__ + "SOME ATTR"
@@ -1165,7 +1109,6 @@ class DeclarativeMixinTest(DeclarativeTestBase):
                 self.filter = filter_
 
         class FilterMixin(object):
-
             @declared_attr
             def _filters(cls):
                 return relationship(cls.filter_class,
@@ -1190,23 +1133,19 @@ class DeclarativeMixinTest(DeclarativeTestBase):
 
 
 class DeclarativeMixinPropertyTest(DeclarativeTestBase):
-
     def test_column_property(self):
 
         class MyMixin(object):
-
             @declared_attr
             def prop_hoho(cls):
                 return column_property(Column('prop', String(50)))
 
         class MyModel(Base, MyMixin):
-
             __tablename__ = 'test'
             id = Column(Integer, primary_key=True,
                         test_needs_autoincrement=True)
 
         class MyOtherModel(Base, MyMixin):
-
             __tablename__ = 'othertest'
             id = Column(Integer, primary_key=True,
                         test_needs_autoincrement=True)
@@ -1214,13 +1153,13 @@ class DeclarativeMixinPropertyTest(DeclarativeTestBase):
         assert MyModel.__table__.c.prop is not None
         assert MyOtherModel.__table__.c.prop is not None
         assert MyModel.__table__.c.prop \
-            is not MyOtherModel.__table__.c.prop
+               is not MyOtherModel.__table__.c.prop
         assert MyModel.prop_hoho.property.columns \
-            == [MyModel.__table__.c.prop]
+               == [MyModel.__table__.c.prop]
         assert MyOtherModel.prop_hoho.property.columns \
-            == [MyOtherModel.__table__.c.prop]
+               == [MyOtherModel.__table__.c.prop]
         assert MyModel.prop_hoho.property \
-            is not MyOtherModel.prop_hoho.property
+               is not MyOtherModel.prop_hoho.property
         Base.metadata.create_all()
         sess = create_session()
         m1, m2 = MyModel(prop_hoho='foo'), MyOtherModel(prop_hoho='bar')
@@ -1240,7 +1179,6 @@ class DeclarativeMixinPropertyTest(DeclarativeTestBase):
         """
 
         class MyMixin(object):
-
             @declared_attr
             def type_(cls):
                 """this is a document."""
@@ -1254,7 +1192,6 @@ class DeclarativeMixinPropertyTest(DeclarativeTestBase):
                 return column_property(Column(String(50)))
 
         class MyModel(Base, MyMixin):
-
             __tablename__ = 'test'
             id = Column(Integer, primary_key=True)
 
@@ -1265,14 +1202,13 @@ class DeclarativeMixinPropertyTest(DeclarativeTestBase):
     def test_column_in_mapper_args(self):
 
         class MyMixin(object):
-
             @declared_attr
             def type_(cls):
                 return Column(String(50))
+
             __mapper_args__ = {'polymorphic_on': type_}
 
         class MyModel(Base, MyMixin):
-
             __tablename__ = 'test'
             id = Column(Integer, primary_key=True)
 
@@ -1284,17 +1220,14 @@ class DeclarativeMixinPropertyTest(DeclarativeTestBase):
     def test_column_in_mapper_args_used_multiple_times(self):
 
         class MyMixin(object):
-
             version_id = Column(Integer)
             __mapper_args__ = {'version_id_col': version_id}
 
         class ModelOne(Base, MyMixin):
-
             __tablename__ = 'm1'
             id = Column(Integer, primary_key=True)
 
         class ModelTwo(Base, MyMixin):
-
             __tablename__ = 'm2'
             id = Column(Integer, primary_key=True)
 
@@ -1310,13 +1243,11 @@ class DeclarativeMixinPropertyTest(DeclarativeTestBase):
     def test_deferred(self):
 
         class MyMixin(object):
-
             @declared_attr
             def data(cls):
                 return deferred(Column('data', String(50)))
 
         class MyModel(Base, MyMixin):
-
             __tablename__ = 'test'
             id = Column(Integer, primary_key=True,
                         test_needs_autoincrement=True)
@@ -1338,12 +1269,14 @@ class DeclarativeMixinPropertyTest(DeclarativeTestBase):
             @declared_attr
             def target_id(cls):
                 return Column('target_id', ForeignKey('target.id'))
+
             if usestring:
 
                 @declared_attr
                 def target(cls):
                     return relationship('Target',
-                                        primaryjoin='Target.id=={0!s}.target_id'.format(cls.__name__))
+                                        primaryjoin='Target.id=={0!s}.target_id'.format(
+                                            cls.__name__))
             else:
 
                 @declared_attr
@@ -1634,8 +1567,8 @@ class DeclaredAttrTest(DeclarativeTestBase, testing.AssertsCompiledSQL):
                 counter(cls.id)
                 return column_property(
                     select([func.count(Address.id)]).
-                    where(Address.user_id == cls.id).
-                    as_scalar()
+                        where(Address.user_id == cls.id).
+                        as_scalar()
                 )
 
         class Address(Base):
@@ -1664,9 +1597,7 @@ class DeclaredAttrTest(DeclarativeTestBase, testing.AssertsCompiledSQL):
 
 
 class AbstractTest(DeclarativeTestBase):
-
     def test_abstract_boolean(self):
-
         class A(Base):
             __abstract__ = True
             __tablename__ = 'x'

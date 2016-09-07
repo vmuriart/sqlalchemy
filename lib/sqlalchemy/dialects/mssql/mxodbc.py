@@ -42,7 +42,6 @@ of ``False`` will unconditionally use string-escaped parameters.
 
 """
 
-
 from ... import types as sqltypes
 from ...connectors.mxodbc import MxODBCConnector
 from .pyodbc import MSExecutionContext_pyodbc, _MSNumeric_pyodbc
@@ -61,9 +60,11 @@ class _MSDate_mxodbc(_MSDate):
     def bind_processor(self, dialect):
         def process(value):
             if value is not None:
-                return "{0!s}-{1!s}-{2!s}".format(value.year, value.month, value.day)
+                return "{0!s}-{1!s}-{2!s}".format(value.year, value.month,
+                                                  value.day)
             else:
                 return None
+
         return process
 
 
@@ -71,14 +72,15 @@ class _MSTime_mxodbc(_MSTime):
     def bind_processor(self, dialect):
         def process(value):
             if value is not None:
-                return "{0!s}:{1!s}:{2!s}".format(value.hour, value.minute, value.second)
+                return "{0!s}:{1!s}:{2!s}".format(value.hour, value.minute,
+                                                  value.second)
             else:
                 return None
+
         return process
 
 
 class _VARBINARY_mxodbc(VARBINARY):
-
     """
     mxODBC Support for VARBINARY column types.
 
@@ -98,6 +100,7 @@ class _VARBINARY_mxodbc(VARBINARY):
             else:
                 # should pull from mx.ODBC.Manager.BinaryNull
                 return dialect.dbapi.BinaryNull
+
         return process
 
 
@@ -113,7 +116,6 @@ class MSExecutionContext_mxodbc(MSExecutionContext_pyodbc):
 
 
 class MSDialect_mxodbc(MxODBCConnector, MSDialect):
-
     # this is only needed if "native ODBC" mode is used,
     # which is now disabled by default.
     # statement_compiler = MSSQLStrictCompiler
@@ -135,5 +137,6 @@ class MSDialect_mxodbc(MxODBCConnector, MSDialect):
     def __init__(self, description_encoding=None, **params):
         super(MSDialect_mxodbc, self).__init__(**params)
         self.description_encoding = description_encoding
+
 
 dialect = MSDialect_mxodbc

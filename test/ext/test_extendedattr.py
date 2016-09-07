@@ -32,7 +32,6 @@ class _ExtBase(object):
 
 
 class MyTypesManager(instrumentation.InstrumentationManager):
-
     def instrument_attribute(self, class_, key, attr):
         pass
 
@@ -68,6 +67,7 @@ class MyListLike(list):
         if _sa_initiator is not False:
             self._sa_adapter.fire_append_event(item, _sa_initiator)
         list.append(self, item)
+
     append = _sa_appender
 
     def _sa_remover(self, item, _sa_initiator=None):
@@ -75,6 +75,7 @@ class MyListLike(list):
         if _sa_initiator is not False:
             self._sa_adapter.fire_remove_event(item, _sa_initiator)
         list.remove(self, item)
+
     remove = _sa_remover
 
 
@@ -82,7 +83,6 @@ MyBaseClass, MyClass = None, None
 
 
 class UserDefinedExtensionTest(_ExtBase, fixtures.ORMTest):
-
     @classmethod
     def setup_class(cls):
         global MyBaseClass, MyClass
@@ -103,7 +103,7 @@ class UserDefinedExtensionTest(_ExtBase, fixtures.ORMTest):
 
             # This proves SA can handle a class with non-string dict keys
             if not util.pypy and not util.jython:
-                locals()[42] = 99   # Don't remove this line!
+                locals()[42] = 99  # Don't remove this line!
 
             def __init__(self, **kwargs):
                 for k in kwargs:
@@ -218,10 +218,10 @@ class UserDefinedExtensionTest(_ExtBase, fixtures.ORMTest):
 
             if base is object:
                 assert Foo not in \
-                    instrumentation._instrumentation_factory._state_finders
+                       instrumentation._instrumentation_factory._state_finders
             else:
                 assert Foo in \
-                    instrumentation._instrumentation_factory._state_finders
+                       instrumentation._instrumentation_factory._state_finders
 
             f = Foo()
             attributes.instance_state(f)._expire(
@@ -276,6 +276,7 @@ class UserDefinedExtensionTest(_ExtBase, fixtures.ORMTest):
 
             def func3(state, passive):
                 return "this is the shared attr"
+
             attributes.register_attribute(Foo, 'element',
                                           uselist=False, callable_=func1,
                                           useobject=True)
@@ -402,6 +403,7 @@ class UserDefinedExtensionTest(_ExtBase, fixtures.ORMTest):
     def test_null_instrumentation(self):
         class Foo(MyBaseClass):
             pass
+
         register_class(Foo)
         attributes.register_attribute(
             Foo, "name", uselist=False, useobject=False)
@@ -457,7 +459,6 @@ class UserDefinedExtensionTest(_ExtBase, fixtures.ORMTest):
 
 
 class FinderTest(_ExtBase, fixtures.ORMTest):
-
     def test_standard(self):
         class A(object):
             pass
@@ -520,25 +521,28 @@ class FinderTest(_ExtBase, fixtures.ORMTest):
 
 
 class InstrumentationCollisionTest(_ExtBase, fixtures.ORMTest):
-
     def test_none(self):
         class A(object):
             pass
+
         register_class(A)
 
         mgr_factory = lambda cls: instrumentation.ClassManager(cls)
 
         class B(object):
             __sa_instrumentation_manager__ = staticmethod(mgr_factory)
+
         register_class(B)
 
         class C(object):
             __sa_instrumentation_manager__ = instrumentation.ClassManager
+
         register_class(C)
 
     def test_single_down(self):
         class A(object):
             pass
+
         register_class(A)
 
         mgr_factory = lambda cls: instrumentation.ClassManager(cls)
@@ -551,15 +555,16 @@ class InstrumentationCollisionTest(_ExtBase, fixtures.ORMTest):
             register_class, B)
 
     def test_single_up(self):
-
         class A(object):
             pass
+
         # delay registration
 
         mgr_factory = lambda cls: instrumentation.ClassManager(cls)
 
         class B(A):
             __sa_instrumentation_manager__ = staticmethod(mgr_factory)
+
         register_class(B)
 
         assert_raises_message(
@@ -628,7 +633,6 @@ class InstrumentationCollisionTest(_ExtBase, fixtures.ORMTest):
 
 
 class ExtendedEventsTest(_ExtBase, fixtures.ORMTest):
-
     """Allow custom Events implementations."""
 
     @modifies_instrumentation_finders

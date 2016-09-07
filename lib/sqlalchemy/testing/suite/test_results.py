@@ -44,7 +44,7 @@ class RowFetchTest(fixtures.TablesTest):
     def test_via_string(self):
         row = config.db.execute(
             self.tables.plain_pk.select().
-            order_by(self.tables.plain_pk.c.id)
+                order_by(self.tables.plain_pk.c.id)
         ).first()
 
         eq_(
@@ -57,7 +57,7 @@ class RowFetchTest(fixtures.TablesTest):
     def test_via_int(self):
         row = config.db.execute(
             self.tables.plain_pk.select().
-            order_by(self.tables.plain_pk.c.id)
+                order_by(self.tables.plain_pk.c.id)
         ).first()
 
         eq_(
@@ -70,7 +70,7 @@ class RowFetchTest(fixtures.TablesTest):
     def test_via_col_object(self):
         row = config.db.execute(
             self.tables.plain_pk.select().
-            order_by(self.tables.plain_pk.c.id)
+                order_by(self.tables.plain_pk.c.id)
         ).first()
 
         eq_(
@@ -85,7 +85,7 @@ class RowFetchTest(fixtures.TablesTest):
         result = config.db.execute(
             select([self.tables.plain_pk.c.data,
                     self.tables.plain_pk.c.data.label('data')]).
-            order_by(self.tables.plain_pk.c.id)
+                order_by(self.tables.plain_pk.c.id)
         )
         row = result.first()
         eq_(result.keys(), ['data', 'data'])
@@ -116,7 +116,7 @@ class PercentSchemaNamesTest(fixtures.TablesTest):
 
     """
 
-    __requires__ = ('percent_schema_names', )
+    __requires__ = ('percent_schema_names',)
 
     __backend__ = True
 
@@ -162,10 +162,10 @@ class PercentSchemaNamesTest(fixtures.TablesTest):
         lightweight_percent_table = self.tables.lightweight_percent_table
 
         for table in (
-                percent_table,
-                percent_table.alias(),
-                lightweight_percent_table,
-                lightweight_percent_table.alias()):
+            percent_table,
+            percent_table.alias(),
+            lightweight_percent_table,
+            lightweight_percent_table.alias()):
             eq_(
                 list(
                     config.db.execute(
@@ -184,8 +184,9 @@ class PercentSchemaNamesTest(fixtures.TablesTest):
                 list(
                     config.db.execute(
                         table.select().
-                        where(table.c['spaces % more spaces'].in_([9, 10])).
-                        order_by(table.c['percent%']),
+                            where(
+                            table.c['spaces % more spaces'].in_([9, 10])).
+                            order_by(table.c['percent%']),
                     )
                 ),
                 [
@@ -212,8 +213,8 @@ class PercentSchemaNamesTest(fixtures.TablesTest):
             list(
                 config.db.execute(
                     percent_table.
-                    select().
-                    order_by(percent_table.c['percent%'])
+                        select().
+                        order_by(percent_table.c['percent%'])
                 )
             ),
             [(5, 15), (7, 15), (9, 15), (11, 15)]

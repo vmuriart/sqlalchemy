@@ -87,12 +87,12 @@ class DialectImportTest(fixtures.TestBase):
         # the globals() somehow makes it for the exec() + nose3.
 
         for name in (
-                'mysql',
-                'firebird',
-                'postgresql',
-                'sqlite',
-                'oracle',
-                'mssql'):
+            'mysql',
+            'firebird',
+            'postgresql',
+            'sqlite',
+            'oracle',
+            'mssql'):
             exec ('from sqlalchemy.dialects import %s\ndialect = '
                   '%s.dialect()' % (name, name), globals())
             eq_(dialect.name, name)
@@ -127,15 +127,15 @@ class CreateEngineTest(fixtures.TestBase):
 
         config = {
             'sqlalchemy.url': 'postgresql://scott:tiger@somehost/test'
-            '?fooz=somevalue',
+                              '?fooz=somevalue',
             'sqlalchemy.pool_recycle': '50',
             'sqlalchemy.echo': 'true'}
 
         e = engine_from_config(config, module=dbapi, _initialize=False)
         assert e.pool._recycle == 50
         assert e.url \
-            == url.make_url('postgresql://scott:tiger@somehost/test?foo'
-                            'z=somevalue')
+               == url.make_url('postgresql://scott:tiger@somehost/test?foo'
+                               'z=somevalue')
         assert e.echo is True
 
     def test_pool_threadlocal_from_config(self):
@@ -436,6 +436,7 @@ def MockDBAPI(**assert_kwargs):
         paramstyle='named',
         connect=Mock(side_effect=connect)
     )
+
 
 mock_dbapi = MockDBAPI()
 mock_sqlite_dbapi = msd = MockDBAPI()

@@ -21,7 +21,6 @@ class CompareClausesTest(fixtures.TestBase):
         )
 
     def test_compare_clauselist_associative(self):
-
         l1 = and_(
             self.a.c.x == self.b.c.y,
             self.a.c.y == self.b.c.z
@@ -42,7 +41,6 @@ class CompareClausesTest(fixtures.TestBase):
         is_false(l1.compare(l3))
 
     def test_compare_clauselist_not_associative(self):
-
         l1 = ClauseList(
             self.a.c.x, self.a.c.y, self.b.c.y, operator=operators.sub)
 
@@ -53,7 +51,6 @@ class CompareClausesTest(fixtures.TestBase):
         is_false(l1.compare(l2))
 
     def test_compare_clauselist_assoc_different_operator(self):
-
         l1 = and_(
             self.a.c.x == self.b.c.y,
             self.a.c.y == self.b.c.z
@@ -67,7 +64,6 @@ class CompareClausesTest(fixtures.TestBase):
         is_false(l1.compare(l2))
 
     def test_compare_clauselist_not_assoc_different_operator(self):
-
         l1 = ClauseList(
             self.a.c.x, self.a.c.y, self.b.c.y, operator=operators.sub)
 
@@ -75,4 +71,3 @@ class CompareClausesTest(fixtures.TestBase):
             self.a.c.x, self.a.c.y, self.b.c.y, operator=operators.div)
 
         is_false(l1.compare(l2))
-

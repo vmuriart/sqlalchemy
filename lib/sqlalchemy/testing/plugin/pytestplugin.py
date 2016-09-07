@@ -13,6 +13,7 @@ import os
 
 try:
     import xdist  # noqa
+
     has_xdist = True
 except ImportError:
     has_xdist = False
@@ -28,6 +29,7 @@ def pytest_addoption(parser):
                 def __call__(self, parser, namespace,
                              values, option_string=None):
                     callback_(option_string, values, parser)
+
             kw["action"] = CallableAction
 
         group.addoption(name, **kw)
@@ -48,7 +50,7 @@ def pytest_configure(config):
                 file_.write(config.slaveinput["follower_ident"] + "\n")
     else:
         if config.option.write_idents and \
-                os.path.exists(config.option.write_idents):
+            os.path.exists(config.option.write_idents):
             os.remove(config.option.write_idents)
 
     plugin_base.pre_begin(config.option)
@@ -70,15 +72,18 @@ def pytest_sessionfinish(session):
 if has_xdist:
     import uuid
 
+
     def pytest_configure_node(node):
         # the master for each node fills slaveinput dictionary
         # which pytest-xdist will transfer to the subprocess
 
         plugin_base.memoize_important_follower_config(node.slaveinput)
 
-        node.slaveinput["follower_ident"] = "test_{0!s}".format(uuid.uuid4().hex[0:12])
+        node.slaveinput["follower_ident"] = "test_{0!s}".format(
+            uuid.uuid4().hex[0:12])
         from sqlalchemy.testing import provision
         provision.create_follower_db(node.slaveinput["follower_ident"])
+
 
     def pytest_testnodedown(node, error):
         from sqlalchemy.testing import provision
@@ -104,13 +109,13 @@ def pytest_collection_modifyitems(session, config, items):
     test_classes = set(item.parent for item in items)
     for test_class in test_classes:
         for sub_cls in plugin_base.generate_sub_tests(
-                test_class.cls, test_class.parent.module):
+            test_class.cls, test_class.parent.module):
             if sub_cls is not test_class.cls:
                 list_ = rebuilt_items[test_class.cls]
 
                 for inst in pytest.Class(
-                        sub_cls.__name__,
-                        parent=test_class.parent.parent).collect():
+                    sub_cls.__name__,
+                    parent=test_class.parent.parent).collect():
                     list_.extend(inst.collect())
 
     newitems = []
@@ -134,11 +139,12 @@ def pytest_pycollect_makeitem(collector, name, obj):
     if inspect.isclass(obj) and plugin_base.want_class(obj):
         return pytest.Class(name, parent=collector)
     elif inspect.isfunction(obj) and \
-            isinstance(collector, pytest.Instance) and \
-            plugin_base.want_method(collector.cls, obj):
+        isinstance(collector, pytest.Instance) and \
+        plugin_base.want_method(collector.cls, obj):
         return pytest.Function(name, parent=collector)
     else:
         return []
+
 
 _current_class = None
 
@@ -164,6 +170,7 @@ def pytest_runtest_setup(item):
             global _current_class
             class_teardown(item.parent.parent)
             _current_class = None
+
         item.parent.parent.addfinalizer(finalize)
 
     test_setup(item)

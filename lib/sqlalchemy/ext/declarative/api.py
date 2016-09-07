@@ -6,10 +6,9 @@
 # the MIT License: http://www.opensource.org/licenses/mit-license.php
 """Public API functions and helpers for declarative."""
 
-
 from ...schema import Table, MetaData, Column
 from ...orm import synonym as _orm_synonym, \
-    comparable_property,\
+    comparable_property, \
     interfaces, properties, attributes
 from ...orm.util import polymorphic_union
 from ...orm.base import _mapper_or_none
@@ -19,7 +18,7 @@ from ... import exc
 import weakref
 
 from .base import _as_declarative, \
-    _declarative_constructor,\
+    _declarative_constructor, \
     _DeferredMapperConfig, _add_attribute
 from .clsregistry import _class_resolver
 
@@ -77,8 +76,10 @@ def synonym_for(name, map_column=False):
       prop = synonym('col', descriptor=property(_read_prop, _write_prop))
 
     """
+
     def decorate(fn):
         return _orm_synonym(name, map_column=map_column, descriptor=fn)
+
     return decorate
 
 
@@ -100,8 +101,10 @@ def comparable_using(comparator_factory):
       prop = comparable_property(MyComparatorType)
 
     """
+
     def decorate(fn):
         return comparable_property(comparator_factory, fn)
+
     return decorate
 
 
@@ -361,6 +364,7 @@ def as_declarative(**kw):
         :func:`.declarative_base`
 
     """
+
     def decorate(cls):
         kw['cls'] = cls
         kw['name'] = cls.__name__
@@ -566,6 +570,7 @@ class AbstractConcreteBase(ConcreteBase):
             args = m_args()
             args['polymorphic_on'] = pjoin.c.type
             return args
+
         to_map.mapper_args_fn = mapper_args
 
         m = to_map.map()
@@ -644,6 +649,7 @@ class DeferredReflection(object):
     .. versionadded:: 0.8
 
     """
+
     @classmethod
     def prepare(cls, engine):
         """Reflect all :class:`.Table` objects for all current
@@ -671,6 +677,7 @@ class DeferredReflection(object):
             t1 = Table(key, metadata)
             cls._reflect_table(t1, engine)
             return t1
+
         return _resolve
 
     @classmethod

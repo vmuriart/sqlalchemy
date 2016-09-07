@@ -10,7 +10,6 @@ from __future__ import with_statement
 
 """
 
-
 import sys
 from .. import exc, util, log, interfaces
 from ..sql import util as sql_util
@@ -323,7 +322,7 @@ class Connection(Connectable):
         """Return True if this connection is closed."""
 
         return '_Connection__connection' not in self.__dict__ \
-            and not self.__can_reconnect
+               and not self.__can_reconnect
 
     @property
     def invalidated(self):
@@ -1124,8 +1123,8 @@ class Connection(Connectable):
             context.pre_exec()
 
         cursor, statement, parameters = context.cursor, \
-            context.statement, \
-            context.parameters
+                                        context.statement, \
+                                        context.parameters
 
         if not context.executemany:
             parameters = parameters[0]
@@ -1236,7 +1235,7 @@ class Connection(Connectable):
             self.engine.logger.info("%r", parameters)
         try:
             for fn in () if not self.dialect._has_events \
-                    else self.dialect.dispatch.do_execute:
+                else self.dialect.dispatch.do_execute:
                 if fn(cursor, statement, parameters, context):
                     break
             else:
@@ -1287,7 +1286,7 @@ class Connection(Connectable):
             context.exception = e
 
         if not self._is_disconnect:
-            self._is_disconnect =  \
+            self._is_disconnect = \
                 isinstance(e, self.dialect.dbapi.Error) and \
                 not self.closed and \
                 self.dialect.is_disconnect(
@@ -1313,7 +1312,7 @@ class Connection(Connectable):
             # non-DBAPI error - if we already got a context,
             # or there's no string statement, don't wrap it
             should_wrap = isinstance(e, self.dialect.dbapi.Error) or \
-                (statement is not None and context is None)
+                          (statement is not None and context is None)
 
             if should_wrap:
                 sqlalchemy_exception = exc.DBAPIError.instance(
@@ -2185,7 +2184,7 @@ class OptionEngine(Engine):
 
     def _get_has_events(self):
         return self._proxied._has_events or \
-            self.__dict__.get('_has_events', False)
+               self.__dict__.get('_has_events', False)
 
     def _set_has_events(self, value):
         self.__dict__['_has_events'] = value

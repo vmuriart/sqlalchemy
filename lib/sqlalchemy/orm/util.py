@@ -41,8 +41,9 @@ class CascadeOptions(frozenset):
         if values.difference(cls._allowed_cascades):
             raise sa_exc.ArgumentError(
                 "Invalid cascade option(s): {0!s}".format(
-                ", ".join([repr(x) for x in
-                           sorted(values.difference(cls._allowed_cascades))])))
+                    ", ".join([repr(x) for x in
+                               sorted(values.difference(
+                                   cls._allowed_cascades))])))
 
         if "all" in values:
             values.update(cls._add_w_all_cascades)
@@ -74,12 +75,12 @@ class CascadeOptions(frozenset):
             c for c
             in re.split('\s*,\s*', arg or "")
             if c
-        ]
+            ]
         return cls(values)
 
 
 def _validator_events(
-        desc, key, validator, include_removes, include_backrefs):
+    desc, key, validator, include_removes, include_backrefs):
     """Runs a validation method on an attribute value to be set or
     appended.
     """
@@ -181,7 +182,7 @@ def polymorphic_union(table_map, typecolname,
                 sql.select([col(name, table) for name in colnames] +
                            [sql.literal_column(
                                sql_util._quote_ddl_expr(type)).
-                               label(typecolname)],
+                           label(typecolname)],
                            from_obj=[table]))
         else:
             result.append(sql.select([col(name, table) for name in colnames],
@@ -262,14 +263,16 @@ first()
                 "expected up to three positional arguments, "
                 "got %s" % len(args))
         if kwargs:
-            raise sa_exc.ArgumentError("unknown keyword arguments: {0!s}".format(", ".join(kwargs)))
+            raise sa_exc.ArgumentError(
+                "unknown keyword arguments: {0!s}".format(", ".join(kwargs)))
         mapper = class_mapper(class_)
         if "ident" in locals():
             return mapper.identity_key_from_primary_key(util.to_list(ident))
         return mapper.identity_key_from_row(row)
     instance = kwargs.pop("instance")
     if kwargs:
-        raise sa_exc.ArgumentError("unknown keyword arguments: {0!s}".format(", ".join(kwargs.keys)))
+        raise sa_exc.ArgumentError(
+            "unknown keyword arguments: {0!s}".format(", ".join(kwargs.keys)))
     mapper = object_mapper(instance)
     return mapper.identity_key_from_instance(instance)
 
@@ -526,10 +529,10 @@ class AliasedInsp(InspectionAttr):
         )
 
     def _adapt_element(self, elem):
-        return self._adapter.traverse(elem).\
+        return self._adapter.traverse(elem). \
             _annotate({
-                'parententity': self,
-                'parentmapper': self.mapper}
+            'parententity': self,
+            'parentmapper': self.mapper}
         )
 
     def _entity_for_mapper(self, mapper):
@@ -727,13 +730,13 @@ def with_polymorphic(base, classes, selectable=False,
         assert _existing_alias.mapper is primary_mapper
         classes = util.to_set(classes)
         new_classes = set([
-            mp.class_ for mp in
-            _existing_alias.with_polymorphic_mappers])
+                              mp.class_ for mp in
+                              _existing_alias.with_polymorphic_mappers])
         if classes == new_classes:
             return _existing_alias
         else:
             classes = classes.union(new_classes)
-    mappers, selectable = primary_mapper.\
+    mappers, selectable = primary_mapper. \
         _with_polymorphic_args(classes, selectable,
                                innerjoin=innerjoin)
     if aliased or flat:
@@ -779,9 +782,9 @@ class _ORMJoin(expression.Join):
     __visit_name__ = expression.Join.__visit_name__
 
     def __init__(
-            self,
-            left, right, onclause=None, isouter=False,
-            full=False, _left_memo=None, _right_memo=None):
+        self,
+        left, right, onclause=None, isouter=False,
+        full=False, _left_memo=None, _right_memo=None):
 
         left_info = inspection.inspect(left)
         left_orm_info = getattr(left, '_joined_from_info', left_info)
@@ -808,18 +811,18 @@ class _ORMJoin(expression.Join):
 
         if prop:
             if sql_util.clause_is_present(
-                    on_selectable, left_info.selectable):
+                on_selectable, left_info.selectable):
                 adapt_from = on_selectable
             else:
                 adapt_from = left_info.selectable
 
             pj, sj, source, dest, \
-                secondary, target_adapter = prop._create_joins(
-                    source_selectable=adapt_from,
-                    dest_selectable=adapt_to,
-                    source_polymorphic=True,
-                    dest_polymorphic=True,
-                    of_type=right_info.mapper)
+            secondary, target_adapter = prop._create_joins(
+                source_selectable=adapt_from,
+                dest_selectable=adapt_to,
+                source_polymorphic=True,
+                dest_polymorphic=True,
+                of_type=right_info.mapper)
 
             if sj is not None:
                 if isouter:
@@ -836,7 +839,7 @@ class _ORMJoin(expression.Join):
         expression.Join.__init__(self, left, right, onclause, isouter, full)
 
         if not prop and getattr(right_info, 'mapper', None) \
-                and right_info.mapper.single:
+            and right_info.mapper.single:
             # if single inheritance target and we are using a manual
             # or implicit ON clause, augment it the same way we'd augment the
             # WHERE.
@@ -873,19 +876,19 @@ class _ORMJoin(expression.Join):
         )
 
     def join(
-            self, right, onclause=None,
-            isouter=False, full=False, join_to_left=None):
+        self, right, onclause=None,
+        isouter=False, full=False, join_to_left=None):
         return _ORMJoin(self, right, onclause, full, isouter)
 
     def outerjoin(
-            self, right, onclause=None,
-            full=False, join_to_left=None):
+        self, right, onclause=None,
+        full=False, join_to_left=None):
         return _ORMJoin(self, right, onclause, True, full=full)
 
 
 def join(
-        left, right, onclause=None, isouter=False,
-        full=False, join_to_left=None):
+    left, right, onclause=None, isouter=False,
+    full=False, join_to_left=None):
     """Produce an inner join between left and right clauses.
 
     :func:`.orm.join` is an extension to the core join interface

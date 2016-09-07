@@ -8,7 +8,6 @@
 """Define result set constructs including :class:`.ResultProxy`
 and :class:`.RowProxy."""
 
-
 from .. import exc, util
 from ..sql import expression, sqltypes, util as sql_util
 import collections
@@ -21,6 +20,7 @@ try:
     # add extra checks that fields have correctly been initialized by
     # __setstate__.
     from sqlalchemy.cresultproxy import safe_rowproxy_reconstructor
+
 
     # The extra function embedding is needed so that the
     # reconstructor function has the same signature whether or not
@@ -35,9 +35,11 @@ except ImportError:
 
 try:
     from sqlalchemy.cresultproxy import BaseRowProxy
+
     _baserowproxy_usecext = True
 except ImportError:
     _baserowproxy_usecext = False
+
 
     class BaseRowProxy(object):
         __slots__ = ('_parent', '_row', '_processors', '_keymap')
@@ -176,10 +178,12 @@ class RowProxy(BaseRowProxy):
     def itervalues(self):
         return iter(self)
 
+
 try:
     # Register RowProxy with Sequence,
     # so sequence protocol is implemented
     from collections import Sequence
+
     Sequence.register(RowProxy)
 except ImportError:
     pass
@@ -225,12 +229,13 @@ class ResultMetaData(object):
             len_raw = len(raw)
 
             self._keymap.update([
-                (elem[0], (elem[3], elem[4], elem[0]))
-                for elem in raw
-            ] + [
-                (elem[0] - len_raw, (elem[3], elem[4], elem[0]))
-                for elem in raw
-            ])
+                                    (elem[0], (elem[3], elem[4], elem[0]))
+                                    for elem in raw
+                                    ] + [
+                                    (elem[0] - len_raw,
+                                     (elem[3], elem[4], elem[0]))
+                                    for elem in raw
+                                    ])
 
         # processors in key order for certain per-row
         # views like __iter__ and slices
@@ -238,7 +243,7 @@ class ResultMetaData(object):
 
         # keymap by primary string...
         by_key = {elem[2]: (elem[3], elem[4], elem[0])
-            for elem in raw}
+                  for elem in raw}
 
         # for compiled SQL constructs, copy additional lookup keys into
         # the key lookup map, such as Column objects, labels,
@@ -264,10 +269,10 @@ class ResultMetaData(object):
                 # into self._keymap, write in the potentially "ambiguous"
                 # element
                 self._keymap.update([
-                    (obj_elem, by_key[elem[2]])
-                    for elem in raw if elem[4]
-                    for obj_elem in elem[4]
-                ])
+                                        (obj_elem, by_key[elem[2]])
+                                        for elem in raw if elem[4]
+                                        for obj_elem in elem[4]
+                                        ])
 
                 # if we did a pure positional match, then reset the
                 # original "expression element" back to the "unambiguous"
@@ -275,17 +280,18 @@ class ResultMetaData(object):
                 # TextAsFrom but also straight compiled SQL constructs.
                 if not self.matched_on_name:
                     self._keymap.update([
-                        (elem[4][0], (elem[3], elem[4], elem[0]))
-                        for elem in raw if elem[4]
-                    ])
+                                            (elem[4][0],
+                                             (elem[3], elem[4], elem[0]))
+                                            for elem in raw if elem[4]
+                                            ])
             else:
                 # no dupes - copy secondary elements from compiled
                 # columns into self._keymap
                 self._keymap.update([
-                    (obj_elem, (elem[3], elem[4], elem[0]))
-                    for elem in raw if elem[4]
-                    for obj_elem in elem[4]
-                ])
+                                        (obj_elem, (elem[3], elem[4], elem[0]))
+                                        for elem in raw if elem[4]
+                                        for obj_elem in elem[4]
+                                        ])
 
         # update keymap with primary string names taking
         # precedence
@@ -294,13 +300,13 @@ class ResultMetaData(object):
         # update keymap with "translated" names (sqlite-only thing)
         if not num_ctx_cols and context._translate_colname:
             self._keymap.update([
-                (elem[5], self._keymap[elem[2]])
-                for elem in raw if elem[5]
-            ])
+                                    (elem[5], self._keymap[elem[2]])
+                                    for elem in raw if elem[5]
+                                    ])
 
     def _merge_cursor_description(
-            self, context, cursor_description, result_columns,
-            num_ctx_cols, cols_are_ordered, textual_ordered):
+        self, context, cursor_description, result_columns,
+        num_ctx_cols, cols_are_ordered, textual_ordered):
         """Merge a cursor.description with compiled result column information.
 
         There are at least four separate strategies used here, selected
@@ -357,8 +363,8 @@ class ResultMetaData(object):
         case_sensitive = context.dialect.case_sensitive
 
         if num_ctx_cols and \
-                cols_are_ordered and \
-                not textual_ordered and \
+            cols_are_ordered and \
+            not textual_ordered and \
                 num_ctx_cols == len(cursor_description):
             self.keys = [elem[0] for elem in result_columns]
             # pure positional 1-1 case; doesn't need to read
@@ -375,7 +381,7 @@ class ResultMetaData(object):
                     None
                 ) for idx, (key, name, obj, type_)
                 in enumerate(result_columns)
-            ]
+                ]
         else:
             # name-based or text-positional cases, where we need
             # to read cursor.description names
@@ -402,7 +408,7 @@ class ResultMetaData(object):
 
                 for idx, colname, mapped_type, coltype, obj, untranslated
                 in raw_iterator
-            ]
+                ]
 
     def _colnames_from_description(self, context, cursor_description):
         """Extract column names and data types from a cursor.description.
@@ -443,7 +449,7 @@ class ResultMetaData(object):
             yield idx, colname, untranslated, coltype
 
     def _merge_textual_cols_by_position(
-            self, context, cursor_description, result_columns):
+        self, context, cursor_description, result_columns):
         dialect = context.dialect
         typemap = dialect.dbapi_type_map
         num_ctx_cols = len(result_columns) if result_columns else None
@@ -457,7 +463,7 @@ class ResultMetaData(object):
 
         seen = set()
         for idx, colname, untranslated, coltype in \
-                self._colnames_from_description(context, cursor_description):
+            self._colnames_from_description(context, cursor_description):
             if idx < num_ctx_cols:
                 ctx_rec = result_columns[idx]
                 obj = ctx_rec[2]
@@ -481,7 +487,7 @@ class ResultMetaData(object):
 
         self.matched_on_name = True
         for idx, colname, untranslated, coltype in \
-                self._colnames_from_description(context, cursor_description):
+            self._colnames_from_description(context, cursor_description):
             try:
                 ctx_rec = result_map[colname]
             except KeyError:
@@ -496,7 +502,7 @@ class ResultMetaData(object):
         dialect = context.dialect
         typemap = dialect.dbapi_type_map
         for idx, colname, untranslated, coltype in \
-                self._colnames_from_description(context, cursor_description):
+            self._colnames_from_description(context, cursor_description):
             mapped_type = typemap.get(coltype, sqltypes.NULLTYPE)
             yield idx, colname, mapped_type, coltype, None, untranslated
 
@@ -529,20 +535,20 @@ class ResultMetaData(object):
         # pickle/unpickle roundtrip
         elif isinstance(key, expression.ColumnElement):
             if key._label and (
-                    key._label
-                    if self.case_sensitive
-                    else key._label.lower()) in map:
+                key._label
+                if self.case_sensitive
+                else key._label.lower()) in map:
                 result = map[key._label
-                             if self.case_sensitive
-                             else key._label.lower()]
+                if self.case_sensitive
+                else key._label.lower()]
             elif hasattr(key, 'name') and (
-                    key.name
-                    if self.case_sensitive
-                    else key.name.lower()) in map:
+                key.name
+                if self.case_sensitive
+                else key.name.lower()) in map:
                 # match is only on name.
                 result = map[key.name
-                             if self.case_sensitive
-                             else key.name.lower()]
+                if self.case_sensitive
+                else key.name.lower()]
             # search extra hard to make sure this
             # isn't a column/label name overlap.
             # this check isn't currently available if the row
@@ -558,7 +564,7 @@ class ResultMetaData(object):
             if raiseerr:
                 raise exc.NoSuchColumnError(
                     "Could not locate column in row for column '{0!s}'".format(
-                    expression._string_or_unprintable(key)))
+                        expression._string_or_unprintable(key)))
             else:
                 return None
         else:
@@ -647,7 +653,7 @@ class ResultProxy(object):
         self.cursor = self._saved_cursor = context.cursor
         self.connection = context.root_connection
         self._echo = self.connection._echo and \
-            context.engine._should_log_debug()
+                     context.engine._should_log_debug()
         self._init_metadata()
 
     def _getter(self, key, raiseerr=True):
@@ -819,7 +825,7 @@ class ResultProxy(object):
         cursor = self.cursor
         self.connection._safe_close_cursor(cursor)
         if _autoclose_connection and \
-                self.connection.should_close_with_result:
+            self.connection.should_close_with_result:
             self.connection.close()
         self.cursor = None
 

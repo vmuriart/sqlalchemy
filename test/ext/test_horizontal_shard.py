@@ -10,6 +10,7 @@ from sqlalchemy.testing import fixtures
 from sqlalchemy.testing.engines import testing_engine
 from sqlalchemy.testing import eq_
 
+
 # TODO: ShardTest can be turned into a base for further subclasses
 
 
@@ -28,7 +29,7 @@ class ShardTest(object):
 
         meta = MetaData()
         ids = Table('ids', meta,
-            Column('nextid', Integer, nullable=False))
+                    Column('nextid', Integer, nullable=False))
 
         def id_generator(ctx):
             # in reality, might want to use a separate transaction for this.
@@ -39,11 +40,13 @@ class ShardTest(object):
             return nextid
 
         weather_locations = Table("weather_locations", meta,
-                Column('id', Integer, primary_key=True, default=id_generator),
-                Column('continent', String(30), nullable=False),
-                Column('city', String(50), nullable=False),
-                schema=self.schema
-            )
+                                  Column('id', Integer, primary_key=True,
+                                         default=id_generator),
+                                  Column('continent', String(30),
+                                         nullable=False),
+                                  Column('city', String(50), nullable=False),
+                                  schema=self.schema
+                                  )
 
         weather_reports = Table(
             'weather_reports',
@@ -55,7 +58,7 @@ class ShardTest(object):
             Column('report_time', DateTime,
                    default=datetime.datetime.now),
             schema=self.schema
-            )
+        )
 
         for db in (db1, db2, db3, db4):
             meta.create_all(db)
@@ -65,7 +68,6 @@ class ShardTest(object):
         self.setup_session()
         self.setup_mappers()
 
-
     @classmethod
     def setup_session(cls):
         global create_session
@@ -74,7 +76,7 @@ class ShardTest(object):
             'Asia': 'asia',
             'Europe': 'europe',
             'South America': 'south_america',
-            }
+        }
 
         def shard_chooser(mapper, instance, clause=None):
             if isinstance(instance, WeatherLocation):
@@ -88,12 +90,11 @@ class ShardTest(object):
         def query_chooser(query):
             ids = []
 
-
             class FindContinent(sql.ClauseVisitor):
 
                 def visit_binary(self, binary):
                     if binary.left.shares_lineage(
-                            weather_locations.c.continent):
+                        weather_locations.c.continent):
                         if binary.operator == operators.eq:
                             ids.append(shard_lookup[binary.right.value])
                         elif binary.operator == operators.in_op:
@@ -109,15 +110,14 @@ class ShardTest(object):
                 return ids
 
         create_session = sessionmaker(class_=ShardedSession,
-                autoflush=True, autocommit=False)
+                                      autoflush=True, autocommit=False)
         create_session.configure(shards={
             'north_america': db1,
             'asia': db2,
             'europe': db3,
             'south_america': db4,
-            }, shard_chooser=shard_chooser, id_chooser=id_chooser,
-                query_chooser=query_chooser)
-
+        }, shard_chooser=shard_chooser, id_chooser=id_chooser,
+            query_chooser=query_chooser)
 
     @classmethod
     def setup_mappers(cls):
@@ -159,7 +159,7 @@ class ShardTest(object):
             dublin,
             brasilia,
             quito,
-            ]:
+        ]:
             sess.add(c)
         sess.commit()
         sess.close()
@@ -171,50 +171,56 @@ class ShardTest(object):
         tokyo.city  # reload 'city' attribute on tokyo
         sess.expunge_all()
         eq_(db2.execute(weather_locations.select()).fetchall(), [(1,
-            'Asia', 'Tokyo')])
+                                                                  'Asia',
+                                                                  'Tokyo')])
         eq_(db1.execute(weather_locations.select()).fetchall(), [(2,
-            'North America', 'New York'), (3, 'North America', 'Toronto'
-            )])
+                                                                  'North America',
+                                                                  'New York'),
+                                                                 (3,
+                                                                  'North America',
+                                                                  'Toronto'
+                                                                  )])
         eq_(sess.execute(weather_locations.select(), shard_id='asia'
-            ).fetchall(), [(1, 'Asia', 'Tokyo')])
+                         ).fetchall(), [(1, 'Asia', 'Tokyo')])
         t = sess.query(WeatherLocation).get(tokyo.id)
         eq_(t.city, tokyo.city)
         eq_(t.reports[0].temperature, 80.0)
         north_american_cities = \
             sess.query(WeatherLocation).filter(WeatherLocation.continent
-                == 'North America')
+                                               == 'North America')
         eq_(set([c.city for c in north_american_cities]),
             set(['New York', 'Toronto']))
         asia_and_europe = \
             sess.query(WeatherLocation).filter(
                 WeatherLocation.continent.in_(['Europe', 'Asia']))
         eq_(set([c.city for c in asia_and_europe]), set(['Tokyo',
-            'London', 'Dublin']))
+                                                         'London', 'Dublin']))
 
     def test_shard_id_event(self):
         canary = []
+
         def load(instance, ctx):
             canary.append(ctx.attributes["shard_id"])
 
         event.listen(WeatherLocation, "load", load)
         sess = self._fixture_data()
 
-        tokyo = sess.query(WeatherLocation).\
-                    filter_by(city="Tokyo").set_shard("asia").one()
+        tokyo = sess.query(WeatherLocation). \
+            filter_by(city="Tokyo").set_shard("asia").one()
 
         sess.query(WeatherLocation).all()
         eq_(
             canary,
             ['asia', 'north_america', 'north_america',
-            'europe', 'europe', 'south_america',
-            'south_america']
+             'europe', 'europe', 'south_america',
+             'south_america']
         )
 
-class DistinctEngineShardTest(ShardTest, fixtures.TestBase):
 
+class DistinctEngineShardTest(ShardTest, fixtures.TestBase):
     def _init_dbs(self):
         db1 = testing_engine('sqlite:///shard1.db',
-                            options=dict(pool_threadlocal=True))
+                             options=dict(pool_threadlocal=True))
         db2 = testing_engine('sqlite:///shard2.db')
         db3 = testing_engine('sqlite:///shard3.db')
         db4 = testing_engine('sqlite:///shard4.db')
@@ -229,12 +235,13 @@ class DistinctEngineShardTest(ShardTest, fixtures.TestBase):
         for i in range(1, 5):
             os.remove("shard{0:d}.db".format(i))
 
+
 class AttachedFileShardTest(ShardTest, fixtures.TestBase):
     schema = "changeme"
 
     def _init_dbs(self):
         db1 = testing_engine('sqlite://', options={"execution_options":
-                                            {"shard_id": "shard1"}})
+                                                       {"shard_id": "shard1"}})
         db2 = db1.execution_options(shard_id="shard2")
         db3 = db1.execution_options(shard_id="shard3")
         db4 = db1.execution_options(shard_id="shard4")
@@ -251,5 +258,3 @@ class AttachedFileShardTest(ShardTest, fixtures.TestBase):
             return stmt, params
 
         return db1, db2, db3, db4
-
-

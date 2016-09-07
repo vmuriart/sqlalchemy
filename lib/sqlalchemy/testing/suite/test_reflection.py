@@ -1,5 +1,3 @@
-
-
 import sqlalchemy as sa
 from sqlalchemy import exc as sa_exc
 from sqlalchemy import types as sql_types
@@ -68,7 +66,7 @@ class ComponentReflectionTest(fixtures.TablesTest):
                           Column('test2', sa.Float(5), nullable=False),
                           Column('parent_user_id', sa.Integer,
                                  sa.ForeignKey('{0!s}users.user_id'.format(
-                                               schema_prefix))),
+                                     schema_prefix))),
                           schema=schema,
                           test_needs_fk=True,
                           )
@@ -85,7 +83,7 @@ class ComponentReflectionTest(fixtures.TablesTest):
               Column('dingaling_id', sa.Integer, primary_key=True),
               Column('address_id', sa.Integer,
                      sa.ForeignKey('{0!s}email_addresses.address_id'.format(
-                                   schema_prefix))),
+                         schema_prefix))),
               Column('data', sa.String(30)),
               schema=schema,
               test_needs_fk=True,
@@ -131,7 +129,7 @@ class ComponentReflectionTest(fixtures.TablesTest):
             **kw
         )
         if testing.requires.view_reflection.enabled and \
-                testing.requires.temporary_views.enabled:
+            testing.requires.temporary_views.enabled:
             event.listen(
                 user_tmp, "after_create",
                 DDL("create temporary view user_tmp_v as "
@@ -191,7 +189,7 @@ class ComponentReflectionTest(fixtures.TablesTest):
                               order_by=None):
         meta = self.metadata
         users, addresses, dingalings = self.tables.users, \
-            self.tables.email_addresses, self.tables.dingalings
+                                       self.tables.email_addresses, self.tables.dingalings
         insp = inspect(meta.bind)
 
         if table_type == 'view':
@@ -256,7 +254,7 @@ class ComponentReflectionTest(fixtures.TablesTest):
     def _test_get_columns(self, schema=None, table_type='table'):
         meta = MetaData(testing.db)
         users, addresses, dingalings = self.tables.users, \
-            self.tables.email_addresses, self.tables.dingalings
+                                       self.tables.email_addresses, self.tables.dingalings
         table_names = ['users', 'email_addresses']
         if table_type == 'view':
             table_names = ['users_v', 'email_addresses_v']
@@ -279,23 +277,26 @@ class ComponentReflectionTest(fixtures.TablesTest):
                 # Oracle returns Date for DateTime.
 
                 if testing.against('oracle') and ctype_def \
-                        in (sql_types.Date, sql_types.DateTime):
+                    in (sql_types.Date, sql_types.DateTime):
                     ctype_def = sql_types.Date
 
                 # assert that the desired type and return type share
                 # a base within one of the generic types.
 
                 self.assert_(len(set(ctype.__mro__).
-                                 intersection(ctype_def.__mro__).
-                                 intersection([
-                                     sql_types.Integer,
-                                     sql_types.Numeric,
-                                     sql_types.DateTime,
-                                     sql_types.Date,
-                                     sql_types.Time,
-                                     sql_types.String,
-                                     sql_types._Binary,
-                                 ])) > 0, '{0!s}({1!s}), {2!s}({3!s})'.format(col.name, col.type, cols[i]['name'], ctype))
+                    intersection(ctype_def.__mro__).
+                    intersection([
+                    sql_types.Integer,
+                    sql_types.Numeric,
+                    sql_types.DateTime,
+                    sql_types.Date,
+                    sql_types.Time,
+                    sql_types.String,
+                    sql_types._Binary,
+                ])) > 0, '{0!s}({1!s}), {2!s}({3!s})'.format(col.name,
+                                                             col.type,
+                                                             cols[i]['name'],
+                                                             ctype))
 
                 if not col.primary_key:
                     assert cols[i]['default'] is None
@@ -310,14 +311,14 @@ class ComponentReflectionTest(fixtures.TablesTest):
                   *[
                       Column('t{0:d}'.format(i), type_)
                       for i, type_ in enumerate(types)
-                  ]
+                      ]
                   )
         t.create()
 
         return [
             c['type'] for c in
             inspect(self.metadata.bind).get_columns('t')
-        ]
+            ]
 
     @testing.requires.table_reflection
     def test_numeric_reflection(self):
@@ -430,7 +431,7 @@ class ComponentReflectionTest(fixtures.TablesTest):
     def _test_get_foreign_keys(self, schema=None):
         meta = self.metadata
         users, addresses, dingalings = self.tables.users, \
-            self.tables.email_addresses, self.tables.dingalings
+                                       self.tables.email_addresses, self.tables.dingalings
         insp = inspect(meta.bind)
         expected_schema = schema
         # users
@@ -527,7 +528,7 @@ class ComponentReflectionTest(fixtures.TablesTest):
     def _test_get_indexes(self, schema=None):
         meta = self.metadata
         users, addresses, dingalings = self.tables.users, \
-            self.tables.email_addresses, self.tables.dingalings
+                                       self.tables.email_addresses, self.tables.dingalings
         # The database may decide to create indexes for foreign keys, etc.
         # so there may be more indexes than expected.
         insp = inspect(meta.bind)
@@ -641,7 +642,7 @@ class ComponentReflectionTest(fixtures.TablesTest):
     def _test_get_view_definition(self, schema=None):
         meta = self.metadata
         users, addresses, dingalings = self.tables.users, \
-            self.tables.email_addresses, self.tables.dingalings
+                                       self.tables.email_addresses, self.tables.dingalings
         view_name1 = 'users_v'
         view_name2 = 'email_addresses_v'
         insp = inspect(meta.bind)
@@ -664,7 +665,7 @@ class ComponentReflectionTest(fixtures.TablesTest):
     def _test_get_table_oid(self, table_name, schema=None):
         meta = self.metadata
         users, addresses, dingalings = self.tables.users, \
-            self.tables.email_addresses, self.tables.dingalings
+                                       self.tables.email_addresses, self.tables.dingalings
         insp = inspect(meta.bind)
         oid = insp.get_table_oid(table_name, schema)
         self.assert_(isinstance(oid, int))

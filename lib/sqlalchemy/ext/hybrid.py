@@ -772,6 +772,7 @@ class hybrid_property(interfaces.InspectionAttrInfo):
 
         def _expr(cls):
             return ExprComparator(expr(cls), self)
+
         util.update_wrapper(_expr, expr)
 
         self.expr = _expr
@@ -786,13 +787,14 @@ class hybrid_property(interfaces.InspectionAttrInfo):
 
         """
 
-        proxy_attr = attributes.\
+        proxy_attr = attributes. \
             create_proxied_attribute(self)
 
         def expr(owner):
             return proxy_attr(
                 owner, self.__name__, self, comparator(owner),
                 doc=comparator.__doc__ or self.__doc__)
+
         self.expr = expr
         return self
 

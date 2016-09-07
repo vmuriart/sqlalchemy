@@ -114,8 +114,8 @@ static/sql-createtable.html#SQL-CREATETABLE-EXCLUDE
         expressions, operators = zip(*elements)
 
         for (expr, column, strname, add_element), operator in zip(
-                self._extract_col_expression_collection(expressions),
-                operators
+            self._extract_col_expression_collection(expressions),
+            operators
         ):
             if add_element is not None:
                 columns.append(add_element)

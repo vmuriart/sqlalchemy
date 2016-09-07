@@ -14,7 +14,7 @@ class ProxyDict(object):
         return [x[0] for x in self.collection.values(descriptor)]
 
     def __getitem__(self, key):
-        x = self.collection.filter_by(**{self.keyname:key}).first()
+        x = self.collection.filter_by(**{self.keyname: key}).first()
         if x:
             return x
         else:
@@ -28,6 +28,7 @@ class ProxyDict(object):
             pass
         self.collection.append(value)
 
+
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
 from sqlalchemy.orm import sessionmaker, relationship
@@ -35,16 +36,18 @@ from sqlalchemy.orm import sessionmaker, relationship
 engine = create_engine('sqlite://', echo=True)
 Base = declarative_base(engine)
 
+
 class Parent(Base):
     __tablename__ = 'parent'
     id = Column(Integer, primary_key=True)
     name = Column(String(50))
     _collection = relationship("Child", lazy="dynamic",
-                                    cascade="all, delete-orphan")
+                               cascade="all, delete-orphan")
 
     @property
     def child_map(self):
         return ProxyDict(self, '_collection', Child, 'key')
+
 
 class Child(Base):
     __tablename__ = 'child'
@@ -54,6 +57,7 @@ class Child(Base):
 
     def __repr__(self):
         return "Child(key={0!r})".format(self.key)
+
 
 Base.metadata.create_all()
 
@@ -85,4 +89,3 @@ print(p1.child_map['k2'])
 print("\n---------print all child nodes\n")
 # [k1, k2b]
 print(sess.query(Child).all())
-

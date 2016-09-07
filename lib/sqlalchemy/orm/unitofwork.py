@@ -43,7 +43,7 @@ def track_cascade_events(descriptor, prop):
             item_state = attributes.instance_state(item)
             if prop._cascade.save_update and \
                 (prop.cascade_backrefs or key == initiator.key) and \
-                    not sess._contains_state(item_state):
+                not sess._contains_state(item_state):
                 sess._save_or_update_state(item_state)
         return item
 
@@ -65,8 +65,8 @@ def track_cascade_events(descriptor, prop):
             # expunge pending orphans
             item_state = attributes.instance_state(item)
             if prop._cascade.delete_orphan and \
-                item_state in sess._new and \
-                    prop.mapper._is_orphan(item_state):
+                    item_state in sess._new and \
+                prop.mapper._is_orphan(item_state):
                 sess.expunge(item)
 
     def set_(state, newvalue, oldvalue, initiator):
@@ -85,19 +85,19 @@ def track_cascade_events(descriptor, prop):
             if newvalue is not None:
                 newvalue_state = attributes.instance_state(newvalue)
                 if prop._cascade.save_update and \
-                        (prop.cascade_backrefs or key == initiator.key) and \
-                        not sess._contains_state(newvalue_state):
+                    (prop.cascade_backrefs or key == initiator.key) and \
+                    not sess._contains_state(newvalue_state):
                     sess._save_or_update_state(newvalue_state)
 
             if oldvalue is not None and \
-                oldvalue is not attributes.NEVER_SET and \
-                oldvalue is not attributes.PASSIVE_NO_RESULT and \
-                    prop._cascade.delete_orphan:
+                    oldvalue is not attributes.NEVER_SET and \
+                    oldvalue is not attributes.PASSIVE_NO_RESULT and \
+                prop._cascade.delete_orphan:
                 # possible to reach here with attributes.NEVER_SET ?
                 oldvalue_state = attributes.instance_state(oldvalue)
 
                 if oldvalue_state in sess._new and \
-                        prop.mapper._is_orphan(oldvalue_state):
+                    prop.mapper._is_orphan(oldvalue_state):
                     sess.expunge(oldvalue)
         return newvalue
 
@@ -205,7 +205,7 @@ class UOWTransaction(object):
             # we want non-passive, do a non-passive lookup and re-cache
 
             if not cached_passive & attributes.SQL_OK \
-                    and passive & attributes.SQL_OK:
+                and passive & attributes.SQL_OK:
                 impl = state.manager[key].impl
                 history = impl.get_history(state, state.dict,
                                            attributes.PASSIVE_OFF |
@@ -344,8 +344,8 @@ class UOWTransaction(object):
             # that were broken up.
             for edge in list(self.dependencies):
                 if None in edge or \
-                        edge[0].disabled or edge[1].disabled or \
-                        cycles.issuperset(edge):
+                    edge[0].disabled or edge[1].disabled or \
+                    cycles.issuperset(edge):
                     self.dependencies.remove(edge)
                 elif edge[0] in cycles:
                     self.dependencies.remove(edge)
@@ -374,15 +374,15 @@ class UOWTransaction(object):
         # execute
         if self.cycles:
             for set_ in topological.sort_as_subsets(
-                    self.dependencies,
-                    postsort_actions):
+                self.dependencies,
+                postsort_actions):
                 while set_:
                     n = set_.pop()
                     n.execute_aggregate(self, set_)
         else:
             for rec in topological.sort(
-                    self.dependencies,
-                    postsort_actions):
+                self.dependencies,
+                postsort_actions):
                 rec.execute(self)
 
     def finalize_flush_changes(self):
@@ -450,9 +450,9 @@ class Preprocess(IterateMappersMixin):
         if (delete_states or save_states):
             if not self.setup_flush_actions and (
                     self.dependency_processor.
-                    prop_has_changes(uow, delete_states, True) or
+                        prop_has_changes(uow, delete_states, True) or
                     self.dependency_processor.
-                    prop_has_changes(uow, save_states, False)
+                        prop_has_changes(uow, save_states, False)
             ):
                 self.dependency_processor.per_property_flush_actions(uow)
                 self.setup_flush_actions = True
@@ -465,7 +465,7 @@ class PostSortRec(object):
     disabled = False
 
     def __new__(cls, uow, *args):
-        key = (cls, ) + args
+        key = (cls,) + args
         if key in uow.postsort_actions:
             return uow.postsort_actions[key]
         else:
@@ -489,7 +489,7 @@ class ProcessAll(IterateMappersMixin, PostSortRec):
         self.dependency_processor = dependency_processor
         self.delete = delete
         self.fromparent = fromparent
-        uow.deps[dependency_processor.parent.base_mapper].\
+        uow.deps[dependency_processor.parent.base_mapper]. \
             add(dependency_processor)
 
     def execute(self, uow):

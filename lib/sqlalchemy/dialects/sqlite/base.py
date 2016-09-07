@@ -523,6 +523,7 @@ class _DateTimeMixin(object):
 
         def process(value):
             return "'{0!s}'".format(bp(value))
+
         return process
 
 
@@ -570,10 +571,10 @@ class DATETIME(_DateTimeMixin, sqltypes.DateTime):
         truncate_microseconds = kwargs.pop('truncate_microseconds', False)
         super(DATETIME, self).__init__(*args, **kwargs)
         if truncate_microseconds:
-            assert 'storage_format' not in kwargs, "You can specify only "\
-                "one of truncate_microseconds or storage_format."
-            assert 'regexp' not in kwargs, "You can specify only one of "\
-                "truncate_microseconds or regexp."
+            assert 'storage_format' not in kwargs, "You can specify only " \
+                                                   "one of truncate_microseconds or storage_format."
+            assert 'regexp' not in kwargs, "You can specify only one of " \
+                                           "truncate_microseconds or regexp."
             self._storage_format = (
                 "%(year)04d-%(month)02d-%(day)02d "
                 "%(hour)02d:%(minute)02d:%(second)02d"
@@ -610,6 +611,7 @@ class DATETIME(_DateTimeMixin, sqltypes.DateTime):
             else:
                 raise TypeError("SQLite DateTime type only accepts Python "
                                 "datetime and date objects as input.")
+
         return process
 
     def result_processor(self, dialect, coltype):
@@ -671,6 +673,7 @@ class DATE(_DateTimeMixin, sqltypes.Date):
             else:
                 raise TypeError("SQLite Date type only accepts Python "
                                 "date objects as input.")
+
         return process
 
     def result_processor(self, dialect, coltype):
@@ -720,10 +723,10 @@ class TIME(_DateTimeMixin, sqltypes.Time):
         truncate_microseconds = kwargs.pop('truncate_microseconds', False)
         super(TIME, self).__init__(*args, **kwargs)
         if truncate_microseconds:
-            assert 'storage_format' not in kwargs, "You can specify only "\
-                "one of truncate_microseconds or storage_format."
-            assert 'regexp' not in kwargs, "You can specify only one of "\
-                "truncate_microseconds or regexp."
+            assert 'storage_format' not in kwargs, "You can specify only " \
+                                                   "one of truncate_microseconds or storage_format."
+            assert 'regexp' not in kwargs, "You can specify only one of " \
+                                           "truncate_microseconds or regexp."
             self._storage_format = "%(hour)02d:%(minute)02d:%(second)02d"
 
     def bind_processor(self, dialect):
@@ -743,6 +746,7 @@ class TIME(_DateTimeMixin, sqltypes.Time):
             else:
                 raise TypeError("SQLite Time type only accepts Python "
                                 "time objects as input.")
+
         return process
 
     def result_processor(self, dialect, coltype):
@@ -751,6 +755,7 @@ class TIME(_DateTimeMixin, sqltypes.Time):
                 self._reg, datetime.time)
         else:
             return processors.str_to_time
+
 
 colspecs = {
     sqltypes.Date: DATE,
@@ -851,15 +856,14 @@ class SQLiteCompiler(compiler.SQLCompiler):
 
     def visit_is_distinct_from_binary(self, binary, operator, **kw):
         return "{0!s} IS NOT {1!s}".format(self.process(binary.left),
-                                 self.process(binary.right))
+                                           self.process(binary.right))
 
     def visit_isnot_distinct_from_binary(self, binary, operator, **kw):
         return "{0!s} IS {1!s}".format(self.process(binary.left),
-                             self.process(binary.right))
+                                       self.process(binary.right))
 
 
 class SQLiteDDLCompiler(compiler.DDLCompiler):
-
     def get_column_specification(self, column, **kwargs):
         coltype = self.dialect.type_compiler.process(
             column.type, type_expression=column)
@@ -873,16 +877,17 @@ class SQLiteDDLCompiler(compiler.DDLCompiler):
 
         if column.primary_key:
             if (
-                column.autoincrement is True and
-                len(column.table.primary_key.columns) != 1
+                        column.autoincrement is True and
+                        len(column.table.primary_key.columns) != 1
             ):
                 raise exc.CompileError(
                     "SQLite does not support autoincrement for "
                     "composite primary keys")
 
             if (column.table.dialect_options['sqlite']['autoincrement'] and
-                    len(column.table.primary_key.columns) == 1 and
-                    issubclass(column.type._type_affinity, sqltypes.Integer) and
+                        len(column.table.primary_key.columns) == 1 and
+                    issubclass(column.type._type_affinity,
+                               sqltypes.Integer) and
                     not column.foreign_keys):
                 colspec += " PRIMARY KEY AUTOINCREMENT"
 
@@ -929,15 +934,15 @@ class SQLiteDDLCompiler(compiler.DDLCompiler):
         if index.unique:
             text += "UNIQUE "
         text += "INDEX {0!s} ON {1!s} ({2!s})".format(
-                self._prepared_index_name(index,
-                                          include_schema=True),
-                preparer.format_table(index.table,
-                                      use_schema=False),
-                ', '.join(
-                    self.sql_compiler.process(
-                        expr, include_table=False, literal_binds=True) for
-                    expr in index.expressions)
-            )
+            self._prepared_index_name(index,
+                                      include_schema=True),
+            preparer.format_table(index.table,
+                                  use_schema=False),
+            ', '.join(
+                self.sql_compiler.process(
+                    expr, include_table=False, literal_binds=True) for
+                expr in index.expressions)
+        )
 
         whereclause = index.dialect_options["sqlite"]["where"]
         if whereclause is not None:
@@ -955,21 +960,21 @@ class SQLiteTypeCompiler(compiler.GenericTypeCompiler):
 
     def visit_DATETIME(self, type_, **kw):
         if not isinstance(type_, _DateTimeMixin) or \
-                type_.format_is_text_affinity:
+            type_.format_is_text_affinity:
             return super(SQLiteTypeCompiler, self).visit_DATETIME(type_)
         else:
             return "DATETIME_CHAR"
 
     def visit_DATE(self, type_, **kw):
         if not isinstance(type_, _DateTimeMixin) or \
-                type_.format_is_text_affinity:
+            type_.format_is_text_affinity:
             return super(SQLiteTypeCompiler, self).visit_DATE(type_)
         else:
             return "DATE_CHAR"
 
     def visit_TIME(self, type_, **kw):
         if not isinstance(type_, _DateTimeMixin) or \
-                type_.format_is_text_affinity:
+            type_.format_is_text_affinity:
             return super(SQLiteTypeCompiler, self).visit_TIME(type_)
         else:
             return "TIME_CHAR"
@@ -1015,7 +1020,7 @@ class SQLiteExecutionContext(default.DefaultExecutionContext):
     @util.memoized_property
     def _preserve_raw_colnames(self):
         return not self.dialect._broken_dotted_colnames or \
-            self.execution_options.get("sqlite_raw_colnames", False)
+               self.execution_options.get("sqlite_raw_colnames", False)
 
     def _translate_colname(self, colname):
         # TODO: detect SQLite version 3.10.0 or greater;
@@ -1109,7 +1114,8 @@ class SQLiteDialect(default.DefaultDialect):
                 (level, self.name, ", ".join(self._isolation_lookup))
             )
         cursor = connection.cursor()
-        cursor.execute("PRAGMA read_uncommitted = {0:d}".format(isolation_level))
+        cursor.execute(
+            "PRAGMA read_uncommitted = {0:d}".format(isolation_level))
         cursor.close()
 
     def get_isolation_level(self, connection):
@@ -1138,6 +1144,7 @@ class SQLiteDialect(default.DefaultDialect):
         if self.isolation_level is not None:
             def connect(conn):
                 self.set_isolation_level(conn, self.isolation_level)
+
             return connect
         else:
             return None
@@ -1163,7 +1170,7 @@ class SQLiteDialect(default.DefaultDialect):
 
     @reflection.cache
     def get_temp_table_names(self, connection, **kw):
-        s = "SELECT name FROM sqlite_temp_master "\
+        s = "SELECT name FROM sqlite_temp_master " \
             "WHERE type='table' ORDER BY name "
         rs = connection.execute(s)
 
@@ -1171,7 +1178,7 @@ class SQLiteDialect(default.DefaultDialect):
 
     @reflection.cache
     def get_temp_view_names(self, connection, **kw):
-        s = "SELECT name FROM sqlite_temp_master "\
+        s = "SELECT name FROM sqlite_temp_master " \
             "WHERE type='view' ORDER BY name "
         rs = connection.execute(s)
 
@@ -1358,7 +1365,7 @@ class SQLiteDialect(default.DefaultDialect):
 
         def fk_sig(constrained_columns, referred_table, referred_columns):
             return tuple(constrained_columns) + (referred_table,) + \
-                tuple(referred_columns)
+                   tuple(referred_columns)
 
         # then, parse the actual SQL and attempt to find DDL that matches
         # the names as well.   SQLite saves the DDL in whatever format
@@ -1410,11 +1417,12 @@ class SQLiteDialect(default.DefaultDialect):
                 yield (
                     constraint_name, constrained_columns,
                     referred_name, referred_columns, options)
+
         fkeys = []
 
         for (
             constraint_name, constrained_columns,
-                referred_name, referred_columns, options) in parse_fks():
+            referred_name, referred_columns, options) in parse_fks():
             sig = fk_sig(
                 constrained_columns, referred_name, referred_columns)
             if sig not in keys_by_signature:
@@ -1446,8 +1454,8 @@ class SQLiteDialect(default.DefaultDialect):
 
         auto_index_by_sig = {}
         for idx in self.get_indexes(
-                connection, table_name, schema=schema,
-                include_auto_indexes=True, **kw):
+            connection, table_name, schema=schema,
+            include_auto_indexes=True, **kw):
             if not idx['name'].startswith("sqlite_autoindex"):
                 continue
             sig = tuple(idx['column_names'])

@@ -7,17 +7,19 @@ from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
+
 class Company(Base):
     __tablename__ = 'company'
     id = Column(Integer, primary_key=True)
     name = Column(String(50))
 
     employees = relationship("Person",
-                    backref='company',
-                    cascade='all, delete-orphan')
+                             backref='company',
+                             cascade='all, delete-orphan')
 
     def __repr__(self):
         return "Company {0!s}".format(self.name)
+
 
 class Person(Base):
     __tablename__ = 'person'
@@ -27,11 +29,13 @@ class Person(Base):
     type = Column(String(50))
 
     __mapper_args__ = {
-        'polymorphic_identity':'person',
-        'polymorphic_on':type
+        'polymorphic_identity': 'person',
+        'polymorphic_on': type
     }
+
     def __repr__(self):
         return "Ordinary person {0!s}".format(self.name)
+
 
 class Engineer(Person):
     __tablename__ = 'engineer'
@@ -41,13 +45,15 @@ class Engineer(Person):
     primary_language = Column(String(30))
 
     __mapper_args__ = {
-        'polymorphic_identity':'engineer',
+        'polymorphic_identity': 'engineer',
     }
+
     def __repr__(self):
-        return "Engineer %s, status %s, engineer_name %s, "\
-                "primary_language %s" % \
-                    (self.name, self.status,
-                        self.engineer_name, self.primary_language)
+        return "Engineer %s, status %s, engineer_name %s, " \
+               "primary_language %s" % \
+               (self.name, self.status,
+                self.engineer_name, self.primary_language)
+
 
 class Manager(Person):
     __tablename__ = 'manager'
@@ -56,10 +62,12 @@ class Manager(Person):
     manager_name = Column(String(30))
 
     __mapper_args__ = {
-        'polymorphic_identity':'manager',
+        'polymorphic_identity': 'manager',
     }
+
     def __repr__(self):
-        return "Manager {0!s}, status {1!s}, manager_name {2!s}".format(self.name, self.status, self.manager_name)
+        return "Manager {0!s}, status {1!s}, manager_name {2!s}".format(
+            self.name, self.status, self.manager_name)
 
 
 engine = create_engine('sqlite://', echo=True)
@@ -73,17 +81,17 @@ c = Company(name='company1', employees=[
         status='AAB',
         manager_name='manager1'),
     Engineer(name='dilbert',
-        status='BBA',
-        engineer_name='engineer1',
-        primary_language='java'),
+             status='BBA',
+             engineer_name='engineer1',
+             primary_language='java'),
     Person(name='joesmith'),
     Engineer(name='wally',
-            status='CGG',
-            engineer_name='engineer2',
-            primary_language='python'),
+             status='CGG',
+             engineer_name='engineer2',
+             primary_language='python'),
     Manager(name='jsmith',
-                status='ABA',
-                manager_name='manager2')
+            status='ABA',
+            manager_name='manager2')
 ])
 session.add(c)
 
@@ -93,7 +101,8 @@ c = session.query(Company).get(1)
 for e in c.employees:
     print(e, inspect(e).key, e.company)
 assert set([e.name for e in c.employees]) == set(['pointy haired boss',
-        'dilbert', 'joesmith', 'wally', 'jsmith'])
+                                                  'dilbert', 'joesmith',
+                                                  'wally', 'jsmith'])
 print("\n")
 
 dilbert = session.query(Person).filter_by(name='dilbert').one()
@@ -110,26 +119,24 @@ for e in c.employees:
 
 # query using with_polymorphic.
 eng_manager = with_polymorphic(Person, [Engineer, Manager], aliased=True)
-print(session.query(eng_manager).\
-            filter(
-                or_(eng_manager.Engineer.engineer_name=='engineer1',
-                    eng_manager.Manager.manager_name=='manager2'
-                )
-            ).all())
+print(session.query(eng_manager). \
+      filter(
+    or_(eng_manager.Engineer.engineer_name == 'engineer1',
+        eng_manager.Manager.manager_name == 'manager2'
+        )
+).all())
 
 # illustrate join from Company,
 # We use aliased=True
 # to help when the selectable is used as the target of a join.
 eng_manager = with_polymorphic(Person, [Engineer, Manager], aliased=True)
-print(session.query(Company).\
-    join(
-        eng_manager,
-        Company.employees
-    ).filter(
-        or_(eng_manager.Engineer.engineer_name=='engineer1',
-            eng_manager.Manager.manager_name=='manager2')
-    ).all())
+print(session.query(Company). \
+      join(
+    eng_manager,
+    Company.employees
+).filter(
+    or_(eng_manager.Engineer.engineer_name == 'engineer1',
+        eng_manager.Manager.manager_name == 'manager2')
+).all())
 
 session.commit()
-
-

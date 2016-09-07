@@ -15,8 +15,9 @@ has no dependency on the system.
 """
 from sqlalchemy.ext.declarative import as_declarative, declared_attr
 from sqlalchemy import create_engine, Integer, Column, \
-                    String, ForeignKey, Table
+    String, ForeignKey, Table
 from sqlalchemy.orm import Session, relationship
+
 
 @as_declarative()
 class Base(object):
@@ -24,10 +25,13 @@ class Base(object):
     and surrogate primary key column.
 
     """
+
     @declared_attr
     def __tablename__(cls):
         return cls.__name__.lower()
+
     id = Column(Integer, primary_key=True)
+
 
 class Address(Base):
     """The Address class.
@@ -41,32 +45,38 @@ class Address(Base):
     zip = Column(String)
 
     def __repr__(self):
-        return "{0!s}(street={1!r}, city={2!r}, zip={3!r})".format(self.__class__.__name__, self.street,
+        return "{0!s}(street={1!r}, city={2!r}, zip={3!r})".format(
+            self.__class__.__name__, self.street,
             self.city, self.zip)
+
 
 class HasAddresses(object):
     """HasAddresses mixin, creates a new address_association
     table for each parent.
 
     """
+
     @declared_attr
     def addresses(cls):
         address_association = Table(
             "{0!s}_addresses".format(cls.__tablename__),
             cls.metadata,
             Column("address_id", ForeignKey("address.id"),
-                                primary_key=True),
+                   primary_key=True),
             Column("{0!s}_id".format(cls.__tablename__),
-                                ForeignKey("{0!s}.id".format(cls.__tablename__)),
-                                primary_key=True),
+                   ForeignKey("{0!s}.id".format(cls.__tablename__)),
+                   primary_key=True),
         )
         return relationship(Address, secondary=address_association)
+
 
 class Customer(HasAddresses, Base):
     name = Column(String)
 
+
 class Supplier(HasAddresses, Base):
     company_name = Column(String)
+
 
 engine = create_engine('sqlite://', echo=True)
 Base.metadata.create_all(engine)
@@ -78,22 +88,22 @@ session.add_all([
         name='customer 1',
         addresses=[
             Address(
-                    street='123 anywhere street',
-                    city="New York",
-                    zip="10110"),
+                street='123 anywhere street',
+                city="New York",
+                zip="10110"),
             Address(
-                    street='40 main street',
-                    city="San Francisco",
-                    zip="95732")
+                street='40 main street',
+                city="San Francisco",
+                zip="95732")
         ]
     ),
     Supplier(
         company_name="Ace Hammers",
         addresses=[
             Address(
-                    street='2569 west elm',
-                    city="Detroit",
-                    zip="56785")
+                street='2569 west elm',
+                city="Detroit",
+                zip="56785")
         ]
     ),
 ])

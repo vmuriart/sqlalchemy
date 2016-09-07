@@ -6,6 +6,8 @@ from sqlalchemy.util import KeyedTuple
 from sqlalchemy.testing import mock
 from sqlalchemy import select
 from sqlalchemy import exc
+
+
 # class GetFromIdentityTest(_fixtures.FixtureTest):
 # class LoadOnIdentTest(_fixtures.FixtureTest):
 # class InstanceProcessorTest(_fixture.FixtureTest):
@@ -65,7 +67,7 @@ class MergeResultTest(_fixtures.FixtureTest):
 
         s = Session()
         u1, u2, u3, u4 = User(id=1, name='u1'), User(id=2, name='u2'), \
-                            User(id=7, name='u3'), User(id=8, name='u4')
+                         User(id=7, name='u3'), User(id=8, name='u4')
         s.query(User).filter(User.id.in_([7, 8])).all()
         s.close()
         return s, [u1, u2, u3, u4]
@@ -91,14 +93,14 @@ class MergeResultTest(_fixtures.FixtureTest):
         s = Session()
 
         q = s.query(User.id)
-        collection = [(1, ), (2, ), (7, ), (8, )]
+        collection = [(1,), (2,), (7,), (8,)]
         it = loading.merge_result(
             q,
             collection
         )
         eq_(
             list(it),
-            [(1, ), (2, ), (7, ), (8, )]
+            [(1,), (2,), (7,), (8,)]
         )
 
     def test_entity_col_mix_plain_tuple(self):
@@ -152,8 +154,6 @@ class MergeResultTest(_fixtures.FixtureTest):
             [
                 (x and x.id or None, y and y.id or None)
                 for x, y in it
-            ],
+                ],
             [(u1.id, u2.id), (u1.id, None), (u2.id, u3.id)]
         )
-
-

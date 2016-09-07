@@ -48,7 +48,7 @@ def _history_mapper(local_mapper):
             local_mapper.local_table is not super_mapper.local_table:
         cols = []
         version_meta = {"version_meta": True}  # add column.info to identify
-                                               # columns specific to versioning
+        # columns specific to versioning
 
         for column in local_mapper.local_table.c:
             if _is_versioning_col(column):
@@ -57,7 +57,7 @@ def _history_mapper(local_mapper):
             col = _col_copy(column)
 
             if super_mapper and \
-                    col_references_table(column, super_mapper.local_table):
+                col_references_table(column, super_mapper.local_table):
                 super_fks.append(
                     (
                         col.key,
@@ -122,13 +122,14 @@ def _history_mapper(local_mapper):
 
         if table is not None:
             properties['changed'] = (
-                (table.c.changed, ) +
+                (table.c.changed,) +
                 tuple(super_history_mapper.attrs.changed.columns)
             )
 
     else:
         bases = local_mapper.base_mapper.class_.__bases__
-    versioned_cls = type.__new__(type, "{0!s}History".format(cls.__name__), bases, {})
+    versioned_cls = type.__new__(type, "{0!s}History".format(cls.__name__),
+                                 bases, {})
 
     m = mapper(
         versioned_cls,
@@ -155,6 +156,7 @@ class Versioned(object):
             mp = mapper(cls, *arg, **kw)
             _history_mapper(mp)
             return mp
+
         return map
 
 
@@ -176,8 +178,8 @@ def create_version(obj, session, deleted=False):
     obj_changed = False
 
     for om, hm in zip(
-            obj_mapper.iterate_to_root(),
-            history_mapper.iterate_to_root()
+        obj_mapper.iterate_to_root(),
+        history_mapper.iterate_to_root()
     ):
         if hm.single:
             continue

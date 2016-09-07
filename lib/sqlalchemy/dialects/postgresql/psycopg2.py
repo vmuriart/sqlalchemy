@@ -320,7 +320,7 @@ from ...sql import expression
 from ... import types as sqltypes
 from .base import PGDialect, PGCompiler, \
     PGIdentifierPreparer, PGExecutionContext, \
-    ENUM, _DECIMAL_TYPES, _FLOAT_TYPES,\
+    ENUM, _DECIMAL_TYPES, _FLOAT_TYPES, \
     _INT_TYPES, UUID
 from .hstore import HSTORE
 from .json import JSON, JSONB
@@ -329,7 +329,6 @@ try:
     from uuid import UUID as _python_UUID
 except ImportError:
     _python_UUID = None
-
 
 logger = logging.getLogger('sqlalchemy.dialects.postgresql')
 
@@ -386,7 +385,6 @@ class _PGHStore(HSTORE):
 
 
 class _PGJSON(JSON):
-
     def result_processor(self, dialect, coltype):
         if dialect._has_native_json:
             return None
@@ -395,7 +393,6 @@ class _PGJSON(JSON):
 
 
 class _PGJSONB(JSONB):
-
     def result_processor(self, dialect, coltype):
         if dialect._has_native_jsonb:
             return None
@@ -412,6 +409,7 @@ class _PGUUID(UUID):
                 if value is not None:
                     value = _python_UUID(value)
                 return value
+
             return process
 
     def result_processor(self, dialect, coltype):
@@ -420,7 +418,9 @@ class _PGUUID(UUID):
                 if value is not None:
                     value = str(value)
                 return value
+
             return process
+
 
 # When we're handed literal SQL, ensure it's a SELECT query. Since
 # 8.3, combining cursors and "FOR UPDATE" has been fine.
@@ -442,11 +442,11 @@ class PGExecutionContext_psycopg2(PGExecutionContext):
                                                   expression.Selectable)
                      or
                      (
-                        (not self.compiled or
-                         isinstance(self.compiled.statement,
-                                    expression.TextClause))
-                        and self.statement and SERVER_SIDE_CURSOR_RE.match(
-                            self.statement))
+                         (not self.compiled or
+                          isinstance(self.compiled.statement,
+                                     expression.TextClause))
+                         and self.statement and SERVER_SIDE_CURSOR_RE.match(
+                             self.statement))
                      )
                 )
         else:
@@ -458,7 +458,7 @@ class PGExecutionContext_psycopg2(PGExecutionContext):
             # use server-side cursors:
             # http://lists.initd.org/pipermail/psycopg/2007-January/005251.html
             ident = "c_{0!s}_{1!s}".format(hex(id(self))[2:],
-                                 hex(_server_side_id())[2:])
+                                           hex(_server_side_id())[2:])
             return self._dbapi_connection.cursor(ident)
         else:
             return self._dbapi_connection.cursor()
@@ -485,7 +485,7 @@ class PGExecutionContext_psycopg2(PGExecutionContext):
 class PGCompiler_psycopg2(PGCompiler):
     def visit_mod_binary(self, binary, operator, **kw):
         return self.process(binary.left, **kw) + " %% " + \
-            self.process(binary.right, **kw)
+               self.process(binary.right, **kw)
 
     def post_process_text(self, text):
         return text.replace('%', '%%')
@@ -563,8 +563,8 @@ class PGDialect_psycopg2(PGDialect):
     def initialize(self, connection):
         super(PGDialect_psycopg2, self).initialize(connection)
         self._has_native_hstore = self.use_native_hstore and \
-            self._hstore_oids(connection.connection) \
-            is not None
+                                  self._hstore_oids(connection.connection) \
+                                  is not None
         self._has_native_json = \
             self.psycopg2_version >= self.FEATURE_VERSION_MAP['native_json']
         self._has_native_jsonb = \
@@ -621,22 +621,26 @@ class PGDialect_psycopg2(PGDialect):
         if self.client_encoding is not None:
             def on_connect(conn):
                 conn.set_client_encoding(self.client_encoding)
+
             fns.append(on_connect)
 
         if self.isolation_level is not None:
             def on_connect(conn):
                 self.set_isolation_level(conn, self.isolation_level)
+
             fns.append(on_connect)
 
         if self.dbapi and self.use_native_uuid:
             def on_connect(conn):
                 extras.register_uuid(None, conn)
+
             fns.append(on_connect)
 
         if self.dbapi and self.use_native_unicode:
             def on_connect(conn):
                 extensions.register_type(extensions.UNICODE, conn)
                 extensions.register_type(extensions.UNICODEARRAY, conn)
+
             fns.append(on_connect)
 
         if self.dbapi and self.use_native_hstore:
@@ -648,9 +652,10 @@ class PGDialect_psycopg2(PGDialect):
                     if util.py2k:
                         kw['unicode'] = True
                     if self.psycopg2_version >= \
-                            self.FEATURE_VERSION_MAP['array_oid']:
+                        self.FEATURE_VERSION_MAP['array_oid']:
                         kw['array_oid'] = array_oid
                     extras.register_hstore(conn, **kw)
+
             fns.append(on_connect)
 
         if self.dbapi and self._json_deserializer:
@@ -661,12 +666,14 @@ class PGDialect_psycopg2(PGDialect):
                 if self._has_native_jsonb:
                     extras.register_default_jsonb(
                         conn, loads=self._json_deserializer)
+
             fns.append(on_connect)
 
         if fns:
             def on_connect(conn):
                 for fn in fns:
                     fn(conn)
+
             return on_connect
         else:
             return None
@@ -724,5 +731,6 @@ class PGDialect_psycopg2(PGDialect):
                 if idx >= 0 and '"' not in str_e[:idx]:
                     return True
         return False
+
 
 dialect = PGDialect_psycopg2

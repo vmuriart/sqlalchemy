@@ -72,7 +72,7 @@ class compound(object):
             predicate._as_string(config) for predicate
             in self.skips.union(self.fails)
             if predicate(config)
-        ]
+            ]
 
     def include_test(self, include_tags, exclude_tags):
         return bool(
@@ -93,6 +93,7 @@ class compound(object):
         @decorator
         def decorate(fn, *args, **kw):
             return self._do(config._current, fn, *args, **kw)
+
         decorated = decorate(fn)
         decorated._sa_exclusion_extend = self
         return decorated
@@ -265,7 +266,7 @@ class SpecPredicate(Predicate):
 
             version = _server_version(engine)
             oper = hasattr(self.op, '__call__') and self.op \
-                or self._ops[self.op]
+                   or self._ops[self.op]
             return oper(version, self.spec)
         else:
             return True
@@ -413,8 +414,8 @@ def fails_on(db, reason=None):
 def fails_on_everything_except(*dbs):
     return succeeds_if(
         OrPredicate([
-            Predicate.as_predicate(db) for db in dbs
-        ])
+                        Predicate.as_predicate(db) for db in dbs
+                        ])
     )
 
 
@@ -435,6 +436,6 @@ def exclude(db, op, spec, reason=None):
 def against(config, *queries):
     assert queries, "no queries sent!"
     return OrPredicate([
-        Predicate.as_predicate(query)
-        for query in queries
-    ])(config)
+                           Predicate.as_predicate(query)
+                           for query in queries
+                           ])(config)

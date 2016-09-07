@@ -20,7 +20,7 @@ from .. import exc
 
 
 class UpdateBase(
-        HasCTE, DialectKWArgs, HasPrefixes, Executable, ClauseElement):
+    HasCTE, DialectKWArgs, HasPrefixes, Executable, ClauseElement):
     """Form the base for ``INSERT``, ``UPDATE``, and ``DELETE`` statements.
 
     """
@@ -46,7 +46,7 @@ class UpdateBase(
 
         if self._preserve_parameter_order and parameters is not None:
             if not isinstance(parameters, list) or \
-                    (parameters and not isinstance(parameters[0], tuple)):
+                (parameters and not isinstance(parameters[0], tuple)):
                 raise ValueError(
                     "When preserve_parameter_order is True, "
                     "values() only accepts a list of 2-tuples")
@@ -88,6 +88,7 @@ class UpdateBase(
 
     def _set_bind(self, bind):
         self._bind = bind
+
     bind = property(bind, _set_bind)
 
     @_generative

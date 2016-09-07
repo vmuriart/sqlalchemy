@@ -87,7 +87,7 @@ def test_orm_columns(n):
     sess = Session(engine)
     for row in sess.query(
         Customer.id, Customer.name,
-            Customer.description).yield_per(10000).limit(n):
+        Customer.description).yield_per(10000).limit(n):
         pass
 
 
@@ -106,7 +106,7 @@ def test_core_fetchmany_w_streaming(n):
     """Load Core result rows using fetchmany/streaming."""
 
     with engine.connect() as conn:
-        result = conn.execution_options(stream_results=True).\
+        result = conn.execution_options(stream_results=True). \
             execute(Customer.__table__.select().limit(n))
         while True:
             chunk = result.fetchmany(10000)
@@ -145,10 +145,10 @@ def test_dbapi_fetchall_no_object(n):
 
 
 def _test_dbapi_raw(n, make_objects):
-    compiled = Customer.__table__.select().limit(n).\
+    compiled = Customer.__table__.select().limit(n). \
         compile(
-            dialect=engine.dialect,
-            compile_kwargs={"literal_binds": True})
+        dialect=engine.dialect,
+        compile_kwargs={"literal_binds": True})
 
     if make_objects:
         # because if you're going to roll your own, you're probably
@@ -177,6 +177,7 @@ def _test_dbapi_raw(n, make_objects):
             data = row[0], row[1], row[2]
 
     conn.close()
+
 
 if __name__ == '__main__':
     Profiler.main()

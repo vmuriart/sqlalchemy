@@ -27,6 +27,7 @@ from .util import threading, memoized_property, \
     chop_traceback
 
 from collections import deque
+
 proxies = {}
 
 
@@ -63,13 +64,13 @@ def clear_managers():
         manager.close()
     proxies.clear()
 
+
 reset_rollback = util.symbol('reset_rollback')
 reset_commit = util.symbol('reset_commit')
 reset_none = util.symbol('reset_none')
 
 
 class _ConnDialect(object):
-
     """partial implementation of :class:`.Dialect`
     which provides DBAPI connection methods.
 
@@ -90,7 +91,6 @@ class _ConnDialect(object):
 
 
 class Pool(log.Identified):
-
     """Abstract base class for connection pools."""
 
     _dialect = _ConnDialect()
@@ -230,7 +230,8 @@ class Pool(log.Identified):
             self._reset_on_return = reset_commit
         else:
             raise exc.ArgumentError(
-                "Invalid value for 'reset_on_return': {0!r}".format(reset_on_return))
+                "Invalid value for 'reset_on_return': {0!r}".format(
+                    reset_on_return))
 
         self.echo = echo
 
@@ -414,7 +415,6 @@ class Pool(log.Identified):
 
 
 class _ConnectionRecord(object):
-
     """Internal object which maintains an individual DBAPI connection
     referenced by a :class:`.Pool`.
 
@@ -483,9 +483,9 @@ class _ConnectionRecord(object):
         rec.fairy_ref = weakref.ref(
             fairy,
             lambda ref: _finalize_fairy and
-            _finalize_fairy(
-                dbapi_connection,
-                rec, pool, ref, echo)
+                        _finalize_fairy(
+                            dbapi_connection,
+                            rec, pool, ref, echo)
         )
         _refs.add(rec)
         if echo:
@@ -557,7 +557,7 @@ class _ConnectionRecord(object):
             self.info.clear()
             self.__connect()
         elif self.__pool._recycle > -1 and \
-                time.time() - self.starttime > self.__pool._recycle:
+                    time.time() - self.starttime > self.__pool._recycle:
             self.__pool.logger.info(
                 "Connection %r exceeded timeout; recycling",
                 self.connection)
@@ -606,8 +606,8 @@ class _ConnectionRecord(object):
             raise
         else:
             if first_connect_check:
-                pool.dispatch.first_connect.\
-                    for_modify(pool.dispatch).\
+                pool.dispatch.first_connect. \
+                    for_modify(pool.dispatch). \
                     exec_once(self.connection, self)
             if pool.dispatch.connect:
                 pool.dispatch.connect(self.connection, self)
@@ -657,7 +657,6 @@ _refs = set()
 
 
 class _ConnectionFairy(object):
-
     """Proxies a DBAPI connection and provides return-on-dereference
     support.
 
@@ -890,7 +889,6 @@ class _ConnectionFairy(object):
 
 
 class SingletonThreadPool(Pool):
-
     """A Pool that maintains one connection per thread.
 
     Maintains one connection per each thread, never moving a connection to a
@@ -958,7 +956,8 @@ class SingletonThreadPool(Pool):
             c.close()
 
     def status(self):
-        return "SingletonThreadPool id:{0:d} size: {1:d}".format(id(self), len(self._all_conns))
+        return "SingletonThreadPool id:{0:d} size: {1:d}".format(id(self), len(
+            self._all_conns))
 
     def _do_return_conn(self, conn):
         pass
@@ -979,7 +978,6 @@ class SingletonThreadPool(Pool):
 
 
 class QueuePool(Pool):
-
     """A :class:`.Pool` that imposes a limit on the number of open connections.
 
     :class:`.QueuePool` is the default pooling implementation used for
@@ -1110,12 +1108,12 @@ class QueuePool(Pool):
         self.logger.info("Pool disposed. %s", self.status())
 
     def status(self):
-        return "Pool size: %d  Connections in pool: %d "\
-            "Current Overflow: %d Current Checked out "\
-            "connections: %d" % (self.size(),
-                                 self.checkedin(),
-                                 self.overflow(),
-                                 self.checkedout())
+        return "Pool size: %d  Connections in pool: %d " \
+               "Current Overflow: %d Current Checked out " \
+               "connections: %d" % (self.size(),
+                                    self.checkedin(),
+                                    self.overflow(),
+                                    self.checkedout())
 
     def size(self):
         return self._pool.maxsize
@@ -1131,7 +1129,6 @@ class QueuePool(Pool):
 
 
 class NullPool(Pool):
-
     """A Pool which does not pool connections.
 
     Instead it literally opens and closes the underlying DB-API connection
@@ -1173,7 +1170,6 @@ class NullPool(Pool):
 
 
 class StaticPool(Pool):
-
     """A Pool of exactly one connection, used for all requests.
 
     Reconnect-related functions such as ``recycle`` and connection
@@ -1221,7 +1217,6 @@ class StaticPool(Pool):
 
 
 class AssertionPool(Pool):
-
     """A :class:`.Pool` that allows at most one checked out connection at
     any given time.
 
@@ -1283,7 +1278,6 @@ class AssertionPool(Pool):
 
 
 class _DBProxy(object):
-
     """Layers connection pooling behavior on top of a standard DB-API module.
 
     Proxies a DB-API 2.0 connect() call to a connection pool keyed to the

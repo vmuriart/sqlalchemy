@@ -82,7 +82,8 @@ class Node(Base):
 
 
 if __name__ == "__main__":
-    engine = create_engine("postgresql://scott:tiger@localhost/test", echo=True)
+    engine = create_engine("postgresql://scott:tiger@localhost/test",
+                           echo=True)
     Base.metadata.create_all(engine)
 
     session = Session(engine)

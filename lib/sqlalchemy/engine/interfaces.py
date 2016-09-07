@@ -208,7 +208,7 @@ class Dialect(object):
         pass
 
     def reflecttable(
-            self, connection, table, include_columns, exclude_columns):
+        self, connection, table, include_columns, exclude_columns):
         """Load table description from the database.
 
         Given a :class:`.Connection` and a
@@ -377,7 +377,7 @@ class Dialect(object):
         raise NotImplementedError()
 
     def get_unique_constraints(
-            self, connection, table_name, schema=None, **kw):
+        self, connection, table_name, schema=None, **kw):
         """Return information about unique constraints in `table_name`.
 
         Given a string `table_name` and an optional string `schema`, return
@@ -400,7 +400,7 @@ class Dialect(object):
         raise NotImplementedError()
 
     def get_check_constraints(
-            self, connection, table_name, schema=None, **kw):
+        self, connection, table_name, schema=None, **kw):
         """Return information about check constraints in `table_name`.
 
         Given a string `table_name` and an optional string `schema`, return
@@ -880,6 +880,7 @@ class CreateEnginePlugin(object):
     .. versionadded:: 1.1
 
     """
+
     def __init__(self, url, kwargs):
         """Contruct a new :class:`.CreateEnginePlugin`.
 

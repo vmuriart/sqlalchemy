@@ -23,7 +23,6 @@ from contextlib import contextmanager
 from sqlalchemy.util import nested
 from sqlalchemy.testing.assertsql import CompiledSQL
 
-
 users, metadata, users_autoinc = None, None, None
 
 
@@ -68,8 +67,8 @@ class ExecuteTest(fixtures.TestBase):
             testing.db.dialect, None).default_from()
 
         conn = testing.db.connect()
-        result = conn.\
-            execution_options(no_parameters=True).\
+        result = conn. \
+            execution_options(no_parameters=True). \
             scalar(stmt)
         eq_(result, '%')
 
@@ -162,6 +161,7 @@ class ExecuteTest(fixtures.TestBase):
             assert res.fetchall() == [(1, 'jack')]
 
             conn.execute('delete from users')
+
         go(testing.db)
         conn = testing.db.connect()
         try:
@@ -197,6 +197,7 @@ class ExecuteTest(fixtures.TestBase):
             assert res.fetchall() == [
                 (1, 'jack'), (2, 'ed'), (3, 'horse'), (4, 'sally')]
             conn.execute('delete from users')
+
         go(testing.db)
         conn = testing.db.connect()
         try:
@@ -219,6 +220,7 @@ class ExecuteTest(fixtures.TestBase):
             assert res.fetchall() == [
                 (1, 'jack'), (2, 'ed'), (3, 'horse'), (4, 'sally')]
             conn.execute('delete from users')
+
         go(testing.db)
         conn = testing.db.connect()
         try:
@@ -295,10 +297,11 @@ class ExecuteTest(fixtures.TestBase):
                 "nope \[SQL\: u?'SELECT 1 ",
                 conn.execute,
                 select([1]).
-                where(
+                    where(
                     column('foo') == literal('bar', MyType())
                 )
             )
+
         _go(testing.db)
         conn = testing.db.connect()
         try:
@@ -415,10 +418,11 @@ class ExecuteTest(fixtures.TestBase):
                 "nope",
                 conn.execute,
                 select([1]).
-                where(
+                    where(
                     column('foo') == literal('bar', MyType())
                 )
             )
+
         _go(testing.db)
         conn = testing.db.connect()
         try:
@@ -436,7 +440,7 @@ class ExecuteTest(fixtures.TestBase):
     @testing.requires.ad_hoc_engines
     def test_engine_level_options(self):
         eng = engines.testing_engine(options={'execution_options':
-                                              {'foo': 'bar'}})
+                                                  {'foo': 'bar'}})
         with eng.contextual_connect() as conn:
             eq_(conn._execution_options['foo'], 'bar')
             eq_(
@@ -455,7 +459,7 @@ class ExecuteTest(fixtures.TestBase):
     @testing.requires.ad_hoc_engines
     def test_generative_engine_execution_options(self):
         eng = engines.testing_engine(options={'execution_options':
-                                              {'base': 'x1'}})
+                                                  {'base': 'x1'}})
 
         eng1 = eng.execution_options(foo="b1")
         eng2 = eng.execution_options(foo="b2")
@@ -493,7 +497,7 @@ class ExecuteTest(fixtures.TestBase):
             canary.append("l3")
 
         eng = engines.testing_engine(options={'execution_options':
-                                              {'base': 'x1'}})
+                                                  {'base': 'x1'}})
         event.listen(eng, "before_execute", l1)
 
         eng1 = eng.execution_options(foo="b1")
@@ -514,7 +518,6 @@ class ExecuteTest(fixtures.TestBase):
         conn = eng.connect()
         conn.close()
         eng.dispose()
-
 
         conn = eng.connect()
         conn.close()
@@ -555,6 +558,7 @@ class ExecuteTest(fixtures.TestBase):
     def test_generative_engine_event_dispatch_hasevents(self):
         def l1(*arg, **kw):
             pass
+
         eng = create_engine(testing.db.url)
         assert not eng._has_events
         event.listen(eng, "before_execute", l1)
@@ -569,6 +573,7 @@ class ExecuteTest(fixtures.TestBase):
                     raise self.engine.dialect.dbapi.DatabaseError("boom")
                 else:
                     return super(MockCursor, self).execute(stmt, params, **kw)
+
         eng = engines.proxying_engine(cursor_cls=MockCursor)
         assert_raises_message(
             tsa.exc.SAWarning,
@@ -607,6 +612,7 @@ class ConvenienceExecuteTest(fixtures.TablesTest):
             if is_transaction:
                 conn = conn.connection
             conn.execute(self.table.insert().values(a=x, b=value))
+
         return go
 
     def _trans_rollback_fn(self, is_transaction=False):
@@ -615,6 +621,7 @@ class ConvenienceExecuteTest(fixtures.TablesTest):
                 conn = conn.connection
             conn.execute(self.table.insert().values(a=x, b=value))
             raise SomeException("breakage")
+
         return go
 
     def _assert_no_data(self):
@@ -783,7 +790,7 @@ class CompiledCacheTest(fixtures.TestBase):
         ins = users.insert()
         with patch.object(
             ins, "compile",
-                Mock(side_effect=ins.compile)) as compile_mock:
+            Mock(side_effect=ins.compile)) as compile_mock:
             cached_conn.execute(ins, {'user_name': 'u1'})
             cached_conn.execute(ins, {'user_name': 'u2'})
             cached_conn.execute(ins, {'user_name': 'u3'})
@@ -803,7 +810,7 @@ class CompiledCacheTest(fixtures.TestBase):
 
         with patch.object(
             upd, "compile",
-                Mock(side_effect=upd.compile)) as compile_mock:
+            Mock(side_effect=upd.compile)) as compile_mock:
             cached_conn.execute(
                 upd, util.OrderedDict([
                     ("b_user_id", 1),
@@ -864,12 +871,12 @@ class CompiledCacheTest(fixtures.TestBase):
 
 
 class MockStrategyTest(fixtures.TestBase):
-
     def _engine_fixture(self):
         buf = util.StringIO()
 
         def dump(sql, *multiparams, **params):
             buf.write(util.text_type(sql.compile(dialect=engine.dialect)))
+
         engine = create_engine('postgresql://', strategy='mock', executor=dump)
         return engine, buf
 
@@ -878,7 +885,8 @@ class MockStrategyTest(fixtures.TestBase):
         metadata = MetaData()
         t = Table('testtable', metadata,
                   Column(
-                      'pk', Integer, Sequence('testtable_pk_seq'), primary_key=True)
+                      'pk', Integer, Sequence('testtable_pk_seq'),
+                      primary_key=True)
                   )
 
         t.create(engine)
@@ -911,8 +919,7 @@ class SchemaTranslateTest(fixtures.TestBase, testing.AssertsExecutionResults):
 
         with self.sql_execution_asserter(config.db) as asserter:
             with config.db.connect().execution_options(
-                    schema_translate_map=map_) as conn:
-
+                schema_translate_map=map_) as conn:
                 t1.create(conn)
                 t2.create(conn)
                 t3.create(conn)
@@ -922,8 +929,10 @@ class SchemaTranslateTest(fixtures.TestBase, testing.AssertsExecutionResults):
                 t1.drop(conn)
 
         asserter.assert_(
-            CompiledSQL("CREATE TABLE {0!s}.t1 (x INTEGER)".format(config.test_schema)),
-            CompiledSQL("CREATE TABLE {0!s}.t2 (x INTEGER)".format(config.test_schema)),
+            CompiledSQL("CREATE TABLE {0!s}.t1 (x INTEGER)".format(
+                config.test_schema)),
+            CompiledSQL("CREATE TABLE {0!s}.t2 (x INTEGER)".format(
+                config.test_schema)),
             CompiledSQL("CREATE TABLE t3 (x INTEGER)"),
             CompiledSQL("DROP TABLE t3"),
             CompiledSQL("DROP TABLE {0!s}.t2".format(config.test_schema)),
@@ -942,7 +951,6 @@ class SchemaTranslateTest(fixtures.TestBase, testing.AssertsExecutionResults):
         metadata.create_all()
 
     def test_ddl_hastable(self):
-
         map_ = {
             None: config.test_schema,
             "foo": config.test_schema, "bar": None}
@@ -953,7 +961,7 @@ class SchemaTranslateTest(fixtures.TestBase, testing.AssertsExecutionResults):
         Table('t3', metadata, Column('x', Integer), schema="bar")
 
         with config.db.connect().execution_options(
-                schema_translate_map=map_) as conn:
+            schema_translate_map=map_) as conn:
             metadata.create_all(conn)
 
         assert config.db.has_table('t1', schema=config.test_schema)
@@ -961,7 +969,7 @@ class SchemaTranslateTest(fixtures.TestBase, testing.AssertsExecutionResults):
         assert config.db.has_table('t3', schema=None)
 
         with config.db.connect().execution_options(
-                schema_translate_map=map_) as conn:
+            schema_translate_map=map_) as conn:
             metadata.drop_all(conn)
 
         assert not config.db.has_table('t1', schema=config.test_schema)
@@ -983,8 +991,7 @@ class SchemaTranslateTest(fixtures.TestBase, testing.AssertsExecutionResults):
 
         with self.sql_execution_asserter(config.db) as asserter:
             with config.db.connect().execution_options(
-                    schema_translate_map=map_) as conn:
-
+                schema_translate_map=map_) as conn:
                 conn.execute(t1.insert(), {'x': 1})
                 conn.execute(t2.insert(), {'x': 1})
                 conn.execute(t3.insert(), {'x': 1})
@@ -1003,9 +1010,11 @@ class SchemaTranslateTest(fixtures.TestBase, testing.AssertsExecutionResults):
 
         asserter.assert_(
             CompiledSQL(
-                "INSERT INTO {0!s}.t1 (x) VALUES (:x)".format(config.test_schema)),
+                "INSERT INTO {0!s}.t1 (x) VALUES (:x)".format(
+                    config.test_schema)),
             CompiledSQL(
-                "INSERT INTO {0!s}.t2 (x) VALUES (:x)".format(config.test_schema)),
+                "INSERT INTO {0!s}.t2 (x) VALUES (:x)".format(
+                    config.test_schema)),
             CompiledSQL(
                 "INSERT INTO t3 (x) VALUES (:x)"),
             CompiledSQL(
@@ -1047,7 +1056,6 @@ class SchemaTranslateTest(fixtures.TestBase, testing.AssertsExecutionResults):
 
 
 class ExecutionOptionsTest(fixtures.TestBase):
-
     def test_dialect_conn_options(self):
         engine = testing_engine("sqlite://", options=dict(_initialize=False))
         engine.dialect = Mock()
@@ -1122,7 +1130,7 @@ class EngineEventsTest(fixtures.TestBase):
                 teststmt = re.compile(r'[\n\t ]+', re.M).sub(' ',
                                                              teststmt).strip()
                 if teststmt.startswith(stmt) and (
-                        testparams == params or testparams == posn):
+                            testparams == params or testparams == posn):
                     break
 
     def test_per_engine_independence(self):
@@ -1247,7 +1255,6 @@ class EngineEventsTest(fixtures.TestBase):
         stmt = str(select([1]).compile(dialect=e1.dialect))
 
         with e1.connect() as conn:
-
             result = conn.execute(stmt)
 
         ctx = result.context
@@ -1264,6 +1271,7 @@ class EngineEventsTest(fixtures.TestBase):
         def after_execute(conn, clauseelement, multiparams, params, result):
             assert isinstance(multiparams, (list, tuple))
             assert isinstance(params, dict)
+
         e1 = testing_engine(config.db_url)
         event.listen(e1, 'before_execute', before_execute)
         event.listen(e1, 'after_execute', after_execute)
@@ -1288,11 +1296,11 @@ class EngineEventsTest(fixtures.TestBase):
             cursor_stmts.append((str(statement), parameters, None))
 
         for engine in [
-                engines.testing_engine(options=dict(implicit_returning=False)),
-                engines.testing_engine(options=dict(implicit_returning=False,
-                                                    strategy='threadlocal')),
-                engines.testing_engine(options=dict(implicit_returning=False)).
-            connect()
+            engines.testing_engine(options=dict(implicit_returning=False)),
+            engines.testing_engine(options=dict(implicit_returning=False,
+                                                strategy='threadlocal')),
+            engines.testing_engine(options=dict(implicit_returning=False)).
+                connect()
         ]:
             event.listen(engine, 'before_execute', execute)
             event.listen(engine, 'before_cursor_execute', cursor_execute)
@@ -1326,9 +1334,9 @@ class EngineEventsTest(fixtures.TestBase):
                     ('CREATE TABLE t1', {}, ()),
                     ('INSERT INTO t1 (c1, c2)', {
                         'c2': 'some data', 'c1': 5},
-                        (5, 'some data')),
+                     (5, 'some data')),
                     ('SELECT lower', {'lower_2': 'Foo'},
-                        ('Foo', )),
+                     ('Foo',)),
                     ('INSERT INTO t1 (c1, c2)',
                      {'c2': 'foo', 'c1': 6},
                      (6, 'foo')),
@@ -1338,7 +1346,7 @@ class EngineEventsTest(fixtures.TestBase):
             else:
                 insert2_params = 6, 'Foo'
                 if testing.against('oracle+zxjdbc'):
-                    insert2_params += (ReturningParam(12), )
+                    insert2_params += (ReturningParam(12),)
                 cursor = [('CREATE TABLE t1', {}, ()),
                           ('INSERT INTO t1 (c1, c2)',
                            {'c2': 'some data', 'c1': 5}, (5, 'some data')),
@@ -1377,6 +1385,7 @@ class EngineEventsTest(fixtures.TestBase):
         def tracker(name):
             def go(conn, *args, **kw):
                 canary.append(name)
+
             return go
 
         def execute(conn, clauseelement, multiparams, params):
@@ -1448,7 +1457,9 @@ class EngineEventsTest(fixtures.TestBase):
         def tracker(name):
             def go(conn, cursor, statement, parameters, context, executemany):
                 canary.append((statement, context))
+
             return go
+
         engine = engines.testing_engine()
 
         t = Table('t', self.metadata,
@@ -1474,6 +1485,7 @@ class EngineEventsTest(fixtures.TestBase):
         def tracker(name):
             def go(conn, *args, **kw):
                 canary.append(name)
+
             return go
 
         engine = engines.testing_engine()
@@ -1504,6 +1516,7 @@ class EngineEventsTest(fixtures.TestBase):
         def tracker(name):
             def go(*args, **kw):
                 canary.append((name, set(kw)))
+
             return go
 
         engine = engines.testing_engine()
@@ -1548,12 +1561,15 @@ class EngineEventsTest(fixtures.TestBase):
         def tracker1(name):
             def go(*args, **kw):
                 canary1.append(name)
+
             return go
+
         canary2 = []
 
         def tracker2(name):
             def go(*args, **kw):
                 canary2.append(name)
+
             return go
 
         engine = engines.testing_engine()
@@ -1737,7 +1753,7 @@ class HandleErrorTest(fixtures.TestBase):
             stmt = context.statement
 
             if "ERROR ONE" in str(stmt) or "ERROR TWO" in str(stmt) \
-                    or "ERROR THREE" in str(stmt):
+                or "ERROR THREE" in str(stmt):
                 return MyException1("my exception")
             elif "ERROR FOUR" in str(stmt):
                 raise MyException3("my exception short circuit")
@@ -1746,7 +1762,7 @@ class HandleErrorTest(fixtures.TestBase):
         def err2(context):
             stmt = context.statement
             if ("ERROR ONE" in str(stmt) or "ERROR FOUR" in str(stmt)) \
-                    and isinstance(context.chained_exception, MyException1):
+                and isinstance(context.chained_exception, MyException1):
                 raise MyException2("my exception chained")
             elif "ERROR TWO" in str(stmt):
                 return context.chained_exception
@@ -1756,7 +1772,7 @@ class HandleErrorTest(fixtures.TestBase):
         conn = engine.connect()
 
         with patch.object(engine.
-                          dialect.execution_ctx_cls,
+                              dialect.execution_ctx_cls,
                           "handle_dbapi_exception") as patched:
             assert_raises_message(
                 MyException2,
@@ -1766,7 +1782,7 @@ class HandleErrorTest(fixtures.TestBase):
             eq_(patched.call_count, 1)
 
         with patch.object(engine.
-                          dialect.execution_ctx_cls,
+                              dialect.execution_ctx_cls,
                           "handle_dbapi_exception") as patched:
             assert_raises(
                 MyException1,
@@ -1775,7 +1791,7 @@ class HandleErrorTest(fixtures.TestBase):
             eq_(patched.call_count, 1)
 
         with patch.object(engine.
-                          dialect.execution_ctx_cls,
+                              dialect.execution_ctx_cls,
                           "handle_dbapi_exception") as patched:
             # test that non None from err1 isn't cancelled out
             # by err2
@@ -1786,7 +1802,7 @@ class HandleErrorTest(fixtures.TestBase):
             eq_(patched.call_count, 1)
 
         with patch.object(engine.
-                          dialect.execution_ctx_cls,
+                              dialect.execution_ctx_cls,
                           "handle_dbapi_exception") as patched:
             assert_raises(
                 tsa.exc.DBAPIError,
@@ -1795,7 +1811,7 @@ class HandleErrorTest(fixtures.TestBase):
             eq_(patched.call_count, 1)
 
         with patch.object(engine.
-                          dialect.execution_ctx_cls,
+                              dialect.execution_ctx_cls,
                           "handle_dbapi_exception") as patched:
             assert_raises_message(
                 MyException3,
@@ -1934,7 +1950,7 @@ class HandleErrorTest(fixtures.TestBase):
                 ctx.invalidate_pool_on_disconnect = False
 
         c1, c2, c3 = engine.pool.connect(), \
-            engine.pool.connect(), engine.pool.connect()
+                     engine.pool.connect(), engine.pool.connect()
         crecs = [conn._connection_record for conn in (c1, c2, c3)]
         c1.close()
         c2.close()
@@ -1986,7 +2002,7 @@ class HandleErrorTest(fixtures.TestBase):
 
 
 class HandleInvalidatedOnConnectTest(fixtures.TestBase):
-    __requires__ = ('sqlite', )
+    __requires__ = ('sqlite',)
 
     def setUp(self):
         e = create_engine('sqlite://')
@@ -1996,6 +2012,7 @@ class HandleInvalidatedOnConnectTest(fixtures.TestBase):
 
         def connect(*args, **kwargs):
             return connection
+
         dbapi = Mock(
             sqlite_version_info=(99, 9, 9,),
             version_info=(99, 9, 9,),
@@ -2054,7 +2071,8 @@ class HandleInvalidatedOnConnectTest(fixtures.TestBase):
         def handle_error(ctx):
             assert ctx.engine is eng
             assert ctx.connection is conn
-            assert isinstance(ctx.sqlalchemy_exception, tsa.exc.ProgrammingError)
+            assert isinstance(ctx.sqlalchemy_exception,
+                              tsa.exc.ProgrammingError)
             raise MySpecialException("failed operation")
 
         conn = eng.connect()
@@ -2231,7 +2249,6 @@ class HandleInvalidatedOnConnectTest(fixtures.TestBase):
 
 
 class ProxyConnectionTest(fixtures.TestBase):
-
     """These are the same tests as EngineEventsTest, except using
     the deprecated ConnectionProxy interface.
 
@@ -2274,14 +2291,15 @@ class ProxyConnectionTest(fixtures.TestBase):
         def assert_stmts(expected, received):
             for stmt, params, posn in expected:
                 if not received:
-                    assert False, "Nothing available for stmt: {0!s}".format(stmt)
+                    assert False, "Nothing available for stmt: {0!s}".format(
+                        stmt)
                 while received:
                     teststmt, testparams, testmultiparams = \
                         received.pop(0)
                     teststmt = re.compile(
                         r'[\n\t ]+', re.M).sub(' ', teststmt).strip()
                     if teststmt.startswith(stmt) and (
-                            testparams == params or testparams == posn):
+                                testparams == params or testparams == posn):
                         break
 
         for engine in \
@@ -2313,14 +2331,14 @@ class ProxyConnectionTest(fixtures.TestBase):
                         ('select * from t1', {}, None),
                         ('DROP TABLE t1', {}, None)]
             if not testing.against('oracle+zxjdbc'):  # or engine.dialect.pr
-                                                      # eexecute_pk_sequence
-                                                      # s:
+                # eexecute_pk_sequence
+                # s:
                 cursor = [
                     ('CREATE TABLE t1', {}, ()),
                     ('INSERT INTO t1 (c1, c2)', {
-                     'c2': 'some data', 'c1': 5}, (5, 'some data')),
+                        'c2': 'some data', 'c1': 5}, (5, 'some data')),
                     ('SELECT lower', {'lower_2': 'Foo'},
-                        ('Foo', )),
+                     ('Foo',)),
                     ('INSERT INTO t1 (c1, c2)', {'c2': 'foo', 'c1': 6},
                      (6, 'foo')),
                     ('select * from t1', {}, ()),
@@ -2329,10 +2347,10 @@ class ProxyConnectionTest(fixtures.TestBase):
             else:
                 insert2_params = 6, 'Foo'
                 if testing.against('oracle+zxjdbc'):
-                    insert2_params += (ReturningParam(12), )
+                    insert2_params += (ReturningParam(12),)
                 cursor = [('CREATE TABLE t1', {}, ()),
                           ('INSERT INTO t1 (c1, c2)', {
-                           'c2': 'some data', 'c1': 5}, (5, 'some data')),
+                              'c2': 'some data', 'c1': 5}, (5, 'some data')),
                           ('INSERT INTO t1 (c1, c2)',
                            {'c1': 6, 'lower_2': 'Foo'}, insert2_params),
                           ('select * from t1', {}, ()),
@@ -2345,14 +2363,15 @@ class ProxyConnectionTest(fixtures.TestBase):
         canary = []
 
         class TrackProxy(ConnectionProxy):
-
             def __getattribute__(self, key):
                 fn = object.__getattribute__(self, key)
 
                 def go(*arg, **kw):
                     canary.append(fn.__name__)
                     return fn(*arg, **kw)
+
                 return go
+
         engine = engines.testing_engine(options={'proxy': TrackProxy()})
         conn = engine.connect()
         c2 = conn.execution_options(foo='bar')
@@ -2367,13 +2386,13 @@ class ProxyConnectionTest(fixtures.TestBase):
         canary = []
 
         class TrackProxy(ConnectionProxy):
-
             def __getattribute__(self, key):
                 fn = object.__getattribute__(self, key)
 
                 def go(*arg, **kw):
                     canary.append(fn.__name__)
                     return fn(*arg, **kw)
+
                 return go
 
         engine = engines.testing_engine(options={'proxy': TrackProxy()})
@@ -2398,13 +2417,13 @@ class ProxyConnectionTest(fixtures.TestBase):
         canary = []
 
         class TrackProxy(ConnectionProxy):
-
             def __getattribute__(self, key):
                 fn = object.__getattribute__(self, key)
 
                 def go(*arg, **kw):
                     canary.append(fn.__name__)
                     return fn(*arg, **kw)
+
                 return go
 
         engine = engines.testing_engine(options={'proxy': TrackProxy()})
@@ -2433,7 +2452,6 @@ class ProxyConnectionTest(fixtures.TestBase):
 
 
 class DialectEventTest(fixtures.TestBase):
-
     @contextmanager
     def _run_test(self, retval):
         m1 = Mock()
@@ -2499,7 +2517,7 @@ class DialectEventTest(fixtures.TestBase):
 
     def _test_do_execute_no_params(self, retval):
         with self._run_test(retval) as (conn, m1):
-            result = conn.execution_options(no_parameters=True).\
+            result = conn.execution_options(no_parameters=True). \
                 execute("insert into table foo")
         self._assert(
             retval,
@@ -2634,5 +2652,3 @@ class DialectEventTest(fixtures.TestBase):
         conn.connection.invalidate()
         conn = e.connect()
         eq_(conn.info['boom'], "one")
-
-

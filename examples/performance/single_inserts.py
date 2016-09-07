@@ -125,12 +125,13 @@ def test_dbapi_raw_w_pool(n):
 def _test_dbapi_raw(n, connect):
     compiled = Customer.__table__.insert().values(
         name=bindparam('name'),
-        description=bindparam('description')).\
+        description=bindparam('description')). \
         compile(dialect=engine.dialect)
 
     if compiled.positional:
         args = (
-            ('customer name {0:d}'.format(i), 'customer description {0:d}'.format(i))
+            ('customer name {0:d}'.format(i),
+             'customer description {0:d}'.format(i))
             for i in range(n))
     else:
         args = (

@@ -9,7 +9,6 @@
 
 """
 
-
 from .. import exc, util
 from . import operators
 from .visitors import Visitable, VisitableType
@@ -96,7 +95,7 @@ class TypeEngine(Visitable):
             return op, self.type
 
         def __reduce__(self):
-            return _reconstitute_comparator, (self.expr, )
+            return _reconstitute_comparator, (self.expr,)
 
     hashable = True
     """Flag, if False, means values from this type aren't hashable.
@@ -306,7 +305,7 @@ class TypeEngine(Visitable):
         """
 
         return self.__class__.column_expression.__code__ \
-            is not TypeEngine.column_expression.__code__
+               is not TypeEngine.column_expression.__code__
 
     def bind_expression(self, bindvalue):
         """"Given a bind value (i.e. a :class:`.BindParameter` instance),
@@ -344,7 +343,7 @@ class TypeEngine(Visitable):
         """
 
         return self.__class__.bind_expression.__code__ \
-            is not TypeEngine.bind_expression.__code__
+               is not TypeEngine.bind_expression.__code__
 
     def compare_values(self, x, y):
         """Compare two values for equality."""
@@ -515,7 +514,7 @@ class TypeEngine(Visitable):
         """
         _coerced_type = _resolve_value_to_type(value)
         if _coerced_type is NULLTYPE or _coerced_type._type_affinity \
-                is self._type_affinity:
+            is self._type_affinity:
             return self
         else:
             return _coerced_type
@@ -551,7 +550,7 @@ class TypeEngine(Visitable):
 
     def __str__(self):
         if util.py2k:
-            return unicode(self.compile()).\
+            return unicode(self.compile()). \
                 encode('ascii', 'backslashreplace')
         else:
             return str(self.compile())
@@ -778,7 +777,7 @@ class TypeDecorator(SchemaEventTarget, TypeEngine):
                                  "type being decorated")
         self.impl = to_instance(self.__class__.impl, *args, **kwargs)
 
-    coerce_to_is_types = (util.NoneType, )
+    coerce_to_is_types = (util.NoneType,)
     """Specify those Python types which should be coerced at the expression
     level to "IS <constant>" when compared using ``==`` (and same for
     ``IS NOT`` in conjunction with ``!=``.
@@ -979,7 +978,7 @@ class TypeDecorator(SchemaEventTarget, TypeEngine):
         """
 
         return self.__class__.process_bind_param.__code__ \
-            is not TypeDecorator.process_bind_param.__code__
+               is not TypeDecorator.process_bind_param.__code__
 
     @util.memoized_property
     def _has_literal_processor(self):
@@ -989,7 +988,7 @@ class TypeDecorator(SchemaEventTarget, TypeEngine):
         """
 
         return self.__class__.process_literal_param.__code__ \
-            is not TypeDecorator.process_literal_param.__code__
+               is not TypeDecorator.process_literal_param.__code__
 
     def literal_processor(self, dialect):
         """Provide a literal processing function for the given
@@ -1080,7 +1079,7 @@ class TypeDecorator(SchemaEventTarget, TypeEngine):
 
         """
         return self.__class__.process_result_value.__code__ \
-            is not TypeDecorator.process_result_value.__code__
+               is not TypeDecorator.process_result_value.__code__
 
     def result_processor(self, dialect, coltype):
         """Provide a result value processing function for the given

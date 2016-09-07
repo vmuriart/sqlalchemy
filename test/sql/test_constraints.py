@@ -1,5 +1,5 @@
 from sqlalchemy.testing import assert_raises, assert_raises_message
-from sqlalchemy import Table, Integer, String, Column, PrimaryKeyConstraint,\
+from sqlalchemy import Table, Integer, String, Column, PrimaryKeyConstraint, \
     ForeignKeyConstraint, ForeignKey, UniqueConstraint, Index, MetaData, \
     CheckConstraint, func, text
 from sqlalchemy import exc, schema
@@ -10,7 +10,8 @@ from sqlalchemy.engine import default
 from sqlalchemy.testing import engines
 from sqlalchemy.testing.assertions import expect_warnings
 from sqlalchemy.testing import eq_
-from sqlalchemy.testing.assertsql import AllOf, RegexSQL, CompiledSQL, DialectSQL
+from sqlalchemy.testing.assertsql import AllOf, RegexSQL, CompiledSQL, \
+    DialectSQL
 from sqlalchemy.sql import table, column
 
 
@@ -86,8 +87,8 @@ class ConstraintGenTest(fixtures.TestBase, AssertsExecutionResults):
             )
         else:
             with expect_warnings(
-                    "Can't sort tables for DROP; an unresolvable "
-                    "foreign key dependency "):
+                "Can't sort tables for DROP; an unresolvable "
+                "foreign key dependency "):
                 with self.sql_execution_asserter() as asserter:
                     metadata.drop_all(testing.db, checkfirst=False)
 
@@ -182,7 +183,7 @@ class ConstraintGenTest(fixtures.TestBase, AssertsExecutionResults):
         self._assert_cyclic_constraint(metadata, auto=False)
 
     def _assert_cyclic_constraint(
-            self, metadata, auto=False, sqlite_warning=False):
+        self, metadata, auto=False, sqlite_warning=False):
         if testing.db.dialect.supports_alter:
             self._assert_cyclic_constraint_supports_alter(metadata, auto=auto)
         else:
@@ -253,7 +254,7 @@ class ConstraintGenTest(fixtures.TestBase, AssertsExecutionResults):
         asserter.assert_(*assertions)
 
     def _assert_cyclic_constraint_no_alter(
-            self, metadata, auto=False, sqlite_warning=False):
+        self, metadata, auto=False, sqlite_warning=False):
         table_assertions = []
         if auto:
             table_assertions.append(
@@ -375,8 +376,8 @@ class ConstraintGenTest(fixtures.TestBase, AssertsExecutionResults):
             )
         else:
             with expect_warnings(
-                    "Can't sort tables for DROP; an unresolvable "
-                    "foreign key dependency exists between tables"):
+                "Can't sort tables for DROP; an unresolvable "
+                "foreign key dependency exists between tables"):
                 with self.sql_execution_asserter() as asserter:
                     metadata.drop_all(checkfirst=False)
 
@@ -450,11 +451,6 @@ class ConstraintGenTest(fixtures.TestBase, AssertsExecutionResults):
                     CompiledSQL("DROP TABLE a"),
                 ),
             )
-
-
-
-
-
 
     @testing.requires.check_constraints
     @testing.provide_metadata
@@ -616,11 +612,11 @@ class ConstraintGenTest(fixtures.TestBase, AssertsExecutionResults):
             RegexSQL("^CREATE TABLE events"),
             AllOf(
                 CompiledSQL('CREATE UNIQUE INDEX ix_events_name ON events '
-                         '(name)'),
+                            '(name)'),
                 CompiledSQL('CREATE INDEX ix_events_location ON events '
-                         '(location)'),
+                            '(location)'),
                 CompiledSQL('CREATE UNIQUE INDEX sport_announcer ON events '
-                         '(sport, announcer)'),
+                            '(sport, announcer)'),
                 CompiledSQL('CREATE INDEX idx_winners ON events (winner)'),
             )
         )
@@ -693,7 +689,6 @@ class ConstraintCompilationTest(fixtures.TestBase, AssertsCompiledSQL):
                 ('sometable', 'this_name_is_too_long', 'ix_sometable_t_09aa'),
                 ('sometable', 'this_name_alsois_long', 'ix_sometable_t_3cf1'),
             ]:
-
                 t1 = Table(tname, MetaData(),
                            Column(cname, Integer, index=True),
                            )
@@ -1148,5 +1143,3 @@ class ConstraintCompilationTest(fixtures.TestBase, AssertsCompiledSQL):
             schema.CreateIndex(constraint),
             "CREATE INDEX name ON tbl (a + 5)"
         )
-
-

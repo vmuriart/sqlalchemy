@@ -13,7 +13,6 @@ from sqlalchemy import inspect
 
 
 class IndexPropertyTest(fixtures.TestBase):
-
     def test_array(self):
         Base = declarative_base()
 
@@ -116,6 +115,7 @@ class IndexPropertyTest(fixtures.TestBase):
 
         def set_():
             a.first = 10
+
         assert_raises(AttributeError, set_)
 
     def test_set_mutable_dict(self):
@@ -165,7 +165,6 @@ class IndexPropertyTest(fixtures.TestBase):
 
 
 class IndexPropertyArrayTest(fixtures.DeclarativeMappedTest):
-
     __requires__ = ('array_type',)
     __backend__ = True
 
@@ -242,7 +241,6 @@ class IndexPropertyArrayTest(fixtures.DeclarativeMappedTest):
 
 
 class IndexPropertyJsonTest(fixtures.DeclarativeMappedTest):
-
     # TODO: remove reliance on "astext" for these tests
     __requires__ = ('json_type',)
     __only_on__ = 'postgresql'
@@ -287,7 +285,8 @@ class IndexPropertyJsonTest(fixtures.DeclarativeMappedTest):
             Json(json={'field': 20})])
         s.commit()
 
-        a1 = s.query(Json).filter(Json.json['field'].astext.cast(Integer) == 10)\
+        a1 = s.query(Json).filter(
+            Json.json['field'].astext.cast(Integer) == 10) \
             .one()
         a2 = s.query(Json).filter(Json.field.astext == '10').one()
         eq_(a1.id, a2.id)
@@ -315,7 +314,6 @@ class IndexPropertyJsonTest(fixtures.DeclarativeMappedTest):
         eq_(j.other, 42)
 
     def test_modified(self):
-
         Json = self.classes.Json
         s = Session(testing.db)
 

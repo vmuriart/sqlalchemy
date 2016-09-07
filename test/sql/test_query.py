@@ -106,7 +106,7 @@ class QueryTest(fixtures.TestBase):
         concat = ("test: " + users.c.user_name).label('thedata')
         eq_(
             select([concat]).order_by(literal_column('thedata') + "x").
-            execute().fetchall(),
+                execute().fetchall(),
             [("test: ed",), ("test: fred",), ("test: jack",)]
         )
 
@@ -125,14 +125,14 @@ class QueryTest(fixtures.TestBase):
         row = testing.db.execute(
             select(
                 [or_(false, false).label("x"),
-                    and_(true, false).label("y")])).first()
+                 and_(true, false).label("y")])).first()
         assert row.x == False  # noqa
         assert row.y == False  # noqa
 
         row = testing.db.execute(
             select(
                 [or_(true, false).label("x"),
-                    and_(true, false).label("y")])).first()
+                 and_(true, false).label("y")])).first()
         assert row.x == True  # noqa
         assert row.y == False  # noqa
 
@@ -147,14 +147,14 @@ class QueryTest(fixtures.TestBase):
 
         for expr, result in (
             (select([users.c.user_id]).
-                where(users.c.user_name.startswith('apple')), [(1,)]),
+                 where(users.c.user_name.startswith('apple')), [(1,)]),
             (select([users.c.user_id]).
-                where(users.c.user_name.contains('i % t')), [(5,)]),
+                 where(users.c.user_name.contains('i % t')), [(5,)]),
             (select([users.c.user_id]).
-                where(users.c.user_name.endswith('anas')), [(3,)]),
+                 where(users.c.user_name.endswith('anas')), [(3,)]),
             (select([users.c.user_id]).
-                where(users.c.user_name.contains('i % t', escape='&')),
-                [(5,)]),
+                 where(users.c.user_name.contains('i % t', escape='&')),
+             [(5,)]),
         ):
             eq_(expr.execute().fetchall(), result)
 
@@ -181,20 +181,21 @@ class QueryTest(fixtures.TestBase):
 
         eq_(
             select([users.c.user_id]).where(users.c.user_name.ilike('one')).
-            execute().fetchall(), [(1, ), (3, ), (4, )])
+                execute().fetchall(), [(1,), (3,), (4,)])
 
         eq_(
             select([users.c.user_id]).where(users.c.user_name.ilike('TWO')).
-            execute().fetchall(), [(2, )])
+                execute().fetchall(), [(2,)])
 
         if testing.against('postgresql'):
             eq_(
                 select([users.c.user_id]).
-                where(users.c.user_name.like('one')).execute().fetchall(),
-                [(1, )])
+                    where(users.c.user_name.like('one')).execute().fetchall(),
+                [(1,)])
             eq_(
                 select([users.c.user_id]).
-                where(users.c.user_name.like('TWO')).execute().fetchall(), [])
+                    where(users.c.user_name.like('TWO')).execute().fetchall(),
+                [])
 
     def test_compiled_execute(self):
         users.insert().execute(user_id=7, user_name='jack')
@@ -639,7 +640,6 @@ class LimitTest(fixtures.TestBase):
 
 
 class CompoundTest(fixtures.TestBase):
-
     """test compound statements like UNION, INTERSECT, particularly their
     ability to nest on different databases."""
 
@@ -941,11 +941,11 @@ class CompoundTest(fixtures.TestBase):
         found = self._fetchall_sorted(ua.select().execute())
         eq_(found, wanted)
 
+
 t1 = t2 = t3 = None
 
 
 class JoinTest(fixtures.TestBase):
-
     """Tests join execution.
 
     The compiled SQL emitted by the dialect might be ANSI joins or
@@ -1032,7 +1032,7 @@ class JoinTest(fixtures.TestBase):
             expr = select(
                 [t1.c.t1_id, t2.c.t2_id, t3.c.t3_id],
                 from_obj=[t1.outerjoin(t2, t1.c.t1_id == t2.c.t1_id).
-                          outerjoin(t3, criteria)])
+                              outerjoin(t3, criteria)])
             self.assertRows(
                 expr, [(10, 20, 30), (11, 21, None), (12, None, None)])
 
@@ -1144,7 +1144,7 @@ class JoinTest(fixtures.TestBase):
                 and_(t1.c.t1_id < 19, t2.c.t2_id < 29, t3.c.t3_id < 39),
                 from_obj=[
                     (t1.outerjoin(t2, t1.c.t1_id == t2.c.t1_id).
-                        outerjoin(t3, criteria))])
+                     outerjoin(t3, criteria))])
             self.assertRows(expr, [(10, 20, 30)])
 
     def test_mixed(self):
@@ -1198,6 +1198,7 @@ class JoinTest(fixtures.TestBase):
                      t3.c.name == 't3 #30'),
                 from_obj=[(t1.join(t2).outerjoin(t3, criteria))])
             self.assertRows(expr, [(10, 20, 30)])
+
 
 metadata = flds = None
 

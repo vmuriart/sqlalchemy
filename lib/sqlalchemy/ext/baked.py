@@ -129,7 +129,7 @@ class BakedQuery(object):
         """
         if not full:
             _spoil_point = self._clone()
-            _spoil_point._cache_key += ('_query_only', )
+            _spoil_point._cache_key += ('_query_only',)
             self.steps = [_spoil_point._retrieve_baked_query]
         self._spoiled = True
         return self
@@ -155,8 +155,8 @@ class BakedQuery(object):
         # so delete some compilation-use-only attributes that can take up
         # space
         for attr in (
-                '_correlate', '_from_obj', '_mapper_adapter_map',
-                '_joinpath', '_joinpoint'):
+            '_correlate', '_from_obj', '_mapper_adapter_map',
+            '_joinpath', '_joinpoint'):
             query.__dict__.pop(attr, None)
         self._bakery[self._cache_key] = context
         return context
@@ -251,7 +251,7 @@ class Result(object):
         context.statement.use_labels = True
         if context.autoflush and not context.populate_existing:
             self.session._autoflush()
-        return context.query.params(self._params).\
+        return context.query.params(self._params). \
             with_session(self.session)._execute_and_instances(context)
 
     def first(self):
@@ -340,9 +340,9 @@ class Result(object):
             # into "IS NULL"
             if None in ident:
                 nones = set([
-                    _get_params[col].key for col, value in
-                    zip(mapper.primary_key, ident) if value is None
-                ])
+                                _get_params[col].key for col, value in
+                                zip(mapper.primary_key, ident) if value is None
+                                ])
                 _lcl_get_clause = sql_util.adapt_criterion_to_null(
                     _lcl_get_clause, nones)
 
@@ -359,12 +359,12 @@ class Result(object):
         # key so that if a race causes multiple calls to _get_clause,
         # we've cached on ours
         bq = bq._clone()
-        bq._cache_key += (_get_clause, )
+        bq._cache_key += (_get_clause,)
 
         bq = bq.with_criteria(setup, tuple(elem is None for elem in ident))
 
         params = {_get_params[primary_key].key: id_val
-            for id_val, primary_key in zip(ident, mapper.primary_key)}
+                  for id_val, primary_key in zip(ident, mapper.primary_key)}
 
         result = list(bq.for_session(self.session).params(**params))
         l = len(result)
@@ -416,7 +416,6 @@ def unbake_lazy_loaders():
 @sqla_log.class_logger
 @properties.RelationshipProperty.strategy_for(lazy="baked_select")
 class BakedLazyLoader(strategies.LazyLoader):
-
     def _emit_lazyload(self, session, state, ident_key, passive):
         q = BakedQuery(
             self.mapper._compiled_cache,
@@ -464,7 +463,7 @@ class BakedLazyLoader(strategies.LazyLoader):
             # object from get(), so don't need to eager out to those.
             if rev.direction is interfaces.MANYTOONE and \
                 rev._use_get and \
-                    not isinstance(rev.strategy, strategies.LazyLoader):
+                not isinstance(rev.strategy, strategies.LazyLoader):
                 q.add_criteria(
                     lambda q:
                     q.options(
@@ -514,6 +513,7 @@ def baked_lazyload(*keys):
 def baked_lazyload_all(*keys):
     return strategy_options._UnboundLoad._from_keys(
         strategy_options._UnboundLoad.baked_lazyload, keys, True, {})
+
 
 baked_lazyload = baked_lazyload._unbound_fn
 baked_lazyload_all = baked_lazyload_all._unbound_all_fn

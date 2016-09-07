@@ -149,7 +149,7 @@ class LikeQueryTest(BakedTest):
 
         eq_(
             bq(Session()).first(),
-            (8, )
+            (8,)
         )
 
     def test_one_or_none_no_result(self):
@@ -227,6 +227,7 @@ class LikeQueryTest(BakedTest):
         def go():
             u1 = bq(sess).get(7)
             eq_(u1.name, 'jack')
+
         self.assert_sql_count(testing.db, go, 1)
 
         u1 = sess.query(User).get(7)  # noqa
@@ -234,11 +235,13 @@ class LikeQueryTest(BakedTest):
         def go():
             u2 = bq(sess).get(7)
             eq_(u2.name, 'jack')
+
         self.assert_sql_count(testing.db, go, 0)
 
         def go():
             u2 = bq(sess).get(8)
             eq_(u2.name, 'ed')
+
         self.assert_sql_count(testing.db, go, 1)
 
     def test_get_pk_w_null(self):
@@ -246,6 +249,7 @@ class LikeQueryTest(BakedTest):
 
         class AddressUser(object):
             pass
+
         mapper(
             AddressUser,
             self.tables.users.outerjoin(self.tables.addresses),
@@ -262,6 +266,7 @@ class LikeQueryTest(BakedTest):
         def go():
             u1 = bq(sess).get((10, None))
             eq_(u1.name, 'chuck')
+
         self.assert_sql_count(testing.db, go, 1)
 
         u1 = sess.query(AddressUser).get((10, None))  # noqa
@@ -269,6 +274,7 @@ class LikeQueryTest(BakedTest):
         def go():
             u2 = bq(sess).get((10, None))
             eq_(u2.name, 'chuck')
+
         self.assert_sql_count(testing.db, go, 0)
 
     def test_get_includes_getclause(self):
@@ -460,7 +466,7 @@ class ResultTest(BakedTest):
             session = Session(autocommit=True)
             eq_(
                 bq(session).all(),
-                [(4, )]
+                [(4,)]
             )
 
     def test_conditional_step(self):
@@ -478,7 +484,7 @@ class ResultTest(BakedTest):
 
         for i in range(4):
             for cond1, cond2, cond3, cond4 in itertools.product(
-                    *[(False, True) for j in range(4)]):
+                *[(False, True) for j in range(4)]):
                 bq = base_bq._clone()
                 if cond1:
                     bq += lambda q: q.filter(User.name != 'jack')
@@ -541,7 +547,8 @@ class ResultTest(BakedTest):
 
                 # we were using (filename, firstlineno) as cache key,
                 # which fails for this kind of thing!
-                bq += (lambda q: q.filter(User.name != 'jack')) if cond1 else (lambda q: q.filter(User.name == 'jack'))  # noqa
+                bq += (lambda q: q.filter(User.name != 'jack')) if cond1 else (
+                    lambda q: q.filter(User.name == 'jack'))  # noqa
                 sess = Session(autocommit=True)
                 result = bq(sess).all()
 
@@ -568,22 +575,22 @@ class ResultTest(BakedTest):
 
         assert_result = [
             User(id=7,
-                addresses=[Address(id=1, email_address='jack@bean.com')],
-                orders=[Order(id=1), Order(id=3), Order(id=5)]),
+                 addresses=[Address(id=1, email_address='jack@bean.com')],
+                 orders=[Order(id=1), Order(id=3), Order(id=5)]),
             User(id=8, addresses=[
                 Address(id=2, email_address='ed@wood.com'),
                 Address(id=3, email_address='ed@bettyboop.com'),
                 Address(id=4, email_address='ed@lala.com'),
             ]),
             User(id=9,
-                addresses=[Address(id=5)], 
-                orders=[Order(id=2), Order(id=4)]),
+                 addresses=[Address(id=5)],
+                 orders=[Order(id=2), Order(id=4)]),
             User(id=10, addresses=[])
         ]
 
         for i in range(4):
             for cond1, cond2 in itertools.product(
-                    *[(False, True) for j in range(2)]):
+                *[(False, True) for j in range(2)]):
                 bq = base_bq._clone()
 
                 sess = Session()
@@ -597,7 +604,7 @@ class ResultTest(BakedTest):
                     ct = func.count(Address.id).label('count')
                     subq = sess.query(
                         ct,
-                        Address.user_id).group_by(Address.user_id).\
+                        Address.user_id).group_by(Address.user_id). \
                         having(ct > 2).subquery()
 
                     bq += lambda q: q.join(subq)
@@ -607,22 +614,26 @@ class ResultTest(BakedTest):
                         def go():
                             result = bq(sess).all()
                             eq_([], result)
+
                         self.assert_sql_count(testing.db, go, 1)
                     else:
                         def go():
                             result = bq(sess).all()
                             eq_(assert_result[1:2], result)
+
                         self.assert_sql_count(testing.db, go, 3)
                 else:
                     if cond1:
                         def go():
                             result = bq(sess).all()
                             eq_(assert_result[0:1], result)
+
                         self.assert_sql_count(testing.db, go, 3)
                     else:
                         def go():
                             result = bq(sess).all()
                             eq_(assert_result[1:3], result)
+
                         self.assert_sql_count(testing.db, go, 3)
 
                 sess.close()
@@ -738,7 +749,7 @@ class LazyLoaderTest(BakedTest):
 
             is_(
                 User.addresses.property.
-                _get_strategy_by_cls(LazyLoader).__class__,
+                    _get_strategy_by_cls(LazyLoader).__class__,
                 BakedLazyLoader
             )
         finally:
@@ -840,7 +851,7 @@ class LazyLoaderTest(BakedTest):
 
         for i in range(4):
             for cond1, cond2 in itertools.product(
-                    *[(False, True) for j in range(2)]):
+                *[(False, True) for j in range(2)]):
                 bq = base_bq._clone()
 
                 sess = Session()
@@ -854,7 +865,7 @@ class LazyLoaderTest(BakedTest):
                     ct = func.count(Address.id).label('count')
                     subq = sess.query(
                         ct,
-                        Address.user_id).group_by(Address.user_id).\
+                        Address.user_id).group_by(Address.user_id). \
                         having(ct > 2).subquery()
 
                     bq += lambda q: q.join(subq)
@@ -864,22 +875,26 @@ class LazyLoaderTest(BakedTest):
                         def go():
                             result = bq(sess).all()
                             eq_([], result)
+
                         self.assert_sql_count(testing.db, go, 1)
                     else:
                         def go():
                             result = bq(sess).all()
                             eq_(assert_result[1:2], result)
+
                         self.assert_sql_count(testing.db, go, 2)
                 else:
                     if cond1:
                         def go():
                             result = bq(sess).all()
                             eq_(assert_result[0:1], result)
+
                         self.assert_sql_count(testing.db, go, 2)
                     else:
                         def go():
                             result = bq(sess).all()
                             eq_(assert_result[1:3], result)
+
                         self.assert_sql_count(testing.db, go, 3)
 
                 sess.close()
@@ -912,18 +927,19 @@ class LazyLoaderTest(BakedTest):
                     def go():
                         result = bq(sess).all()
                         eq_(assert_result[0:1], result)
+
                     self.assert_sql_count(testing.db, go, 2)
                 else:
                     def go():
                         result = bq(sess).all()
                         eq_(assert_result[1:4], result)
+
                     self.assert_sql_count(testing.db, go, 2)
 
                 sess.close()
 
-    # additional tests:
-    # 1. m2m w lazyload
-    # 2. o2m lazyload where m2o backrefs have an eager load, test
-    # that eager load is canceled out
-    # 3. uselist = False, uselist=False assertion
-
+                # additional tests:
+                # 1. m2m w lazyload
+                # 2. o2m lazyload where m2o backrefs have an eager load, test
+                # that eager load is canceled out
+                # 3. uselist = False, uselist=False assertion

@@ -74,19 +74,19 @@ class LazyTest(_fixtures.FixtureTest):
         })
         q = create_session().query(User)
         assert [
-            User(id=7, addresses=[
-                Address(id=1)
-            ]),
-            User(id=8, addresses=[
-                Address(id=3, email_address='ed@bettyboop.com'),
-                Address(id=4, email_address='ed@lala.com'),
-                Address(id=2, email_address='ed@wood.com')
-            ]),
-            User(id=9, addresses=[
-                Address(id=5)
-            ]),
-            User(id=10, addresses=[])
-        ] == q.all()
+                   User(id=7, addresses=[
+                       Address(id=1)
+                   ]),
+                   User(id=8, addresses=[
+                       Address(id=3, email_address='ed@bettyboop.com'),
+                       Address(id=4, email_address='ed@lala.com'),
+                       Address(id=2, email_address='ed@wood.com')
+                   ]),
+                   User(id=9, addresses=[
+                       Address(id=5)
+                   ]),
+                   User(id=10, addresses=[])
+               ] == q.all()
 
     def test_orderby_secondary(self):
         """tests that a regular mapper select on a single table can
@@ -104,21 +104,21 @@ class LazyTest(_fixtures.FixtureTest):
             addresses=relationship(Address, lazy='select'),
         ))
         q = create_session().query(User)
-        l = q.filter(users.c.id == addresses.c.user_id).\
+        l = q.filter(users.c.id == addresses.c.user_id). \
             order_by(addresses.c.email_address).all()
         assert [
-            User(id=8, addresses=[
-                Address(id=2, email_address='ed@wood.com'),
-                Address(id=3, email_address='ed@bettyboop.com'),
-                Address(id=4, email_address='ed@lala.com'),
-            ]),
-            User(id=9, addresses=[
-                Address(id=5)
-            ]),
-            User(id=7, addresses=[
-                Address(id=1)
-            ]),
-        ] == l
+                   User(id=8, addresses=[
+                       Address(id=2, email_address='ed@wood.com'),
+                       Address(id=3, email_address='ed@bettyboop.com'),
+                       Address(id=4, email_address='ed@lala.com'),
+                   ]),
+                   User(id=9, addresses=[
+                       Address(id=5)
+                   ]),
+                   User(id=7, addresses=[
+                       Address(id=1)
+                   ]),
+               ] == l
 
     def test_orderby_desc(self):
         Address, addresses, users, User = (
@@ -136,19 +136,19 @@ class LazyTest(_fixtures.FixtureTest):
         ))
         sess = create_session()
         assert [
-            User(id=7, addresses=[
-                Address(id=1)
-            ]),
-            User(id=8, addresses=[
-                Address(id=2, email_address='ed@wood.com'),
-                Address(id=4, email_address='ed@lala.com'),
-                Address(id=3, email_address='ed@bettyboop.com'),
-            ]),
-            User(id=9, addresses=[
-                Address(id=5)
-            ]),
-            User(id=10, addresses=[])
-        ] == sess.query(User).all()
+                   User(id=7, addresses=[
+                       Address(id=1)
+                   ]),
+                   User(id=8, addresses=[
+                       Address(id=2, email_address='ed@wood.com'),
+                       Address(id=4, email_address='ed@lala.com'),
+                       Address(id=3, email_address='ed@bettyboop.com'),
+                   ]),
+                   User(id=9, addresses=[
+                       Address(id=5)
+                   ]),
+                   User(id=10, addresses=[])
+               ] == sess.query(User).all()
 
     def test_no_orphan(self):
         """test that a lazily loaded child object is not marked as an orphan"""
@@ -176,16 +176,16 @@ class LazyTest(_fixtures.FixtureTest):
         """test limit operations combined with lazy-load relationships."""
 
         users, items, order_items, orders, Item, \
-            User, Address, Order, addresses = (
-                self.tables.users,
-                self.tables.items,
-                self.tables.order_items,
-                self.tables.orders,
-                self.classes.Item,
-                self.classes.User,
-                self.classes.Address,
-                self.classes.Order,
-                self.tables.addresses)
+        User, Address, Order, addresses = (
+            self.tables.users,
+            self.tables.items,
+            self.tables.order_items,
+            self.tables.orders,
+            self.classes.Item,
+            self.classes.User,
+            self.classes.Address,
+            self.classes.Order,
+            self.tables.addresses)
 
         mapper(Item, items)
         mapper(Order, orders, properties={
@@ -209,16 +209,16 @@ class LazyTest(_fixtures.FixtureTest):
 
     def test_distinct(self):
         users, items, order_items, orders, \
-            Item, User, Address, Order, addresses = (
-                self.tables.users,
-                self.tables.items,
-                self.tables.order_items,
-                self.tables.orders,
-                self.classes.Item,
-                self.classes.User,
-                self.classes.Address,
-                self.classes.Order,
-                self.tables.addresses)
+        Item, User, Address, Order, addresses = (
+            self.tables.users,
+            self.tables.items,
+            self.tables.order_items,
+            self.tables.orders,
+            self.classes.Item,
+            self.classes.User,
+            self.classes.Address,
+            self.classes.Order,
+            self.tables.addresses)
 
         mapper(Item, items)
         mapper(Order, orders, properties={
@@ -339,27 +339,27 @@ class LazyTest(_fixtures.FixtureTest):
         q = create_session().query(User)
 
         assert [
-            User(
-                id=7,
-                addresses=[Address(id=1)],
-                open_orders=[Order(id=3)],
-                closed_orders=[Order(id=1), Order(id=5)]
-            ),
-            User(
-                id=8,
-                addresses=[Address(id=2), Address(id=3), Address(id=4)],
-                open_orders=[],
-                closed_orders=[]
-            ),
-            User(
-                id=9,
-                addresses=[Address(id=5)],
-                open_orders=[Order(id=4)],
-                closed_orders=[Order(id=2)]
-            ),
-            User(id=10)
+                   User(
+                       id=7,
+                       addresses=[Address(id=1)],
+                       open_orders=[Order(id=3)],
+                       closed_orders=[Order(id=1), Order(id=5)]
+                   ),
+                   User(
+                       id=8,
+                       addresses=[Address(id=2), Address(id=3), Address(id=4)],
+                       open_orders=[],
+                       closed_orders=[]
+                   ),
+                   User(
+                       id=9,
+                       addresses=[Address(id=5)],
+                       open_orders=[Order(id=4)],
+                       closed_orders=[Order(id=2)]
+                   ),
+                   User(id=10)
 
-        ] == q.all()
+               ] == q.all()
 
         sess = create_session()
         user = sess.query(User).get(7)
@@ -371,7 +371,7 @@ class LazyTest(_fixtures.FixtureTest):
         eq_(
             [Order(id=3)],
             create_session().query(open_mapper).
-            with_parent(user, property='open_orders').all()
+                with_parent(user, property='open_orders').all()
         )
 
     def test_many_to_many(self):
@@ -419,7 +419,7 @@ class LazyTest(_fixtures.FixtureTest):
             sess = create_session()
 
             # load address
-            a1 = sess.query(Address).\
+            a1 = sess.query(Address). \
                 filter_by(email_address="ed@wood.com").one()
 
             # load user that is attached to the address
@@ -428,6 +428,7 @@ class LazyTest(_fixtures.FixtureTest):
             def go():
                 # lazy load of a1.user should get it from the session
                 assert a1.user is u1
+
             self.assert_sql_count(testing.db, go, 0)
             sa.orm.clear_mappers()
 
@@ -477,7 +478,7 @@ class LazyTest(_fixtures.FixtureTest):
             sess = create_session(bind=testing.db)
 
             # load address
-            a1 = sess.query(Address).\
+            a1 = sess.query(Address). \
                 filter_by(email_address="ed@wood.com").one()
 
             # load user that is attached to the address
@@ -486,6 +487,7 @@ class LazyTest(_fixtures.FixtureTest):
             def go():
                 # lazy load of a1.user should get it from the session
                 assert a1.user is u1
+
             self.assert_sql_count(testing.db, go, 0)
             sa.orm.clear_mappers()
 
@@ -527,18 +529,21 @@ class LazyTest(_fixtures.FixtureTest):
         def go():
             ad.user = None
             assert ad.user is None
+
         self.assert_sql_count(testing.db, go, 0)
 
         u1 = sess.query(User).filter_by(id=7).one()
 
         def go():
             assert ad not in u1.addresses
+
         self.assert_sql_count(testing.db, go, 1)
 
         sess.expire(u1, ['addresses'])
 
         def go():
             assert ad in u1.addresses
+
         self.assert_sql_count(testing.db, go, 1)
 
         sess.expire(u1, ['addresses'])
@@ -547,15 +552,16 @@ class LazyTest(_fixtures.FixtureTest):
         def go():
             ad2.user = u1
             assert ad2.user is u1
+
         self.assert_sql_count(testing.db, go, 0)
 
         def go():
             assert ad2 in u1.addresses
+
         self.assert_sql_count(testing.db, go, 1)
 
 
 class GetterStateTest(_fixtures.FixtureTest):
-
     """test lazyloader on non-existent attribute returns
     expected attribute symbols, maintain expected state"""
 
@@ -568,8 +574,8 @@ class GetterStateTest(_fixtures.FixtureTest):
             def process_bind_param(self, value, dialect):
                 return ";".join(
                     "{0!s}={1!s}".format(k, v)
-                       for k, v in
-                       sorted(value.items(), key=lambda key: key[0]))
+                    for k, v in
+                    sorted(value.items(), key=lambda key: key[0]))
 
             def process_result_value(self, value, dialect):
                 return dict(elem.split("=", 1) for elem in value.split(";"))
@@ -811,11 +817,11 @@ class M2OGetTest(_fixtures.FixtureTest):
             assert ad2.user.name == 'jack'
             # no lazy load
             assert ad3.user is None
+
         self.assert_sql_count(testing.db, go, 1)
 
 
 class CorrelatedTest(fixtures.MappedTest):
-
     @classmethod
     def define_tables(self, meta):
         Table('user_t', meta,
@@ -854,8 +860,8 @@ class CorrelatedTest(fixtures.MappedTest):
 
         mapper(Stuff, stuff)
 
-        stuff_view = sa.select([stuff.c.id]).\
-            where(stuff.c.user_id == user_t.c.id).correlate(user_t).\
+        stuff_view = sa.select([stuff.c.id]). \
+            where(stuff.c.user_id == user_t.c.id).correlate(user_t). \
             order_by(sa.desc(stuff.c.date)).limit(1)
 
         mapper(User, user_t, properties={
@@ -1075,7 +1081,7 @@ class RefersToSelfLazyLoadInterferenceTest(fixtures.MappedTest):
             sa.orm.joinedload('parent').joinedload('zc')).all()
 
 
-class TypeCoerceTest(fixtures.MappedTest, testing.AssertsExecutionResults,):
+class TypeCoerceTest(fixtures.MappedTest, testing.AssertsExecutionResults, ):
     """ORM-level test for [ticket:3531]"""
 
     # mysql is having a recursion issue in the bind_expression

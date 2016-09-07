@@ -20,8 +20,9 @@ class ResultSetTest(fixtures.TestBase, AssertsExecutionResults):
     def setup_class(cls):
         global t, t2, metadata
         metadata = MetaData(testing.db)
-        t = Table('table', metadata, *[Column('field{0:d}'.format(fnum), String(50))
-                                       for fnum in range(NUM_FIELDS)])
+        t = Table('table', metadata,
+                  *[Column('field{0:d}'.format(fnum), String(50))
+                    for fnum in range(NUM_FIELDS)])
         t2 = Table(
             'table2', metadata, *
             [Column('field{0:d}'.format(fnum), Unicode(50))
@@ -29,12 +30,14 @@ class ResultSetTest(fixtures.TestBase, AssertsExecutionResults):
 
     def setup(self):
         metadata.create_all()
-        t.insert().execute([dict(('field{0:d}'.format(fnum), u('value{0:d}'.format(fnum)))
-                                 for fnum in range(NUM_FIELDS)) for r_num in
-                            range(NUM_RECORDS)])
-        t2.insert().execute([dict(('field{0:d}'.format(fnum), u('value{0:d}'.format(fnum)))
-                                  for fnum in range(NUM_FIELDS)) for r_num in
-                             range(NUM_RECORDS)])
+        t.insert().execute(
+            [dict(('field{0:d}'.format(fnum), u('value{0:d}'.format(fnum)))
+                  for fnum in range(NUM_FIELDS)) for r_num in
+             range(NUM_RECORDS)])
+        t2.insert().execute(
+            [dict(('field{0:d}'.format(fnum), u('value{0:d}'.format(fnum)))
+                  for fnum in range(NUM_FIELDS)) for r_num in
+             range(NUM_RECORDS)])
 
         # warm up type caches
         t.select().execute().fetchall()
@@ -54,11 +57,12 @@ class ResultSetTest(fixtures.TestBase, AssertsExecutionResults):
     def test_contains_doesnt_compile(self):
         row = t.select().execute().first()
         c1 = Column('some column', Integer) + \
-            Column("some other column", Integer)
+             Column("some other column", Integer)
 
         @profiling.function_call_count()
         def go():
             c1 in row
+
         go()
 
 
@@ -75,6 +79,7 @@ class ExecutionTest(fixtures.TestBase):
         @profiling.function_call_count()
         def go():
             c.execute("select 1")
+
         try:
             go()
         finally:
@@ -89,6 +94,7 @@ class ExecutionTest(fixtures.TestBase):
         @profiling.function_call_count()
         def go():
             e.execute("select 1")
+
         go()
 
 
@@ -106,7 +112,7 @@ class RowProxyTest(fixtures.TestBase):
 
         keymap = {}
         for index, (keyobjs, processor, values) in \
-                enumerate(list(zip(keys, processors, row))):
+            enumerate(list(zip(keys, processors, row))):
             for key in keyobjs:
                 keymap[key] = (processor, key, index)
             keymap[index] = (processor, key, index)
@@ -117,6 +123,7 @@ class RowProxyTest(fixtures.TestBase):
 
         def proc1(value):
             return value
+
         value1, value2 = "x", "y"
         row = self._rowproxy_fixture(
             [(col1, "a"), (col2, "b")],
@@ -142,7 +149,6 @@ class RowProxyTest(fixtures.TestBase):
 
     def test_value_refcounts_custom_seq(self):
         class CustomSeq(object):
-
             def __init__(self, data):
                 self.data = data
 
@@ -151,4 +157,5 @@ class RowProxyTest(fixtures.TestBase):
 
             def __iter__(self):
                 return iter(self.data)
+
         self._test_getitem_value_refcounts(CustomSeq)

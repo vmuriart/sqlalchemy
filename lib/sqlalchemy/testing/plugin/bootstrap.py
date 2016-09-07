@@ -25,7 +25,8 @@ to_bootstrap = locals()['to_bootstrap']
 
 
 def load_file_as_module(name):
-    path = os.path.join(os.path.dirname(bootstrap_file), "{0!s}.py".format(name))
+    path = os.path.join(os.path.dirname(bootstrap_file),
+                        "{0!s}.py".format(name))
     if sys.version_info >= (3, 3):
         from importlib import machinery
         mod = machinery.SourceFileLoader(name, path).load_module()
@@ -33,6 +34,7 @@ def load_file_as_module(name):
         import imp
         mod = imp.load_source(name, path)
     return mod
+
 
 if to_bootstrap == "pytest":
     sys.modules["sqla_plugin_base"] = load_file_as_module("plugin_base")

@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 
 An adaptation of Robert Brewers' ZooMark speed tests. """
 
-
 import datetime
 from sqlalchemy import Table, Column, Integer, Unicode, Date, \
     DateTime, Time, Float, Sequence, ForeignKey, \
@@ -18,7 +17,6 @@ Zoo = Animal = session = None
 
 
 class ZooMarkTest(replay_fixture.ReplayFixtureTest):
-
     """Runs the ZooMark and squawks if method counts vary from the norm.
 
 
@@ -134,29 +132,29 @@ class ZooMarkTest(replay_fixture.ReplayFixtureTest):
         self.session.add(Animal(Species='Ostrich', Legs=2, Lifespan=103.2))
         self.session.add(Animal(Species='Centipede', Legs=100))
         self.session.add(Animal(Species='Emperor Penguin', Legs=2,
-                           ZooID=seaworld.ID))
+                                ZooID=seaworld.ID))
         self.session.add(Animal(Species='Adelie Penguin', Legs=2,
-                           ZooID=seaworld.ID))
+                                ZooID=seaworld.ID))
         self.session.add(Animal(Species='Millipede', Legs=1000000,
-                           ZooID=sdz.ID))
+                                ZooID=sdz.ID))
 
         # Add a mother and child to test relationships
 
         bai_yun = Animal(Species='Ape', Nameu='Bai Yun', Legs=2)
         self.session.add(bai_yun)
         self.session.add(Animal(Species='Ape', Name='Hua Mei', Legs=2,
-                           MotherID=bai_yun.ID))
+                                MotherID=bai_yun.ID))
         self.session.commit()
 
     def _baseline_2_insert(self):
         for x in range(ITERATIONS):
-            self.session.add(Animal(Species='Tick', Name='Tick {0:d}'.format(x),
-                               Legs=8))
+            self.session.add(
+                Animal(Species='Tick', Name='Tick {0:d}'.format(x),
+                       Legs=8))
         self.session.flush()
 
     def _baseline_3_properties(self):
         for x in range(ITERATIONS):
-
             # Zoos
 
             list(self.session.query(Zoo).filter(
@@ -175,22 +173,22 @@ class ZooMarkTest(replay_fixture.ReplayFixtureTest):
             # Animals
 
             list(self.session.query(Animal).filter(
-                    Animal.Species == 'Leopard'))
+                Animal.Species == 'Leopard'))
             list(self.session.query(Animal).filter(
-                    Animal.Species == 'Ostrich'))
+                Animal.Species == 'Ostrich'))
             list(self.session.query(Animal).filter(
-                    Animal.Legs == 1000000))
+                Animal.Legs == 1000000))
             list(self.session.query(Animal).filter(
-                    Animal.Species == 'Tick'))
+                Animal.Species == 'Tick'))
 
     def _baseline_4_expressions(self):
         for x in range(ITERATIONS):
             assert len(list(self.session.query(Zoo))) == 5
             assert len(list(self.session.query(Animal))) == ITERATIONS + 12
             assert len(list(self.session.query(Animal).filter(Animal.Legs
-                                                         == 4))) == 4
+                                                              == 4))) == 4
             assert len(list(self.session.query(Animal).filter(Animal.Legs
-                                                         == 2))) == 5
+                                                              == 2))) == 5
             assert len(
                 list(
                     self.session.query(Animal).filter(
@@ -198,15 +196,15 @@ class ZooMarkTest(replay_fixture.ReplayFixtureTest):
                             Animal.Legs >= 2,
                             Animal.Legs < 20)))) == ITERATIONS + 9
             assert len(list(self.session.query(Animal).filter(Animal.Legs
-                                                         > 10))) == 2
+                                                              > 10))) == 2
             assert len(list(self.session.query(Animal).filter(Animal.Lifespan
-                                                         > 70))) == 2
+                                                              > 70))) == 2
             assert len(list(self.session.query(Animal).
                             filter(Animal.Species.like('L%')))) == 2
             assert len(list(self.session.query(Animal).
                             filter(Animal.Species.like('%pede')))) == 2
             assert len(list(self.session.query(Animal).filter(Animal.LastEscape
-                                                         != None))) == 1
+                                                              != None))) == 1
             assert len(
                 list(
                     self.session.query(Animal).filter(
@@ -218,7 +216,7 @@ class ZooMarkTest(replay_fixture.ReplayFixtureTest):
                 Animal.Species.like('%pede%')))) == 2
             assert len(
                 list(
-                    self.session.query(Animal). filter(
+                    self.session.query(Animal).filter(
                         Animal.Species.in_(
                             ('Lion', 'Tiger', 'Bear'))))) == 3
 
@@ -251,12 +249,12 @@ class ZooMarkTest(replay_fixture.ReplayFixtureTest):
                             Zoo.Founded != None,
                             Zoo.Founded < func.now())))) == 3
             assert len(list(self.session.query(Animal).filter(Animal.LastEscape
-                                                         == func.now()))) == 0
+                                                              == func.now()))) == 0
             assert len(list(self.session.query(Animal).filter(
                 func.date_part('year', Animal.LastEscape) == 2004))) == 1
             assert len(
                 list(
-                    self.session.query(Animal). filter(
+                    self.session.query(Animal).filter(
                         func.date_part(
                             'month',
                             Animal.LastEscape) == 12))) == 1
@@ -290,7 +288,7 @@ class ZooMarkTest(replay_fixture.ReplayFixtureTest):
                 'Tick': None,
             }
             for species, lifespan in engine.execute(
-                    select([Animal.c.Species, Animal.c.Lifespan])).fetchall():
+                select([Animal.c.Species, Animal.c.Lifespan])).fetchall():
                 assert lifespan == expected[species]
             expected = ['Montr\xe9al Biod\xf4me', 'Wild Animal Park']
             e = select([Zoo.c.Name],
@@ -313,11 +311,10 @@ class ZooMarkTest(replay_fixture.ReplayFixtureTest):
 
     def _baseline_6_editing(self):
         for x in range(ITERATIONS):
-
             # Edit
 
             SDZ = self.session.query(Zoo).filter(Zoo.Name == 'San Diego Zoo'
-                                            ).one()
+                                                 ).one()
             SDZ.Name = 'The San Diego Zoo'
             SDZ.Founded = datetime.date(1900, 1, 1)
             SDZ.Opens = datetime.time(7, 30, 0)
@@ -326,7 +323,7 @@ class ZooMarkTest(replay_fixture.ReplayFixtureTest):
             # Test edits
 
             SDZ = self.session.query(Zoo).filter(Zoo.Name
-                                            == 'The San Diego Zoo').one()
+                                                 == 'The San Diego Zoo').one()
             assert SDZ.Founded == datetime.date(1900, 1, 1), SDZ.Founded
 
             # Change it back
@@ -339,7 +336,7 @@ class ZooMarkTest(replay_fixture.ReplayFixtureTest):
             # Test re-edits
 
             SDZ = self.session.query(Zoo).filter(Zoo.Name == 'San Diego Zoo'
-                                            ).one()
+                                                 ).one()
             assert SDZ.Founded == datetime.date(1835, 9, 13), \
                 SDZ.Founded
 

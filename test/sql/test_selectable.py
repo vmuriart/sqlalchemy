@@ -37,9 +37,9 @@ keyed = Table('keyed', metadata,
 
 
 class SelectableTest(
-        fixtures.TestBase,
-        AssertsExecutionResults,
-        AssertsCompiledSQL):
+    fixtures.TestBase,
+    AssertsExecutionResults,
+    AssertsCompiledSQL):
     __dialect__ = 'default'
 
     def test_indirect_correspondence_on_labels(self):
@@ -216,7 +216,7 @@ class SelectableTest(
         for s in (select([a1, table1], use_labels=True),
                   select([table1, a1], use_labels=True)):
             assert s.corresponding_column(table1.c.col1) \
-                is s.c.table1_col1
+                   is s.c.table1_col1
             assert s.corresponding_column(a1.c.col1) is s.c.a1_col1
 
     def test_join_against_self(self):
@@ -226,14 +226,14 @@ class SelectableTest(
         # test column directly against itself
 
         assert jjj.corresponding_column(jjj.c.table1_col1) \
-            is jjj.c.table1_col1
+               is jjj.c.table1_col1
         assert jjj.corresponding_column(jj.c.bar_col1) is jjj.c.bar_col1
 
         # test alias of the join
 
         j2 = jjj.alias('foo')
         assert j2.corresponding_column(table1.c.col1) \
-            is j2.c.table1_col1
+               is j2.c.table1_col1
 
     def test_clone_append_column(self):
         sel = select([literal_column('1').label('a')])
@@ -304,12 +304,12 @@ class SelectableTest(
         sel = select([table1, table2], use_labels=True)
 
         assert sel.corresponding_column(table1.c.col1) \
-            is sel.c.table1_col1
+               is sel.c.table1_col1
         assert sel.corresponding_column(
             table1.c.col1,
             require_embedded=True) is sel.c.table1_col1
         assert table1.corresponding_column(sel.c.table1_col1) \
-            is table1.c.col1
+               is table1.c.col1
         assert table1.corresponding_column(sel.c.table1_col1,
                                            require_embedded=True) is None
 
@@ -319,10 +319,10 @@ class SelectableTest(
                     from_obj=[j]).alias('foo')
         jjj = join(table1, jj, table1.c.col1 == jj.c.bar_col1)
         assert jjj.corresponding_column(jjj.c.table1_col1) \
-            is jjj.c.table1_col1
+               is jjj.c.table1_col1
         j2 = jjj.alias('foo')
         assert j2.corresponding_column(jjj.c.table1_col1) \
-            is j2.c.table1_col1
+               is j2.c.table1_col1
         assert jjj.corresponding_column(jj.c.bar_col1) is jj.c.bar_col1
 
     def test_table_alias(self):
@@ -334,7 +334,6 @@ class SelectableTest(
         self.assert_(criterion.compare(j.onclause))
 
     def test_union(self):
-
         # tests that we can correspond a column in a Select statement
         # with a certain Table, against a column in a Union where one of
         # its underlying Selects matches to that same Table
@@ -374,15 +373,15 @@ class SelectableTest(
         assert u1.corresponding_column(table1.c.col3) is u1.c.col1
 
     def test_singular_union(self):
-        u = union(select([table1.c.col1, table1.c.col2, table1.c.col3]), select(
-            [table1.c.col1, table1.c.col2, table1.c.col3]))
+        u = union(select([table1.c.col1, table1.c.col2, table1.c.col3]),
+                  select(
+                      [table1.c.col1, table1.c.col2, table1.c.col3]))
         u = union(select([table1.c.col1, table1.c.col2, table1.c.col3]))
         assert u.c.col1 is not None
         assert u.c.col2 is not None
         assert u.c.col3 is not None
 
     def test_alias_union(self):
-
         # same as testunion, except its an alias of the union
 
         u = select([table1.c.col1,
@@ -393,7 +392,8 @@ class SelectableTest(
                                                          table2.c.col2,
                                                          table2.c.col3,
                                                          null().label('colx'),
-                                                         table2.c.coly])).alias('analias')
+                                                         table2.c.coly])).alias(
+            'analias')
         s1 = table1.select(use_labels=True)
         s2 = table2.select(use_labels=True)
         assert u.corresponding_column(s1.c.table1_col2) is u.c.col2
@@ -464,7 +464,7 @@ class SelectableTest(
 
     @testing.emits_warning("Column 'col1'")
     def test_union_alias_dupe_keys_grouped(self):
-        s1 = select([table1.c.col1, table1.c.col2, table2.c.col1]).\
+        s1 = select([table1.c.col1, table1.c.col2, table2.c.col1]). \
             limit(1).alias()
         s2 = select([table2.c.col1, table2.c.col2, table2.c.col3]).limit(1)
         u1 = union(s1, s2)
@@ -483,7 +483,6 @@ class SelectableTest(
         assert u1.corresponding_column(table2.c.col3) is u1.c._all_columns[2]
 
     def test_select_union(self):
-
         # like testaliasunion, but off a Select off the union.
 
         u = select([table1.c.col1,
@@ -494,7 +493,8 @@ class SelectableTest(
                                                          table2.c.col2,
                                                          table2.c.col3,
                                                          null().label('colx'),
-                                                         table2.c.coly])).alias('analias')
+                                                         table2.c.coly])).alias(
+            'analias')
         s = select([u])
         s1 = table1.select(use_labels=True)
         s2 = table2.select(use_labels=True)
@@ -502,7 +502,6 @@ class SelectableTest(
         assert s.corresponding_column(s2.c.table2_col2) is s.c.col2
 
     def test_union_against_join(self):
-
         # same as testunion, except its an alias of the union
 
         u = select([table1.c.col1,
@@ -513,7 +512,8 @@ class SelectableTest(
                                                          table2.c.col2,
                                                          table2.c.col3,
                                                          null().label('colx'),
-                                                         table2.c.coly])).alias('analias')
+                                                         table2.c.coly])).alias(
+            'analias')
         j1 = table1.join(table2)
         assert u.corresponding_column(j1.c.table1_colx) is u.c.colx
         assert j1.corresponding_column(u.c.colx) is j1.c.table1_colx
@@ -768,6 +768,7 @@ class SelectableTest(
         @testing.emits_warning()
         def go():
             return Table('t', MetaData(), c1, c2)
+
         t = go()
 
         eq_(c1._from_objects, [t])
@@ -788,7 +789,6 @@ class SelectableTest(
 
 
 class RefreshForNewColTest(fixtures.TestBase):
-
     def test_join_uninit(self):
         a = table('a', column('x'))
         b = table('b', column('y'))
@@ -918,7 +918,6 @@ class RefreshForNewColTest(fixtures.TestBase):
 
 
 class AnonLabelTest(fixtures.TestBase):
-
     """Test behaviors fixed by [ticket:2168]."""
 
     def test_anon_labels_named_column(self):
@@ -1099,16 +1098,16 @@ class JoinConditionTest(fixtures.TestBase, AssertsCompiledSQL):
         assert j.onclause.compare(t2.c.id == t3.c.t2id)
         self.assert_compile(
             j, "t1 JOIN t2 ON t1.id = t2.t1id JOIN "
-            "(t2 JOIN t3 ON t2.id = t3.t2id) ON t2.id = t3.t2id")
+               "(t2 JOIN t3 ON t2.id = t3.t2id) ON t2.id = t3.t2id")
 
         st2t3 = t2t3.select(use_labels=True)
         j = t1t2.join(st2t3)
         assert j.onclause.compare(t2.c.id == st2t3.c.t3_t2id)
         self.assert_compile(
             j, "t1 JOIN t2 ON t1.id = t2.t1id JOIN "
-            "(SELECT t2.id AS t2_id, t2.t1id AS t2_t1id, "
-            "t3.id AS t3_id, t3.t1id AS t3_t1id, t3.t2id AS t3_t2id "
-            "FROM t2 JOIN t3 ON t2.id = t3.t2id) ON t2.id = t3_t2id")
+               "(SELECT t2.id AS t2_id, t2.t1id AS t2_t1id, "
+               "t3.id AS t3_id, t3.t1id AS t3_t1id, t3.t2id AS t3_t2id "
+               "FROM t2 JOIN t3 ON t2.id = t3.t2id) ON t2.id = t3_t2id")
 
     def test_join_multiple_equiv_fks(self):
         m = MetaData()
@@ -1192,7 +1191,6 @@ class JoinConditionTest(fixtures.TestBase, AssertsCompiledSQL):
 
 
 class PrimaryKeyTest(fixtures.TestBase, AssertsExecutionResults):
-
     def test_join_pk_collapse_implicit(self):
         """test that redundant columns in a join get 'collapsed' into a
         minimal primary key, which is the root column along a chain of
@@ -1233,18 +1231,18 @@ class PrimaryKeyTest(fixtures.TestBase, AssertsExecutionResults):
         assert list(a.join(b, a.c.x == b.c.id).primary_key) == [a.c.id]
         assert list(b.join(c, b.c.x == c.c.id).primary_key) == [b.c.id]
         assert list(a.join(b).join(c, c.c.id == b.c.x).primary_key) \
-            == [a.c.id]
+               == [a.c.id]
         assert list(b.join(c, c.c.x == b.c.id).join(d).primary_key) \
-            == [b.c.id]
+               == [b.c.id]
         assert list(b.join(c, c.c.id == b.c.x).join(d).primary_key) \
-            == [b.c.id]
+               == [b.c.id]
         assert list(
             d.join(
                 b,
                 d.c.id == b.c.id).join(
                 c,
                 b.c.id == c.c.x).primary_key) == [
-            b.c.id]
+                   b.c.id]
         assert list(a.join(b).join(c, c.c.id
                                    == b.c.x).join(d).primary_key) == [a.c.id]
         assert list(a.join(b, and_(a.c.id == b.c.id, a.c.x
@@ -1299,7 +1297,6 @@ class PrimaryKeyTest(fixtures.TestBase, AssertsExecutionResults):
 
 
 class ReduceTest(fixtures.TestBase, AssertsExecutionResults):
-
     def test_reduce(self):
         meta = MetaData()
         t1 = Table('t1', meta,
@@ -1415,7 +1412,7 @@ class ReduceTest(fixtures.TestBase, AssertsExecutionResults):
                 'person_id', Integer, Sequence(
                     'person_id_seq', optional=True), primary_key=True), Column(
                 'name', String(50)), Column(
-                    'type', String(30)))
+                'type', String(30)))
         engineers = Table(
             'engineers',
             metadata,
@@ -1427,13 +1424,14 @@ class ReduceTest(fixtures.TestBase, AssertsExecutionResults):
         )
         managers = Table(
             'managers', metadata, Column(
-                'person_id', Integer, ForeignKey('people.person_id'), primary_key=True), Column(
+                'person_id', Integer, ForeignKey('people.person_id'),
+                primary_key=True), Column(
                 'status', String(30)), Column(
                 'manager_name', String(50)))
         pjoin = \
-            people.outerjoin(engineers).outerjoin(managers).\
-            select(use_labels=True).alias('pjoin'
-                                          )
+            people.outerjoin(engineers).outerjoin(managers). \
+                select(use_labels=True).alias('pjoin'
+                                              )
         eq_(util.column_set(sql_util.reduce_columns([pjoin.c.people_person_id,
                                                      pjoin.c.engineers_person_id,
                                                      pjoin.c.managers_person_id])),
@@ -1461,10 +1459,10 @@ class ReduceTest(fixtures.TestBase, AssertsExecutionResults):
         from sqlalchemy.orm.util import polymorphic_union
         item_join = polymorphic_union({
             'BaseItem':
-            base_item_table.select(
-                base_item_table.c.child_name
-                == 'BaseItem'),
-                'Item': base_item_table.join(item_table)},
+                base_item_table.select(
+                    base_item_table.c.child_name
+                    == 'BaseItem'),
+            'Item': base_item_table.join(item_table)},
             None, 'item_join')
         eq_(util.column_set(sql_util.reduce_columns([item_join.c.id,
                                                      item_join.c.dummy,
@@ -1503,19 +1501,20 @@ class ReduceTest(fixtures.TestBase, AssertsExecutionResults):
                 magazine_page_table.c.page_id,
                 classified_page_table.c.magazine_page_id
             ]).
-            select_from(
+                select_from(
                 page_table.join(magazine_page_table).
-                join(classified_page_table)),
+                    join(classified_page_table)),
 
             select([
                 page_table.c.id,
                 magazine_page_table.c.page_id,
                 cast(null(), Integer).label('magazine_page_id')
             ]).
-            select_from(page_table.join(magazine_page_table))
+                select_from(page_table.join(magazine_page_table))
         ).alias('pjoin')
         eq_(util.column_set(sql_util.reduce_columns(
-            [pjoin.c.id, pjoin.c.page_id, pjoin.c.magazine_page_id])), util.column_set([pjoin.c.id]))
+            [pjoin.c.id, pjoin.c.page_id, pjoin.c.magazine_page_id])),
+            util.column_set([pjoin.c.id]))
 
         # the first selectable has a CAST, which is a placeholder for
         # classified_page.magazine_page_id in the second selectable.
@@ -1529,22 +1528,22 @@ class ReduceTest(fixtures.TestBase, AssertsExecutionResults):
             magazine_page_table.c.page_id,
             cast(null(), Integer).label('magazine_page_id')
         ]).
-            select_from(page_table.join(magazine_page_table)),
+                      select_from(page_table.join(magazine_page_table)),
 
-            select([
-                page_table.c.id,
-                magazine_page_table.c.page_id,
-                classified_page_table.c.magazine_page_id
-            ]).
-            select_from(page_table.join(magazine_page_table).
-                        join(classified_page_table))
-        ).alias('pjoin')
+                      select([
+                          page_table.c.id,
+                          magazine_page_table.c.page_id,
+                          classified_page_table.c.magazine_page_id
+                      ]).
+                      select_from(page_table.join(magazine_page_table).
+                                  join(classified_page_table))
+                      ).alias('pjoin')
         eq_(util.column_set(sql_util.reduce_columns(
-            [pjoin.c.id, pjoin.c.page_id, pjoin.c.magazine_page_id])), util.column_set([pjoin.c.id]))
+            [pjoin.c.id, pjoin.c.page_id, pjoin.c.magazine_page_id])),
+            util.column_set([pjoin.c.id]))
 
 
 class DerivedTest(fixtures.TestBase, AssertsExecutionResults):
-
     def test_table(self):
         meta = MetaData()
 
@@ -1587,7 +1586,6 @@ class DerivedTest(fixtures.TestBase, AssertsExecutionResults):
 
 
 class AnnotationsTest(fixtures.TestBase):
-
     def test_hashing(self):
         t = table('t', column('x'))
 
@@ -1601,7 +1599,7 @@ class AnnotationsTest(fixtures.TestBase):
             a,
             s,
             s2,
-            t.c.x > 1,
+                t.c.x > 1,
             (t.c.x > 1).label(None)
         ]:
             annot = obj._annotate({})
@@ -1656,9 +1654,9 @@ class AnnotationsTest(fixtures.TestBase):
         from sqlalchemy.schema import Column
 
         class MyColumn(Column):
-
             def __init__(self):
                 Column.__init__(self, 'foo', Integer)
+
             _constructor = Column
 
         t1 = Table('t1', MetaData(), MyColumn())
@@ -1737,7 +1735,7 @@ class AnnotationsTest(fixtures.TestBase):
         assert str(b2) == "table1.col1 = table1.col2"
 
         b3 = visitors.cloned_traverse(bin._annotate({}), {}, {'binary':
-                                                              visit_binary})
+                                                                  visit_binary})
         assert str(b3) == 'table1.col1 = table1.col2'
 
         def visit_binary(b):
@@ -1791,7 +1789,7 @@ class AnnotationsTest(fixtures.TestBase):
             assert '_orm_adapt' in elem
 
         for elem in b3._annotations, b3.left._annotations, \
-                b4._annotations, b4.left._annotations:
+                    b4._annotations, b4.left._annotations:
             assert elem == {}
 
         assert b2.left is not bin.left
@@ -1912,7 +1910,6 @@ class AnnotationsTest(fixtures.TestBase):
             lambda s: visitors.cloned_traverse(s, {}, {}),
             lambda s: visitors.replacement_traverse(s, {}, lambda x: None)
         ):
-
             sel = fn(select([fn(select([fn(s)]))]))
             eq_(str(assert_s), str(sel))
 
@@ -1983,7 +1980,6 @@ class ReprTest(fixtures.TestBase):
 
 
 class WithLabelsTest(fixtures.TestBase):
-
     def _assert_labels_warning(self, s):
         assert_raises_message(
             exc.SAWarning,
@@ -2138,7 +2134,6 @@ class WithLabelsTest(fixtures.TestBase):
 
 
 class ResultMapTest(fixtures.TestBase):
-
     def _fixture(self):
         m = MetaData()
         t = Table('t', m, Column('x', Integer), Column('y', Integer))
@@ -2257,12 +2252,12 @@ class ResultMapTest(fixtures.TestBase):
         )
 
     def test_unary_boolean(self):
-
         s1 = select([not_(True)], use_labels=True)
         eq_(
             [type(entry[-1]) for entry in s1.compile()._result_columns],
             [Boolean]
         )
+
 
 class ForUpdateTest(fixtures.TestBase, AssertsCompiledSQL):
     __dialect__ = "default"

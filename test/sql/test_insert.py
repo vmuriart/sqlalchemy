@@ -1,15 +1,15 @@
 #! coding:utf-8
 
-from sqlalchemy import Column, Integer, MetaData, String, Table,\
+from sqlalchemy import Column, Integer, MetaData, String, Table, \
     bindparam, exc, func, insert, select, column, text, table
 from sqlalchemy.dialects import mysql, postgresql
 from sqlalchemy.engine import default
-from sqlalchemy.testing import AssertsCompiledSQL,\
+from sqlalchemy.testing import AssertsCompiledSQL, \
     assert_raises_message, fixtures, eq_
 from sqlalchemy.sql import crud
 
-class _InsertTestBase(object):
 
+class _InsertTestBase(object):
     @classmethod
     def define_tables(cls, metadata):
         Table('mytable', metadata,
@@ -24,7 +24,7 @@ class _InsertTestBase(object):
               Column('x', Integer, default=10),
               Column('y', Integer, server_default=text('5')),
               Column('z', Integer, default=lambda: 10)
-            )
+              )
 
 
 class InsertTest(_InsertTestBase, fixtures.TablesTest, AssertsCompiledSQL):
@@ -166,8 +166,8 @@ class InsertTest(_InsertTestBase, fixtures.TablesTest, AssertsCompiledSQL):
     def test_prefix_with(self):
         table1 = self.tables.mytable
 
-        stmt = table1.insert().\
-            prefix_with('A', 'B', dialect='mysql').\
+        stmt = table1.insert(). \
+            prefix_with('A', 'B', dialect='mysql'). \
             prefix_with('C', 'D')
 
         self.assert_compile(
@@ -211,10 +211,10 @@ class InsertTest(_InsertTestBase, fixtures.TablesTest, AssertsCompiledSQL):
         table1 = self.tables.mytable
         sel = select([table1.c.myid, table1.c.name]).where(
             table1.c.name == 'foo')
-        ins = self.tables.myothertable.insert().\
+        ins = self.tables.myothertable.insert(). \
             from_select(("otherid", "othername"), sel).returning(
-                self.tables.myothertable.c.otherid
-            )
+            self.tables.myothertable.c.otherid
+        )
         self.assert_compile(
             ins,
             "INSERT INTO myothertable (otherid, othername) "
@@ -228,7 +228,7 @@ class InsertTest(_InsertTestBase, fixtures.TablesTest, AssertsCompiledSQL):
         table1 = self.tables.mytable
         sel = select([table1.c.myid, table1.c.name]).where(
             table1.c.name == 'foo')
-        ins = self.tables.myothertable.insert().\
+        ins = self.tables.myothertable.insert(). \
             from_select(("otherid", "othername"), sel)
         self.assert_compile(
             ins,
@@ -246,7 +246,7 @@ class InsertTest(_InsertTestBase, fixtures.TablesTest, AssertsCompiledSQL):
         sel = select([table1.c.myid, table1.c.name]).where(
             table1.c.name == cte.c.name)
 
-        ins = self.tables.myothertable.insert().\
+        ins = self.tables.myothertable.insert(). \
             from_select(("otherid", "othername"), sel)
         self.assert_compile(
             ins,
@@ -278,7 +278,7 @@ class InsertTest(_InsertTestBase, fixtures.TablesTest, AssertsCompiledSQL):
         table1 = self.tables.mytable
         sel = select([table1.c.name, table1.c.myid]).where(
             table1.c.name == 'foo')
-        ins = self.tables.myothertable.insert().\
+        ins = self.tables.myothertable.insert(). \
             from_select(("othername", "otherid"), sel)
         self.assert_compile(
             ins,
@@ -295,7 +295,7 @@ class InsertTest(_InsertTestBase, fixtures.TablesTest, AssertsCompiledSQL):
                       Column('foo', Integer, default=func.foobar()))
         table1 = self.tables.mytable
         sel = select([table1.c.myid]).where(table1.c.name == 'foo')
-        ins = table.insert().\
+        ins = table.insert(). \
             from_select(["id"], sel, include_defaults=False)
         self.assert_compile(
             ins,
@@ -311,7 +311,7 @@ class InsertTest(_InsertTestBase, fixtures.TablesTest, AssertsCompiledSQL):
                       Column('foo', Integer, default=func.foobar()))
         table1 = self.tables.mytable
         sel = select([table1.c.myid]).where(table1.c.name == 'foo')
-        ins = table.insert().\
+        ins = table.insert(). \
             from_select(["id"], sel)
         self.assert_compile(
             ins,
@@ -328,7 +328,7 @@ class InsertTest(_InsertTestBase, fixtures.TablesTest, AssertsCompiledSQL):
                       Column('foo', Integer, default=12))
         table1 = self.tables.mytable
         sel = select([table1.c.myid]).where(table1.c.name == 'foo')
-        ins = table.insert().\
+        ins = table.insert(). \
             from_select(["id"], sel)
         self.assert_compile(
             ins,
@@ -348,7 +348,7 @@ class InsertTest(_InsertTestBase, fixtures.TablesTest, AssertsCompiledSQL):
         sel = select(
             [table1.c.myid, table1.c.myid.label('q')]).where(
             table1.c.name == 'foo')
-        ins = table.insert().\
+        ins = table.insert(). \
             from_select(["id", "foo"], sel)
         self.assert_compile(
             ins,
@@ -371,7 +371,7 @@ class InsertTest(_InsertTestBase, fixtures.TablesTest, AssertsCompiledSQL):
         sel = select(
             [table1.c.myid]).where(
             table1.c.name == 'foo')
-        ins = table.insert().\
+        ins = table.insert(). \
             from_select(["id"], sel)
         self.assert_compile(
             ins,
@@ -407,12 +407,11 @@ class InsertTest(_InsertTestBase, fixtures.TablesTest, AssertsCompiledSQL):
             "SELECT mytable.foo, :bar AS anon_1 FROM mytable"
         )
 
-
     def test_insert_mix_select_values_exception(self):
         table1 = self.tables.mytable
         sel = select([table1.c.myid, table1.c.name]).where(
             table1.c.name == 'foo')
-        ins = self.tables.myothertable.insert().\
+        ins = self.tables.myothertable.insert(). \
             from_select(("otherid", "othername"), sel)
         assert_raises_message(
             exc.InvalidRequestError,
@@ -433,7 +432,7 @@ class InsertTest(_InsertTestBase, fixtures.TablesTest, AssertsCompiledSQL):
 
     def test_insert_from_select_table(self):
         table1 = self.tables.mytable
-        ins = self.tables.myothertable.insert().\
+        ins = self.tables.myothertable.insert(). \
             from_select(("otherid", "othername"), table1)
         # note we aren't checking the number of columns right now
         self.assert_compile(
@@ -454,9 +453,9 @@ class InsertTest(_InsertTestBase, fixtures.TablesTest, AssertsCompiledSQL):
         ).union(
             select([name, description])
         )
-        ins = mytable.insert().\
+        ins = mytable.insert(). \
             from_select(
-                [mytable.c.name, mytable.c.description], sel)
+            [mytable.c.name, mytable.c.description], sel)
         self.assert_compile(
             ins,
             "INSERT INTO mytable (name, description) "
@@ -469,7 +468,7 @@ class InsertTest(_InsertTestBase, fixtures.TablesTest, AssertsCompiledSQL):
         table2 = self.tables.myothertable
         sel = select([table1.c.myid, table1.c.name]).where(
             table1.c.name == 'foo')
-        ins = table2.insert().\
+        ins = table2.insert(). \
             from_select((table2.c.otherid, table2.c.othername), sel)
         self.assert_compile(
             ins,
@@ -581,14 +580,14 @@ class InsertTest(_InsertTestBase, fixtures.TablesTest, AssertsCompiledSQL):
 
 
 class InsertImplicitReturningTest(
-        _InsertTestBase, fixtures.TablesTest, AssertsCompiledSQL):
+    _InsertTestBase, fixtures.TablesTest, AssertsCompiledSQL):
     __dialect__ = postgresql.dialect(implicit_returning=True)
 
     def test_insert_select(self):
         table1 = self.tables.mytable
         sel = select([table1.c.myid, table1.c.name]).where(
             table1.c.name == 'foo')
-        ins = self.tables.myothertable.insert().\
+        ins = self.tables.myothertable.insert(). \
             from_select(("otherid", "othername"), sel)
         self.assert_compile(
             ins,
@@ -602,8 +601,8 @@ class InsertImplicitReturningTest(
         table1 = self.tables.mytable
         sel = select([table1.c.myid, table1.c.name]).where(
             table1.c.name == 'foo')
-        ins = self.tables.myothertable.insert().\
-            from_select(("otherid", "othername"), sel).\
+        ins = self.tables.myothertable.insert(). \
+            from_select(("otherid", "othername"), sel). \
             return_defaults(self.tables.myothertable.c.otherid)
         self.assert_compile(
             ins,
@@ -887,8 +886,8 @@ class MultirowTest(_InsertTestBase, fixtures.TablesTest, AssertsCompiledSQL):
 
         eq_(
             {k: v.type._type_affinity
-                for (k, v) in
-                stmt.compile(dialect=postgresql.dialect()).binds.items()},
+             for (k, v) in
+             stmt.compile(dialect=postgresql.dialect()).binds.items()},
             {
                 'foo': Integer, 'data_2': String, 'id_0': Integer,
                 'id_2': Integer, 'foo_1': Integer, 'data_1': String,
@@ -932,8 +931,8 @@ class MultirowTest(_InsertTestBase, fixtures.TablesTest, AssertsCompiledSQL):
         stmt = table.insert().values(values)
         eq_(
             {k: v.type._type_affinity
-                for (k, v) in
-                stmt.compile(dialect=postgresql.dialect()).binds.items()},
+             for (k, v) in
+             stmt.compile(dialect=postgresql.dialect()).binds.items()},
             {
                 'foo': Integer, 'data_2': String, 'id_0': Integer,
                 'id_2': Integer, 'foo_1': Integer, 'data_1': String,

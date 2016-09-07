@@ -56,7 +56,7 @@ class ReturningTest(fixtures.TestBase, AssertsExecutionResults):
         assert row['full'] is False
 
         result = table.insert().values(
-            persons=5, full=True, goofy="somegoofy").\
+            persons=5, full=True, goofy="somegoofy"). \
             returning(table.c.persons, table.c.full, table.c.goofy).execute()
         row = result.first()
         assert row[table.c.persons] == row['persons'] == 5
@@ -67,7 +67,7 @@ class ReturningTest(fixtures.TestBase, AssertsExecutionResults):
 
     @testing.fails_on('firebird', "fb can't handle returning x AS y")
     def test_labeling(self):
-        result = table.insert().values(persons=6).\
+        result = table.insert().values(persons=6). \
             returning(table.c.persons.label('lala')).execute()
         row = result.first()
         assert row['lala'] == 6
@@ -77,12 +77,12 @@ class ReturningTest(fixtures.TestBase, AssertsExecutionResults):
         "fb/kintersbasdb can't handle the bind params")
     @testing.fails_on('oracle+zxjdbc', "JDBC driver bug")
     def test_anon_expressions(self):
-        result = table.insert().values(goofy="someOTHERgoofy").\
+        result = table.insert().values(goofy="someOTHERgoofy"). \
             returning(func.lower(table.c.goofy, type_=GoofyType)).execute()
         row = result.first()
         eq_(row[0], "foosomeothergoofyBAR")
 
-        result = table.insert().values(persons=12).\
+        result = table.insert().values(persons=12). \
             returning(table.c.persons + 18).execute()
         row = result.first()
         eq_(row[0], 30)
@@ -212,12 +212,11 @@ class SequenceReturningTest(fixtures.TestBase):
 
     def test_insert(self):
         r = table.insert().values(data='hi').returning(table.c.id).execute()
-        assert r.first() == (1, )
+        assert r.first() == (1,)
         assert seq.execute() == 2
 
 
 class KeyReturningTest(fixtures.TestBase, AssertsExecutionResults):
-
     """test returning() works with columns that define 'key'."""
 
     __requires__ = 'returning',
@@ -259,7 +258,7 @@ class KeyReturningTest(fixtures.TestBase, AssertsExecutionResults):
 
 
 class ReturnDefaultsTest(fixtures.TablesTest):
-    __requires__ = ('returning', )
+    __requires__ = ('returning',)
     run_define_tables = 'each'
     __backend__ = True
 
@@ -352,7 +351,7 @@ class ReturnDefaultsTest(fixtures.TablesTest):
             t1.insert().values(upddef=1)
         )
         result = testing.db.execute(
-            t1.update(). values(
+            t1.update().values(
                 upddef=2).return_defaults(
                 t1.c.data))
         eq_(
@@ -380,7 +379,7 @@ class ReturnDefaultsTest(fixtures.TablesTest):
         )
         result = testing.db.execute(
             t1.update().
-            values(insdef=2).return_defaults(
+                values(insdef=2).return_defaults(
                 t1.c.data, t1.c.upddef))
         eq_(
             dict(result.returned_defaults),
@@ -406,13 +405,12 @@ class ReturnDefaultsTest(fixtures.TablesTest):
         )
         result = testing.db.execute(
             t1.update().
-            values(insdef=2).return_defaults()
+                values(insdef=2).return_defaults()
         )
         eq_(
             dict(result.returned_defaults),
             {'upddef': 1}
         )
-
 
 
 class ImplicitReturningFlag(fixtures.TestBase):
@@ -437,6 +435,7 @@ class ImplicitReturningFlag(fixtures.TestBase):
 
         def go():
             supports[0] = True
+
         testing.requires.returning(go)()
         e = engines.testing_engine()
 

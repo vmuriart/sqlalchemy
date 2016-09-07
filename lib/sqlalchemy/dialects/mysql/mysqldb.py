@@ -49,7 +49,6 @@ import re
 
 
 class MySQLExecutionContext_mysqldb(MySQLExecutionContext):
-
     @property
     def rowcount(self):
         if hasattr(self, '_rowcount'):
@@ -61,14 +60,13 @@ class MySQLExecutionContext_mysqldb(MySQLExecutionContext):
 class MySQLCompiler_mysqldb(MySQLCompiler):
     def visit_mod_binary(self, binary, operator, **kw):
         return self.process(binary.left, **kw) + " %% " + \
-            self.process(binary.right, **kw)
+               self.process(binary.right, **kw)
 
     def post_process_text(self, text):
         return text.replace('%', '%%')
 
 
 class MySQLIdentifierPreparer_mysqldb(MySQLIdentifierPreparer):
-
     def _escape_identifier(self, value):
         value = value.replace(self.escape_quote, self.escape_to_quote)
         return value.replace("%", "%%")
@@ -101,17 +99,17 @@ class MySQLDialect_mysqldb(MySQLDialect):
         # https://github.com/farcepest/MySQLdb1/commit/cd44524fef63bd3fcb71947392326e9742d520e8
         # specific issue w/ the utf8_bin collation and unicode returns
 
-        has_utf8_bin = self.server_version_info > (5, ) and \
-            connection.scalar(
-                "show collation where {0!s} = 'utf8' and {1!s} = 'utf8_bin'".format(
-                    self.identifier_preparer.quote("Charset"),
-                    self.identifier_preparer.quote("Collation")
-                ))
+        has_utf8_bin = self.server_version_info > (5,) and \
+                       connection.scalar(
+                           "show collation where {0!s} = 'utf8' and {1!s} = 'utf8_bin'".format(
+                               self.identifier_preparer.quote("Charset"),
+                               self.identifier_preparer.quote("Collation")
+                           ))
         if has_utf8_bin:
             additional_tests = [
                 sql.collate(sql.cast(
                     sql.literal_column(
-                            "'test collated returns'"),
+                        "'test collated returns'"),
                     TEXT(charset='utf8')), "utf8_bin")
             ]
         else:
