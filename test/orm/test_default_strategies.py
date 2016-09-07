@@ -18,8 +18,8 @@ class DefaultStrategyOptionsTest(_fixtures.FixtureTest):
             # a list for any([...]) instead of any(...) to prove we've
             # iterated all the items with no sql.
             f = util.flatten_iterator
-            assert any([i.keywords for i in
-                f([o.items for o in f([u.orders for u in users])])])
+            assert any( i.keywords for i in
+                f([o.items for o in f([u.orders for u in users])]))
         self.assert_sql_count(testing.db, go, 0)
 
     def _assert_addresses_loaded(self, users):
