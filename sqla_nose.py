@@ -6,14 +6,14 @@ This script is a front-end to "nosetests" which
 installs SQLAlchemy's testing plugin into the local environment.
 
 """
-import sys
-import nose
 import os
+import sys
+
+import nose
 
 if not sys.flags.no_user_site:
     sys.path.insert(
-        0,
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lib')
+        0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lib')
     )
 
 # use bootstrapping so that test plugins are loaded
@@ -28,6 +28,6 @@ with open(bootstrap_file) as f:
     to_bootstrap = "nose"
     exec(code, globals(), locals())
 
-
 from noseplugin import NoseSQLAlchemy
+
 nose.main(addplugins=[NoseSQLAlchemy()])

@@ -4,11 +4,10 @@ import re
 import sys
 from distutils.command.build_ext import build_ext
 from distutils.errors import CCompilerError
-from distutils.errors import DistutilsExecError
-from distutils.errors import DistutilsPlatformError
-from setuptools import Distribution as _Distribution, Extension
-from setuptools import setup
-from setuptools import find_packages
+from distutils.errors import DistutilsExecError, DistutilsPlatformError
+
+from setuptools import Extension, Distribution as _Distribution
+from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 
 cmdclass = {}
@@ -34,7 +33,6 @@ if sys.platform == 'win32':
 
 
 class BuildFailed(Exception):
-
     def __init__(self):
         self.cause = sys.exc_info()[1]  # work around py 2/3 different syntax
 
@@ -59,11 +57,11 @@ class ve_build_ext(build_ext):
                 raise BuildFailed()
             raise
 
+
 cmdclass['build_ext'] = ve_build_ext
 
 
 class Distribution(_Distribution):
-
     def has_ext_modules(self):
         # We want to always claim that we have ext_modules. This will be fine
         # if we don't actually have them (such as on PyPy) because nothing
@@ -99,6 +97,7 @@ class PyTest(TestCommand):
             " ".join(self.default_options) + " " + self.pytest_args)
         sys.exit(errno)
 
+
 cmdclass['test'] = PyTest
 
 
@@ -109,13 +108,11 @@ def status_msgs(*msgs):
     print('*' * 75)
 
 
-with open(
-        os.path.join(
-            os.path.dirname(__file__),
-            'lib', 'sqlalchemy', '__init__.py')) as v_file:
+with open(os.path.join(
+    os.path.dirname(__file__),
+    'lib', 'sqlalchemy', '__init__.py')) as v_file:
     VERSION = re.compile(
-        r".*__version__ = '(.*?)'",
-        re.S).match(v_file.read()).group(1)
+        r".*__version__ = '(.*?)'", re.S).match(v_file.read()).group(1)
 
 with open(os.path.join(os.path.dirname(__file__), 'README.rst')) as r_file:
     readme = r_file.read()
@@ -166,6 +163,7 @@ def run_setup(with_cext):
         },
         **kwargs
     )
+
 
 if not cpython:
     run_setup(False)
