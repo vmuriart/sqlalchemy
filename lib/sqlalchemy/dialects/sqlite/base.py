@@ -522,7 +522,7 @@ class _DateTimeMixin(object):
         bp = self.bind_processor(dialect)
 
         def process(value):
-            return "'%s'" % bp(value)
+            return "'{0!s}'".format(bp(value))
 
         return process
 
@@ -820,7 +820,7 @@ class SQLiteCompiler(compiler.SQLCompiler):
         return '0'
 
     def visit_char_length_func(self, fn, **kw):
-        return "length%s" % self.function_argspec(fn)
+        return "length{0!s}".format(self.function_argspec(fn))
 
     def visit_cast(self, cast, **kwargs):
         if self.dialect.supports_cast:
@@ -830,13 +830,13 @@ class SQLiteCompiler(compiler.SQLCompiler):
 
     def visit_extract(self, extract, **kw):
         try:
-            return "CAST(STRFTIME('%s', %s) AS INTEGER)" % (
+            return "CAST(STRFTIME('{0!s}', {1!s}) AS INTEGER)".format(
                 self.extract_map[extract.field],
                 self.process(extract.expr, **kw)
             )
         except KeyError:
             raise exc.CompileError(
-                "%s is not a valid extract argument." % extract.field)
+                "{0!s} is not a valid extract argument.".format(extract.field))
 
     def limit_clause(self, select, **kw):
         text = ""
@@ -855,11 +855,11 @@ class SQLiteCompiler(compiler.SQLCompiler):
         return ''
 
     def visit_is_distinct_from_binary(self, binary, operator, **kw):
-        return "%s IS NOT %s" % (self.process(binary.left),
+        return "{0!s} IS NOT {1!s}".format(self.process(binary.left),
                                  self.process(binary.right))
 
     def visit_isnot_distinct_from_binary(self, binary, operator, **kw):
-        return "%s IS %s" % (self.process(binary.left),
+        return "{0!s} IS {1!s}".format(self.process(binary.left),
                              self.process(binary.right))
 
 
@@ -933,8 +933,7 @@ class SQLiteDDLCompiler(compiler.DDLCompiler):
         text = "CREATE "
         if index.unique:
             text += "UNIQUE "
-        text += "INDEX %s ON %s (%s)" \
-                % (
+        text += "INDEX {0!s} ON {1!s} ({2!s})".format(
                     self._prepared_index_name(index,
                                               include_schema=True),
                     preparer.format_table(index.table,
@@ -1115,7 +1114,7 @@ class SQLiteDialect(default.DefaultDialect):
                 (level, self.name, ", ".join(self._isolation_lookup))
             )
         cursor = connection.cursor()
-        cursor.execute("PRAGMA read_uncommitted = %d" % isolation_level)
+        cursor.execute("PRAGMA read_uncommitted = {0:d}".format(isolation_level))
         cursor.close()
 
     def get_isolation_level(self, connection):
@@ -1138,7 +1137,7 @@ class SQLiteDialect(default.DefaultDialect):
         elif value == 1:
             return "READ UNCOMMITTED"
         else:
-            assert False, "Unknown isolation level %s" % value
+            assert False, "Unknown isolation level {0!s}".format(value)
 
     def on_connect(self):
         if self.isolation_level is not None:
@@ -1160,7 +1159,7 @@ class SQLiteDialect(default.DefaultDialect):
     def get_table_names(self, connection, schema=None, **kw):
         if schema is not None:
             qschema = self.identifier_preparer.quote_identifier(schema)
-            master = '%s.sqlite_master' % qschema
+            master = '{0!s}.sqlite_master'.format(qschema)
         else:
             master = "sqlite_master"
         s = ("SELECT name FROM %s "
@@ -1193,7 +1192,7 @@ class SQLiteDialect(default.DefaultDialect):
     def get_view_names(self, connection, schema=None, **kw):
         if schema is not None:
             qschema = self.identifier_preparer.quote_identifier(schema)
-            master = '%s.sqlite_master' % qschema
+            master = '{0!s}.sqlite_master'.format(qschema)
         else:
             master = "sqlite_master"
         s = ("SELECT name FROM %s "
@@ -1206,7 +1205,7 @@ class SQLiteDialect(default.DefaultDialect):
     def get_view_definition(self, connection, view_name, schema=None, **kw):
         if schema is not None:
             qschema = self.identifier_preparer.quote_identifier(schema)
-            master = '%s.sqlite_master' % qschema
+            master = '{0!s}.sqlite_master'.format(qschema)
             s = ("SELECT sql FROM %s WHERE name = '%s'"
                  "AND type='view'") % (master, view_name)
             rs = connection.execute(s)
@@ -1568,11 +1567,11 @@ class SQLiteDialect(default.DefaultDialect):
     def _get_table_pragma(self, connection, pragma, table_name, schema=None):
         quote = self.identifier_preparer.quote_identifier
         if schema is not None:
-            statement = "PRAGMA %s." % quote(schema)
+            statement = "PRAGMA {0!s}.".format(quote(schema))
         else:
             statement = "PRAGMA "
         qtable = quote(table_name)
-        statement = "%s%s(%s)" % (statement, pragma, qtable)
+        statement = "{0!s}{1!s}({2!s})".format(statement, pragma, qtable)
         cursor = connection.execute(statement)
         if not cursor._soft_closed:
             # work around SQLite issue whereby cursor.description

@@ -423,7 +423,7 @@ class Table(DialectKWArgs, SchemaItem, TableClause):
         else:
             if mustexist:
                 raise exc.InvalidRequestError(
-                    "Table '%s' not defined" % (key))
+                    "Table '{0!s}' not defined".format((key)))
             table = object.__new__(cls)
             table.dispatch.before_parent_attach(table, metadata)
             metadata._add_table(name, schema, table)
@@ -477,7 +477,7 @@ class Table(DialectKWArgs, SchemaItem, TableClause):
         self.foreign_keys = set()
         self._extra_dependencies = set()
         if self.schema is not None:
-            self.fullname = "%s.%s" % (self.schema, self.name)
+            self.fullname = "{0!s}.{1!s}".format(self.schema, self.name)
         else:
             self.fullname = self.name
 
@@ -616,10 +616,10 @@ class Table(DialectKWArgs, SchemaItem, TableClause):
         return _get_table_key(self.name, self.schema)
 
     def __repr__(self):
-        return "Table(%s)" % ', '.join(
+        return "Table({0!s})".format(', '.join(
             [repr(self.name)] + [repr(self.metadata)] +
             [repr(x) for x in self.columns] +
-            ["%s=%s" % (k, repr(getattr(self, k))) for k in ['schema']])
+            ["{0!s}={1!s}".format(k, repr(getattr(self, k))) for k in ['schema']]))
 
     def __str__(self):
         return _get_table_key(self.description, self.schema)
@@ -1270,13 +1270,13 @@ class Column(SchemaItem, ColumnClause):
             kwarg.append('default')
         if self.server_default:
             kwarg.append('server_default')
-        return "Column(%s)" % ', '.join(
+        return "Column({0!s})".format(', '.join(
             [repr(self.name)] + [repr(self.type)] +
             [repr(x) for x in self.foreign_keys if x is not None] +
             [repr(x) for x in self.constraints] +
-            [(self.table is not None and "table=<%s>" %
-              self.table.description or "table=None")] +
-            ["%s=%s" % (k, repr(getattr(self, k))) for k in kwarg])
+            [(self.table is not None and "table=<{0!s}>".format(
+              self.table.description) or "table=None")] +
+            ["{0!s}={1!s}".format(k, repr(getattr(self, k))) for k in kwarg]))
 
     def _set_parent(self, table):
         if not self.name:
@@ -1289,7 +1289,7 @@ class Column(SchemaItem, ColumnClause):
         existing = getattr(self, 'table', None)
         if existing is not None and existing is not table:
             raise exc.ArgumentError(
-                "Column object '%s' already assigned to Table '%s'" % (
+                "Column object '{0!s}' already assigned to Table '{1!s}'".format(
                     self.key,
                     existing.description
                 ))
@@ -1599,7 +1599,7 @@ class ForeignKey(DialectKWArgs, SchemaItem):
         self._unvalidated_dialect_kw = dialect_kw
 
     def __repr__(self):
-        return "ForeignKey(%r)" % self._get_colspec()
+        return "ForeignKey({0!r})".format(self._get_colspec())
 
     def copy(self, schema=None):
         """Produce a copy of this :class:`.ForeignKey` object.
@@ -1643,15 +1643,15 @@ class ForeignKey(DialectKWArgs, SchemaItem):
             _schema, tname, colname = self._column_tokens
             if table_name is not None:
                 tname = table_name
-            return "%s.%s.%s" % (schema, tname, colname)
+            return "{0!s}.{1!s}.{2!s}".format(schema, tname, colname)
         elif table_name:
             schema, tname, colname = self._column_tokens
             if schema:
-                return "%s.%s.%s" % (schema, table_name, colname)
+                return "{0!s}.{1!s}.{2!s}".format(schema, table_name, colname)
             else:
-                return "%s.%s" % (table_name, colname)
+                return "{0!s}.{1!s}".format(table_name, colname)
         elif self._table_column is not None:
-            return "%s.%s" % (
+            return "{0!s}.{1!s}".format(
                 self._table_column.table.fullname, self._table_column.key)
         else:
             return self._colspec
@@ -1696,8 +1696,8 @@ class ForeignKey(DialectKWArgs, SchemaItem):
         m = self._get_colspec().split('.')
         if m is None:
             raise exc.ArgumentError(
-                "Invalid foreign key column specification: %s" %
-                self._colspec)
+                "Invalid foreign key column specification: {0!s}".format(
+                self._colspec))
         if (len(m) == 1):
             tname = m.pop()
             colname = None
@@ -2055,7 +2055,7 @@ class ColumnDefault(DefaultGenerator):
     __visit_name__ = property(_visit_name)
 
     def __repr__(self):
-        return "ColumnDefault(%r)" % self.arg
+        return "ColumnDefault({0!r})".format(self.arg)
 
 
 class Sequence(DefaultGenerator):
@@ -2367,8 +2367,7 @@ class DefaultClause(FetchedValue):
         self.reflected = _reflected
 
     def __repr__(self):
-        return "DefaultClause(%r, for_update=%r)" % \
-               (self.arg, self.for_update)
+        return "DefaultClause({0!r}, for_update={1!r})".format(self.arg, self.for_update)
 
 
 class PassiveDefault(DefaultClause):
@@ -2566,8 +2565,7 @@ class ColumnCollectionMixin(object):
             others = [c for c in columns[1:] if c.table is not table]
             if others:
                 raise exc.ArgumentError(
-                    "Column(s) %s are not part of table '%s'." %
-                    (", ".join("'%s'" % c for c in others),
+                    "Column(s) {0!s} are not part of table '{1!s}'.".format(", ".join("'{0!s}'".format(c) for c in others),
                      table.description)
                 )
 
@@ -3057,9 +3055,9 @@ class PrimaryKeyConstraint(ColumnCollectionConstraint):
                 "may become an exception in a future release" %
                 (
                     table.name,
-                    ", ".join("'%s'" % c.name for c in table_pks),
-                    ", ".join("'%s'" % c.name for c in self.columns),
-                    ", ".join("'%s'" % c.name for c in self.columns)
+                    ", ".join("'{0!s}'".format(c.name) for c in table_pks),
+                    ", ".join("'{0!s}'".format(c.name) for c in self.columns),
+                    ", ".join("'{0!s}'".format(c.name) for c in self.columns)
                 )
             )
             table_pks[:] = []
@@ -3368,12 +3366,12 @@ class Index(DialectKWArgs, ColumnCollectionMixin, SchemaItem):
         bind._run_visitor(ddl.SchemaDropper, self)
 
     def __repr__(self):
-        return 'Index(%s)' % (
+        return 'Index({0!s})'.format((
             ", ".join(
                 [repr(self.name)] +
                 [repr(e) for e in self.expressions] +
                 (self.unique and ["unique=True"] or [])
-            ))
+            )))
 
 
 DEFAULT_NAMING_CONVENTION = util.immutabledict({
@@ -3555,7 +3553,7 @@ class MetaData(SchemaItem):
     """
 
     def __repr__(self):
-        return 'MetaData(bind=%r)' % self.bind
+        return 'MetaData(bind={0!r})'.format(self.bind)
 
     def __contains__(self, table_or_key):
         if not isinstance(table_or_key, util.string_types):
@@ -3770,7 +3768,7 @@ class MetaData(SchemaItem):
                 )
 
             if schema is not None:
-                available_w_schema = util.OrderedSet(["%s.%s" % (schema, name)
+                available_w_schema = util.OrderedSet(["{0!s}.{1!s}".format(schema, name)
                                                       for name in available])
             else:
                 available_w_schema = available
@@ -3789,7 +3787,7 @@ class MetaData(SchemaItem):
             else:
                 missing = [name for name in only if name not in available]
                 if missing:
-                    s = schema and (" schema '%s'" % schema) or ''
+                    s = schema and (" schema '{0!s}'".format(schema)) or ''
                     raise exc.InvalidRequestError(
                         'Could not reflect: requested table(s) not available '
                         'in %s%s: (%s)' %
@@ -3961,7 +3959,7 @@ class _SchemaTranslateMap(object):
 
             self.__call__ = schema_for_object
             self.hash_key = ";".join(
-                "%s=%s" % (k, map_[k])
+                "{0!s}={1!s}".format(k, map_[k])
                 for k in sorted(map_, key=str)
             )
             self.is_default = False

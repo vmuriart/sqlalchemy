@@ -157,10 +157,10 @@ class SybaseTypeCompiler(compiler.GenericTypeCompiler):
         return self.visit_NVARCHAR(type_)
 
     def visit_UNICHAR(self, type_, **kw):
-        return "UNICHAR(%d)" % type_.length
+        return "UNICHAR({0:d})".format(type_.length)
 
     def visit_UNIVARCHAR(self, type_, **kw):
-        return "UNIVARCHAR(%d)" % type_.length
+        return "UNIVARCHAR({0:d})".format(type_.length)
 
     def visit_UNITEXT(self, type_, **kw):
         return "UNITEXT"
@@ -275,8 +275,8 @@ class SybaseExecutionContext(default.DefaultExecutionContext):
 
             if self._enable_identity_insert:
                 self.cursor.execute(
-                    "SET IDENTITY_INSERT %s ON" %
-                    self.dialect.identifier_preparer.format_table(tbl))
+                    "SET IDENTITY_INSERT {0!s} ON".format(
+                    self.dialect.identifier_preparer.format_table(tbl)))
 
         if self.isddl:
             # TODO: to enhance this, we can detect "ddl in tran" on the
@@ -300,9 +300,9 @@ class SybaseExecutionContext(default.DefaultExecutionContext):
 
         if self._enable_identity_insert:
             self.cursor.execute(
-                "SET IDENTITY_INSERT %s OFF" %
+                "SET IDENTITY_INSERT {0!s} OFF".format(
                 self.dialect.identifier_preparer.
-                format_table(self.compiled.statement.table)
+                format_table(self.compiled.statement.table))
             )
 
     def get_lastrowid(self):
@@ -334,7 +334,7 @@ class SybaseSQLCompiler(compiler.SQLCompiler):
             # s += "FIRST "
             # else:
             # s += "TOP %s " % (select._limit,)
-            s += "TOP %s " % (limit,)
+            s += "TOP {0!s} ".format(limit)
         offset = select._offset
         if offset:
             raise NotImplementedError("Sybase ASE does not support OFFSET")
@@ -349,7 +349,7 @@ class SybaseSQLCompiler(compiler.SQLCompiler):
 
     def visit_extract(self, extract, **kw):
         field = self.extract_map.get(extract.field, extract.field)
-        return 'DATEPART("%s", %s)' % (
+        return 'DATEPART("{0!s}", {1!s})'.format(
             field, self.process(extract.expr, **kw))
 
     def visit_now_func(self, fn, **kw):
@@ -396,7 +396,7 @@ class SybaseDDLCompiler(compiler.DDLCompiler):
                 colspec += " IDENTITY"
             else:
                 # TODO: need correct syntax for this
-                colspec += " IDENTITY(%s,%s)" % (start, increment)
+                colspec += " IDENTITY({0!s},{1!s})".format(start, increment)
         else:
             default = self.get_column_default_string(column)
             if default is not None:
@@ -412,7 +412,7 @@ class SybaseDDLCompiler(compiler.DDLCompiler):
 
     def visit_drop_index(self, drop):
         index = drop.element
-        return "\nDROP INDEX %s.%s" % (
+        return "\nDROP INDEX {0!s}.{1!s}".format(
             self.preparer.quote_identifier(index.table.name),
             self._prepared_index_name(drop.element,
                                       include_schema=False)
@@ -548,8 +548,7 @@ class SybaseDialect(default.DefaultDialect):
             # if is_array:
             #     coltype = ARRAY(coltype)
         else:
-            util.warn("Did not recognize type '%s' of column '%s'" %
-                      (type_, name))
+            util.warn("Did not recognize type '{0!s}' of column '{1!s}'".format(type_, name))
             coltype = sqltypes.NULLTYPE
 
         if default:
@@ -639,8 +638,8 @@ class SybaseDialect(default.DefaultDialect):
             constrained_columns = []
             referred_columns = []
             for i in range(1, r["count"] + 1):
-                constrained_columns.append(columns[r["fokey%i" % i]])
-                referred_columns.append(reftable_columns[r["refkey%i" % i]])
+                constrained_columns.append(columns[r["fokey{0:d}".format(i)]])
+                referred_columns.append(reftable_columns[r["refkey{0:d}".format(i)]])
 
             fk_info = {
                 "constrained_columns": constrained_columns,
@@ -692,7 +691,7 @@ class SybaseDialect(default.DefaultDialect):
         for r in results:
             column_names = []
             for i in range(1, r["count"]):
-                column_names.append(r["col_%i" % (i,)])
+                column_names.append(r["col_{0:d}".format(i)])
             index_info = {"name": r["name"],
                           "unique": bool(r["unique"]),
                           "column_names": column_names}
@@ -739,7 +738,7 @@ class SybaseDialect(default.DefaultDialect):
         constrained_columns = []
         if pks:
             for i in range(1, pks["count"] + 1):
-                constrained_columns.append(pks["pk_%i" % (i,)])
+                constrained_columns.append(pks["pk_{0:d}".format(i)])
             return {"constrained_columns": constrained_columns,
                     "name": pks["name"]}
         else:

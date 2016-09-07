@@ -142,8 +142,8 @@ def _get_crud_params(compiler, stmt, **kw):
         ).difference(check_columns)
         if check:
             raise exc.CompileError(
-                "Unconsumed column names: %s" %
-                (", ".join("%s" % c for c in check))
+                "Unconsumed column names: {0!s}".format(
+                (", ".join("{0!s}".format(c) for c in check)))
             )
 
     if stmt._has_multi_parameters:
@@ -190,7 +190,7 @@ def _key_getters_for_crud_column(compiler, stmt):
 
         def _col_bind_name(col):
             if col.table in _et:
-                return "%s_%s" % (col.table.name, col.key)
+                return "{0!s}_{1!s}".format(col.table.name, col.key)
             else:
                 return col.key
 
@@ -315,7 +315,7 @@ def _append_param_parameter(
             compiler, c, value, required=value is REQUIRED,
             name=_col_bind_name(c)
             if not stmt._has_multi_parameters
-            else "%s_0" % _col_bind_name(c),
+            else "{0!s}_0".format(_col_bind_name(c)),
             **kw
         )
     else:
@@ -394,7 +394,7 @@ def _create_update_prefetch_bind_param(compiler, c, process=True, name=None):
 
 class _multiparam_column(elements.ColumnElement):
     def __init__(self, original, index):
-        self.key = "%s_%d" % (original.key, index + 1)
+        self.key = "{0!s}_{1:d}".format(original.key, index + 1)
         self.original = original
         self.default = original.default
         self.type = original.type
@@ -596,7 +596,7 @@ def _extend_values_for_multiparams(compiler, stmt, values, kw):
                 c,
                 (_create_bind_param(
                     compiler, c, row[c.key],
-                    name="%s_%d" % (c.key, i + 1)
+                    name="{0!s}_{1:d}".format(c.key, i + 1)
                 ) if elements._is_literal(row[c.key])
                  else compiler.process(
                     row[c.key].self_group(), **kw))

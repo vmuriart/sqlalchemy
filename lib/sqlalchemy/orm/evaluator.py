@@ -30,10 +30,10 @@ class EvaluatorCompiler(object):
         self.target_cls = target_cls
 
     def process(self, clause):
-        meth = getattr(self, "visit_%s" % clause.__visit_name__, None)
+        meth = getattr(self, "visit_{0!s}".format(clause.__visit_name__), None)
         if not meth:
             raise UnevaluatableError(
-                "Cannot evaluate %s" % type(clause).__name__)
+                "Cannot evaluate {0!s}".format(type(clause).__name__))
         return meth(clause)
 
     def visit_grouping(self, clause):
@@ -54,8 +54,8 @@ class EvaluatorCompiler(object):
             if self.target_cls and not issubclass(
                     self.target_cls, parentmapper.class_):
                 raise UnevaluatableError(
-                    "Can't evaluate criteria against alternate class %s" %
-                    parentmapper.class_
+                    "Can't evaluate criteria against alternate class {0!s}".format(
+                    parentmapper.class_)
                 )
             key = parentmapper._columntoproperty[clause].key
         else:
@@ -88,8 +88,8 @@ class EvaluatorCompiler(object):
                 return True
         else:
             raise UnevaluatableError(
-                "Cannot evaluate clauselist with operator %s" %
-                clause.operator)
+                "Cannot evaluate clauselist with operator {0!s}".format(
+                clause.operator))
 
         return evaluate
 
@@ -112,8 +112,7 @@ class EvaluatorCompiler(object):
                 return operator(eval_left(obj), eval_right(obj))
         else:
             raise UnevaluatableError(
-                "Cannot evaluate %s with operator %s" %
-                (type(clause).__name__, clause.operator))
+                "Cannot evaluate {0!s} with operator {1!s}".format(type(clause).__name__, clause.operator))
         return evaluate
 
     def visit_unary(self, clause):
@@ -127,8 +126,7 @@ class EvaluatorCompiler(object):
 
             return evaluate
         raise UnevaluatableError(
-            "Cannot evaluate %s with operator %s" %
-            (type(clause).__name__, clause.operator))
+            "Cannot evaluate {0!s} with operator {1!s}".format(type(clause).__name__, clause.operator))
 
     def visit_bindparam(self, clause):
         if clause.callable:

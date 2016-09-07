@@ -192,7 +192,7 @@ def _log(opt_str, value, parser):
 def _list_dbs(*args):
     print("Available --db options (use --dburi to override)")
     for macro in sorted(file_config.options('db')):
-        print("%20s\t%s" % (macro, file_config.get('db', macro)))
+        print("{0:20!s}\t{1!s}".format(macro, file_config.get('db', macro)))
     sys.exit(0)
 
 
@@ -407,12 +407,12 @@ def want_method(cls, fn):
 def generate_sub_tests(cls, module):
     if getattr(cls, '__backend__', False):
         for cfg in _possible_configs_for_cls(cls):
-            name = "%s_%s_%s" % (cls.__name__, cfg.db.name, cfg.db.driver)
+            name = "{0!s}_{1!s}_{2!s}".format(cls.__name__, cfg.db.name, cfg.db.driver)
             subcls = type(
                 name,
                 (cls,),
                 {
-                    "__only_on__": ("%s+%s" % (cfg.db.name, cfg.db.driver)),
+                    "__only_on__": ("{0!s}+{1!s}".format(cfg.db.name, cfg.db.driver)),
                 }
             )
             setattr(module, name, subcls)
@@ -458,11 +458,11 @@ def before_test(test, test_module_name, test_class, test_name):
     # "test.aaa_profiling.test_compiler.CompileTest.test_update_whereclause"
     name = test_class.__name__
 
-    suffix = "_%s_%s" % (config.db.name, config.db.driver)
+    suffix = "_{0!s}_{1!s}".format(config.db.name, config.db.driver)
     if name.endswith(suffix):
         name = name[0:-(len(suffix))]
 
-    id_ = "%s.%s.%s" % (test_module_name, name, test_name)
+    id_ = "{0!s}.{1!s}.{2!s}".format(test_module_name, name, test_name)
 
     profiling._current_test = id_
 
@@ -521,19 +521,19 @@ def _do_skips(cls):
     if getattr(cls, '__skip_if__', False):
         for c in getattr(cls, '__skip_if__'):
             if c():
-                config.skip_test("'%s' skipped by %s" % (
+                config.skip_test("'{0!s}' skipped by {1!s}".format(
                     cls.__name__, c.__name__)
                                  )
 
     if not all_configs:
         if getattr(cls, '__backend__', False):
-            msg = "'%s' unsupported for implementation '%s'" % (
+            msg = "'{0!s}' unsupported for implementation '{1!s}'".format(
                 cls.__name__, cls.__only_on__)
         else:
-            msg = "'%s' unsupported on any DB implementation %s%s" % (
+            msg = "'{0!s}' unsupported on any DB implementation {1!s}{2!s}".format(
                 cls.__name__,
                 ", ".join(
-                    "'%s(%s)+%s'" % (
+                    "'{0!s}({1!s})+{2!s}'".format(
                         config_obj.db.name,
                         ".".join(
                             str(dig) for dig in

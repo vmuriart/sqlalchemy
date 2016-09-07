@@ -62,8 +62,7 @@ class Address(Base):
     parent = association_proxy("association", "parent")
 
     def __repr__(self):
-        return "%s(street=%r, city=%r, zip=%r)" % \
-            (self.__class__.__name__, self.street,
+        return "{0!s}(street={1!r}, city={2!r}, zip={3!r})".format(self.__class__.__name__, self.street,
             self.city, self.zip)
 
 class HasAddresses(object):
@@ -81,7 +80,7 @@ class HasAddresses(object):
         discriminator = name.lower()
 
         assoc_cls = type(
-                        "%sAddressAssociation" % name,
+                        "{0!s}AddressAssociation".format(name),
                         (AddressAssociation, ),
                         dict(
                             __tablename__=None,

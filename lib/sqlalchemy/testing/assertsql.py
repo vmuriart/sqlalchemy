@@ -45,7 +45,7 @@ class CursorSQL(SQLMatchRule):
         if self.statement != stmt.statement or (
                         self.params is not None and self.params != stmt.parameters):
             self.errormessage = \
-                "Testing for exact SQL %s parameters %s received %s %s" % (
+                "Testing for exact SQL {0!s} parameters {1!s} received {2!s} {3!s}".format(
                     self.statement, self.params,
                     stmt.statement, stmt.parameters
                 )
@@ -254,8 +254,7 @@ class CountStatements(AssertRule):
 
     def no_more_statements(self):
         if self.count != self._statement_count:
-            assert False, 'desired statement count %d does not match %d' \
-                          % (self.count, self._statement_count)
+            assert False, 'desired statement count {0:d} does not match {1:d}'.format(self.count, self._statement_count)
 
 
 class AllOf(AssertRule):

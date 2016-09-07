@@ -24,8 +24,7 @@ def _event_key(target, identifier, fn):
         if tgt is not None:
             return _EventKey(target, identifier, fn, tgt)
     else:
-        raise exc.InvalidRequestError("No such event '%s' for target '%s'" %
-                                      (identifier, target))
+        raise exc.InvalidRequestError("No such event '{0!s}' for target '{1!s}'".format(identifier, target))
 
 
 def listen(target, identifier, fn, *args, **kw):

@@ -200,7 +200,7 @@ class String(Concatenable, TypeEngine):
     def literal_processor(self, dialect):
         def process(value):
             value = value.replace("'", "''")
-            return "'%s'" % value
+            return "'{0!s}'".format(value)
 
         return process
 
@@ -837,7 +837,7 @@ class _Binary(TypeEngine):
     def literal_processor(self, dialect):
         def process(value):
             value = value.decode(dialect.encoding).replace("'", "''")
-            return "'%s'" % value
+            return "'{0!s}'".format(value)
 
         return process
 
@@ -1271,14 +1271,14 @@ class Enum(String, SchemaType):
                 return elem
             else:
                 raise LookupError(
-                    '"%s" is not among the defined enum values' % elem)
+                    '"{0!s}" is not among the defined enum values'.format(elem))
 
     def _object_value_for_elem(self, elem):
         try:
             return self._object_lookup[elem]
         except KeyError:
             raise LookupError(
-                '"%s" is not among the defined enum values' % elem)
+                '"{0!s}" is not among the defined enum values'.format(elem))
 
     def __repr__(self):
         return util.generic_repr(self,
@@ -2404,7 +2404,7 @@ def _resolve_value_to_type(value):
                         insp.__class__ in inspection._registrars
         ):
             raise exc.ArgumentError(
-                "Object %r is not legal as a SQL literal value" % value)
+                "Object {0!r} is not legal as a SQL literal value".format(value))
         return NULLTYPE
     else:
         return _result_type

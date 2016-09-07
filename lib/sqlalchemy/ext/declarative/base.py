@@ -644,8 +644,7 @@ def _declarative_constructor(self, **kwargs):
     for k in kwargs:
         if not hasattr(cls_, k):
             raise TypeError(
-                "%r is an invalid keyword argument for %s" %
-                (k, cls_.__name__))
+                "{0!r} is an invalid keyword argument for {1!s}".format(k, cls_.__name__))
         setattr(self, k, kwargs[k])
 
 

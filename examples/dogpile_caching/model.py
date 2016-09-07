@@ -89,7 +89,7 @@ class Person(Base):
         return self.name
 
     def __repr__(self):
-        return "Person(name=%r)" % self.name
+        return "Person(name={0!r})".format(self.name)
 
     def format_full(self):
         return "\t".join([str(x) for x in [self] + list(self.addresses)])

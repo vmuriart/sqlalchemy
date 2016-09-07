@@ -101,8 +101,7 @@ class MySQLDialect_mysqldb(MySQLDialect):
 
         has_utf8_bin = self.server_version_info > (5,) and \
                        connection.scalar(
-                           "show collation where %s = 'utf8' and %s = 'utf8_bin'"
-                           % (
+                           "show collation where {0!s} = 'utf8' and {1!s} = 'utf8_bin'".format(
                                self.identifier_preparer.quote("Charset"),
                                self.identifier_preparer.quote("Collation")
                            ))

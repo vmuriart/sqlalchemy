@@ -230,8 +230,7 @@ class Pool(log.Identified):
             self._reset_on_return = reset_commit
         else:
             raise exc.ArgumentError(
-                "Invalid value for 'reset_on_return': %r"
-                % reset_on_return)
+                "Invalid value for 'reset_on_return': {0!r}".format(reset_on_return))
 
         self.echo = echo
 
@@ -956,8 +955,7 @@ class SingletonThreadPool(Pool):
             c.close()
 
     def status(self):
-        return "SingletonThreadPool id:%d size: %d" % \
-               (id(self), len(self._all_conns))
+        return "SingletonThreadPool id:{0:d} size: {1:d}".format(id(self), len(self._all_conns))
 
     def _do_return_conn(self, conn):
         pass
@@ -1262,8 +1260,8 @@ class AssertionPool(Pool):
     def _do_get(self):
         if self._checked_out:
             if self._checkout_traceback:
-                suffix = ' at:\n%s' % ''.join(
-                    chop_traceback(self._checkout_traceback))
+                suffix = ' at:\n{0!s}'.format(''.join(
+                    chop_traceback(self._checkout_traceback)))
             else:
                 suffix = ''
             raise AssertionError("connection is already checked out" + suffix)

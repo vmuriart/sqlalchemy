@@ -28,7 +28,7 @@ class Person(object):
         for key, value in kwargs.items():
             setattr(self, key, value)
     def __repr__(self):
-        return "Ordinary person %s" % self.name
+        return "Ordinary person {0!s}".format(self.name)
 class Engineer(Person):
     def __repr__(self):
         return "Engineer %s, status %s, engineer_name %s, "\
@@ -37,14 +37,13 @@ class Engineer(Person):
                         self.engineer_name, self.primary_language)
 class Manager(Person):
     def __repr__(self):
-        return "Manager %s, status %s, manager_name %s" % \
-                    (self.name, self.status, self.manager_name)
+        return "Manager {0!s}, status {1!s}, manager_name {2!s}".format(self.name, self.status, self.manager_name)
 class Company(object):
     def __init__(self, **kwargs):
         for key, value in kwargs.items():
             setattr(self, key, value)
     def __repr__(self):
-        return "Company %s" % self.name
+        return "Company {0!s}".format(self.name)
 
 person_mapper = mapper(Person, employees_table,
                        polymorphic_on=employees_table.c.type,

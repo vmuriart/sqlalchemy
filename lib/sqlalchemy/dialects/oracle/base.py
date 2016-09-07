@@ -475,13 +475,13 @@ class OracleTypeCompiler(compiler.GenericTypeCompiler):
             return self.visit_VARCHAR2(type_, **kw)
 
     def visit_INTERVAL(self, type_, **kw):
-        return "INTERVAL DAY%s TO SECOND%s" % (
+        return "INTERVAL DAY{0!s} TO SECOND{1!s}".format(
             type_.day_precision is not None and
-            "(%d)" % type_.day_precision or
+            "({0:d})".format(type_.day_precision) or
             "",
             type_.second_precision is not None and
-            "(%d)" % type_.second_precision or
-            "",
+            "({0:d})".format(type_.second_precision) or
+            ""
         )
 
     def visit_LONG(self, type_, **kw):
@@ -531,7 +531,7 @@ class OracleTypeCompiler(compiler.GenericTypeCompiler):
 
     def _visit_varchar(self, type_, n, num):
         if not type_.length:
-            return "%(n)sVARCHAR%(two)s" % {'two': num, 'n': n}
+            return "{n!s}VARCHAR{two!s}".format(**{'two': num, 'n': n})
         elif not n and self.dialect._supports_char_length:
             varchar = "VARCHAR%(two)s(%(length)s CHAR)"
             return varchar % {'length': type_.length, 'two': num}
@@ -559,7 +559,7 @@ class OracleTypeCompiler(compiler.GenericTypeCompiler):
 
     def visit_RAW(self, type_, **kw):
         if type_.length:
-            return "RAW(%(length)s)" % {'length': type_.length}
+            return "RAW({length!s})".format(**{'length': type_.length})
         else:
             return "RAW"
 
@@ -586,7 +586,7 @@ class OracleCompiler(compiler.SQLCompiler):
         super(OracleCompiler, self).__init__(*args, **kwargs)
 
     def visit_mod_binary(self, binary, operator, **kw):
-        return "mod(%s, %s)" % (self.process(binary.left, **kw),
+        return "mod({0!s}, {1!s})".format(self.process(binary.left, **kw),
                                 self.process(binary.right, **kw))
 
     def visit_now_func(self, fn, **kw):
@@ -596,7 +596,7 @@ class OracleCompiler(compiler.SQLCompiler):
         return "LENGTH" + self.function_argspec(fn, **kw)
 
     def visit_match_op_binary(self, binary, operator, **kw):
-        return "CONTAINS (%s, %s)" % (self.process(binary.left),
+        return "CONTAINS ({0!s}, {1!s})".format(self.process(binary.left),
                                       self.process(binary.right))
 
     def visit_true(self, expr, **kw):
@@ -610,7 +610,7 @@ class OracleCompiler(compiler.SQLCompiler):
 
     def get_select_hint_text(self, byfroms):
         return " ".join(
-            "/*+ %s */" % text for table, text in byfroms.items()
+            "/*+ {0!s} */".format(text) for table, text in byfroms.items()
         )
 
     def function_argspec(self, fn, **kw):
@@ -693,7 +693,7 @@ class OracleCompiler(compiler.SQLCompiler):
                 col_expr = column.type.column_expression(column)
             else:
                 col_expr = column
-            outparam = sql.outparam("ret_%d" % i, type_=column.type)
+            outparam = sql.outparam("ret_{0:d}".format(i), type_=column.type)
             self.binds[outparam.key] = outparam
             binds.append(
                 self.bindparam_string(self._truncate_bindparam(outparam)))
@@ -754,8 +754,8 @@ class OracleCompiler(compiler.SQLCompiler):
                         self.dialect.optimize_limits and \
                         select._simple_int_limit:
                     limitselect = limitselect.prefix_with(
-                        "/*+ FIRST_ROWS(%d) */" %
-                        select._limit)
+                        "/*+ FIRST_ROWS({0:d}) */".format(
+                        select._limit))
 
                 limitselect._oracle_visit = True
                 limitselect._is_wrapper = True
@@ -783,7 +783,7 @@ class OracleCompiler(compiler.SQLCompiler):
 
                         if offset_clause is not None:
                             max_row += select._offset
-                        max_row = sql.literal_column("%d" % max_row)
+                        max_row = sql.literal_column("{0:d}".format(max_row))
                     else:
                         max_row = limit_clause
                         if offset_clause is not None:
@@ -813,7 +813,7 @@ class OracleCompiler(compiler.SQLCompiler):
 
                     if not self.dialect.use_binds_for_limits:
                         offset_clause = sql.literal_column(
-                            "%d" % select._offset)
+                            "{0:d}".format(select._offset))
                     offsetselect.append_whereclause(
                         sql.literal_column("ora_rn") > offset_clause)
 
@@ -849,7 +849,7 @@ class OracleDDLCompiler(compiler.DDLCompiler):
     def define_constraint_cascades(self, constraint):
         text = ""
         if constraint.ondelete is not None:
-            text += " ON DELETE %s" % constraint.ondelete
+            text += " ON DELETE {0!s}".format(constraint.ondelete)
 
         # oracle has no ON UPDATE CASCADE -
         # its only available via triggers
@@ -872,7 +872,7 @@ class OracleDDLCompiler(compiler.DDLCompiler):
             text += "UNIQUE "
         if index.dialect_options['oracle']['bitmap']:
             text += "BITMAP "
-        text += "INDEX %s ON %s (%s)" % (
+        text += "INDEX {0!s} ON {1!s} ({2!s})".format(
             self._prepared_index_name(index, include_schema=True),
             preparer.format_table(index.table, use_schema=True),
             ', '.join(
@@ -885,9 +885,9 @@ class OracleDDLCompiler(compiler.DDLCompiler):
             if index.dialect_options['oracle']['compress'] is True:
                 text += " COMPRESS"
             else:
-                text += " COMPRESS %d" % (
+                text += " COMPRESS {0:d}".format((
                     index.dialect_options['oracle']['compress']
-                )
+                ))
         return text
 
     def post_create_table(self, table):
@@ -896,15 +896,15 @@ class OracleDDLCompiler(compiler.DDLCompiler):
 
         if opts['on_commit']:
             on_commit_options = opts['on_commit'].replace("_", " ").upper()
-            table_opts.append('\n ON COMMIT %s' % on_commit_options)
+            table_opts.append('\n ON COMMIT {0!s}'.format(on_commit_options))
 
         if opts['compress']:
             if opts['compress'] is True:
                 table_opts.append("\n COMPRESS")
             else:
-                table_opts.append("\n COMPRESS FOR %s" % (
+                table_opts.append("\n COMPRESS FOR {0!s}".format((
                     opts['compress']
-                ))
+                )))
 
         return ''.join(table_opts)
 
@@ -1301,8 +1301,7 @@ class OracleDialect(default.DefaultDialect):
                 try:
                     coltype = self.ischema_names[coltype]
                 except KeyError:
-                    util.warn("Did not recognize type '%s' of column '%s'" %
-                              (coltype, colname))
+                    util.warn("Did not recognize type '{0!s}' of column '{1!s}'".format(coltype, colname))
                     coltype = sqltypes.NULLTYPE
 
             cdict = {

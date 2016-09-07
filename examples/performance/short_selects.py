@@ -41,7 +41,7 @@ def setup_database(dburl, echo, num):
     sess = Session(engine)
     sess.add_all([
         Customer(
-            id=i, name='c%d' % i, description="c%d" % i,
+            id=i, name='c{0:d}'.format(i), description="c{0:d}".format(i),
             q=i * 10,
             p=i * 20,
             x=i * 30,

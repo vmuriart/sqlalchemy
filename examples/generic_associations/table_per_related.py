@@ -47,8 +47,7 @@ class Address(object):
     zip = Column(String)
 
     def __repr__(self):
-        return "%s(street=%r, city=%r, zip=%r)" % \
-            (self.__class__.__name__, self.street,
+        return "{0!s}(street={1!r}, city={2!r}, zip={3!r})".format(self.__class__.__name__, self.street,
             self.city, self.zip)
 
 class HasAddresses(object):
@@ -59,13 +58,13 @@ class HasAddresses(object):
     @declared_attr
     def addresses(cls):
         cls.Address = type(
-            "%sAddress" % cls.__name__,
+            "{0!s}Address".format(cls.__name__),
             (Address, Base,),
             dict(
-                __tablename__="%s_address" %
-                            cls.__tablename__,
+                __tablename__="{0!s}_address".format(
+                            cls.__tablename__),
                 parent_id=Column(Integer,
-                            ForeignKey("%s.id" % cls.__tablename__)),
+                            ForeignKey("{0!s}.id".format(cls.__tablename__))),
                 parent=relationship(cls)
             )
         )

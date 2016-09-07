@@ -98,7 +98,7 @@ if __name__ == '__main__':
             self.name = name
 
         def __repr__(self):
-            return "Animal(%r)" % self.name
+            return "Animal({0!r})".format(self.name)
 
         @classmethod
         def with_characteristic(self, key, value):

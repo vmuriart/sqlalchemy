@@ -182,7 +182,7 @@ def count_from_n_factory(start):
         return index + start
 
     try:
-        f.__name__ = 'count_from_%i' % start
+        f.__name__ = 'count_from_{0:d}'.format(start)
     except TypeError:
         pass
     return f

@@ -749,7 +749,7 @@ class MySQLCompiler(compiler.SQLCompiler):
     extract_map.update({'milliseconds': 'millisecond'})
 
     def visit_random_func(self, fn, **kw):
-        return "rand%s" % self.function_argspec(fn)
+        return "rand{0!s}".format(self.function_argspec(fn))
 
     def visit_utc_timestamp_func(self, fn, **kw):
         return "UTC_TIMESTAMP"
@@ -758,22 +758,21 @@ class MySQLCompiler(compiler.SQLCompiler):
         return "SYSDATE()"
 
     def visit_json_getitem_op_binary(self, binary, operator, **kw):
-        return "JSON_EXTRACT(%s, %s)" % (
+        return "JSON_EXTRACT({0!s}, {1!s})".format(
             self.process(binary.left, **kw),
             self.process(binary.right, **kw))
 
     def visit_json_path_getitem_op_binary(self, binary, operator, **kw):
-        return "JSON_EXTRACT(%s, %s)" % (
+        return "JSON_EXTRACT({0!s}, {1!s})".format(
             self.process(binary.left, **kw),
             self.process(binary.right, **kw))
 
     def visit_concat_op_binary(self, binary, operator, **kw):
-        return "concat(%s, %s)" % (self.process(binary.left),
+        return "concat({0!s}, {1!s})".format(self.process(binary.left),
                                    self.process(binary.right))
 
     def visit_match_op_binary(self, binary, operator, **kw):
-        return "MATCH (%s) AGAINST (%s IN BOOLEAN MODE)" % \
-               (self.process(binary.left), self.process(binary.right))
+        return "MATCH ({0!s}) AGAINST ({1!s} IN BOOLEAN MODE)".format(self.process(binary.left), self.process(binary.right))
 
     def get_from_hint_text(self, table, text):
         return text
@@ -823,7 +822,7 @@ class MySQLCompiler(compiler.SQLCompiler):
                 self.dialect.type_compiler.process(cast.typeclause.type))
             return self.process(cast.clause.self_group(), **kw)
 
-        return 'CAST(%s AS %s)' % (self.process(cast.clause, **kw), type_)
+        return 'CAST({0!s} AS {1!s})'.format(self.process(cast.clause, **kw), type_)
 
     def render_literal_value(self, value, type_):
         value = super(MySQLCompiler, self).render_literal_value(value, type_)
@@ -902,21 +901,21 @@ class MySQLCompiler(compiler.SQLCompiler):
                 # but also is consistent with the usage of the upper
                 # bound as part of MySQL's "syntax" for OFFSET with
                 # no LIMIT
-                return ' \n LIMIT %s, %s' % (
+                return ' \n LIMIT {0!s}, {1!s}'.format(
                     self.process(offset_clause, **kw),
                     "18446744073709551615")
             else:
-                return ' \n LIMIT %s, %s' % (
+                return ' \n LIMIT {0!s}, {1!s}'.format(
                     self.process(offset_clause, **kw),
                     self.process(limit_clause, **kw))
         else:
             # No offset provided, so just use the limit
-            return ' \n LIMIT %s' % (self.process(limit_clause, **kw),)
+            return ' \n LIMIT {0!s}'.format(self.process(limit_clause, **kw))
 
     def update_limit_clause(self, update_stmt):
-        limit = update_stmt.kwargs.get('%s_limit' % self.dialect.name, None)
+        limit = update_stmt.kwargs.get('{0!s}_limit'.format(self.dialect.name), None)
         if limit:
-            return "LIMIT %s" % limit
+            return "LIMIT {0!s}".format(limit)
         else:
             return None
 
@@ -972,7 +971,7 @@ class MySQLDDLCompiler(compiler.DDLCompiler):
                 v
             )
             for k, v in table.kwargs.items()
-            if k.startswith('%s_' % self.dialect.name)
+            if k.startswith('{0!s}_'.format(self.dialect.name))
         )
 
         for opt in topological.sort([
@@ -982,7 +981,7 @@ class MySQLDDLCompiler(compiler.DDLCompiler):
         ], opts):
             arg = opts[opt]
             if opt in _reflection._options_of_type_string:
-                arg = "'%s'" % arg.replace("\\", "\\\\").replace("'", "''")
+                arg = "'{0!s}'".format(arg.replace("\\", "\\\\").replace("'", "''"))
 
             if opt in ('DATA_DIRECTORY', 'INDEX_DIRECTORY',
                        'DEFAULT_CHARACTER_SET', 'CHARACTER_SET',
@@ -1013,7 +1012,7 @@ class MySQLDDLCompiler(compiler.DDLCompiler):
         text = "CREATE "
         if index.unique:
             text += "UNIQUE "
-        text += "INDEX %s ON %s " % (name, table)
+        text += "INDEX {0!s} ON {1!s} ".format(name, table)
 
         length = index.dialect_options['mysql']['length']
         if length is not None:
@@ -1023,11 +1022,11 @@ class MySQLDDLCompiler(compiler.DDLCompiler):
                 # mapping specifying the prefix length for each column of the
                 # index
                 columns = ', '.join(
-                    '%s(%d)' % (expr, length[col.name]) if col.name in length
+                    '{0!s}({1:d})'.format(expr, length[col.name]) if col.name in length
                     else
                     (
-                        '%s(%d)' % (expr, length[expr]) if expr in length
-                        else '%s' % expr
+                        '{0!s}({1:d})'.format(expr, length[expr]) if expr in length
+                        else '{0!s}'.format(expr)
                     )
                     for col, expr in zip(index.expressions, columns)
                 )
@@ -1035,16 +1034,16 @@ class MySQLDDLCompiler(compiler.DDLCompiler):
                 # or can be an integer value specifying the same
                 # prefix length for all columns of the index
                 columns = ', '.join(
-                    '%s(%d)' % (col, length)
+                    '{0!s}({1:d})'.format(col, length)
                     for col in columns
                 )
         else:
             columns = ', '.join(columns)
-        text += '(%s)' % columns
+        text += '({0!s})'.format(columns)
 
         using = index.dialect_options['mysql']['using']
         if using is not None:
-            text += " USING %s" % (preparer.quote(using))
+            text += " USING {0!s}".format((preparer.quote(using)))
 
         return text
 
@@ -1053,13 +1052,13 @@ class MySQLDDLCompiler(compiler.DDLCompiler):
             visit_primary_key_constraint(constraint)
         using = constraint.dialect_options['mysql']['using']
         if using:
-            text += " USING %s" % (self.preparer.quote(using))
+            text += " USING {0!s}".format((self.preparer.quote(using)))
         return text
 
     def visit_drop_index(self, drop):
         index = drop.element
 
-        return "\nDROP INDEX %s ON %s" % (
+        return "\nDROP INDEX {0!s} ON {1!s}".format(
             self._prepared_index_name(index,
                                       include_schema=False),
             self.preparer.format_table(index.table))
@@ -1078,8 +1077,7 @@ class MySQLDDLCompiler(compiler.DDLCompiler):
         else:
             qual = ""
             const = self.preparer.format_constraint(constraint)
-        return "ALTER TABLE %s DROP %s%s" % \
-               (self.preparer.format_table(constraint.table),
+        return "ALTER TABLE {0!s} DROP {1!s}{2!s}".format(self.preparer.format_table(constraint.table),
                 qual, const)
 
     def define_constraint_match(self, constraint):
@@ -1113,7 +1111,7 @@ class MySQLTypeCompiler(compiler.GenericTypeCompiler):
             return getattr(type_, name, defaults.get(name))
 
         if attr('charset'):
-            charset = 'CHARACTER SET %s' % attr('charset')
+            charset = 'CHARACTER SET {0!s}'.format(attr('charset'))
         elif attr('ascii'):
             charset = 'ASCII'
         elif attr('unicode'):
@@ -1122,7 +1120,7 @@ class MySQLTypeCompiler(compiler.GenericTypeCompiler):
             charset = None
 
         if attr('collation'):
-            collation = 'COLLATE %s' % type_.collation
+            collation = 'COLLATE {0!s}'.format(type_.collation)
         elif attr('binary'):
             collation = 'BINARY'
         else:
@@ -1143,42 +1141,42 @@ class MySQLTypeCompiler(compiler.GenericTypeCompiler):
             return self._extend_numeric(type_, "NUMERIC")
         elif type_.scale is None:
             return self._extend_numeric(type_,
-                                        "NUMERIC(%(precision)s)" %
-                                        {'precision': type_.precision})
+                                        "NUMERIC({precision!s})".format(**
+                                        {'precision': type_.precision}))
         else:
             return self._extend_numeric(type_,
-                                        "NUMERIC(%(precision)s, %(scale)s)" %
+                                        "NUMERIC({precision!s}, {scale!s})".format(**
                                         {'precision': type_.precision,
-                                         'scale': type_.scale})
+                                         'scale': type_.scale}))
 
     def visit_DECIMAL(self, type_, **kw):
         if type_.precision is None:
             return self._extend_numeric(type_, "DECIMAL")
         elif type_.scale is None:
             return self._extend_numeric(type_,
-                                        "DECIMAL(%(precision)s)" %
-                                        {'precision': type_.precision})
+                                        "DECIMAL({precision!s})".format(**
+                                        {'precision': type_.precision}))
         else:
             return self._extend_numeric(type_,
-                                        "DECIMAL(%(precision)s, %(scale)s)" %
+                                        "DECIMAL({precision!s}, {scale!s})".format(**
                                         {'precision': type_.precision,
-                                         'scale': type_.scale})
+                                         'scale': type_.scale}))
 
     def visit_DOUBLE(self, type_, **kw):
         if type_.precision is not None and type_.scale is not None:
             return self._extend_numeric(type_,
-                                        "DOUBLE(%(precision)s, %(scale)s)" %
+                                        "DOUBLE({precision!s}, {scale!s})".format(**
                                         {'precision': type_.precision,
-                                         'scale': type_.scale})
+                                         'scale': type_.scale}))
         else:
             return self._extend_numeric(type_, 'DOUBLE')
 
     def visit_REAL(self, type_, **kw):
         if type_.precision is not None and type_.scale is not None:
             return self._extend_numeric(type_,
-                                        "REAL(%(precision)s, %(scale)s)" %
+                                        "REAL({precision!s}, {scale!s})".format(**
                                         {'precision': type_.precision,
-                                         'scale': type_.scale})
+                                         'scale': type_.scale}))
         else:
             return self._extend_numeric(type_, 'REAL')
 
@@ -1187,62 +1185,62 @@ class MySQLTypeCompiler(compiler.GenericTypeCompiler):
                         type_.scale is not None and \
                         type_.precision is not None:
             return self._extend_numeric(
-                type_, "FLOAT(%s, %s)" % (type_.precision, type_.scale))
+                type_, "FLOAT({0!s}, {1!s})".format(type_.precision, type_.scale))
         elif type_.precision is not None:
             return self._extend_numeric(type_,
-                                        "FLOAT(%s)" % (type_.precision,))
+                                        "FLOAT({0!s})".format(type_.precision))
         else:
             return self._extend_numeric(type_, "FLOAT")
 
     def visit_INTEGER(self, type_, **kw):
         if self._mysql_type(type_) and type_.display_width is not None:
             return self._extend_numeric(
-                type_, "INTEGER(%(display_width)s)" %
-                       {'display_width': type_.display_width})
+                type_, "INTEGER({display_width!s})".format(**
+                       {'display_width': type_.display_width}))
         else:
             return self._extend_numeric(type_, "INTEGER")
 
     def visit_BIGINT(self, type_, **kw):
         if self._mysql_type(type_) and type_.display_width is not None:
             return self._extend_numeric(
-                type_, "BIGINT(%(display_width)s)" %
-                       {'display_width': type_.display_width})
+                type_, "BIGINT({display_width!s})".format(**
+                       {'display_width': type_.display_width}))
         else:
             return self._extend_numeric(type_, "BIGINT")
 
     def visit_MEDIUMINT(self, type_, **kw):
         if self._mysql_type(type_) and type_.display_width is not None:
             return self._extend_numeric(
-                type_, "MEDIUMINT(%(display_width)s)" %
-                       {'display_width': type_.display_width})
+                type_, "MEDIUMINT({display_width!s})".format(**
+                       {'display_width': type_.display_width}))
         else:
             return self._extend_numeric(type_, "MEDIUMINT")
 
     def visit_TINYINT(self, type_, **kw):
         if self._mysql_type(type_) and type_.display_width is not None:
             return self._extend_numeric(type_,
-                                        "TINYINT(%s)" % type_.display_width)
+                                        "TINYINT({0!s})".format(type_.display_width))
         else:
             return self._extend_numeric(type_, "TINYINT")
 
     def visit_SMALLINT(self, type_, **kw):
         if self._mysql_type(type_) and type_.display_width is not None:
             return self._extend_numeric(type_,
-                                        "SMALLINT(%(display_width)s)" %
-                                        {'display_width': type_.display_width}
+                                        "SMALLINT({display_width!s})".format(**
+                                        {'display_width': type_.display_width})
                                         )
         else:
             return self._extend_numeric(type_, "SMALLINT")
 
     def visit_BIT(self, type_, **kw):
         if type_.length is not None:
-            return "BIT(%s)" % type_.length
+            return "BIT({0!s})".format(type_.length)
         else:
             return "BIT"
 
     def visit_DATETIME(self, type_, **kw):
         if getattr(type_, 'fsp', None):
-            return "DATETIME(%d)" % type_.fsp
+            return "DATETIME({0:d})".format(type_.fsp)
         else:
             return "DATETIME"
 
@@ -1251,13 +1249,13 @@ class MySQLTypeCompiler(compiler.GenericTypeCompiler):
 
     def visit_TIME(self, type_, **kw):
         if getattr(type_, 'fsp', None):
-            return "TIME(%d)" % type_.fsp
+            return "TIME({0:d})".format(type_.fsp)
         else:
             return "TIME"
 
     def visit_TIMESTAMP(self, type_, **kw):
         if getattr(type_, 'fsp', None):
-            return "TIMESTAMP(%d)" % type_.fsp
+            return "TIMESTAMP({0:d})".format(type_.fsp)
         else:
             return "TIMESTAMP"
 
@@ -1265,11 +1263,11 @@ class MySQLTypeCompiler(compiler.GenericTypeCompiler):
         if type_.display_width is None:
             return "YEAR"
         else:
-            return "YEAR(%s)" % type_.display_width
+            return "YEAR({0!s})".format(type_.display_width)
 
     def visit_TEXT(self, type_, **kw):
         if type_.length:
-            return self._extend_string(type_, {}, "TEXT(%d)" % type_.length)
+            return self._extend_string(type_, {}, "TEXT({0:d})".format(type_.length))
         else:
             return self._extend_string(type_, {}, "TEXT")
 
@@ -1285,16 +1283,16 @@ class MySQLTypeCompiler(compiler.GenericTypeCompiler):
     def visit_VARCHAR(self, type_, **kw):
         if type_.length:
             return self._extend_string(
-                type_, {}, "VARCHAR(%d)" % type_.length)
+                type_, {}, "VARCHAR({0:d})".format(type_.length))
         else:
             raise exc.CompileError(
-                "VARCHAR requires a length on dialect %s" %
-                self.dialect.name)
+                "VARCHAR requires a length on dialect {0!s}".format(
+                self.dialect.name))
 
     def visit_CHAR(self, type_, **kw):
         if type_.length:
-            return self._extend_string(type_, {}, "CHAR(%(length)s)" %
-                                       {'length': type_.length})
+            return self._extend_string(type_, {}, "CHAR({length!s})".format(**
+                                       {'length': type_.length}))
         else:
             return self._extend_string(type_, {}, "CHAR")
 
@@ -1304,11 +1302,11 @@ class MySQLTypeCompiler(compiler.GenericTypeCompiler):
         if type_.length:
             return self._extend_string(
                 type_, {'national': True},
-                "VARCHAR(%(length)s)" % {'length': type_.length})
+                "VARCHAR({length!s})".format(**{'length': type_.length}))
         else:
             raise exc.CompileError(
-                "NVARCHAR requires a length on dialect %s" %
-                self.dialect.name)
+                "NVARCHAR requires a length on dialect {0!s}".format(
+                self.dialect.name))
 
     def visit_NCHAR(self, type_, **kw):
         # We'll actually generate the equiv.
@@ -1316,12 +1314,12 @@ class MySQLTypeCompiler(compiler.GenericTypeCompiler):
         if type_.length:
             return self._extend_string(
                 type_, {'national': True},
-                "CHAR(%(length)s)" % {'length': type_.length})
+                "CHAR({length!s})".format(**{'length': type_.length}))
         else:
             return self._extend_string(type_, {'national': True}, "CHAR")
 
     def visit_VARBINARY(self, type_, **kw):
-        return "VARBINARY(%d)" % type_.length
+        return "VARBINARY({0:d})".format(type_.length)
 
     def visit_JSON(self, type_, **kw):
         return "JSON"
@@ -1337,7 +1335,7 @@ class MySQLTypeCompiler(compiler.GenericTypeCompiler):
 
     def visit_BLOB(self, type_, **kw):
         if type_.length:
-            return "BLOB(%d)" % type_.length
+            return "BLOB({0:d})".format(type_.length)
         else:
             return "BLOB"
 
@@ -1353,8 +1351,8 @@ class MySQLTypeCompiler(compiler.GenericTypeCompiler):
     def _visit_enumerated_values(self, name, type_, enumerated_values):
         quoted_enums = []
         for e in enumerated_values:
-            quoted_enums.append("'%s'" % e.replace("'", "''"))
-        return self._extend_string(type_, {}, "%s(%s)" % (
+            quoted_enums.append("'{0!s}'".format(e.replace("'", "''")))
+        return self._extend_string(type_, {}, "{0!s}({1!s})".format(
             name, ",".join(quoted_enums))
                                    )
 
@@ -1483,7 +1481,7 @@ class MySQLDialect(default.DefaultDialect):
                 (level, self.name, ", ".join(self._isolation_lookup))
             )
         cursor = connection.cursor()
-        cursor.execute("SET SESSION TRANSACTION ISOLATION LEVEL %s" % level)
+        cursor.execute("SET SESSION TRANSACTION ISOLATION LEVEL {0!s}".format(level))
         cursor.execute("COMMIT")
         cursor.close()
 
@@ -1599,7 +1597,7 @@ class MySQLDialect(default.DefaultDialect):
         full_name = '.'.join(self.identifier_preparer._quote_free_identifiers(
             schema, table_name))
 
-        st = "DESCRIBE %s" % full_name
+        st = "DESCRIBE {0!s}".format(full_name)
         rs = None
         try:
             try:
@@ -1652,14 +1650,14 @@ class MySQLDialect(default.DefaultDialect):
         charset = self._connection_charset
         if self.server_version_info < (5, 0, 2):
             rp = connection.execute(
-                "SHOW TABLES FROM %s" %
-                self.identifier_preparer.quote_identifier(current_schema))
+                "SHOW TABLES FROM {0!s}".format(
+                self.identifier_preparer.quote_identifier(current_schema)))
             return [row[0] for
                     row in self._compat_fetchall(rp, charset=charset)]
         else:
             rp = connection.execute(
-                "SHOW FULL TABLES FROM %s" %
-                self.identifier_preparer.quote_identifier(current_schema))
+                "SHOW FULL TABLES FROM {0!s}".format(
+                self.identifier_preparer.quote_identifier(current_schema)))
 
             return [row[0]
                     for row in self._compat_fetchall(rp, charset=charset)
@@ -1675,8 +1673,8 @@ class MySQLDialect(default.DefaultDialect):
             return self.get_table_names(connection, schema)
         charset = self._connection_charset
         rp = connection.execute(
-            "SHOW FULL TABLES FROM %s" %
-            self.identifier_preparer.quote_identifier(schema))
+            "SHOW FULL TABLES FROM {0!s}".format(
+            self.identifier_preparer.quote_identifier(schema)))
         return [row[0]
                 for row in self._compat_fetchall(rp, charset=charset)
                 if row[1] in ('VIEW', 'SYSTEM VIEW')]
@@ -1912,7 +1910,7 @@ class MySQLDialect(default.DefaultDialect):
 
         if full_name is None:
             full_name = self.identifier_preparer.format_table(table)
-        st = "SHOW CREATE TABLE %s" % full_name
+        st = "SHOW CREATE TABLE {0!s}".format(full_name)
 
         rp = None
         try:
@@ -1936,7 +1934,7 @@ class MySQLDialect(default.DefaultDialect):
 
         if full_name is None:
             full_name = self.identifier_preparer.format_table(table)
-        st = "DESCRIBE %s" % full_name
+        st = "DESCRIBE {0!s}".format(full_name)
 
         rp, rows = None, None
         try:

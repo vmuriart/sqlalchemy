@@ -244,8 +244,8 @@ class SessionTransaction(object):
                 break
             elif current._parent is None:
                 raise sa_exc.InvalidRequestError(
-                    "Transaction %s is not on the active transaction list" % (
-                        upto))
+                    "Transaction {0!s} is not on the active transaction list".format((
+                        upto)))
             else:
                 current = current._parent
 
@@ -1121,8 +1121,8 @@ class Session(_SessionClassMethods):
         except sa_exc.NoInspectionAvailable:
             if not isinstance(key, type):
                 raise exc.ArgumentError(
-                    "Not acceptable bind target: %s" %
-                    key)
+                    "Not acceptable bind target: {0!s}".format(
+                    key))
             else:
                 self.__binds[key] = bind
         else:
@@ -1134,8 +1134,8 @@ class Session(_SessionClassMethods):
                     self.__binds[selectable] = bind
             else:
                 raise exc.ArgumentError(
-                    "Not acceptable bind target: %s" %
-                    key)
+                    "Not acceptable bind target: {0!s}".format(
+                    key))
 
     def bind_mapper(self, mapper, bind):
         """Associate a :class:`.Mapper` with a "bind", e.g. a :class:`.Engine`
@@ -1252,13 +1252,13 @@ class Session(_SessionClassMethods):
 
         context = []
         if mapper is not None:
-            context.append('mapper %s' % mapper)
+            context.append('mapper {0!s}'.format(mapper))
         if clause is not None:
             context.append('SQL expression')
 
         raise sa_exc.UnboundExecutionError(
-            "Could not locate a bind configured on %s or this Session" % (
-                ', '.join(context)))
+            "Could not locate a bind configured on {0!s} or this Session".format((
+                ', '.join(context))))
 
     def query(self, *entities, **kwargs):
         """Return a new :class:`.Query` object corresponding to this
@@ -1358,8 +1358,8 @@ class Session(_SessionClassMethods):
                 lockmode=lockmode,
                 only_load_props=attribute_names) is None:
             raise sa_exc.InvalidRequestError(
-                "Could not refresh instance '%s'" %
-                instance_str(instance))
+                "Could not refresh instance '{0!s}'".format(
+                instance_str(instance)))
 
     def expire_all(self):
         """Expires all persistent instances within this Session.
@@ -1485,8 +1485,8 @@ class Session(_SessionClassMethods):
             raise exc.UnmappedInstanceError(instance)
         if state.session_id is not self.hash_key:
             raise sa_exc.InvalidRequestError(
-                "Instance %s is not present in this Session" %
-                state_str(state))
+                "Instance {0!s} is not present in this Session".format(
+                state_str(state)))
 
         cascaded = list(state.manager.mapper.cascade_iterator(
             'expunge', state))
@@ -1648,8 +1648,8 @@ class Session(_SessionClassMethods):
         if state.key is None:
             if head:
                 raise sa_exc.InvalidRequestError(
-                    "Instance '%s' is not persisted" %
-                    state_str(state))
+                    "Instance '{0!s}' is not persisted".format(
+                    state_str(state)))
             else:
                 return
 
@@ -1863,8 +1863,8 @@ class Session(_SessionClassMethods):
     def _validate_persistent(self, state):
         if not self.identity_map.contains_state(state):
             raise sa_exc.InvalidRequestError(
-                "Instance '%s' is not persistent within this Session" %
-                state_str(state))
+                "Instance '{0!s}' is not persistent within this Session".format(
+                state_str(state)))
 
     def _save_impl(self, state):
         if state.key is not None:
@@ -1883,8 +1883,8 @@ class Session(_SessionClassMethods):
     def _update_impl(self, state, revert_deletion=False):
         if state.key is None:
             raise sa_exc.InvalidRequestError(
-                "Instance '%s' is not persisted" %
-                state_str(state))
+                "Instance '{0!s}' is not persisted".format(
+                state_str(state)))
 
         if state._deleted:
             if revert_deletion:
@@ -2761,10 +2761,10 @@ class sessionmaker(_SessionClassMethods):
         self.kw.update(new_kw)
 
     def __repr__(self):
-        return "%s(class_=%r,%s)" % (
+        return "{0!s}(class_={1!r},{2!s})".format(
             self.__class__.__name__,
             self.class_.__name__,
-            ", ".join("%s=%r" % (k, v) for k, v in self.kw.items())
+            ", ".join("{0!s}={1!r}".format(k, v) for k, v in self.kw.items())
         )
 
 

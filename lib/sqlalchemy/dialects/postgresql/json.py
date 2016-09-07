@@ -53,7 +53,7 @@ class JSONPathType(sqltypes.JSON.JSONPathType):
         def process(value):
             assert isinstance(value, collections.Sequence)
             tokens = [util.text_type(elem) for elem in value]
-            value = "{%s}" % (", ".join(tokens))
+            value = "{{{0!s}}}".format((", ".join(tokens)))
             if super_proc:
                 value = super_proc(value)
             return value
@@ -66,7 +66,7 @@ class JSONPathType(sqltypes.JSON.JSONPathType):
         def process(value):
             assert isinstance(value, collections.Sequence)
             tokens = [util.text_type(elem) for elem in value]
-            value = "{%s}" % (", ".join(tokens))
+            value = "{{{0!s}}}".format((", ".join(tokens)))
             if super_proc:
                 value = super_proc(value)
             return value

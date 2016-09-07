@@ -27,7 +27,7 @@ class Employee(Base):
     right = Column("rgt", Integer, nullable=False)
 
     def __repr__(self):
-        return "Employee(%s, %d, %d)" % (self.emp, self.left, self.right)
+        return "Employee({0!s}, {1:d}, {2:d})".format(self.emp, self.left, self.right)
 
 @event.listens_for(Employee, "before_insert")
 def before_insert(mapper, connection, instance):

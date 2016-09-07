@@ -36,7 +36,7 @@ class ObjectNotExecutableError(ArgumentError):
 
     def __init__(self, target):
         super(ObjectNotExecutableError, self).__init__(
-            "Not an executable object: %r" % target
+            "Not an executable object: {0!r}".format(target)
         )
 
 
@@ -75,7 +75,7 @@ class CircularDependencyError(SQLAlchemyError):
 
     def __init__(self, message, cycles, edges, msg=None):
         if msg is None:
-            message += " (%s)" % ", ".join(repr(s) for s in cycles)
+            message += " ({0!s})".format(", ".join(repr(s) for s in cycles))
         else:
             message = msg
         SQLAlchemyError.__init__(self, message)
@@ -101,8 +101,7 @@ class UnsupportedCompilationError(CompileError):
 
     def __init__(self, compiler, element_type):
         super(UnsupportedCompilationError, self).__init__(
-            "Compiler %r can't render element of type %s" %
-            (compiler, element_type))
+            "Compiler {0!r} can't render element of type {1!s}".format(compiler, element_type))
 
 
 class IdentifierError(SQLAlchemyError):
@@ -256,12 +255,12 @@ class StatementError(SQLAlchemyError):
 
         details = [SQLAlchemyError.__str__(self)]
         if self.statement:
-            details.append("[SQL: %r]" % self.statement)
+            details.append("[SQL: {0!r}]".format(self.statement))
             if self.params:
                 params_repr = util._repr_params(self.params, 10)
-                details.append("[parameters: %r]" % params_repr)
+                details.append("[parameters: {0!r}]".format(params_repr))
         return ' '.join([
-                            "(%s)" % det for det in self.detail
+                            "({0!s})".format(det) for det in self.detail
                             ] + details)
 
     def __unicode__(self):
@@ -308,8 +307,7 @@ class DBAPIError(StatementError):
             # raise a StatementError
             if not isinstance(orig, dbapi_base_err) and statement:
                 return StatementError(
-                    "(%s.%s) %s" %
-                    (orig.__class__.__module__, orig.__class__.__name__,
+                    "({0!s}.{1!s}) {2!s}".format(orig.__class__.__module__, orig.__class__.__name__,
                      orig),
                     statement, params, orig
                 )
@@ -337,8 +335,8 @@ class DBAPIError(StatementError):
             text = 'Error in str() of DB-API-generated exception: ' + str(e)
         StatementError.__init__(
             self,
-            '(%s.%s) %s' % (
-                orig.__class__.__module__, orig.__class__.__name__, text,),
+            '({0!s}.{1!s}) {2!s}'.format(
+                orig.__class__.__module__, orig.__class__.__name__, text),
             statement,
             params,
             orig

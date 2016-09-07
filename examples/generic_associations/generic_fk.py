@@ -65,11 +65,10 @@ class Address(Base):
         the appropriate relationship.
 
         """
-        return getattr(self, "parent_%s" % self.discriminator)
+        return getattr(self, "parent_{0!s}".format(self.discriminator))
 
     def __repr__(self):
-        return "%s(street=%r, city=%r, zip=%r)" % \
-            (self.__class__.__name__, self.street,
+        return "{0!s}(street={1!r}, city={2!r}, zip={3!r})".format(self.__class__.__name__, self.street,
             self.city, self.zip)
 
 class HasAddresses(object):
@@ -88,7 +87,7 @@ def setup_listener(mapper, class_):
                                         Address.discriminator == discriminator
                                     ),
                         backref=backref(
-                                "parent_%s" % discriminator,
+                                "parent_{0!s}".format(discriminator),
                                 primaryjoin=remote(class_.id) == foreign(Address.parent_id)
                                 )
                         )

@@ -194,7 +194,7 @@ class QueryableAttribute(interfaces._MappedAttribute,
             )
 
     def __str__(self):
-        return "%s.%s" % (self.class_.__name__, self.key)
+        return "{0!s}.{1!s}".format(self.class_.__name__, self.key)
 
     @util.memoized_property
     def property(self):
@@ -293,7 +293,7 @@ def create_proxied_attribute(descriptor):
                 return self.descriptor.__get__(instance, owner)
 
         def __str__(self):
-            return "%s.%s" % (self.class_.__name__, self.key)
+            return "{0!s}.{1!s}".format(self.class_.__name__, self.key)
 
         def __getattr__(self, attribute):
             """Delegate __getattr__ to the original descriptor and/or
@@ -460,7 +460,7 @@ class AttributeImpl(object):
     )
 
     def __str__(self):
-        return "%s.%s" % (self.class_.__name__, self.key)
+        return "{0!s}.{1!s}".format(self.class_.__name__, self.key)
 
     def _get_active_history(self):
         """Backwards compat for impl.active_history"""
@@ -803,7 +803,7 @@ class ScalarObjectAttributeImpl(ScalarAttributeImpl):
                 return
             else:
                 raise ValueError(
-                    "Object %s not associated with %s on attribute '%s'" % (
+                    "Object {0!s} not associated with {1!s} on attribute '{2!s}'".format(
                         instance_str(check_old),
                         state_str(state),
                         self.key
@@ -1044,7 +1044,7 @@ class CollectionAttributeImpl(AttributeImpl):
                             iterable.__class__.__name__
                     wanted = self._duck_typed_as.__name__
                     raise TypeError(
-                        "Incompatible collection type: %s is not %s-like" % (
+                        "Incompatible collection type: {0!s} is not {1!s}-like".format(
                             given, wanted))
 
                 # If the object is an adapted collection, return the (iterable)

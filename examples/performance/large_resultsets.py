@@ -46,8 +46,8 @@ def setup_database(dburl, echo, num):
             Customer.__table__.insert(),
             params=[
                 {
-                    'name': 'customer name %d' % i,
-                    'description': 'customer description %d' % i
+                    'name': 'customer name {0:d}'.format(i),
+                    'description': 'customer description {0:d}'.format(i)
                 } for i in range(chunk, chunk + 10000)])
     s.commit()
 

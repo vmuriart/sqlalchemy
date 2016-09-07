@@ -53,7 +53,7 @@ class MySQLTableDefinitionParser(object):
             else:
                 type_, spec = self._parse_constraints(line)
                 if type_ is None:
-                    util.warn("Unknown schema content: %r" % line)
+                    util.warn("Unknown schema content: {0!r}".format(line))
                 elif type_ == 'key':
                     state.keys.append(spec)
                 elif type_ == 'constraint':
@@ -135,7 +135,7 @@ class MySQLTableDefinitionParser(object):
             options.pop(nope, None)
 
         for opt, val in options.items():
-            state.table_options['%s_%s' % (self.dialect.name, opt)] = val
+            state.table_options['{0!s}_{1!s}'.format(self.dialect.name, opt)] = val
 
     def _parse_column(self, line, state):
         """Extract column details.
@@ -156,18 +156,17 @@ class MySQLTableDefinitionParser(object):
                 spec = m.groupdict()
                 spec['full'] = False
         if not spec:
-            util.warn("Unknown column definition %r" % line)
+            util.warn("Unknown column definition {0!r}".format(line))
             return
         if not spec['full']:
-            util.warn("Incomplete reflection of column definition %r" % line)
+            util.warn("Incomplete reflection of column definition {0!r}".format(line))
 
         name, type_, args = spec['name'], spec['coltype'], spec['arg']
 
         try:
             col_type = self.dialect.ischema_names[type_]
         except KeyError:
-            util.warn("Did not recognize type '%s' of column '%s'" %
-                      (type_, name))
+            util.warn("Did not recognize type '{0!s}' of column '{1!s}'".format(type_, name))
             col_type = sqltypes.NullType
 
         # Column type positional arguments eg. varchar(32)
@@ -258,14 +257,14 @@ class MySQLTableDefinitionParser(object):
                     line.append(default)
                 else:
                     line.append('DEFAULT')
-                    line.append("'%s'" % default.replace("'", "''"))
+                    line.append("'{0!s}'".format(default.replace("'", "''")))
             if extra:
                 line.append(extra)
 
             buffer.append(' '.join(line))
 
-        return ''.join([('CREATE TABLE %s (\n' %
-                         self.preparer.quote_identifier(table_name)),
+        return ''.join([('CREATE TABLE {0!s} (\n'.format(
+                         self.preparer.quote_identifier(table_name))),
                         ',\n'.join(buffer),
                         '\n) '])
 

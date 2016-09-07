@@ -170,17 +170,17 @@ class ProfileStatsFile(object):
         profile_f.close()
 
     def _write(self):
-        print(("Writing profile file %s" % self.fname))
+        print(("Writing profile file {0!s}".format(self.fname)))
         profile_f = open(self.fname, "w")
         profile_f.write(self._header())
         for test_key in sorted(self.data):
 
             per_fn = self.data[test_key]
-            profile_f.write("\n# TEST: %s\n\n" % test_key)
+            profile_f.write("\n# TEST: {0!s}\n\n".format(test_key))
             for platform_key in sorted(per_fn):
                 per_platform = per_fn[platform_key]
                 c = ",".join(str(count) for count in per_platform['counts'])
-                profile_f.write("%s %s %s\n" % (test_key, platform_key, c))
+                profile_f.write("{0!s} {1!s} {2!s}\n".format(test_key, platform_key, c))
         profile_f.close()
 
 
@@ -239,7 +239,7 @@ def count_functions(variance=0.05):
     else:
         line_no, expected_count = expected
 
-    print(("Pstats calls: %d Expected %s" % (
+    print(("Pstats calls: {0:d} Expected {1!s}".format(
         callcount,
         expected_count
     )

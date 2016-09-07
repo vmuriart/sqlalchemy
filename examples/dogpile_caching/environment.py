@@ -43,7 +43,7 @@ if not os.path.exists(root):
     os.makedirs(root)
 
 dbfile = os.path.join(root, "dogpile_demo.db")
-engine = create_engine('sqlite:///%s' % dbfile, echo=True)
+engine = create_engine('sqlite:///{0!s}'.format(dbfile), echo=True)
 Session.configure(bind=engine)
 
 
