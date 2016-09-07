@@ -1729,15 +1729,13 @@ class SQLCompiler(Compiled):
             return text
 
     def _setup_select_hints(self, select):
-        byfrom = dict([
-            (from_, hinttext % {
+        byfrom = {from_: hinttext % {
                 'name': from_._compiler_dispatch(
                     self, ashint=True)
-            })
+            }
             for (from_, dialect), hinttext in
             select._hints.items()
-            if dialect in ('*', self.dialect.name)
-        ])
+            if dialect in ('*', self.dialect.name)}
         hint_text = self.get_select_hint_text(byfrom)
         return hint_text, byfrom
 
@@ -1909,12 +1907,10 @@ class SQLCompiler(Compiled):
         )
 
     def _setup_crud_hints(self, stmt, table_text):
-        dialect_hints = dict([
-            (table, hint_text)
+        dialect_hints = {table: hint_text
             for (table, dialect), hint_text in
             stmt._hints.items()
-            if dialect in ('*', self.dialect.name)
-        ])
+            if dialect in ('*', self.dialect.name)}
         if stmt.table in dialect_hints:
             table_text = self.format_from_hint_text(
                 table_text,

@@ -886,10 +886,9 @@ class MultirowTest(_InsertTestBase, fixtures.TablesTest, AssertsCompiledSQL):
         stmt = table.insert().values(values)
 
         eq_(
-            dict([
-                (k, v.type._type_affinity)
+            {k: v.type._type_affinity
                 for (k, v) in
-                stmt.compile(dialect=postgresql.dialect()).binds.items()]),
+                stmt.compile(dialect=postgresql.dialect()).binds.items()},
             {
                 'foo': Integer, 'data_2': String, 'id_0': Integer,
                 'id_2': Integer, 'foo_1': Integer, 'data_1': String,
@@ -932,10 +931,9 @@ class MultirowTest(_InsertTestBase, fixtures.TablesTest, AssertsCompiledSQL):
 
         stmt = table.insert().values(values)
         eq_(
-            dict([
-                (k, v.type._type_affinity)
+            {k: v.type._type_affinity
                 for (k, v) in
-                stmt.compile(dialect=postgresql.dialect()).binds.items()]),
+                stmt.compile(dialect=postgresql.dialect()).binds.items()},
             {
                 'foo': Integer, 'data_2': String, 'id_0': Integer,
                 'id_2': Integer, 'foo_1': Integer, 'data_1': String,

@@ -984,14 +984,14 @@ class CollectionsTest(fixtures.ORMTest):
 
         if hasattr(direct, 'update'):
             e = creator()
-            d = dict([(ee.a, ee) for ee in [e, creator(), creator()]])
+            d = {ee.a: ee for ee in [e, creator(), creator()]}
             addall(e, creator())
 
             direct.update(d)
             control.update(d)
             assert_eq()
 
-            kw = dict([(ee.a, ee) for ee in [e, creator()]])
+            kw = {ee.a: ee for ee in [e, creator()]}
             direct.update(**kw)
             control.update(**kw)
             assert_eq()
