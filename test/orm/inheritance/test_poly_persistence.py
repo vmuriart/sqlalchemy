@@ -338,7 +338,7 @@ def _generate_round_trip_test(include_base, lazy_relationship,
         eq_(select([func.count('*')]).select_from(people).scalar(), 0)
 
     test_roundtrip = function_named(
-        test_roundtrip, "test_%s%s%s_%s" % (
+        test_roundtrip, "test_{0!s}{1!s}{2!s}_{3!s}".format(
           (lazy_relationship and "lazy" or "eager"),
           (include_base and "_inclbase" or ""),
           (redefine_colprop and "_redefcol" or ""),

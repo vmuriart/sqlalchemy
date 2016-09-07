@@ -1276,7 +1276,7 @@ class BulkUpdate(BulkUD):
                 return attr.key
         else:
             raise sa_exc.InvalidRequestError(
-                "Invalid expression type: %r" % key)
+                "Invalid expression type: {0!r}".format(key))
 
     def _do_exec(self):
 

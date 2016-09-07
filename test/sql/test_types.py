@@ -17,7 +17,7 @@ from sqlalchemy import inspection
 from sqlalchemy import exc, types, util, dialects
 from sqlalchemy.util import OrderedDict
 for name in dialects.__all__:
-    __import__("sqlalchemy.dialects.%s" % name)
+    __import__("sqlalchemy.dialects.{0!s}".format(name))
 from sqlalchemy.sql import operators, column, table, null
 from sqlalchemy.schema import CheckConstraint, AddConstraint
 from sqlalchemy.engine import default
@@ -110,12 +110,10 @@ class AdaptTest(fixtures.TestBase):
                     continue
 
                 assert compiled in expected, \
-                    "%r matches none of %r for dialect %s" % \
-                    (compiled, expected, dialect.name)
+                    "{0!r} matches none of {1!r} for dialect {2!s}".format(compiled, expected, dialect.name)
 
                 assert str(types.to_instance(type_)) in expected, \
-                    "default str() of type %r not expected, %r" % \
-                    (type_, expected)
+                    "default str() of type {0!r} not expected, {1!r}".format(type_, expected)
 
     @testing.uses_deprecated()
     def test_adapt_method(self):
@@ -241,7 +239,7 @@ class TypeAffinityTest(fixtures.TestBase):
             (PickleType(), LargeBinary(), True),
             (PickleType(), PickleType(), True),
         ]:
-            eq_(t1._compare_type_affinity(t2), comp, "%s %s" % (t1, t2))
+            eq_(t1._compare_type_affinity(t2), comp, "{0!s} {1!s}".format(t1, t2))
 
     def test_decorator_doesnt_cache(self):
         from sqlalchemy.dialects import postgresql
@@ -326,7 +324,7 @@ class UserDefinedTest(fixtures.TablesTest, AssertsCompiledSQL):
             impl = String
 
             def process_literal_param(self, value, dialect):
-                return "HI->%s<-THERE" % value
+                return "HI->{0!s}<-THERE".format(value)
 
         self.assert_compile(
             select([literal("test", MyType)]),
@@ -338,7 +336,7 @@ class UserDefinedTest(fixtures.TablesTest, AssertsCompiledSQL):
     def test_kw_colspec(self):
         class MyType(types.UserDefinedType):
             def get_col_spec(self, **kw):
-                return "FOOB %s" % kw['type_expression'].name
+                return "FOOB {0!s}".format(kw['type_expression'].name)
 
         class MyOtherType(types.UserDefinedType):
             def get_col_spec(self):
@@ -360,7 +358,7 @@ class UserDefinedTest(fixtures.TablesTest, AssertsCompiledSQL):
             impl = String
 
             def process_bind_param(self, value, dialect):
-                return "HI->%s<-THERE" % value
+                return "HI->{0!s}<-THERE".format(value)
 
         self.assert_compile(
             select([literal("test", MyType)]),
@@ -2172,7 +2170,7 @@ class CompileTest(fixtures.TestBase, AssertsCompiledSQL):
 
             # not affected
             def visit_INTEGER(self, type_, **kw):
-                return "MYINTEGER %s" % kw['type_expression'].name
+                return "MYINTEGER {0!s}".format(kw['type_expression'].name)
 
         dialect = default.DefaultDialect()
         dialect.type_compiler = SomeTypeCompiler(dialect)
@@ -2196,7 +2194,7 @@ class TestKWArgPassThru(AssertsCompiledSQL, fixtures.TestBase):
 
         class MyType(types.UserDefinedType):
             def get_col_spec(self, **kw):
-                return "FOOB %s" % kw['type_expression'].name
+                return "FOOB {0!s}".format(kw['type_expression'].name)
 
         m = MetaData()
         t = Table('t', m, Column('bar', MyType))

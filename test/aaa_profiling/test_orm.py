@@ -159,13 +159,13 @@ class LoadManyToOneFromIdentityTest(fixtures.MappedTest):
         parent, child = cls.tables.parent, cls.tables.child
 
         child.insert().execute([
-            {'id': i, 'data': 'c%d' % i}
+            {'id': i, 'data': 'c{0:d}'.format(i)}
             for i in range(1, 251)
         ])
         parent.insert().execute([
             {
                 'id': i,
-                'data': 'p%dc%d' % (i, (i % 250) + 1),
+                'data': 'p{0:d}c{1:d}'.format(i, (i % 250) + 1),
                 'child_id': (i % 250) + 1
             }
             for i in range(1, 1000)
@@ -309,7 +309,7 @@ class DeferOptionsTest(fixtures.MappedTest):
         s = Session()
         s.add_all([
             A(id=i,
-                **dict((letter, "%s%d" % (letter, i)) for letter in
+                **dict((letter, "{0!s}{1:d}".format(letter, i)) for letter in
                        ['x', 'y', 'z', 'p', 'q', 'r'])
               ) for i in range(1, 1001)
         ])

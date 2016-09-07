@@ -211,7 +211,7 @@ class NamedCallTest(fixtures.TestBase):
                 fn = event_key._listen_fn
 
                 def adapt(*args):
-                    fn(*["adapted %s" % arg for arg in args])
+                    fn(*["adapted {0!s}".format(arg) for arg in args])
                 event_key = event_key.with_wrapper(adapt)
 
                 event_key.base_listen()

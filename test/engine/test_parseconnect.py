@@ -423,7 +423,7 @@ def MockDBAPI(**assert_kwargs):
 
     def connect(*args, **kwargs):
         for k in assert_kwargs:
-            assert k in kwargs, 'key %s not present in dictionary' % k
+            assert k in kwargs, 'key {0!s} not present in dictionary'.format(k)
             eq_(
                 kwargs[k], assert_kwargs[k]
             )

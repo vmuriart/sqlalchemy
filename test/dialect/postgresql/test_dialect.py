@@ -74,7 +74,7 @@ class MiscTest(fixtures.TestBase, AssertsExecutionResults, AssertsCompiledSQL):
         # under pypy the name here is psycopg2cffi
         psycopg2 = testing.db.dialect.dbapi
         TransactionRollbackError = __import__(
-            "%s.extensions" % psycopg2.__name__
+            "{0!s}.extensions".format(psycopg2.__name__)
         ).extensions.TransactionRollbackError
 
         exception = exc.DBAPIError.instance(
@@ -293,5 +293,5 @@ class MiscTest(fixtures.TestBase, AssertsExecutionResults, AssertsCompiledSQL):
             ddl_compiler = dialect.ddl_compiler(dialect, schema.CreateTable(t))
             eq_(
                 ddl_compiler.get_column_specification(t.c.c),
-                "c %s NOT NULL" % expected
+                "c {0!s} NOT NULL".format(expected)
             )

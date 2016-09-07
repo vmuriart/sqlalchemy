@@ -437,7 +437,7 @@ class DefaultsTest(fixtures.MappedTest):
             def __ne__(self, other):
                 return not self.__eq__(other)
             def __repr__(self):
-                return "FBComposite(%r, %r, %r, %r)" % (
+                return "FBComposite({0!r}, {1!r}, {2!r}, {3!r})".format(
                     self.goofy_x1, self.x2, self.x3, self.x4
                 )
         mapper(Foobar, foobars, properties=dict(

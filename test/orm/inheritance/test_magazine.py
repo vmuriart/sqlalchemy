@@ -18,7 +18,7 @@ class Issue(BaseObject):
 
 class Location(BaseObject):
     def __repr__(self):
-        return "%s(%s, %s)" % (self.__class__.__name__, str(getattr(self, 'issue_id', None)), repr(str(self._name.name)))
+        return "{0!s}({1!s}, {2!s})".format(self.__class__.__name__, str(getattr(self, 'issue_id', None)), repr(str(self._name.name)))
 
     def _get_name(self):
         return self._name
@@ -48,23 +48,23 @@ class Location(BaseObject):
 
 class LocationName(BaseObject):
     def __repr__(self):
-        return "%s()" % (self.__class__.__name__)
+        return "{0!s}()".format((self.__class__.__name__))
 
 class PageSize(BaseObject):
     def __repr__(self):
-        return "%s(%sx%s, %s)" % (self.__class__.__name__, self.width, self.height, self.name)
+        return "{0!s}({1!s}x{2!s}, {3!s})".format(self.__class__.__name__, self.width, self.height, self.name)
 
 class Magazine(BaseObject):
     def __repr__(self):
-        return "%s(%s, %s)" % (self.__class__.__name__, repr(self.location), repr(self.size))
+        return "{0!s}({1!s}, {2!s})".format(self.__class__.__name__, repr(self.location), repr(self.size))
 
 class Page(BaseObject):
     def __repr__(self):
-        return "%s(%s)" % (self.__class__.__name__, str(self.page_no))
+        return "{0!s}({1!s})".format(self.__class__.__name__, str(self.page_no))
 
 class MagazinePage(Page):
     def __repr__(self):
-        return "%s(%s, %s)" % (self.__class__.__name__, str(self.page_no), repr(self.magazine))
+        return "{0!s}({1!s}, {2!s})".format(self.__class__.__name__, str(self.page_no), repr(self.magazine))
 
 class ClassifiedPage(MagazinePage):
     pass
@@ -212,7 +212,7 @@ def _generate_round_trip_test(use_unions=False, use_joins=False):
         assert repr(p.issues[0].locations[0].magazine.pages) == repr([page, page2, page3]), repr(p.issues[0].locations[0].magazine.pages)
 
     test_roundtrip = function_named(
-        test_roundtrip, "test_%s" % (not use_union and (use_joins and "joins" or "select") or "unions"))
+        test_roundtrip, "test_{0!s}".format((not use_union and (use_joins and "joins" or "select") or "unions")))
     setattr(MagazineTest, test_roundtrip.__name__, test_roundtrip)
 
 for (use_union, use_join) in [(True, False), (False, True), (False, False)]:

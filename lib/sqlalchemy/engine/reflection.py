@@ -753,8 +753,7 @@ class Inspector(object):
             if include_columns and \
                     not set(columns).issubset(include_columns):
                 util.warn(
-                    "Omitting %s key for (%s), key covers omitted columns." %
-                    (flavor, ', '.join(columns)))
+                    "Omitting {0!s} key for ({1!s}), key covers omitted columns.".format(flavor, ', '.join(columns)))
                 continue
             if duplicates:
                 continue

@@ -76,7 +76,7 @@ if has_xdist:
 
         plugin_base.memoize_important_follower_config(node.slaveinput)
 
-        node.slaveinput["follower_ident"] = "test_%s" % uuid.uuid4().hex[0:12]
+        node.slaveinput["follower_ident"] = "test_{0!s}".format(uuid.uuid4().hex[0:12])
         from sqlalchemy.testing import provision
         provision.create_follower_db(node.slaveinput["follower_ident"])
 

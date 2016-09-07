@@ -38,7 +38,7 @@ class EmitDDLTest(fixtures.TestBase):
         m = MetaData()
 
         return (m, ) + tuple(
-            Table('t%d' % i, m, Column('x', Integer))
+            Table('t{0:d}'.format(i), m, Column('x', Integer))
             for i in range(1, 6)
         )
 
@@ -254,11 +254,10 @@ class EmitDDLTest(fixtures.TestBase):
         for call_ in generator.connection.execute.mock_calls:
             c = call_[1][0]
             assert isinstance(c, ddl_cls)
-            assert c.element in elements, "element %r was not expected"\
-                % c.element
+            assert c.element in elements, "element {0!r} was not expected".format(c.element)
             elements.remove(c.element)
             if getattr(c, 'include_foreign_key_constraints', None) is not None:
                 elements[:] = [
                     e for e in elements
                     if e not in set(c.include_foreign_key_constraints)]
-        assert not elements, "elements remain in list: %r" % elements
+        assert not elements, "elements remain in list: {0!r}".format(elements)

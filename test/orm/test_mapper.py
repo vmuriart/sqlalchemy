@@ -283,7 +283,7 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
                     assert not isinstance(other, basestring)
                     return int(self) < other
 
-        foos = [Foo(id='f%d' % i) for i in range(5)]
+        foos = [Foo(id='f{0:d}'.format(i)) for i in range(5)]
         states = [attributes.instance_state(f) for f in foos]
 
         for s in states[0:3]:
@@ -1902,7 +1902,7 @@ class ORMLoggingTest(_fixtures.FixtureTest):
         s.commit()
 
         for msg in self._current_messages():
-            assert msg.startswith('(User|%%(%d anon)s) ' % id(tb))
+            assert msg.startswith('(User|%({0:d} anon)s) '.format(id(tb)))
 
 
 class OptionsTest(_fixtures.FixtureTest):

@@ -150,7 +150,7 @@ class ZooMarkTest(replay_fixture.ReplayFixtureTest):
 
     def _baseline_2_insert(self):
         for x in range(ITERATIONS):
-            self.session.add(Animal(Species='Tick', Name='Tick %d' % x,
+            self.session.add(Animal(Species='Tick', Name='Tick {0:d}'.format(x),
                                Legs=8))
         self.session.flush()
 

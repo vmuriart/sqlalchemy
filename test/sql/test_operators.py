@@ -786,13 +786,13 @@ class ArrayIndexOpTest(fixtures.TestBase, testing.AssertsCompiledSQL):
 
         class MyCompiler(compiler.SQLCompiler):
             def visit_slice(self, element, **kw):
-                return "%s:%s" % (
+                return "{0!s}:{1!s}".format(
                     self.process(element.start, **kw),
-                    self.process(element.stop, **kw),
+                    self.process(element.stop, **kw)
                 )
 
             def visit_getitem_binary(self, binary, operator, **kw):
-                return "%s[%s]" % (
+                return "{0!s}[{1!s}]".format(
                     self.process(binary.left, **kw),
                     self.process(binary.right, **kw)
                 )
@@ -1863,8 +1863,8 @@ class ComparisonOperatorTest(fixtures.TestBase, testing.AssertsCompiledSQL):
             # the compiled clause should match either (e.g.):
             # 'a' < 'b' -or- 'b' > 'a'.
             compiled = str(py_op(lhs, rhs))
-            fwd_sql = "%s %s %s" % (l_sql, fwd_op, r_sql)
-            rev_sql = "%s %s %s" % (r_sql, rev_op, l_sql)
+            fwd_sql = "{0!s} {1!s} {2!s}".format(l_sql, fwd_op, r_sql)
+            rev_sql = "{0!s} {1!s} {2!s}".format(r_sql, rev_op, l_sql)
 
             self.assert_(compiled == fwd_sql or compiled == rev_sql,
                          "\n'" + compiled + "'\n does not match\n'" +
@@ -1960,7 +1960,7 @@ class NegationTest(fixtures.TestBase, testing.AssertsCompiledSQL):
                 (self.table1.c.myid, "mytable.myid"),
                 (literal("foo"), ":param_1"),
             ):
-                self.assert_compile(py_op(expr), "%s%s" % (op, expected))
+                self.assert_compile(py_op(expr), "{0!s}{1!s}".format(op, expected))
 
     def test_negate_operators_2(self):
         self.assert_compile(

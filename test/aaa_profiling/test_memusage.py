@@ -302,7 +302,7 @@ class MemUsageTest(EnsureZeroed):
         wide_table = Table('t', metadata,
                            Column('id', Integer, primary_key=True,
                                   test_needs_autoincrement=True),
-                           *[Column('col%d' % i, Integer) for i in range(10)]
+                           *[Column('col{0:d}'.format(i), Integer) for i in range(10)]
                            )
 
         class Wide(object):
@@ -329,7 +329,7 @@ class MemUsageTest(EnsureZeroed):
                 # trying to count in binary here,
                 # works enough to trip the test case
                 if pow(2, dec) < x:
-                    setattr(w1, 'col%d' % dec, counter[0])
+                    setattr(w1, 'col{0:d}'.format(dec), counter[0])
                     x -= pow(2, dec)
                 dec -= 1
             session.flush()
@@ -369,7 +369,7 @@ class MemUsageTest(EnsureZeroed):
             # this warning shouldn't clog up memory.
 
             self.engine.execute(table1.select().where(table1.c.col2
-                                                     == 'foo%d' % i[0]))
+                                                     == 'foo{0:d}'.format(i[0])))
             i[0] += 1
         try:
             go()

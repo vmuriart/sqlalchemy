@@ -157,7 +157,7 @@ class EagerTest(fixtures.MappedTest):
                             sa.or_(options.c.someoption==None,
                                    options.c.someoption==False))))
 
-        result = ["%d %s" % ( t.id,t.category.name ) for t in l]
+        result = ["{0:d} {1!s}".format(t.id, t.category.name ) for t in l]
         eq_(result, ['1 Some Category', '3 Some Category'])
 
     def test_withjoinedload(self):
@@ -184,7 +184,7 @@ class EagerTest(fixtures.MappedTest):
                           sa.or_(options.c.someoption==None,
                                  options.c.someoption==False))))
 
-        result = ["%d %s" % ( t.id,t.category.name ) for t in l]
+        result = ["{0:d} {1!s}".format(t.id, t.category.name ) for t in l]
         eq_(result, ['1 Some Category', '3 Some Category'])
 
     def test_dslish(self):
@@ -202,7 +202,7 @@ class EagerTest(fixtures.MappedTest):
                            options.c.someoption == False))
             ).outerjoin('owner_option')
 
-        result = ["%d %s" % ( t.id,t.category.name ) for t in l]
+        result = ["{0:d} {1!s}".format(t.id, t.category.name ) for t in l]
         eq_(result, ['1 Some Category', '3 Some Category'])
 
     @testing.crashes('sybase', 'FIXME: unknown, verify not fails_on')
@@ -215,10 +215,10 @@ class EagerTest(fixtures.MappedTest):
         q = s.query(Thing).options(sa.orm.joinedload('category'))
         l = (q.filter(
             (tests.c.owner_id==1) &
-            text('options.someoption is null or options.someoption=%s' % false)).
+            text('options.someoption is null or options.someoption={0!s}'.format(false))).
              join('owner_option'))
 
-        result = ["%d %s" % ( t.id,t.category.name ) for t in l]
+        result = ["{0:d} {1!s}".format(t.id, t.category.name ) for t in l]
         eq_(result, ['3 Some Category'])
 
     def test_withoutouterjoin(self):
@@ -233,7 +233,7 @@ class EagerTest(fixtures.MappedTest):
             ((options.c.someoption==None) | (options.c.someoption==False))
                     ).join('owner_option')
 
-        result = ["%d %s" % ( t.id,t.category.name ) for t in l]
+        result = ["{0:d} {1!s}".format(t.id, t.category.name ) for t in l]
         eq_(result, ['3 Some Category'])
 
 

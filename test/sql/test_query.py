@@ -229,8 +229,8 @@ class QueryTest(fixtures.TestBase):
 
         def a_eq(got, wanted):
             if got != wanted:
-                print("Wanted %s" % wanted)
-                print("Received %s" % got)
+                print("Wanted {0!s}".format(wanted))
+                print("Received {0!s}".format(got))
             self.assert_(got == wanted, got)
 
         a_eq(prep('select foo'), 'select foo')
@@ -266,7 +266,7 @@ class QueryTest(fixtures.TestBase):
                 return int(value[4:])
 
             def process_result_value(self, value, dialect):
-                return "INT_%d" % value
+                return "INT_{0:d}".format(value)
 
         eq_(
             testing.db.scalar(select([cast("INT_5", type_=MyInteger)])),

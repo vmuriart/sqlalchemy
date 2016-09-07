@@ -1541,11 +1541,11 @@ class SessionEventsTest(_RemoveListeners, _fixtures.FixtureTest):
         def before_flush(session, flush_context, objects):
             for obj in list(session.new) + list(session.dirty):
                 if isinstance(obj, User):
-                    session.add(User(name='another %s' % obj.name))
+                    session.add(User(name='another {0!s}'.format(obj.name)))
             for obj in list(session.deleted):
                 if isinstance(obj, User):
                     x = session.query(User).filter(
-                        User.name == 'another %s' % obj.name).one()
+                        User.name == 'another {0!s}'.format(obj.name)).one()
                     session.delete(x)
 
         sess = Session()
@@ -2341,13 +2341,13 @@ class AttributeExtensionTest(fixtures.MappedTest):
         class Ex1(sa.orm.AttributeExtension):
 
             def set(self, state, value, oldvalue, initiator):
-                ext_msg.append("Ex1 %r" % value)
+                ext_msg.append("Ex1 {0!r}".format(value))
                 return "ex1" + value
 
         class Ex2(sa.orm.AttributeExtension):
 
             def set(self, state, value, oldvalue, initiator):
-                ext_msg.append("Ex2 %r" % value)
+                ext_msg.append("Ex2 {0!r}".format(value))
                 return "ex2" + value
 
         class A(fixtures.BasicEntity):

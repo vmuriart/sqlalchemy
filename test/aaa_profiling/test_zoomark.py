@@ -144,7 +144,7 @@ class ZooMarkTest(replay_fixture.ReplayFixtureTest):
         Animal = self.metadata.tables['Animal']
         i = Animal.insert(inline=True)
         for x in range(ITERATIONS):
-            i.execute(Species='Tick', Name='Tick %d' % x, Legs=8)
+            i.execute(Species='Tick', Name='Tick {0:d}'.format(x), Legs=8)
 
     def _baseline_3_properties(self):
         Zoo = self.metadata.tables['Zoo']

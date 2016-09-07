@@ -37,8 +37,7 @@ def deprecated(version, message=None, add_deprecation_to_docstring=True):
     """
 
     if add_deprecation_to_docstring:
-        header = ".. deprecated:: %s %s" % \
-            (version, (message or ''))
+        header = ".. deprecated:: {0!s} {1!s}".format(version, (message or ''))
     else:
         header = None
 
@@ -71,8 +70,7 @@ def pending_deprecation(version, message=None,
     """
 
     if add_deprecation_to_docstring:
-        header = ".. deprecated:: %s (pending) %s" % \
-            (version, (message or ''))
+        header = ".. deprecated:: {0!s} (pending) {1!s}".format(version, (message or ''))
     else:
         header = None
 

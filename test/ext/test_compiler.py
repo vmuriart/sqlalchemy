@@ -24,7 +24,7 @@ class UserDefinedTest(fixtures.TestBase, AssertsCompiledSQL):
 
         @compiles(MyThingy)
         def visit_thingy(thingy, compiler, **kw):
-            return ">>%s<<" % thingy.name
+            return ">>{0!s}<<".format(thingy.name)
 
         self.assert_compile(
             select([column('foo'), MyThingy()]),
@@ -110,7 +110,7 @@ class UserDefinedTest(fixtures.TestBase, AssertsCompiledSQL):
 
         @compiles(InsertFromSelect)
         def visit_insert_from_select(element, compiler, **kw):
-            return "INSERT INTO %s (%s)" % (
+            return "INSERT INTO {0!s} ({1!s})".format(
                 compiler.process(element.table, asfrom=True),
                 compiler.process(element.select)
             )
@@ -298,11 +298,11 @@ class UserDefinedTest(fixtures.TestBase, AssertsCompiledSQL):
         @compiles(greatest, 'mssql')
         def case_greatest(element, compiler, **kw):
             arg1, arg2 = list(element.clauses)
-            return "CASE WHEN %s > %s THEN %s ELSE %s END" % (
+            return "CASE WHEN {0!s} > {1!s} THEN {2!s} ELSE {3!s} END".format(
                 compiler.process(arg1),
                 compiler.process(arg2),
                 compiler.process(arg1),
-                compiler.process(arg2),
+                compiler.process(arg2)
             )
 
         self.assert_compile(
@@ -410,7 +410,7 @@ class DefaultOnExistingTest(fixtures.TestBase, AssertsCompiledSQL):
 
         @compiles(BindParameter)
         def gen_bind(element, compiler, **kw):
-            return "BIND(%s)" % compiler.visit_bindparam(element, **kw)
+            return "BIND({0!s})".format(compiler.visit_bindparam(element, **kw))
 
         self.assert_compile(
             t.select().where(t.c.c == 5),
@@ -427,7 +427,7 @@ class DefaultOnExistingTest(fixtures.TestBase, AssertsCompiledSQL):
 
         @compiles(BindParameter)
         def gen_bind(element, compiler, **kw):
-            return "BIND(%s)" % compiler.visit_bindparam(element, **kw)
+            return "BIND({0!s})".format(compiler.visit_bindparam(element, **kw))
 
         self.assert_compile(
             t.insert(),

@@ -823,8 +823,7 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
         Table('false', meta,
                     Column('create', sa.Integer, primary_key=True),
                     Column('true', sa.Integer, sa.ForeignKey('select.not')),
-                    sa.CheckConstraint('%s <> 1'
-                        % quoter(check_col), name='limit')
+                    sa.CheckConstraint('{0!s} <> 1'.format(quoter(check_col)), name='limit')
                     )
 
         table_c = Table('is', meta,
@@ -871,7 +870,7 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
     def test_reflect_all(self):
         existing = testing.db.table_names()
 
-        names = ['rt_%s' % name for name in ('a', 'b', 'c', 'd', 'e')]
+        names = ['rt_{0!s}'.format(name) for name in ('a', 'b', 'c', 'd', 'e')]
         nameset = set(names)
         for name in names:
             # be sure our starting environment is sane
@@ -1261,7 +1260,7 @@ class UnicodeReflectionTest(fixtures.TestBase):
     @testing.requires.unicode_connections
     def test_has_table(self):
         for tname, cname, ixname in self.names:
-            assert testing.db.has_table(tname), "Can't detect name %s" % tname
+            assert testing.db.has_table(tname), "Can't detect name {0!s}".format(tname)
 
     @testing.requires.unicode_connections
     def test_basic(self):
@@ -1346,7 +1345,7 @@ class SchemaTest(fixtures.TestBase):
             eq_(set(meta2.tables), set(
                 [
                     'some_other_table',
-                    '%s.some_table' % testing.config.test_schema]))
+                    '{0!s}.some_table'.format(testing.config.test_schema)]))
 
     @testing.requires.schemas
     @testing.fails_on('sqlite', 'FIXME: unknown')
@@ -1373,7 +1372,7 @@ class SchemaTest(fixtures.TestBase):
         Table('table2', metadata,
                        Column('col1', sa.Integer, primary_key=True),
                        Column('col2', sa.Integer,
-                              sa.ForeignKey('%s.table1.col1' % schema)),
+                              sa.ForeignKey('{0!s}.table1.col1'.format(schema))),
                        test_needs_fk=True,
                        schema=schema)
         try:
@@ -1447,9 +1446,9 @@ class SchemaTest(fixtures.TestBase):
         eq_(
             set(m2.tables),
             set([
-                '%s.dingalings' % testing.config.test_schema,
-                '%s.users' % testing.config.test_schema,
-                '%s.email_addresses' % testing.config.test_schema
+                '{0!s}.dingalings'.format(testing.config.test_schema),
+                '{0!s}.users'.format(testing.config.test_schema),
+                '{0!s}.email_addresses'.format(testing.config.test_schema)
                 ])
         )
 
@@ -1498,7 +1497,7 @@ def createTables(meta, schema=None):
         Column('test5', sa.Date),
         Column('test5_1', sa.TIMESTAMP),
         Column('parent_user_id', sa.Integer,
-                    sa.ForeignKey('%susers.user_id' % schema_prefix)),
+                    sa.ForeignKey('{0!s}users.user_id'.format(schema_prefix))),
         Column('test6', sa.Date, nullable=False),
         Column('test7', sa.Text),
         Column('test8', sa.LargeBinary),
@@ -1512,7 +1511,7 @@ def createTables(meta, schema=None):
                 Column('dingaling_id', sa.Integer, primary_key=True),
                 Column('address_id', sa.Integer,
                      sa.ForeignKey(
-                         '%semail_addresses.address_id' % schema_prefix)),
+                         '{0!s}email_addresses.address_id'.format(schema_prefix))),
                 Column('data', sa.String(30)),
                 schema=schema, test_needs_fk=True,
             )
@@ -1532,8 +1531,8 @@ def createTables(meta, schema=None):
 def createIndexes(con, schema=None):
     fullname = 'users'
     if schema:
-        fullname = "%s.%s" % (schema, 'users')
-    query = "CREATE INDEX users_t_idx ON %s (test1, test2)" % fullname
+        fullname = "{0!s}.{1!s}".format(schema, 'users')
+    query = "CREATE INDEX users_t_idx ON {0!s} (test1, test2)".format(fullname)
     con.execute(sa.sql.text(query))
 
 
@@ -1542,9 +1541,9 @@ def _create_views(con, schema=None):
     for table_name in ('users', 'email_addresses'):
         fullname = table_name
         if schema:
-            fullname = "%s.%s" % (schema, table_name)
+            fullname = "{0!s}.{1!s}".format(schema, table_name)
         view_name = fullname + '_v'
-        query = "CREATE VIEW %s AS SELECT * FROM %s" % (view_name, fullname)
+        query = "CREATE VIEW {0!s} AS SELECT * FROM {1!s}".format(view_name, fullname)
         con.execute(sa.sql.text(query))
 
 
@@ -1553,9 +1552,9 @@ def _drop_views(con, schema=None):
     for table_name in ('email_addresses', 'users'):
         fullname = table_name
         if schema:
-            fullname = "%s.%s" % (schema, table_name)
+            fullname = "{0!s}.{1!s}".format(schema, table_name)
         view_name = fullname + '_v'
-        query = "DROP VIEW %s" % view_name
+        query = "DROP VIEW {0!s}".format(view_name)
         con.execute(sa.sql.text(query))
 
 

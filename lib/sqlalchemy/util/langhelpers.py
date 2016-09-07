@@ -96,7 +96,7 @@ def _unique_symbols(used, *bases):
                 yield sym
                 break
         else:
-            raise NameError("exhausted namespace for symbol base %s" % base)
+            raise NameError("exhausted namespace for symbol base {0!s}".format(base))
 
 
 def map_bits(fn, n):
@@ -122,9 +122,9 @@ def decorator(target):
         metadata.update(format_argspec_plus(spec, grouped=False))
         metadata['name'] = fn.__name__
         code = """\
-def %(name)s(%(args)s):
-    return %(target)s(%(fn)s, %(apply_kw)s)
-""" % metadata
+def {name!s}({args!s}):
+    return {target!s}({fn!s}, {apply_kw!s})
+""".format(**metadata)
         decorated = _exec_code_in_env(code,
                                       {targ_name: target, fn_name: fn},
                                       fn.__name__)
@@ -165,9 +165,9 @@ def public_factory(target, location):
     metadata = format_argspec_plus(spec, grouped=False)
     metadata['name'] = location_name
     code = """\
-def %(name)s(%(args)s):
-    return cls(%(apply_kw)s)
-""" % metadata
+def {name!s}({args!s}):
+    return cls({apply_kw!s})
+""".format(**metadata)
     env = {'cls': callable_, 'symbol': symbol}
     exec(code, env)
     decorated = env[location_name]
@@ -208,8 +208,7 @@ class PluginLoader(object):
                 return impl.load()
 
         raise exc.NoSuchModuleError(
-            "Can't load plugin: %s:%s" %
-            (self.group, name))
+            "Can't load plugin: {0!s}:{1!s}".format(self.group, name))
 
     def register(self, name, modulepath, objname):
         def load():
@@ -296,7 +295,7 @@ def get_callable_argspec(fn, no_self=False, _is_init=False):
 
     """
     if inspect.isbuiltin(fn):
-        raise TypeError("Can't inspect builtin: %s" % fn)
+        raise TypeError("Can't inspect builtin: {0!s}".format(fn))
     elif inspect.isfunction(fn):
         if _is_init and no_self:
             spec = compat.inspect_getargspec(fn)
@@ -320,9 +319,9 @@ def get_callable_argspec(fn, no_self=False, _is_init=False):
         if inspect.ismethod(fn.__call__):
             return get_callable_argspec(fn.__call__, no_self=no_self)
         else:
-            raise TypeError("Can't inspect callable: %s" % fn)
+            raise TypeError("Can't inspect callable: {0!s}".format(fn))
     else:
-        raise TypeError("Can't inspect callable: %s" % fn)
+        raise TypeError("Can't inspect callable: {0!s}".format(fn))
 
 
 def format_argspec_plus(fn, grouped=True):
@@ -366,7 +365,7 @@ def format_argspec_plus(fn, grouped=True):
     if spec[0]:
         self_arg = spec[0][0]
     elif spec[1]:
-        self_arg = '%s[0]' % spec[1]
+        self_arg = '{0!s}[0]'.format(spec[1])
     else:
         self_arg = None
 
@@ -507,7 +506,7 @@ def generic_repr(obj, additional_kw=(), to_inspect=None, omit_kwarg=()):
         try:
             val = getattr(obj, arg, missing)
             if val is not missing and val != defval:
-                output.append('%s=%r' % (arg, val))
+                output.append('{0!s}={1!r}'.format(arg, val))
         except Exception:
             pass
 
@@ -516,11 +515,11 @@ def generic_repr(obj, additional_kw=(), to_inspect=None, omit_kwarg=()):
             try:
                 val = getattr(obj, arg, missing)
                 if val is not missing and val != defval:
-                    output.append('%s=%r' % (arg, val))
+                    output.append('{0!s}={1!r}'.format(arg, val))
             except Exception:
                 pass
 
-    return "%s(%s)" % (obj.__class__.__name__, ", ".join(output))
+    return "{0!s}({1!s})".format(obj.__class__.__name__, ", ".join(output))
 
 
 class portable_instancemethod(object):
@@ -715,7 +714,7 @@ def as_interface(obj, cls=None, methods=None, required=None):
     # No dict duck typing here.
     if not isinstance(obj, dict):
         qualifier = complies is operator.gt and 'any of' or 'all of'
-        raise TypeError("%r does not implement %s: %s" % (
+        raise TypeError("{0!r} does not implement {1!s}: {2!s}".format(
             obj, qualifier, ', '.join(interface)))
 
     class AnonymousInterface(object):
@@ -727,17 +726,17 @@ def as_interface(obj, cls=None, methods=None, required=None):
 
     for method, impl in dictlike_iteritems(obj):
         if method not in interface:
-            raise TypeError("%r: unknown in this interface" % method)
+            raise TypeError("{0!r}: unknown in this interface".format(method))
         if not compat.callable(impl):
-            raise TypeError("%r=%r is not callable" % (method, impl))
+            raise TypeError("{0!r}={1!r} is not callable".format(method, impl))
         setattr(AnonymousInterface, method, staticmethod(impl))
         found.add(method)
 
     if complies(found, required):
         return AnonymousInterface
 
-    raise TypeError("dictionary does not contain required keys %s" %
-                    ', '.join(required - found))
+    raise TypeError("dictionary does not contain required keys {0!s}".format(
+                    ', '.join(required - found)))
 
 
 class memoized_property(object):
@@ -820,12 +819,12 @@ class MemoizedSlots(object):
     def __getattr__(self, key):
         if key.startswith('_memoized'):
             raise AttributeError(key)
-        elif hasattr(self, '_memoized_attr_%s' % key):
-            value = getattr(self, '_memoized_attr_%s' % key)()
+        elif hasattr(self, '_memoized_attr_{0!s}'.format(key)):
+            value = getattr(self, '_memoized_attr_{0!s}'.format(key))()
             setattr(self, key, value)
             return value
-        elif hasattr(self, '_memoized_method_%s' % key):
-            fn = getattr(self, '_memoized_method_%s' % key)
+        elif hasattr(self, '_memoized_method_{0!s}'.format(key)):
+            fn = getattr(self, '_memoized_method_{0!s}'.format(key))
 
             def oneshot(*args, **kw):
                 result = fn(*args, **kw)
@@ -890,7 +889,7 @@ class dependencies(object):
         hasself = spec_zero[0] in ('self', 'cls')
 
         for i in range(len(import_deps)):
-            spec[0][i + (1 if hasself else 0)] = "import_deps[%r]" % i
+            spec[0][i + (1 if hasself else 0)] = "import_deps[{0!r}]".format(i)
 
         inner_spec = format_argspec_plus(spec, grouped=False)
 
@@ -900,10 +899,10 @@ class dependencies(object):
 
         outer_spec = format_argspec_plus(spec, grouped=False)
 
-        code = 'lambda %(args)s: fn(%(apply_kw)s)' % {
+        code = 'lambda {args!s}: fn({apply_kw!s})'.format(**{
             "args": outer_spec['args'],
             "apply_kw": inner_spec['apply_kw']
-        }
+        })
 
         decorated = eval(code, locals())
         decorated.__defaults__ = getattr(fn, 'im_func', fn).__defaults__
@@ -958,14 +957,12 @@ class dependencies(object):
 
         def __getattr__(self, key):
             if key == 'module':
-                raise ImportError("Could not resolve module %s"
-                                  % self._full_path)
+                raise ImportError("Could not resolve module {0!s}".format(self._full_path))
             try:
                 attr = getattr(self.module, key)
             except AttributeError:
                 raise AttributeError(
-                    "Module %s has no attribute '%s'" %
-                    (self._full_path, key)
+                    "Module {0!s} has no attribute '{1!s}'".format(self._full_path, key)
                 )
             self.__dict__[key] = attr
             return attr
@@ -980,7 +977,7 @@ def asbool(obj):
         elif obj in ['false', 'no', 'off', 'n', 'f', '0']:
             return False
         else:
-            raise ValueError("String is not true/false: %r" % obj)
+            raise ValueError("String is not true/false: {0!r}".format(obj))
     return bool(obj)
 
 
@@ -1087,12 +1084,10 @@ def assert_arg_type(arg, argtype, name):
     else:
         if isinstance(argtype, tuple):
             raise exc.ArgumentError(
-                "Argument '%s' is expected to be one of type %s, got '%s'" %
-                (name, ' or '.join("'%s'" % a for a in argtype), type(arg)))
+                "Argument '{0!s}' is expected to be one of type {1!s}, got '{2!s}'".format(name, ' or '.join("'{0!s}'".format(a) for a in argtype), type(arg)))
         else:
             raise exc.ArgumentError(
-                "Argument '%s' is expected to be of type '%s', got '%s'" %
-                (name, argtype, type(arg)))
+                "Argument '{0!s}' is expected to be of type '{1!s}', got '{2!s}'".format(name, argtype, type(arg)))
 
 
 def dictlike_iteritems(dictlike):
@@ -1110,7 +1105,7 @@ def dictlike_iteritems(dictlike):
     getter = getattr(dictlike, '__getitem__', getattr(dictlike, 'get', None))
     if getter is None:
         raise TypeError(
-            "Object '%r' is not dict-like" % dictlike)
+            "Object '{0!r}' is not dict-like".format(dictlike))
 
     if hasattr(dictlike, 'iterkeys'):
         def iterator():
@@ -1121,7 +1116,7 @@ def dictlike_iteritems(dictlike):
         return iter((key, getter(key)) for key in dictlike.keys())
     else:
         raise TypeError(
-            "Object '%r' is not dict-like" % dictlike)
+            "Object '{0!r}' is not dict-like".format(dictlike))
 
 
 class classproperty(property):
@@ -1188,7 +1183,7 @@ class _symbol(int):
         return repr(self)
 
     def __repr__(self):
-        return "symbol(%r)" % self.name
+        return "symbol({0!r})".format(self.name)
 
 _symbol.__name__ = 'symbol'
 
@@ -1252,13 +1247,13 @@ def warn_exception(func, *args, **kwargs):
     try:
         return func(*args, **kwargs)
     except Exception:
-        warn("%s('%s') ignored" % sys.exc_info()[0:2])
+        warn("{0!s}('{1!s}') ignored".format(*sys.exc_info()[0:2]))
 
 
 def ellipses_string(value, len_=25):
     try:
         if len(value) > len_:
-            return "%s..." % value[0:len_]
+            return "{0!s}...".format(value[0:len_])
         else:
             return value
     except TypeError:
@@ -1277,9 +1272,9 @@ class _hash_limit_string(compat.text_type):
     """
     def __new__(cls, value, num, args):
         interpolated = (value % args) + \
-            (" (this warning may be suppressed after %d occurrences)" % num)
+            (" (this warning may be suppressed after {0:d} occurrences)".format(num))
         self = super(_hash_limit_string, cls).__new__(cls, interpolated)
-        self._hash = hash("%s_%d" % (value, hash(interpolated) % num))
+        self._hash = hash("{0!s}_{1:d}".format(value, hash(interpolated) % num))
         return self
 
     def __hash__(self):

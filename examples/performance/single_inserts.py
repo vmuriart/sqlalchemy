@@ -42,8 +42,8 @@ def test_orm_commit(n):
         session = Session(bind=engine)
         session.add(
             Customer(
-                name='customer name %d' % i,
-                description='customer description %d' % i)
+                name='customer name {0:d}'.format(i),
+                description='customer description {0:d}'.format(i))
         )
         session.commit()
 
@@ -56,8 +56,8 @@ def test_bulk_save(n):
         session = Session(bind=engine)
         session.bulk_save_objects([
             Customer(
-                name='customer name %d' % i,
-                description='customer description %d' % i
+                name='customer name {0:d}'.format(i),
+                description='customer description {0:d}'.format(i)
             )])
         session.commit()
 
@@ -70,8 +70,8 @@ def test_bulk_insert_dictionaries(n):
         session = Session(bind=engine)
         session.bulk_insert_mappings(Customer, [
             dict(
-                name='customer name %d' % i,
-                description='customer description %d' % i
+                name='customer name {0:d}'.format(i),
+                description='customer description {0:d}'.format(i)
             )])
         session.commit()
 
@@ -85,8 +85,8 @@ def test_core(n):
             conn.execute(
                 Customer.__table__.insert(),
                 dict(
-                    name='customer name %d' % i,
-                    description='customer description %d' % i
+                    name='customer name {0:d}'.format(i),
+                    description='customer description {0:d}'.format(i)
                 )
             )
 
@@ -102,8 +102,8 @@ def test_core_query_caching(n):
             conn.execution_options(compiled_cache=cache).execute(
                 ins,
                 dict(
-                    name='customer name %d' % i,
-                    description='customer description %d' % i
+                    name='customer name {0:d}'.format(i),
+                    description='customer description {0:d}'.format(i)
                 )
             )
 
@@ -130,13 +130,13 @@ def _test_dbapi_raw(n, connect):
 
     if compiled.positional:
         args = (
-            ('customer name %d' % i, 'customer description %d' % i)
+            ('customer name {0:d}'.format(i), 'customer description {0:d}'.format(i))
             for i in range(n))
     else:
         args = (
             dict(
-                name='customer name %d' % i,
-                description='customer description %d' % i
+                name='customer name {0:d}'.format(i),
+                description='customer description {0:d}'.format(i)
             )
             for i in range(n)
         )

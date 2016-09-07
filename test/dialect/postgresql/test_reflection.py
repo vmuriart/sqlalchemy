@@ -317,8 +317,8 @@ class ReflectionTest(fixtures.TestBase):
         m = MetaData()
         t = Table('t', m, autoload=True, autoload_with=testing.db)
         eq_(
-            t.c.x.server_default.arg.text, "'%s'::character varying" % (
-                "abcd" * 40)
+            t.c.x.server_default.arg.text, "'{0!s}'::character varying".format((
+                "abcd" * 40))
         )
 
     @testing.fails_if("postgresql < 8.1", "schema name leaks in, not sure")

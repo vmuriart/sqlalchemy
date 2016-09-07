@@ -45,7 +45,7 @@ class TraversalTest(fixtures.TestBase, AssertsExecutionResults):
                 return other.expr != self.expr
 
             def __str__(self):
-                return "A(%s)" % repr(self.expr)
+                return "A({0!s})".format(repr(self.expr))
 
         class B(ClauseElement):
             __visit_name__ = 'b'
@@ -82,7 +82,7 @@ class TraversalTest(fixtures.TestBase, AssertsExecutionResults):
                 return self.items
 
             def __str__(self):
-                return "B(%s)" % repr([str(i) for i in self.items])
+                return "B({0!s})".format(repr([str(i) for i in self.items]))
 
     def test_test_classes(self):
         a1 = A("expr1")

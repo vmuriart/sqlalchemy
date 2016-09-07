@@ -226,7 +226,7 @@ class CompileTest(fixtures.TestBase, AssertsCompiledSQL):
                  sqltypes.DateTime)
             ]:
                 assert isinstance(fn(*args).type, type_), \
-                    "%s / %r != %s" % (fn(), fn(*args).type, type_)
+                    "{0!s} / {1!r} != {2!s}".format(fn(), fn(*args).type, type_)
 
         assert isinstance(func.concat("foo", "bar").type, sqltypes.String)
 

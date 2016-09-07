@@ -517,7 +517,7 @@ class SetTest(_CollectionOperations):
                     try:
                         self.assert_(p.children == control)
                     except:
-                        print('Test %s.%s(%s):' % (set(base), op, other))
+                        print('Test {0!s}.{1!s}({2!s}):'.format(set(base), op, other))
                         print('want', repr(control))
                         print('got', repr(p.children))
                         raise
@@ -527,7 +527,7 @@ class SetTest(_CollectionOperations):
                     try:
                         self.assert_(p.children == control)
                     except:
-                        print('Test %s.%s(%s):' % (base, op, other))
+                        print('Test {0!s}.{1!s}({2!s}):'.format(base, op, other))
                         print('want', repr(control))
                         print('got', repr(p.children))
                         raise
@@ -544,13 +544,13 @@ class SetTest(_CollectionOperations):
                     p.children = base[:]
                     control = set(base[:])
 
-                    exec("p.children %s other" % op)
-                    exec("control %s other" % op)
+                    exec("p.children {0!s} other".format(op))
+                    exec("control {0!s} other".format(op))
 
                     try:
                         self.assert_(p.children == control)
                     except:
-                        print('Test %s %s %s:' % (set(base), op, other))
+                        print('Test {0!s} {1!s} {2!s}:'.format(set(base), op, other))
                         print('want', repr(control))
                         print('got', repr(p.children))
                         raise
@@ -560,7 +560,7 @@ class SetTest(_CollectionOperations):
                     try:
                         self.assert_(p.children == control)
                     except:
-                        print('Test %s %s %s:' % (base, op, other))
+                        print('Test {0!s} {1!s} {2!s}:'.format(base, op, other))
                         print('want', repr(control))
                         print('got', repr(p.children))
                         raise
@@ -1190,10 +1190,10 @@ class ComparatorTest(fixtures.MappedTest, AssertsCompiledSQL):
             'the', 'lazy',
             )
         for ii in range(16):
-            user = User('user%d' % ii)
+            user = User('user{0:d}'.format(ii))
 
             if ii % 2 == 0:
-                user.singular = Singular(value=("singular%d" % ii)
+                user.singular = Singular(value=("singular{0:d}".format(ii))
                                         if ii % 4 == 0 else None)
             session.add(user)
             for jj in words[(ii % len(words)):((ii + 3) % len(words))]:
@@ -1201,7 +1201,7 @@ class ComparatorTest(fixtures.MappedTest, AssertsCompiledSQL):
                 user.keywords.append(k)
                 if ii % 2 == 0:
                     user.singular.keywords.append(k)
-                    user.user_keywords[-1].value = "singular%d" % ii
+                    user.user_keywords[-1].value = "singular{0:d}".format(ii)
 
         orphan = Keyword('orphan')
         orphan.user_keyword = UserKeyword(keyword=orphan, user=None)

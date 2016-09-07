@@ -264,13 +264,13 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
             def get_select_precolumns(self, select, **kw):
                 result = ""
                 if select._limit:
-                    result += "FIRST %s " % self.process(
+                    result += "FIRST {0!s} ".format(self.process(
                         literal(
-                            select._limit), **kw)
+                            select._limit), **kw))
                 if select._offset:
-                    result += "SKIP %s " % self.process(
+                    result += "SKIP {0!s} ".format(self.process(
                         literal(
-                            select._offset), **kw)
+                            select._offset), **kw))
                 return result
 
             def limit_clause(self, select, **kw):
@@ -2026,13 +2026,13 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
 
         total_params = 100000
 
-        in_clause = [':in%d' % i for i in range(total_params)]
-        params = dict(('in%d' % i, i) for i in range(total_params))
-        t = text('text clause %s' % ', '.join(in_clause))
+        in_clause = [':in{0:d}'.format(i) for i in range(total_params)]
+        params = dict(('in{0:d}'.format(i), i) for i in range(total_params))
+        t = text('text clause {0!s}'.format(', '.join(in_clause)))
         eq_(len(t.bindparams), total_params)
         c = t.compile()
         pp = c.construct_params(params)
-        eq_(len(set(pp)), total_params, '%s %s' % (len(set(pp)), len(pp)))
+        eq_(len(set(pp)), total_params, '{0!s} {1!s}'.format(len(set(pp)), len(pp)))
         eq_(len(set(pp.values())), total_params)
 
     def test_bind_as_col(self):
@@ -2134,17 +2134,17 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
             eq_(len(expected_results), 5,
                 'Incorrect number of expected results')
             eq_(str(cast(tbl.c.v1, Numeric).compile(dialect=dialect)),
-                'CAST(casttest.v1 AS %s)' % expected_results[0])
+                'CAST(casttest.v1 AS {0!s})'.format(expected_results[0]))
             eq_(str(tbl.c.v1.cast(Numeric).compile(dialect=dialect)),
-                'CAST(casttest.v1 AS %s)' % expected_results[0])
+                'CAST(casttest.v1 AS {0!s})'.format(expected_results[0]))
             eq_(str(cast(tbl.c.v1, Numeric(12, 9)).compile(dialect=dialect)),
-                'CAST(casttest.v1 AS %s)' % expected_results[1])
+                'CAST(casttest.v1 AS {0!s})'.format(expected_results[1]))
             eq_(str(cast(tbl.c.ts, Date).compile(dialect=dialect)),
-                'CAST(casttest.ts AS %s)' % expected_results[2])
+                'CAST(casttest.ts AS {0!s})'.format(expected_results[2]))
             eq_(str(cast(1234, Text).compile(dialect=dialect)),
-                'CAST(%s AS %s)' % (literal, expected_results[3]))
+                'CAST({0!s} AS {1!s})'.format(literal, expected_results[3]))
             eq_(str(cast('test', String(20)).compile(dialect=dialect)),
-                'CAST(%s AS %s)' % (literal, expected_results[4]))
+                'CAST({0!s} AS {1!s})'.format(literal, expected_results[4]))
 
             # fixme: shoving all of this dialect-specific stuff in one test
             # is now officially completely ridiculous AND non-obviously omits
@@ -2505,25 +2505,21 @@ class SelectTest(fixtures.TestBase, AssertsCompiledSQL):
 
             if lbl:
                 self.assert_compile(
-                    s1, "SELECT %s AS %s FROM mytable" %
-                    (expr, lbl))
+                    s1, "SELECT {0!s} AS {1!s} FROM mytable".format(expr, lbl))
             else:
-                self.assert_compile(s1, "SELECT %s FROM mytable" % (expr,))
+                self.assert_compile(s1, "SELECT {0!s} FROM mytable".format(expr))
 
             s1 = select([s1])
             if lbl:
                 self.assert_compile(
-                    s1, "SELECT %s FROM (SELECT %s AS %s FROM mytable)" %
-                    (lbl, expr, lbl))
+                    s1, "SELECT {0!s} FROM (SELECT {1!s} AS {2!s} FROM mytable)".format(lbl, expr, lbl))
             elif col.table is not None:
                 # sqlite rule labels subquery columns
                 self.assert_compile(
-                    s1, "SELECT %s FROM (SELECT %s AS %s FROM mytable)" %
-                    (key, expr, key))
+                    s1, "SELECT {0!s} FROM (SELECT {1!s} AS {2!s} FROM mytable)".format(key, expr, key))
             else:
                 self.assert_compile(s1,
-                                    "SELECT %s FROM (SELECT %s FROM mytable)" %
-                                    (expr, expr))
+                                    "SELECT {0!s} FROM (SELECT {1!s} FROM mytable)".format(expr, expr))
 
     def test_hints(self):
         s = select([table1.c.myid]).with_hint(table1, "test hint %(name)s")
@@ -3848,7 +3844,7 @@ class ResultMapTest(fixtures.TestBase):
                 'a': ('a', (t.c.a, 'a', 'a'), t.c.a.type),
                 'bar': ('bar', (l1, 'bar'), l1.type),
                 'anon_1': (
-                    '%%(%d anon)s' % id(tc),
+                    '%({0:d} anon)s'.format(id(tc)),
                     (tc_anon_label, 'anon_1', tc), tc.type),
             },
         )

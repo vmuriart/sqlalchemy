@@ -65,7 +65,7 @@ class LogParamsTest(fixtures.TestBase):
 
         eq_(
             self.buf.buffer[1].message,
-            "('%s ... (4702 characters truncated) ... %s',)" % (
+            "('{0!s} ... (4702 characters truncated) ... {1!s}',)".format(
                 largeparam[0:149], largeparam[-149:]
             )
         )
@@ -83,7 +83,7 @@ class LogParamsTest(fixtures.TestBase):
 
         eq_(
             self.buf.buffer[1].message,
-            "('%s', '%s', '%s ... (372 characters truncated) ... %s')" % (
+            "('{0!s}', '{1!s}', '{2!s} ... (372 characters truncated) ... {3!s}')".format(
                 lp1, lp2, lp3[0:149], lp3[-149:]
             )
         )
@@ -146,7 +146,7 @@ class LogParamsTest(fixtures.TestBase):
 
         eq_(
             self.buf.buffer[1].message,
-            "('%s ... (4702 characters truncated) ... %s',)" % (
+            "('{0!s} ... (4702 characters truncated) ... {1!s}',)".format(
                 largeparam[0:149], largeparam[-149:]
             )
         )
@@ -154,14 +154,14 @@ class LogParamsTest(fixtures.TestBase):
         if util.py3k:
             eq_(
                 self.buf.buffer[3].message,
-                "Row ('%s ... (4702 characters truncated) ... %s',)" % (
+                "Row ('{0!s} ... (4702 characters truncated) ... {1!s}',)".format(
                     largeparam[0:149], largeparam[-149:]
                 )
             )
         else:
             eq_(
                 self.buf.buffer[3].message,
-                "Row (u'%s ... (4703 characters truncated) ... %s',)" % (
+                "Row (u'{0!s} ... (4703 characters truncated) ... {1!s}',)".format(
                     largeparam[0:148], largeparam[-149:]
                 )
             )
@@ -169,14 +169,14 @@ class LogParamsTest(fixtures.TestBase):
         if util.py3k:
             eq_(
                 repr(row),
-                "('%s ... (4702 characters truncated) ... %s',)" % (
+                "('{0!s} ... (4702 characters truncated) ... {1!s}',)".format(
                     largeparam[0:149], largeparam[-149:]
                 )
             )
         else:
             eq_(
                 repr(row),
-                "(u'%s ... (4703 characters truncated) ... %s',)" % (
+                "(u'{0!s} ... (4703 characters truncated) ... {1!s}',)".format(
                     largeparam[0:148], largeparam[-149:]
                 )
             )
@@ -301,9 +301,8 @@ class LoggingNameTest(fixtures.TestBase):
         assert self.buf.buffer
         for name in [b.name for b in self.buf.buffer]:
             assert name in (
-                'sqlalchemy.engine.base.Engine.%s' % eng_name,
-                'sqlalchemy.pool.%s.%s' %
-                (eng.pool.__class__.__name__, pool_name)
+                'sqlalchemy.engine.base.Engine.{0!s}'.format(eng_name),
+                'sqlalchemy.pool.{0!s}.{1!s}'.format(eng.pool.__class__.__name__, pool_name)
             )
 
     def _assert_no_name_in_execute(self, eng):
@@ -312,7 +311,7 @@ class LoggingNameTest(fixtures.TestBase):
         for name in [b.name for b in self.buf.buffer]:
             assert name in (
                 'sqlalchemy.engine.base.Engine',
-                'sqlalchemy.pool.%s' % eng.pool.__class__.__name__
+                'sqlalchemy.pool.{0!s}'.format(eng.pool.__class__.__name__)
             )
 
     def _named_engine(self, **kw):

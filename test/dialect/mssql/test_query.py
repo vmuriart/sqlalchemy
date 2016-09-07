@@ -207,7 +207,7 @@ class QueryUnicodeTest(fixtures.TestBase):
         try:
             r = t1.select().execute().first()
             assert isinstance(r[1], util.text_type), \
-                '%s is %s instead of unicode, working on %s' % (
+                '{0!s} is {1!s} instead of unicode, working on {2!s}'.format(
                 r[1],
                 type(r[1]), meta.bind)
         finally:

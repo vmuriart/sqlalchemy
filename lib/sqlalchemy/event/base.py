@@ -122,7 +122,7 @@ class _Dispatch(object):
         """
         if '_joined_dispatch_cls' not in self.__class__.__dict__:
             cls = type(
-                "Joined%s" % self.__class__.__name__,
+                "Joined{0!s}".format(self.__class__.__name__),
                 (_JoinedDispatcher, ), {'__slots__': self._event_names}
             )
 
@@ -168,7 +168,7 @@ def _create_dispatcher_class(cls, classname, bases, dict_):
         dispatch_base = _Dispatch
 
     event_names = [k for k in dict_ if _is_event_name(k)]
-    dispatch_cls = type("%sDispatch" % classname,
+    dispatch_cls = type("{0!s}Dispatch".format(classname),
                         (dispatch_base, ), {'__slots__': event_names})
 
     dispatch_cls._event_names = event_names

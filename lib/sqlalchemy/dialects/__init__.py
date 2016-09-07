@@ -40,7 +40,7 @@ def _auto_fn(name):
         )
         dialect = translated
     try:
-        module = __import__('sqlalchemy.dialects.%s' % (dialect, )).dialects
+        module = __import__('sqlalchemy.dialects.{0!s}'.format(dialect )).dialects
     except ImportError:
         return None
 

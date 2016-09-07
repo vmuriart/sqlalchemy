@@ -112,7 +112,7 @@ class compound(object):
     def _do(self, config, fn, *args, **kw):
         for skip in self.skips:
             if skip(config):
-                msg = "'%s' : %s" % (
+                msg = "'{0!s}' : {1!s}".format(
                     fn.__name__,
                     skip._as_string(config)
                 )
@@ -129,7 +129,7 @@ class compound(object):
     def _expect_failure(self, config, ex, name='block'):
         for fail in self.fails:
             if fail(config):
-                print(("%s failed as expected (%s): %s " % (
+                print(("{0!s} failed as expected ({1!s}): {2!s} ".format(
                     name, fail._as_string(config), str(ex))))
                 break
         else:
@@ -143,8 +143,7 @@ class compound(object):
                 break
         else:
             raise AssertionError(
-                "Unexpected success for '%s' (%s)" %
-                (
+                "Unexpected success for '{0!s}' ({1!s})".format(
                     name,
                     " and ".join(
                         fail._as_string(config)
@@ -201,7 +200,7 @@ class Predicate(object):
         elif util.callable(predicate):
             return LambdaPredicate(predicate, description)
         else:
-            assert False, "unknown predicate type: %s" % predicate
+            assert False, "unknown predicate type: {0!s}".format(predicate)
 
     def _format_description(self, config, negate=False):
         bool_ = self(config)
@@ -221,7 +220,7 @@ class Predicate(object):
 class BooleanPredicate(Predicate):
     def __init__(self, value, description=None):
         self.value = value
-        self.description = description or "boolean %s" % value
+        self.description = description or "boolean {0!s}".format(value)
 
     def __call__(self, config):
         return self.value
@@ -276,18 +275,18 @@ class SpecPredicate(Predicate):
             return self._format_description(config)
         elif self.op is None:
             if negate:
-                return "not %s" % self.db
+                return "not {0!s}".format(self.db)
             else:
-                return "%s" % self.db
+                return "{0!s}".format(self.db)
         else:
             if negate:
-                return "not %s %s %s" % (
+                return "not {0!s} {1!s} {2!s}".format(
                     self.db,
                     self.op,
                     self.spec
                 )
             else:
-                return "%s %s %s" % (
+                return "{0!s} {1!s} {2!s}".format(
                     self.db,
                     self.op,
                     self.spec

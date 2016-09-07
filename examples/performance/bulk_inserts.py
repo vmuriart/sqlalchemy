@@ -38,8 +38,8 @@ def test_flush_no_pk(n):
     for chunk in range(0, n, 1000):
         session.add_all([
             Customer(
-                name='customer name %d' % i,
-                description='customer description %d' % i)
+                name='customer name {0:d}'.format(i),
+                description='customer description {0:d}'.format(i))
             for i in range(chunk, chunk + 1000)
         ])
         session.flush()
@@ -52,8 +52,8 @@ def test_bulk_save_return_pks(n):
     session = Session(bind=engine)
     session.bulk_save_objects([
         Customer(
-            name='customer name %d' % i,
-            description='customer description %d' % i
+            name='customer name {0:d}'.format(i),
+            description='customer description {0:d}'.format(i)
         )
         for i in range(n)
     ], return_defaults=True)
@@ -68,8 +68,8 @@ def test_flush_pk_given(n):
         session.add_all([
             Customer(
                 id=i + 1,
-                name='customer name %d' % i,
-                description='customer description %d' % i)
+                name='customer name {0:d}'.format(i),
+                description='customer description {0:d}'.format(i))
             for i in range(chunk, chunk + 1000)
         ])
         session.flush()
@@ -82,8 +82,8 @@ def test_bulk_save(n):
     session = Session(bind=engine)
     session.bulk_save_objects([
         Customer(
-            name='customer name %d' % i,
-            description='customer description %d' % i
+            name='customer name {0:d}'.format(i),
+            description='customer description {0:d}'.format(i)
         )
         for i in range(n)
     ])
@@ -96,8 +96,8 @@ def test_bulk_insert_mappings(n):
     session = Session(bind=engine)
     session.bulk_insert_mappings(Customer, [
         dict(
-            name='customer name %d' % i,
-            description='customer description %d' % i
+            name='customer name {0:d}'.format(i),
+            description='customer description {0:d}'.format(i)
         )
         for i in range(n)
     ])
@@ -112,8 +112,8 @@ def test_core_insert(n):
         Customer.__table__.insert(),
         [
             dict(
-                name='customer name %d' % i,
-                description='customer description %d' % i
+                name='customer name {0:d}'.format(i),
+                description='customer description {0:d}'.format(i)
             )
             for i in range(n)
         ])
@@ -132,13 +132,13 @@ def test_dbapi_raw(n):
 
     if compiled.positional:
         args = (
-            ('customer name %d' % i, 'customer description %d' % i)
+            ('customer name {0:d}'.format(i), 'customer description {0:d}'.format(i))
             for i in range(n))
     else:
         args = (
             dict(
-                name='customer name %d' % i,
-                description='customer description %d' % i
+                name='customer name {0:d}'.format(i),
+                description='customer description {0:d}'.format(i)
             )
             for i in range(n)
         )

@@ -22,7 +22,7 @@ class OperationalError(DatabaseError):
 class ProgrammingError(DatabaseError):
 
     def __str__(self):
-        return '<%s>' % self.bogus
+        return '<{0!s}>'.format(self.bogus)
 
 
 class OutOfSpec(DatabaseError):

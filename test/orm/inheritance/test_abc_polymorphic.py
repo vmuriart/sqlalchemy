@@ -83,7 +83,7 @@ class ABCTest(fixtures.MappedTest):
             ], sess.query(C).order_by(A.id).all())
 
         test_roundtrip = function_named(
-            test_roundtrip, 'test_%s' % fetchtype)
+            test_roundtrip, 'test_{0!s}'.format(fetchtype))
         return test_roundtrip
 
     test_union = _make_test('union')

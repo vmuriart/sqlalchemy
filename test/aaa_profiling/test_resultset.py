@@ -20,19 +20,19 @@ class ResultSetTest(fixtures.TestBase, AssertsExecutionResults):
     def setup_class(cls):
         global t, t2, metadata
         metadata = MetaData(testing.db)
-        t = Table('table', metadata, *[Column('field%d' % fnum, String(50))
+        t = Table('table', metadata, *[Column('field{0:d}'.format(fnum), String(50))
                                        for fnum in range(NUM_FIELDS)])
         t2 = Table(
             'table2', metadata, *
-            [Column('field%d' % fnum, Unicode(50))
+            [Column('field{0:d}'.format(fnum), Unicode(50))
              for fnum in range(NUM_FIELDS)])
 
     def setup(self):
         metadata.create_all()
-        t.insert().execute([dict(('field%d' % fnum, u('value%d' % fnum))
+        t.insert().execute([dict(('field{0:d}'.format(fnum), u('value{0:d}'.format(fnum)))
                                  for fnum in range(NUM_FIELDS)) for r_num in
                             range(NUM_RECORDS)])
-        t2.insert().execute([dict(('field%d' % fnum, u('value%d' % fnum))
+        t2.insert().execute([dict(('field{0:d}'.format(fnum), u('value{0:d}'.format(fnum)))
                                   for fnum in range(NUM_FIELDS)) for r_num in
                              range(NUM_RECORDS)])
 

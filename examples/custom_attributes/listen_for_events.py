@@ -30,10 +30,10 @@ if __name__ == '__main__':
     class Base(object):
 
         def receive_change_event(self, verb, key, value, oldvalue):
-            s = "Value '%s' %s on attribute '%s', " % (value, verb, key)
+            s = "Value '{0!s}' {1!s} on attribute '{2!s}', ".format(value, verb, key)
             if oldvalue:
-                s += "which replaced the value '%s', " % oldvalue
-            s += "on object %s" % self
+                s += "which replaced the value '{0!s}', ".format(oldvalue)
+            s += "on object {0!s}".format(self)
             print(s)
 
     Base = declarative_base(cls=Base)
@@ -49,7 +49,7 @@ if __name__ == '__main__':
         related = relationship("Related", backref="mapped")
 
         def __str__(self):
-            return "MyMappedClass(data=%r)" % self.data
+            return "MyMappedClass(data={0!r})".format(self.data)
 
     class Related(Base):
         __tablename__ = "related"
@@ -58,7 +58,7 @@ if __name__ == '__main__':
         data = Column(String(50))
 
         def __str__(self):
-            return "Related(data=%r)" % self.data
+            return "Related(data={0!r})".format(self.data)
 
     # classes are instrumented.  Demonstrate the events !
 

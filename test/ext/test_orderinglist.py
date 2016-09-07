@@ -69,13 +69,13 @@ class OrderingListTest(fixtures.TestBase):
             def __init__(self, name):
                 self.name = name
             def __repr__(self):
-                return '<Slide "%s">' % self.name
+                return '<Slide "{0!s}">'.format(self.name)
 
         class Bullet(object):
             def __init__(self, text):
                 self.text = text
             def __repr__(self):
-                return '<Bullet "%s" pos %s>' % (self.text, self.position)
+                return '<Bullet "{0!s}" pos {1!s}>'.format(self.text, self.position)
 
         mapper(Slide, slides_table, properties={
             'bullets': relationship(Bullet, lazy='joined',

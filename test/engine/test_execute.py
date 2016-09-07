@@ -922,12 +922,12 @@ class SchemaTranslateTest(fixtures.TestBase, testing.AssertsExecutionResults):
                 t1.drop(conn)
 
         asserter.assert_(
-            CompiledSQL("CREATE TABLE %s.t1 (x INTEGER)" % config.test_schema),
-            CompiledSQL("CREATE TABLE %s.t2 (x INTEGER)" % config.test_schema),
+            CompiledSQL("CREATE TABLE {0!s}.t1 (x INTEGER)".format(config.test_schema)),
+            CompiledSQL("CREATE TABLE {0!s}.t2 (x INTEGER)".format(config.test_schema)),
             CompiledSQL("CREATE TABLE t3 (x INTEGER)"),
             CompiledSQL("DROP TABLE t3"),
-            CompiledSQL("DROP TABLE %s.t2" % config.test_schema),
-            CompiledSQL("DROP TABLE %s.t1" % config.test_schema)
+            CompiledSQL("DROP TABLE {0!s}.t2".format(config.test_schema)),
+            CompiledSQL("DROP TABLE {0!s}.t1".format(config.test_schema))
         )
 
     def _fixture(self):
@@ -1003,25 +1003,25 @@ class SchemaTranslateTest(fixtures.TestBase, testing.AssertsExecutionResults):
 
         asserter.assert_(
             CompiledSQL(
-                "INSERT INTO %s.t1 (x) VALUES (:x)" % config.test_schema),
+                "INSERT INTO {0!s}.t1 (x) VALUES (:x)".format(config.test_schema)),
             CompiledSQL(
-                "INSERT INTO %s.t2 (x) VALUES (:x)" % config.test_schema),
+                "INSERT INTO {0!s}.t2 (x) VALUES (:x)".format(config.test_schema)),
             CompiledSQL(
                 "INSERT INTO t3 (x) VALUES (:x)"),
             CompiledSQL(
-                "UPDATE %s.t1 SET x=:x WHERE %s.t1.x = :x_1" % (
+                "UPDATE {0!s}.t1 SET x=:x WHERE {1!s}.t1.x = :x_1".format(
                     config.test_schema, config.test_schema)),
             CompiledSQL(
-                "UPDATE %s.t2 SET x=:x WHERE %s.t2.x = :x_1" % (
+                "UPDATE {0!s}.t2 SET x=:x WHERE {1!s}.t2.x = :x_1".format(
                     config.test_schema, config.test_schema)),
             CompiledSQL("UPDATE t3 SET x=:x WHERE t3.x = :x_1"),
-            CompiledSQL("SELECT %s.t1.x FROM %s.t1" % (
+            CompiledSQL("SELECT {0!s}.t1.x FROM {1!s}.t1".format(
                 config.test_schema, config.test_schema)),
-            CompiledSQL("SELECT %s.t2.x FROM %s.t2" % (
+            CompiledSQL("SELECT {0!s}.t2.x FROM {1!s}.t2".format(
                 config.test_schema, config.test_schema)),
             CompiledSQL("SELECT t3.x FROM t3"),
-            CompiledSQL("DELETE FROM %s.t1" % config.test_schema),
-            CompiledSQL("DELETE FROM %s.t2" % config.test_schema),
+            CompiledSQL("DELETE FROM {0!s}.t1".format(config.test_schema)),
+            CompiledSQL("DELETE FROM {0!s}.t2".format(config.test_schema)),
             CompiledSQL("DELETE FROM t3")
         )
 
@@ -1041,7 +1041,7 @@ class SchemaTranslateTest(fixtures.TestBase, testing.AssertsExecutionResults):
             conn = eng.connect()
             conn.execute(select([t2.c.x]))
         asserter.assert_(
-            CompiledSQL("SELECT %s.t2.x FROM %s.t2" % (
+            CompiledSQL("SELECT {0!s}.t2.x FROM {1!s}.t2".format(
                 config.test_schema, config.test_schema)),
         )
 
@@ -1115,7 +1115,7 @@ class EngineEventsTest(fixtures.TestBase):
         orig = list(received)
         for stmt, params, posn in expected:
             if not received:
-                assert False, "Nothing available for stmt: %s" % stmt
+                assert False, "Nothing available for stmt: {0!s}".format(stmt)
             while received:
                 teststmt, testparams, testmultiparams = \
                     received.pop(0)
@@ -1561,14 +1561,14 @@ class EngineEventsTest(fixtures.TestBase):
                      'rollback_savepoint', 'release_savepoint',
                      'rollback', 'begin_twophase',
                      'prepare_twophase', 'commit_twophase']:
-            event.listen(engine, '%s' % name, tracker1(name))
+            event.listen(engine, '{0!s}'.format(name), tracker1(name))
 
         conn = engine.connect()
         for name in ['begin', 'savepoint',
                      'rollback_savepoint', 'release_savepoint',
                      'rollback', 'begin_twophase',
                      'prepare_twophase', 'commit_twophase']:
-            event.listen(conn, '%s' % name, tracker2(name))
+            event.listen(conn, '{0!s}'.format(name), tracker2(name))
 
         trans = conn.begin()
         trans2 = conn.begin_nested()
@@ -2274,7 +2274,7 @@ class ProxyConnectionTest(fixtures.TestBase):
         def assert_stmts(expected, received):
             for stmt, params, posn in expected:
                 if not received:
-                    assert False, "Nothing available for stmt: %s" % stmt
+                    assert False, "Nothing available for stmt: {0!s}".format(stmt)
                 while received:
                     teststmt, testparams, testmultiparams = \
                         received.pop(0)

@@ -948,8 +948,7 @@ class Mapper(InspectionAttr):
                 self.inherits = class_mapper(self.inherits, configure=False)
             if not issubclass(self.class_, self.inherits.class_):
                 raise sa_exc.ArgumentError(
-                    "Class '%s' does not inherit from '%s'" %
-                    (self.class_.__name__, self.inherits.class_.__name__))
+                    "Class '{0!s}' does not inherit from '{1!s}'".format(self.class_.__name__, self.inherits.class_.__name__))
             if self.non_primary != self.inherits.non_primary:
                 np = not self.non_primary and "primary" or "non-primary"
                 raise sa_exc.ArgumentError(
@@ -1045,8 +1044,7 @@ class Mapper(InspectionAttr):
 
         if self.mapped_table is None:
             raise sa_exc.ArgumentError(
-                "Mapper '%s' does not have a mapped_table specified."
-                % self)
+                "Mapper '{0!s}' does not have a mapped_table specified.".format(self))
 
     def _set_with_polymorphic(self, with_polymorphic):
         if with_polymorphic == '*':
@@ -1684,8 +1682,7 @@ class Mapper(InspectionAttr):
         column = columns[0]
         if not expression._is_column(column):
             raise sa_exc.ArgumentError(
-                "%s=%r is not an instance of MapperProperty or Column"
-                % (key, prop))
+                "{0!s}={1!r} is not an instance of MapperProperty or Column".format(key, prop))
 
         prop = self._props.get(key, None)
 
@@ -1818,11 +1815,11 @@ class Mapper(InspectionAttr):
         )
 
     def __repr__(self):
-        return '<Mapper at 0x%x; %s>' % (
+        return '<Mapper at 0x{0:x}; {1!s}>'.format(
             id(self), self.class_.__name__)
 
     def __str__(self):
-        return "Mapper|%s|%s%s" % (
+        return "Mapper|{0!s}|{1!s}{2!s}".format(
             self.class_.__name__,
             self.local_table is not None and
             self.local_table.description or None,
@@ -1862,7 +1859,7 @@ class Mapper(InspectionAttr):
             return self._props[key]
         except KeyError:
             raise sa_exc.InvalidRequestError(
-                "Mapper '%s' has no property '%s'" % (self, key))
+                "Mapper '{0!s}' has no property '{1!s}'".format(self, key))
 
     def get_property_by_column(self, column):
         """Given a :class:`.Column` object, return the
@@ -1893,8 +1890,7 @@ class Mapper(InspectionAttr):
                 m = _class_to_mapper(m)
                 if not m.isa(self):
                     raise sa_exc.InvalidRequestError(
-                        "%r does not inherit from %r" %
-                        (m, self))
+                        "{0!r} does not inherit from {1!r}".format(m, self))
 
                 if selectable is None:
                     mappers.update(m.iterate_to_root())
@@ -2348,7 +2344,7 @@ class Mapper(InspectionAttr):
         if self.include_properties is not None and \
                 name not in self.include_properties and \
                 (column is None or column not in self.include_properties):
-            self._log("not including property %s" % (name))
+            self._log("not including property {0!s}".format((name)))
             return True
 
         if self.exclude_properties is not None and \
@@ -2356,7 +2352,7 @@ class Mapper(InspectionAttr):
                     name in self.exclude_properties or
                     (column is not None and column in self.exclude_properties)
                 ):
-            self._log("excluding property %s" % (name))
+            self._log("excluding property {0!s}".format((name)))
             return True
 
         return False
@@ -2979,5 +2975,4 @@ class _ColumnMapping(dict):
                 "conflicting property '%s':%r" % (
                     column.table.name, column.name, column.key, prop))
         raise orm_exc.UnmappedColumnError(
-            "No column %s is configured on mapper %s..." %
-            (column, self.mapper))
+            "No column {0!s} is configured on mapper {1!s}...".format(column, self.mapper))

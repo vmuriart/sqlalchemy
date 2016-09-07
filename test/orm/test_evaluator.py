@@ -17,7 +17,7 @@ def eval_eq(clause, testcases=None):
 
     def testeval(obj=None, expected_result=None):
         assert evaluator(obj) == expected_result, \
-            "%s != %r for %s with %r" % (
+            "{0!s} != {1!r} for {2!s} with {3!r}".format(
                 evaluator(obj), expected_result, clause, obj)
     if testcases:
         for an_obj, result in testcases:

@@ -17,7 +17,7 @@ class Company(Base):
                     cascade='all, delete-orphan')
 
     def __repr__(self):
-        return "Company %s" % self.name
+        return "Company {0!s}".format(self.name)
 
 class Person(Base):
     __tablename__ = 'person'
@@ -31,7 +31,7 @@ class Person(Base):
         'polymorphic_on':type
     }
     def __repr__(self):
-        return "Ordinary person %s" % self.name
+        return "Ordinary person {0!s}".format(self.name)
 
 class Engineer(Person):
     __tablename__ = 'engineer'
@@ -59,8 +59,7 @@ class Manager(Person):
         'polymorphic_identity':'manager',
     }
     def __repr__(self):
-        return "Manager %s, status %s, manager_name %s" % \
-                    (self.name, self.status, self.manager_name)
+        return "Manager {0!s}, status {1!s}, manager_name {2!s}".format(self.name, self.status, self.manager_name)
 
 
 engine = create_engine('sqlite://', echo=True)

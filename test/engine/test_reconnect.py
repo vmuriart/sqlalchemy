@@ -742,7 +742,7 @@ class InvalidateDuringResultTest(fixtures.TestBase):
             Column('name', String(50)))
         self.meta.create_all()
         table.insert().execute(
-            [{'id': i, 'name': 'row %d' % i} for i in range(1, 100)]
+            [{'id': i, 'name': 'row {0:d}'.format(i)} for i in range(1, 100)]
         )
 
     def teardown(self):

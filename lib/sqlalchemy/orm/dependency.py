@@ -316,7 +316,7 @@ class DependencyProcessor(object):
         raise NotImplementedError()
 
     def __repr__(self):
-        return "%s(%s)" % (self.__class__.__name__, self.prop)
+        return "{0!s}({1!s})".format(self.__class__.__name__, self.prop)
 
 
 class OneToManyDP(DependencyProcessor):

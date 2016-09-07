@@ -1147,12 +1147,12 @@ class KeyTargetingTest(fixtures.TablesTest):
 
         if testing.requires.schemas.enabled:
             cls.tables[
-                '%s.wschema' % testing.config.test_schema].insert().execute(
+                '{0!s}.wschema'.format(testing.config.test_schema)].insert().execute(
                 dict(b="a1", q="c1"))
 
     @testing.requires.schemas
     def test_keyed_accessor_wschema(self):
-        keyed1 = self.tables['%s.wschema' % testing.config.test_schema]
+        keyed1 = self.tables['{0!s}.wschema'.format(testing.config.test_schema)]
         row = testing.db.execute(keyed1.select()).first()
 
         eq_(row.b, "a1")
@@ -1534,7 +1534,7 @@ class AlternateResultProxyTest(fixtures.TablesTest):
     @classmethod
     def insert_data(cls):
         cls.engine.execute(cls.tables.test.insert(), [
-            {'x': i, 'y': "t_%d" % i} for i in range(1, 12)
+            {'x': i, 'y': "t_{0:d}".format(i)} for i in range(1, 12)
         ])
 
     @contextmanager
@@ -1557,13 +1557,13 @@ class AlternateResultProxyTest(fixtures.TablesTest):
             assert isinstance(r, cls)
             for i in range(5):
                 rows.append(r.fetchone())
-            eq_(rows, [(i, "t_%d" % i) for i in range(1, 6)])
+            eq_(rows, [(i, "t_{0:d}".format(i)) for i in range(1, 6)])
 
             rows = r.fetchmany(3)
-            eq_(rows, [(i, "t_%d" % i) for i in range(6, 9)])
+            eq_(rows, [(i, "t_{0:d}".format(i)) for i in range(6, 9)])
 
             rows = r.fetchall()
-            eq_(rows, [(i, "t_%d" % i) for i in range(9, 12)])
+            eq_(rows, [(i, "t_{0:d}".format(i)) for i in range(9, 12)])
 
             r = self.engine.execute(select([self.table]))
             rows = r.fetchmany(None)
@@ -1577,7 +1577,7 @@ class AlternateResultProxyTest(fixtures.TablesTest):
 
             r = self.engine.execute(select([self.table]).limit(5))
             rows = r.fetchmany(6)
-            eq_(rows, [(i, "t_%d" % i) for i in range(1, 6)])
+            eq_(rows, [(i, "t_{0:d}".format(i)) for i in range(1, 6)])
 
             # result keeps going just fine with blank results...
             eq_(r.fetchmany(2), [])
@@ -1678,7 +1678,7 @@ class AlternateResultProxyTest(fixtures.TablesTest):
         with self._proxy_fixture(_result.BufferedRowResultProxy):
             with self.engine.connect() as conn:
                 conn.execute(self.table.insert(), [
-                    {'x': i, 'y': "t_%d" % i} for i in range(15, 1200)
+                    {'x': i, 'y': "t_{0:d}".format(i)} for i in range(15, 1200)
                 ])
                 result = conn.execute(self.table.select())
                 checks = {
@@ -1697,7 +1697,7 @@ class AlternateResultProxyTest(fixtures.TablesTest):
         with self._proxy_fixture(_result.BufferedRowResultProxy):
             with self.engine.connect() as conn:
                 conn.execute(self.table.insert(), [
-                    {'x': i, 'y': "t_%d" % i} for i in range(15, 1200)
+                    {'x': i, 'y': "t_{0:d}".format(i)} for i in range(15, 1200)
                 ])
                 result = conn.execution_options(max_row_buffer=27).execute(
                     self.table.select()

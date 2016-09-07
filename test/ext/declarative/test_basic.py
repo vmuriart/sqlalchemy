@@ -553,9 +553,8 @@ class DeclarativeTest(DeclarativeTestBase):
             __tablename__ = 'users'
             id = Column(Integer, primary_key=True)
             addresses = relationship(
-                '%s.Address' % __name__,
-                primaryjoin='%s.User.id==%s.Address.user_id.prop.columns[0]'
-                % (__name__, __name__))
+                '{0!s}.Address'.format(__name__),
+                primaryjoin='{0!s}.User.id=={1!s}.Address.user_id.prop.columns[0]'.format(__name__, __name__))
 
         class Address(Base, fixtures.ComparableEntity):
 
@@ -1812,7 +1811,7 @@ def _produce_test(inline, stringbased):
                 User.addresses.any(Address.email == 'jack@bean.com')).all(),
                 [])
 
-    ExplicitJoinTest.__name__ = 'ExplicitJoinTest%s%s' % (
+    ExplicitJoinTest.__name__ = 'ExplicitJoinTest{0!s}{1!s}'.format(
         inline and 'Inline' or 'Separate',
         stringbased and 'String' or 'Literal')
     return ExplicitJoinTest
@@ -1820,5 +1819,5 @@ def _produce_test(inline, stringbased):
 for inline in True, False:
     for stringbased in True, False:
         testclass = _produce_test(inline, stringbased)
-        exec('%s = testclass' % testclass.__name__)
+        exec('{0!s} = testclass'.format(testclass.__name__))
         del testclass

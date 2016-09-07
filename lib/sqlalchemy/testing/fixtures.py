@@ -140,7 +140,7 @@ class TablesTest(TestBase):
                         conn.execute(table.delete())
                     except sa.exc.DBAPIError as ex:
                         util.print_(
-                            ("Error emptying table %s: %r" % (table, ex)),
+                            ("Error emptying table {0!s}: {1!r}".format(table, ex)),
                             file=sys.stderr)
 
     def setup(self):

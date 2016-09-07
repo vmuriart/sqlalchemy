@@ -65,7 +65,7 @@ class CollectionsTest(fixtures.ORMTest):
     @classmethod
     def dictable_entity(cls, a=None, b=None, c=None):
         id = cls._entity_id = (cls._entity_id + 1)
-        return cls.Entity(a or str(id), b or 'value %s' % id, c)
+        return cls.Entity(a or str(id), b or 'value {0!s}'.format(id), c)
 
     def _test_adapter(self, typecallable, creator=None, to_set=None):
         if creator is None:
@@ -426,7 +426,7 @@ class CollectionsTest(fixtures.ORMTest):
             def __eq__(self, other):
                 return self.data == other
             def __repr__(self):
-                return 'ListLike(%s)' % repr(self.data)
+                return 'ListLike({0!s})'.format(repr(self.data))
 
         self._test_adapter(ListLike)
         self._test_list(ListLike)
@@ -460,7 +460,7 @@ class CollectionsTest(fixtures.ORMTest):
             def __eq__(self, other):
                 return self.data == other
             def __repr__(self):
-                return 'ListLike(%s)' % repr(self.data)
+                return 'ListLike({0!s})'.format(repr(self.data))
 
         self._test_adapter(ListLike)
         self._test_list(ListLike)
@@ -488,7 +488,7 @@ class CollectionsTest(fixtures.ORMTest):
             def __eq__(self, other):
                 return self.data == other
             def __repr__(self):
-                return 'ListIsh(%s)' % repr(self.data)
+                return 'ListIsh({0!s})'.format(repr(self.data))
 
         self._test_adapter(ListIsh)
         self._test_list(ListIsh)
@@ -1125,7 +1125,7 @@ class CollectionsTest(fixtures.ORMTest):
         # tests #2654
         class MyDict(collections.MappedCollection):
             def __init__(self):
-                super(MyDict, self).__init__(lambda value: "k%d" % value)
+                super(MyDict, self).__init__(lambda value: "k{0:d}".format(value))
 
             @collection.converter
             def _convert(self, dictlike):
@@ -1178,7 +1178,7 @@ class CollectionsTest(fixtures.ORMTest):
             def __eq__(self, other):
                 return self.data == other
             def __repr__(self):
-                return 'DictLike(%s)' % repr(self.data)
+                return 'DictLike({0!s})'.format(repr(self.data))
 
         self._test_adapter(DictLike, self.dictable_entity,
                            to_set=lambda c: set(c.values()))
@@ -1218,7 +1218,7 @@ class CollectionsTest(fixtures.ORMTest):
             def __eq__(self, other):
                 return self.data == other
             def __repr__(self):
-                return 'DictIsh(%s)' % repr(self.data)
+                return 'DictIsh({0!s})'.format(repr(self.data))
 
         self._test_adapter(DictIsh, self.dictable_entity,
                            to_set=lambda c: set(c.values()))
@@ -1926,7 +1926,7 @@ class CustomCollectionsTest(fixtures.MappedTest):
             def __eq__(self, other):
                 return self.data == other
             def __repr__(self):
-                return 'ListLike(%s)' % repr(self.data)
+                return 'ListLike({0!s})'.format(repr(self.data))
 
         self._test_list(ListLike)
 
