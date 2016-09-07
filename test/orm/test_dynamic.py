@@ -353,7 +353,7 @@ class UOWTest(
             testing.db.scalar(
                 select(
                     [func.count(cast(1, Integer))]).
-                where(addresses.c.user_id != None)),
+                where(addresses.c.user_id is not None)),
             0)
         u1 = sess.query(User).get(u1.id)
         u1.addresses.append(a1)
@@ -361,7 +361,7 @@ class UOWTest(
 
         eq_(
             testing.db.execute(
-                select([addresses]).where(addresses.c.user_id != None)
+                select([addresses]).where(addresses.c.user_id is not None)
             ).fetchall(),
             [(a1.id, u1.id, 'foo')]
         )
@@ -372,7 +372,7 @@ class UOWTest(
             testing.db.scalar(
                 select(
                     [func.count(cast(1, Integer))]).
-                where(addresses.c.user_id != None)),
+                where(addresses.c.user_id is not None)),
             0
         )
 
@@ -380,7 +380,7 @@ class UOWTest(
         sess.flush()
         eq_(
             testing.db.execute(
-                select([addresses]).where(addresses.c.user_id != None)
+                select([addresses]).where(addresses.c.user_id is not None)
             ).fetchall(),
             [(a1.id, u1.id, 'foo')]
         )
@@ -391,7 +391,7 @@ class UOWTest(
         sess.flush()
         eq_(
             testing.db.execute(
-                select([addresses]).where(addresses.c.user_id != None)
+                select([addresses]).where(addresses.c.user_id is not None)
             ).fetchall(),
             [(a2.id, u1.id, 'bar')]
         )
@@ -566,11 +566,11 @@ class UOWTest(
         sess.commit()
         eq_(
             testing.db.scalar(
-                select([func.count('*')]).where(addresses.c.user_id == None)),
+                select([func.count('*')]).where(addresses.c.user_id is None)),
             0)
         eq_(
             testing.db.scalar(
-                select([func.count('*')]).where(addresses.c.user_id != None)),
+                select([func.count('*')]).where(addresses.c.user_id is not None)),
             6)
 
         sess.delete(u)
@@ -581,7 +581,7 @@ class UOWTest(
             eq_(
                 testing.db.scalar(
                     select([func.count('*')]).where(
-                        addresses.c.user_id == None
+                        addresses.c.user_id is None
                     )
                 ),
                 6
@@ -589,7 +589,7 @@ class UOWTest(
             eq_(
                 testing.db.scalar(
                     select([func.count('*')]).where(
-                        addresses.c.user_id != None
+                        addresses.c.user_id is not None
                     )
                 ),
                 0

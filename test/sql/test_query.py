@@ -488,7 +488,7 @@ class QueryTest(fixtures.TestBase):
         s = users.select(users.c.user_name.in_([]) == False)  # noqa
         r = s.execute().fetchall()
         assert len(r) == 2
-        s = users.select(users.c.user_name.in_([]) == None)  # noqa
+        s = users.select(users.c.user_name.in_([]) is None)  # noqa
         r = s.execute().fetchall()
         assert len(r) == 1
 

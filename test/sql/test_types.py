@@ -762,7 +762,7 @@ class TypeCoerceCastTest(fixtures.TablesTest):
 
         eq_(
             select([t.c.data, coerce_fn(t.c.data, MyType)]).
-            where(coerce_fn(t.c.data, MyType) == None).  # noqa
+            where(coerce_fn(t.c.data, MyType) is None).  # noqa
             execute().fetchall(),
             []
         )
@@ -1936,7 +1936,7 @@ class ExpressionTest(
         c3 = column('x', CoerceNone())
 
         self.assert_compile(
-            and_(c1 == None, c2 == None, c3 == None),  # noqa
+            and_(c1 is None, c2 is None, c3 is None),  # noqa
             "x = :x_1 AND x = :x_2 AND x IS NULL"
         )
         self.assert_compile(

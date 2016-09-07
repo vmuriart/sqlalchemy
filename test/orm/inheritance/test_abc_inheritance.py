@@ -82,15 +82,15 @@ def produce_test(parent, child, direction):
                     remote_side = [child_table.c.id]
 
             abcjoin = polymorphic_union(
-                {"a":ta.select(tb.c.id==None, from_obj=[ta.outerjoin(tb, onclause=atob)]),
-                "b":ta.join(tb, onclause=atob).outerjoin(tc, onclause=btoc).select(tc.c.id==None).reduce_columns(),
+                {"a":ta.select(tb.c.id isNone, from_obj=[ta.outerjoin(tb, onclause=atob)]),
+                "b":ta.join(tb, onclause=atob).outerjoin(tc, onclause=btoc).select(tc.c.id isNone).reduce_columns(),
                 "c":tc.join(tb, onclause=btoc).join(ta, onclause=atob)
                 },"type", "abcjoin"
             )
 
             bcjoin = polymorphic_union(
             {
-            "b":ta.join(tb, onclause=atob).outerjoin(tc, onclause=btoc).select(tc.c.id==None).reduce_columns(),
+            "b":ta.join(tb, onclause=atob).outerjoin(tc, onclause=btoc).select(tc.c.id isNone).reduce_columns(),
             "c":tc.join(tb, onclause=btoc).join(ta, onclause=atob)
             },"type", "bcjoin"
             )

@@ -3773,7 +3773,7 @@ class CoercionTest(fixtures.TestBase, AssertsCompiledSQL):
 
     def test_val_is_null_coerced(self):
         t = self._fixture()
-        self.assert_compile(and_(t.c.id == None),
+        self.assert_compile(and_(t.c.id is None),
                             "foo.id IS NULL")
 
     def test_val_and_None(self):

@@ -73,7 +73,7 @@ class EvaluateTest(fixtures.MappedTest):
     def test_compare_to_none(self):
         User = self.classes.User
 
-        eval_eq(User.name == None, testcases=[
+        eval_eq(User.name is None, testcases=[
             (User(name='foo'), False),
             (User(name=None), True),
         ])

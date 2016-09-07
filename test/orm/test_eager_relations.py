@@ -1137,7 +1137,7 @@ class EagerTest(_fixtures.FixtureTest, testing.AssertsCompiledSQL):
                 mapper(Address, addresses),
                 primaryjoin=and_(
                     addresses.c.id == orders.c.address_id,
-                    addresses.c.email_address != None
+                    addresses.c.email_address is not None
                 ),
 
                 lazy='joined')

@@ -182,7 +182,7 @@ class PointTest(fixtures.MappedTest):
                     g.edges[1]
 
         eq_(
-            sess.query(Edge).filter(Edge.start == None).all(),
+            sess.query(Edge).filter(Edge.start is None).all(),
             []
         )
 
@@ -859,7 +859,7 @@ class ComparatorTest(fixtures.MappedTest, testing.AssertsCompiledSQL):
                     e2
 
         eq_(
-            sess.query(Edge).filter(Edge.start==None).all(),
+            sess.query(Edge).filter(Edge.start isNone).all(),
             []
         )
 

@@ -374,7 +374,7 @@ class QueryAlternativesTest(fixtures.MappedTest):
 
         session = create_session()
 
-        users = session.query(User).filter(User.name != None).all()
+        users = session.query(User).filter(User.name is not None).all()
         assert len(users) == 4
 
     def test_select_by(self):

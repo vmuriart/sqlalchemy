@@ -687,7 +687,7 @@ class RelationshipTest7(fixtures.MappedTest):
         car_join = polymorphic_union(
             {
                 'car' : cars.outerjoin(offroad_cars).\
-                        select(offroad_cars.c.car_id == None).reduce_columns(),
+                        select(offroad_cars.c.car_id is None).reduce_columns(),
                 'offroad' : cars.join(offroad_cars)
             }, "type", 'car_join')
 

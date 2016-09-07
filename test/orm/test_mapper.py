@@ -546,7 +546,7 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
                 cls = self.prop.parent.class_
                 col = getattr(cls, 'name')
                 if other is None:
-                    return col == None
+                    return col is None
                 else:
                     return sa.func.upper(col) == sa.func.upper(other)
 
@@ -1478,7 +1478,7 @@ class MapperTest(_fixtures.FixtureTest, AssertsCompiledSQL):
                 cls = self.prop.parent.class_
                 col = getattr(cls, 'name')
                 if other is None:
-                    return col == None
+                    return col is None
                 else:
                     return sa.func.upper(col) == sa.func.upper(other)
 

@@ -971,66 +971,66 @@ class OperatorTest(QueryTest, AssertsCompiledSQL):
     def test_o2m_compare_to_null(self):
         User = self.classes.User
 
-        self._test(User.id == None, "users.id IS NULL")
-        self._test(User.id != None, "users.id IS NOT NULL")
-        self._test(~(User.id == None), "users.id IS NOT NULL")
-        self._test(~(User.id != None), "users.id IS NULL")
-        self._test(None == User.id, "users.id IS NULL")
-        self._test(~(None == User.id), "users.id IS NOT NULL")
+        self._test(User.id is None, "users.id IS NULL")
+        self._test(User.id is not None, "users.id IS NOT NULL")
+        self._test(~(User.id is None), "users.id IS NOT NULL")
+        self._test(~(User.id is not None), "users.id IS NULL")
+        self._test(None is User.id, "users.id IS NULL")
+        self._test(~(None is User.id), "users.id IS NOT NULL")
 
     def test_m2o_compare_to_null(self):
         Address = self.classes.Address
-        self._test(Address.user == None, "addresses.user_id IS NULL")
-        self._test(~(Address.user == None), "addresses.user_id IS NOT NULL")
-        self._test(~(Address.user != None), "addresses.user_id IS NULL")
-        self._test(None == Address.user, "addresses.user_id IS NULL")
-        self._test(~(None == Address.user), "addresses.user_id IS NOT NULL")
+        self._test(Address.user is None, "addresses.user_id IS NULL")
+        self._test(~(Address.user is None), "addresses.user_id IS NOT NULL")
+        self._test(~(Address.user is not None), "addresses.user_id IS NULL")
+        self._test(None is Address.user, "addresses.user_id IS NULL")
+        self._test(~(None is Address.user), "addresses.user_id IS NOT NULL")
 
     def test_o2m_compare_to_null_orm_adapt(self):
         User, Address = self.classes.User, self.classes.Address
         self._test_filter_aliases(
-            User.id == None,
+            User.id is None,
             "users_1.id IS NULL", Address, Address.user),
         self._test_filter_aliases(
-            User.id != None,
+            User.id is not None,
             "users_1.id IS NOT NULL", Address, Address.user),
         self._test_filter_aliases(
-            ~(User.id == None),
+            ~(User.id is None),
             "users_1.id IS NOT NULL", Address, Address.user),
         self._test_filter_aliases(
-            ~(User.id != None),
+            ~(User.id is not None),
             "users_1.id IS NULL", Address, Address.user),
 
     def test_m2o_compare_to_null_orm_adapt(self):
         User, Address = self.classes.User, self.classes.Address
         self._test_filter_aliases(
-            Address.user == None,
+            Address.user is None,
             "addresses_1.user_id IS NULL", User, User.addresses),
         self._test_filter_aliases(
-            Address.user != None,
+            Address.user is not None,
             "addresses_1.user_id IS NOT NULL", User, User.addresses),
         self._test_filter_aliases(
-            ~(Address.user == None),
+            ~(Address.user is None),
             "addresses_1.user_id IS NOT NULL", User, User.addresses),
         self._test_filter_aliases(
-            ~(Address.user != None),
+            ~(Address.user is not None),
             "addresses_1.user_id IS NULL", User, User.addresses),
 
     def test_o2m_compare_to_null_aliased(self):
         User = self.classes.User
         u1 = aliased(User)
-        self._test(u1.id == None, "users_1.id IS NULL")
-        self._test(u1.id != None, "users_1.id IS NOT NULL")
-        self._test(~(u1.id == None), "users_1.id IS NOT NULL")
-        self._test(~(u1.id != None), "users_1.id IS NULL")
+        self._test(u1.id is None, "users_1.id IS NULL")
+        self._test(u1.id is not None, "users_1.id IS NOT NULL")
+        self._test(~(u1.id is None), "users_1.id IS NOT NULL")
+        self._test(~(u1.id is not None), "users_1.id IS NULL")
 
     def test_m2o_compare_to_null_aliased(self):
         Address = self.classes.Address
         a1 = aliased(Address)
-        self._test(a1.user == None, "addresses_1.user_id IS NULL")
-        self._test(~(a1.user == None), "addresses_1.user_id IS NOT NULL")
-        self._test(a1.user != None, "addresses_1.user_id IS NOT NULL")
-        self._test(~(a1.user != None), "addresses_1.user_id IS NULL")
+        self._test(a1.user is None, "addresses_1.user_id IS NULL")
+        self._test(~(a1.user is None), "addresses_1.user_id IS NOT NULL")
+        self._test(a1.user is not None, "addresses_1.user_id IS NOT NULL")
+        self._test(~(a1.user is not None), "addresses_1.user_id IS NULL")
 
     def test_relationship_unimplemented(self):
         User = self.classes.User
@@ -1212,7 +1212,7 @@ class OperatorTest(QueryTest, AssertsCompiledSQL):
 
         # needs autoaliasing
         self._test(
-            Node.children == None,
+            Node.children is None,
             "NOT (EXISTS (SELECT 1 FROM nodes AS nodes_1 "
             "WHERE nodes.id = nodes_1.parent_id))",
             entity=Node,
@@ -1220,25 +1220,25 @@ class OperatorTest(QueryTest, AssertsCompiledSQL):
         )
 
         self._test(
-            Node.parent == None,
+            Node.parent is None,
             "nodes.parent_id IS NULL",
             checkparams={}
         )
 
         self._test(
-            nalias.parent == None,
+            nalias.parent is None,
             "nodes_1.parent_id IS NULL",
             checkparams={}
         )
 
         self._test(
-            nalias.parent != None,
+            nalias.parent is not None,
             "nodes_1.parent_id IS NOT NULL",
             checkparams={}
         )
 
         self._test(
-            nalias.children == None,
+            nalias.children is None,
             "NOT (EXISTS ("
             "SELECT 1 FROM nodes WHERE nodes_1.id = nodes.parent_id))",
             entity=nalias,
@@ -2180,7 +2180,7 @@ class FilterTest(QueryTest, AssertsCompiledSQL):
             assert True
 
         assert [User(id=10)] == \
-            sess.query(User).filter(User.addresses == None).all()
+            sess.query(User).filter(User.addresses is None).all()
 
         try:
             assert [User(id=7), User(id=9), User(id=10)] == \
@@ -2343,11 +2343,11 @@ class FilterTest(QueryTest, AssertsCompiledSQL):
             sess.query(Address).filter(Address.user != user).all()
 
         # generates an IS NULL
-        assert [] == sess.query(Address).filter(Address.user == None).all()
+        assert [] == sess.query(Address).filter(Address.user is None).all()
         assert [] == sess.query(Address).filter(Address.user == null()).all()
 
         assert [Order(id=5)] == \
-            sess.query(Order).filter(Order.address == None).all()
+            sess.query(Order).filter(Order.address is None).all()
 
         # o2o
         dingaling = sess.query(Dingaling).get(2)
@@ -2356,10 +2356,10 @@ class FilterTest(QueryTest, AssertsCompiledSQL):
 
         # m2m
         eq_(
-            sess.query(Item).filter(Item.keywords == None).
+            sess.query(Item).filter(Item.keywords is None).
             order_by(Item.id).all(), [Item(id=4), Item(id=5)])
         eq_(
-            sess.query(Item).filter(Item.keywords != None).
+            sess.query(Item).filter(Item.keywords is not None).
             order_by(Item.id).all(), [Item(id=1), Item(id=2), Item(id=3)])
 
     def test_filter_by(self):
@@ -2414,7 +2414,7 @@ class FilterTest(QueryTest, AssertsCompiledSQL):
         # scalar
         eq_(
             [Order(description="order 5")],
-            sess.query(Order).filter(Order.address_id == None).all()
+            sess.query(Order).filter(Order.address_id is None).all()
         )
         eq_(
             [Order(description="order 5")],
@@ -2424,7 +2424,7 @@ class FilterTest(QueryTest, AssertsCompiledSQL):
         # o2o
         eq_(
             [Address(id=1), Address(id=3), Address(id=4)],
-            sess.query(Address).filter(Address.dingaling == None).
+            sess.query(Address).filter(Address.dingaling is None).
             order_by(Address.id).all())
         eq_(
             [Address(id=1), Address(id=3), Address(id=4)],
@@ -2432,7 +2432,7 @@ class FilterTest(QueryTest, AssertsCompiledSQL):
             order_by(Address.id).all())
         eq_(
             [Address(id=2), Address(id=5)],
-            sess.query(Address).filter(Address.dingaling != None).
+            sess.query(Address).filter(Address.dingaling is not None).
             order_by(Address.id).all())
         eq_(
             [Address(id=2), Address(id=5)],
@@ -2442,19 +2442,19 @@ class FilterTest(QueryTest, AssertsCompiledSQL):
         # m2o
         eq_(
             [Order(id=5)],
-            sess.query(Order).filter(Order.address == None).all())
+            sess.query(Order).filter(Order.address is None).all())
         eq_(
             [Order(id=1), Order(id=2), Order(id=3), Order(id=4)],
             sess.query(Order).order_by(Order.id).
-            filter(Order.address != None).all())
+            filter(Order.address is not None).all())
 
         # o2m
         eq_(
             [User(id=10)],
-            sess.query(User).filter(User.addresses == None).all())
+            sess.query(User).filter(User.addresses is None).all())
         eq_(
             [User(id=7), User(id=8), User(id=9)],
-            sess.query(User).filter(User.addresses != None).
+            sess.query(User).filter(User.addresses is not None).
             order_by(User.id).all())
 
     def test_blank_filter_by(self):

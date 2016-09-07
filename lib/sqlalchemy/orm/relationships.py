@@ -1273,7 +1273,7 @@ class RelationshipProperty(StrategizedProperty):
                     return sql.and_(*[
                         sql.or_(
                             adapt(x) != state_bindparam(adapt(x), state, y),
-                            adapt(x) == None)
+                            adapt(x) is None)
                         for (x, y) in self.property.local_remote_pairs])
 
             criterion = sql.and_(*[

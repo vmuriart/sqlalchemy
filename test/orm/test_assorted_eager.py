@@ -133,7 +133,7 @@ class EagerTest(fixtures.MappedTest):
         result = sa.select(
             [tests.c.id,categories.c.name],
             sa.and_(tests.c.owner_id == 1,
-                    sa.or_(options.c.someoption==None,
+                    sa.or_(options.c.someoption isNone,
                            options.c.someoption==False)),
             order_by=[tests.c.id],
             from_obj=[tests.join(categories).outerjoin(options, sa.and_(
@@ -154,7 +154,7 @@ class EagerTest(fixtures.MappedTest):
                                                  tests.c.owner_id ==
                                                  options.c.owner_id))).
              filter(sa.and_(tests.c.owner_id==1,
-                            sa.or_(options.c.someoption==None,
+                            sa.or_(options.c.someoption isNone,
                                    options.c.someoption==False))))
 
         result = ["%d %s" % ( t.id,t.category.name ) for t in l]
@@ -181,7 +181,7 @@ class EagerTest(fixtures.MappedTest):
                                                  tests.c.owner_id ==
                                                  options.c.owner_id))).
            filter(sa.and_(tests.c.owner_id == 1,
-                          sa.or_(options.c.someoption==None,
+                          sa.or_(options.c.someoption isNone,
                                  options.c.someoption==False))))
 
         result = ["%d %s" % ( t.id,t.category.name ) for t in l]
@@ -198,7 +198,7 @@ class EagerTest(fixtures.MappedTest):
         q = s.query(Thing).options(sa.orm.joinedload('category'))
         l = q.filter (
             sa.and_(tests.c.owner_id == 1,
-                    sa.or_(options.c.someoption == None,
+                    sa.or_(options.c.someoption is None,
                            options.c.someoption == False))
             ).outerjoin('owner_option')
 
@@ -230,7 +230,7 @@ class EagerTest(fixtures.MappedTest):
         q = s.query(Thing).options(sa.orm.joinedload('category'))
         l = q.filter(
             (tests.c.owner_id==1) &
-            ((options.c.someoption==None) | (options.c.someoption==False))
+            ((options.c.someoption isNone) | (options.c.someoption==False))
                     ).join('owner_option')
 
         result = ["%d %s" % ( t.id,t.category.name ) for t in l]

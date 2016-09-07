@@ -174,7 +174,7 @@ print(document)
 # manually search for a document which contains "/somefile/header/field1:hi"
 print("\nManual search for /somefile/header/field1=='hi':", line)
 d = session.query(Document).join('_nodes', aliased=True).\
-                filter(and_(_Node.parent_id==None, _Node.tag=='somefile')).\
+                filter(and_(_Node.parent_id isNone, _Node.tag=='somefile')).\
                 join('children', aliased=True, from_joinpoint=True).\
                 filter(_Node.tag=='header').\
                 join('children', aliased=True, from_joinpoint=True).\
@@ -191,7 +191,7 @@ def find_document(path, compareto):
     for i, match in enumerate(re.finditer(r'/([\w_]+)(?:\[@([\w_]+)(?:=(.*))?\])?', path)):
         (token, attrname, attrvalue) = match.group(1, 2, 3)
         if first:
-            query = query.join('_nodes', aliased=True).filter(_Node.parent_id==None)
+            query = query.join('_nodes', aliased=True).filter(_Node.parent_id isNone)
             first = False
         else:
             query = query.join('children', aliased=True, from_joinpoint=True)

@@ -1815,7 +1815,7 @@ class HStoreTest(AssertsCompiledSQL, fixtures.TestBase):
 
     def test_where_getitem(self):
         self._test_where(
-            self.hashcol['bar'] == None,
+            self.hashcol['bar'] is None,
             "test_table.hash -> %(hash_1)s IS NULL"
         )
 
@@ -2435,13 +2435,13 @@ class JSONTest(AssertsCompiledSQL, fixtures.TestBase):
     # do anything
     def test_where_getitem(self):
         self._test_where(
-            self.jsoncol['bar'] == None,
+            self.jsoncol['bar'] is None,
             "test_table.test_column -> %(test_column_1)s IS NULL"
         )
 
     def test_where_path(self):
         self._test_where(
-            self.jsoncol[("foo", 1)] == None,
+            self.jsoncol[("foo", 1)] is None,
             "test_table.test_column #> %(test_column_1)s IS NULL"
         )
 
@@ -2480,7 +2480,7 @@ class JSONTest(AssertsCompiledSQL, fixtures.TestBase):
 
     def test_where_getitem_as_text(self):
         self._test_where(
-            self.jsoncol['bar'].astext == None,
+            self.jsoncol['bar'].astext is None,
             "test_table.test_column ->> %(test_column_1)s IS NULL"
         )
 
@@ -2500,7 +2500,7 @@ class JSONTest(AssertsCompiledSQL, fixtures.TestBase):
 
     def test_where_path_as_text(self):
         self._test_where(
-            self.jsoncol[("foo", 1)].astext == None,
+            self.jsoncol[("foo", 1)].astext is None,
             "test_table.test_column #>> %(test_column_1)s IS NULL"
         )
 

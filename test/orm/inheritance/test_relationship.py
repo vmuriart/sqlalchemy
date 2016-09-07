@@ -229,7 +229,7 @@ class SelfReferentialJ2JTest(fixtures.MappedTest):
 
         eq_(sess.query(Manager)
                 .join(Manager.engineers)
-                .filter(Engineer.reports_to == None).all(),
+                .filter(Engineer.reports_to is None).all(),
             [])
 
         eq_(sess.query(Manager)
@@ -332,7 +332,7 @@ class SelfReferentialJ2JSelfTest(fixtures.MappedTest):
 
         eq_(sess.query(Engineer)
                 .join(Engineer.engineers, aliased=True)
-                .filter(Engineer.reports_to == None).all(),
+                .filter(Engineer.reports_to is None).all(),
             [])
 
         eq_(sess.query(Engineer)
@@ -342,7 +342,7 @@ class SelfReferentialJ2JSelfTest(fixtures.MappedTest):
 
         eq_(sess.query(Engineer)
                 .join(Engineer.engineers, aliased=True)
-                .filter(Engineer.reports_to != None).all(),
+                .filter(Engineer.reports_to is not None).all(),
             [e1, e2])
 
 class M2MFilterTest(fixtures.MappedTest):

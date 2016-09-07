@@ -467,7 +467,7 @@ class ClauseAttributesTest(fixtures.MappedTest):
         assert_raises_message(
             TypeError,
             "Boolean value of this clause is not defined",
-            bool, None == sa.false()
+            bool, None is sa.false()
         )
         s = create_session()
         hb = HasBoolean(value=None)

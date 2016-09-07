@@ -1281,7 +1281,7 @@ class OperatorPrecedenceTest(fixtures.TestBase, testing.AssertsCompiledSQL):
 
     def test_operator_precedence_1(self):
         self.assert_compile(
-            self.table2.select((self.table2.c.field == 5) == None),
+            self.table2.select((self.table2.c.field == 5) is None),
             "SELECT op.field FROM op WHERE (op.field = :field_1) IS NULL")
 
     def test_operator_precedence_2(self):

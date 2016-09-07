@@ -1239,8 +1239,8 @@ class IdentitySetTest(fixtures.TestBase):
         eq_(ids.copy(), ids)
 
         # explicit __eq__ and __ne__ tests
-        assert ids != None
-        assert not(ids == None)
+        assert ids is not None
+        assert not(ids is None)
 
         ne_(ids, IdentitySet([o1, o2, o3]))
         ids.clear()

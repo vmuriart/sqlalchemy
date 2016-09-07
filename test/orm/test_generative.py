@@ -235,7 +235,7 @@ class RelationshipsTest(_fixtures.FixtureTest):
 
         session = create_session()
         q = (session.query(User).outerjoin('orders', 'addresses').
-             filter(sa.or_(Order.id == None, Address.id == 1)))
+             filter(sa.or_(Order.id is None, Address.id == 1)))
         eq_(set([User(id=7), User(id=8), User(id=10)]),
             set(q.all()))
 
@@ -250,7 +250,7 @@ class RelationshipsTest(_fixtures.FixtureTest):
         session = create_session()
 
         q = (session.query(User).outerjoin('orders', 'addresses').
-             filter(sa.or_(Order.id == None, Address.id == 1)))
+             filter(sa.or_(Order.id is None, Address.id == 1)))
         eq_(q.count(), 4)
 
     def test_from(self):
@@ -266,7 +266,7 @@ class RelationshipsTest(_fixtures.FixtureTest):
         sel = users.outerjoin(orders).outerjoin(
             addresses, orders.c.address_id == addresses.c.id)
         q = (session.query(User).select_from(sel).
-             filter(sa.or_(Order.id == None, Address.id == 1)))
+             filter(sa.or_(Order.id is None, Address.id == 1)))
         eq_(set([User(id=7), User(id=8), User(id=10)]),
             set(q.all()))
 

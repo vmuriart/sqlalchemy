@@ -20,7 +20,7 @@ class PropertyComparatorTest(fixtures.TestBase, AssertsCompiledSQL):
 
             def __eq__(self, other):
                 if other is None:
-                    return self.expression == None
+                    return self.expression is None
                 else:
                     return func.upper(self.expression) == func.upper(other)
 

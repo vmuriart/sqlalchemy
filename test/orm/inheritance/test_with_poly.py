@@ -56,8 +56,8 @@ class _WithPolymorphicBase(_PolymorphicFixtureBase):
                         pa.Engineer.primary_language==\
                         pa_alias.Engineer.primary_language,
                         and_(
-                            pa.Engineer.primary_language == None,
-                            pa_alias.Engineer.primary_language == None,
+                            pa.Engineer.primary_language is None,
+                            pa_alias.Engineer.primary_language is None,
                             pa.person_id > pa_alias.person_id
                         )
                     )
@@ -84,8 +84,8 @@ class _WithPolymorphicBase(_PolymorphicFixtureBase):
                         pa.Engineer.primary_language==\
                         pa_alias.Engineer.primary_language,
                         and_(
-                            pa.Engineer.primary_language == None,
-                            pa_alias.Engineer.primary_language == None,
+                            pa.Engineer.primary_language is None,
+                            pa_alias.Engineer.primary_language is None,
                             pa.person_id > pa_alias.person_id
                         )
                     )

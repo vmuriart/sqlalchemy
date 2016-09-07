@@ -1362,12 +1362,12 @@ class ComparatorTest(fixtures.MappedTest, AssertsCompiledSQL):
         UserKeyword, Keyword = self.classes.UserKeyword, self.classes.Keyword
 
         self._equivalent(
-                self.session.query(Keyword).filter(Keyword.user == None),
+                self.session.query(Keyword).filter(Keyword.user is None),
                 self.session.query(Keyword).
                             filter(
                                 or_(
-                                    Keyword.user_keyword.has(UserKeyword.user == None),
-                                    Keyword.user_keyword == None
+                                    Keyword.user_keyword.has(UserKeyword.user is None),
+                                    Keyword.user_keyword is None
                                 )
 
                             )
@@ -1377,10 +1377,10 @@ class ComparatorTest(fixtures.MappedTest, AssertsCompiledSQL):
         UserKeyword, Keyword = self.classes.UserKeyword, self.classes.Keyword
 
         self._equivalent(
-                self.session.query(Keyword).filter(Keyword.user != None),
+                self.session.query(Keyword).filter(Keyword.user is not None),
                 self.session.query(Keyword).
                             filter(
-                                Keyword.user_keyword.has(UserKeyword.user != None),
+                                Keyword.user_keyword.has(UserKeyword.user is not None),
                             )
                         )
 
@@ -1389,11 +1389,11 @@ class ComparatorTest(fixtures.MappedTest, AssertsCompiledSQL):
         Singular = self.classes.Singular
 
         self._equivalent(
-            self.session.query(User).filter(User.singular_value == None),
+            self.session.query(User).filter(User.singular_value is None),
             self.session.query(User).filter(
                     or_(
-                        User.singular.has(Singular.value == None),
-                        User.singular == None
+                        User.singular.has(Singular.value is None),
+                        User.singular is None
                     )
                 )
         )
@@ -1425,9 +1425,9 @@ class ComparatorTest(fixtures.MappedTest, AssertsCompiledSQL):
         Singular = self.classes.Singular
 
         self._equivalent(
-            self.session.query(User).filter(User.singular_value != None),
+            self.session.query(User).filter(User.singular_value is not None),
             self.session.query(User).filter(
-                        User.singular.has(Singular.value != None),
+                        User.singular.has(Singular.value is not None),
                 )
         )
 
