@@ -12,7 +12,7 @@ class GisElement(object):
         return self.desc
 
     def __repr__(self):
-        return "<%s at 0x%x; %r>" % (self.__class__.__name__,
+        return "<{0!s} at 0x{1:x}; {2!r}>".format(self.__class__.__name__,
                                     id(self), self.desc)
 
 class BinaryGisElement(GisElement, expression.Function):

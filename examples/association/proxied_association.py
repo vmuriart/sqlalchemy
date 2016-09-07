@@ -41,7 +41,7 @@ class Item(Base):
         self.price = price
 
     def __repr__(self):
-        return 'Item(%r, %r)' % (
+        return 'Item({0!r}, {1!r})'.format(
                     self.description, self.price
                 )
 

@@ -101,7 +101,7 @@ class ReflectionTest(fixtures.TestBase, ComparesTables):
 
         inspector = inspect(testing.db)
         bar_via_db = inspector.get_foreign_keys(
-                            "bar", schema="%s.%s" % (dbname, owner))
+                            "bar", schema="{0!s}.{1!s}".format(dbname, owner))
         eq_(
             bar_via_db,
             [{
@@ -243,15 +243,15 @@ class ReflectHugeViewTest(fixtures.TestBase):
         self.metadata = MetaData(testing.db)
         t = Table('base_table', self.metadata,
                 *[
-                    Column("long_named_column_number_%d" % i, Integer)
+                    Column("long_named_column_number_{0:d}".format(i), Integer)
                     for i in range(self.col_num)
                 ]
         )
         self.view_str = view_str = \
-            "CREATE VIEW huge_named_view AS SELECT %s FROM base_table" % (
-            ",".join("long_named_column_number_%d" % i
+            "CREATE VIEW huge_named_view AS SELECT {0!s} FROM base_table".format((
+            ",".join("long_named_column_number_{0:d}".format(i)
                         for i in range(self.col_num))
-            )
+            ))
         assert len(view_str) > 4000
 
         event.listen(t, 'after_create', DDL(view_str) )

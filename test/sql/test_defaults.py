@@ -1278,7 +1278,7 @@ class SpecialTypePKTest(fixtures.TestBase):
             def process_result_value(self, value, dialect):
                 if value is None:
                     return None
-                return "INT_%d" % value
+                return "INT_{0:d}".format(value)
 
         cls.MyInteger = MyInteger
 

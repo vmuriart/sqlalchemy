@@ -68,23 +68,23 @@ def runit(status, factor=1, query_runs=5):
 
     bosses = [
         Boss(
-            name="Boss %d" % i,
+            name="Boss {0:d}".format(i),
             golf_average=Decimal(random.randint(40, 150))
         )
         for i in range(num_bosses)
     ]
 
     sess.add_all(bosses)
-    status("Added %d boss objects" % num_bosses)
+    status("Added {0:d} boss objects".format(num_bosses))
 
     grunts = [
         Grunt(
-            name="Grunt %d" % i,
+            name="Grunt {0:d}".format(i),
             savings=Decimal(random.randint(5000000, 15000000) / 100)
         )
         for i in range(num_grunts)
     ]
-    status("Added %d grunt objects" % num_grunts)
+    status("Added {0:d} grunt objects".format(num_grunts))
 
     while grunts:
         # this doesn't associate grunts with bosses evenly,
@@ -93,7 +93,7 @@ def runit(status, factor=1, query_runs=5):
         batch_size = 100
         batch_num = (num_grunts - len(grunts)) / batch_size
         boss = sess.query(Boss).\
-                    filter_by(name="Boss %d" % batch_num).\
+                    filter_by(name="Boss {0:d}".format(batch_num)).\
                     first()
         for grunt in grunts[0:batch_size]:
             grunt.employer = boss
@@ -105,7 +105,7 @@ def runit(status, factor=1, query_runs=5):
 
     # do some heavier reading
     for i in range(query_runs):
-        status("Heavy query run #%d" % (i + 1))
+        status("Heavy query run #{0:d}".format((i + 1)))
 
         report = []
 
@@ -137,22 +137,20 @@ def run_with_profile(runsnake=False, dump=False):
 
     counts_by_methname = dict((key[2], stats.stats[key][0]) for key in stats.stats)
 
-    print("SQLA Version: %s" % __version__)
-    print("Total calls %d" % stats.total_calls)
-    print("Total cpu seconds: %.2f" % stats.total_tt)
-    print('Total execute calls: %d' \
-        % counts_by_methname["<method 'execute' of 'sqlite3.Cursor' "
-                             "objects>"])
-    print('Total executemany calls: %d' \
-        % counts_by_methname.get("<method 'executemany' of 'sqlite3.Cursor' "
-                             "objects>", 0))
+    print("SQLA Version: {0!s}".format(__version__))
+    print("Total calls {0:d}".format(stats.total_calls))
+    print("Total cpu seconds: {0:.2f}".format(stats.total_tt))
+    print('Total execute calls: {0:d}'.format(counts_by_methname["<method 'execute' of 'sqlite3.Cursor' "
+                             "objects>"]))
+    print('Total executemany calls: {0:d}'.format(counts_by_methname.get("<method 'executemany' of 'sqlite3.Cursor' "
+                             "objects>", 0)))
 
     if dump:
         stats.sort_stats('time', 'calls')
         stats.print_stats()
 
     if runsnake:
-        os.system("runsnake %s" % filename)
+        os.system("runsnake {0!s}".format(filename))
 
 
 def run_with_time():
@@ -160,10 +158,10 @@ def run_with_time():
     now = time.time()
 
     def status(msg):
-        print("%d - %s" % (time.time() - now, msg))
+        print("{0:d} - {1!s}".format(time.time() - now, msg))
 
     runit(status, 10)
-    print("Total time: %d" % (time.time() - now))
+    print("Total time: {0:d}".format((time.time() - now)))
 
 if __name__ == '__main__':
     import argparse

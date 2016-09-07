@@ -480,7 +480,7 @@ class ArgumentTest(fixtures.TestBase):
                     _initialize=False
             )
         )
-        engine = engines.testing_engine("firebird+%s://" % type_,
+        engine = engines.testing_engine("firebird+{0!s}://".format(type_),
                                 options=kw)
         return engine
 

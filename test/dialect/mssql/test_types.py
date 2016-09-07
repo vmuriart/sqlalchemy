@@ -94,7 +94,7 @@ class TypeDDLTest(fixtures.TestBase):
         for index, spec in enumerate(columns):
             type_, args, kw, res = spec
             table_args.append(
-                Column('c%s' % index, type_(*args, **kw), nullable=None))
+                Column('c{0!s}'.format(index), type_(*args, **kw), nullable=None))
 
         boolean_table = Table(*table_args)
         dialect = mssql.dialect()
@@ -104,7 +104,7 @@ class TypeDDLTest(fixtures.TestBase):
             index = int(col.name[1:])
             testing.eq_(
                 gen.get_column_specification(col),
-                "%s %s" % (col.name, columns[index][3]))
+                "{0!s} {1!s}".format(col.name, columns[index][3]))
             self.assert_(repr(col))
 
     def test_numeric(self):
@@ -143,7 +143,7 @@ class TypeDDLTest(fixtures.TestBase):
         for index, spec in enumerate(columns):
             type_, args, kw, res = spec
             table_args.append(
-                Column('c%s' % index, type_(*args, **kw), nullable=None))
+                Column('c{0!s}'.format(index), type_(*args, **kw), nullable=None))
 
         numeric_table = Table(*table_args)
         dialect = mssql.dialect()
@@ -153,7 +153,7 @@ class TypeDDLTest(fixtures.TestBase):
             index = int(col.name[1:])
             testing.eq_(
                 gen.get_column_specification(col),
-                "%s %s" % (col.name, columns[index][3]))
+                "{0!s} {1!s}".format(col.name, columns[index][3]))
             self.assert_(repr(col))
 
     def test_char(self):
@@ -204,7 +204,7 @@ class TypeDDLTest(fixtures.TestBase):
         for index, spec in enumerate(columns):
             type_, args, kw, res = spec
             table_args.append(
-                Column('c%s' % index, type_(*args, **kw), nullable=None))
+                Column('c{0!s}'.format(index), type_(*args, **kw), nullable=None))
 
         charset_table = Table(*table_args)
         dialect = mssql.dialect()
@@ -214,7 +214,7 @@ class TypeDDLTest(fixtures.TestBase):
             index = int(col.name[1:])
             testing.eq_(
                 gen.get_column_specification(col),
-                "%s %s" % (col.name, columns[index][3]))
+                "{0!s} {1!s}".format(col.name, columns[index][3]))
             self.assert_(repr(col))
 
     def test_dates(self):
@@ -277,7 +277,7 @@ class TypeDDLTest(fixtures.TestBase):
         for index, spec in enumerate(columns):
             type_, args, kw, res, server_version = spec
             table_args.append(
-                Column('c%s' % index, type_(*args, **kw), nullable=None))
+                Column('c{0!s}'.format(index), type_(*args, **kw), nullable=None))
 
         date_table = Table(*table_args)
         dialect = mssql.dialect()
@@ -294,11 +294,11 @@ class TypeDDLTest(fixtures.TestBase):
             if not server_version:
                 testing.eq_(
                     gen.get_column_specification(col),
-                    "%s %s" % (col.name, columns[index][3]))
+                    "{0!s} {1!s}".format(col.name, columns[index][3]))
             else:
                 testing.eq_(
                     gen2005.get_column_specification(col),
-                    "%s %s" % (col.name, columns[index][3]))
+                    "{0!s} {1!s}".format(col.name, columns[index][3]))
 
             self.assert_(repr(col))
 
@@ -352,7 +352,7 @@ class TypeDDLTest(fixtures.TestBase):
             Column('id', Integer, primary_key=True),
             Column('t', spec, nullable=None))
         gen = dialect.ddl_compiler(dialect, schema.CreateTable(t))
-        testing.eq_(gen.get_column_specification(t.c.t), "t %s" % expected)
+        testing.eq_(gen.get_column_specification(t.c.t), "t {0!s}".format(expected))
         self.assert_(repr(t.c.t))
 
     def test_money(self):
@@ -364,7 +364,7 @@ class TypeDDLTest(fixtures.TestBase):
         table_args = ['test_mssql_money', metadata]
         for index, spec in enumerate(columns):
             type_, args, kw, res = spec
-            table_args.append(Column('c%s' % index, type_(*args, **kw),
+            table_args.append(Column('c{0!s}'.format(index), type_(*args, **kw),
                               nullable=None))
         money_table = Table(*table_args)
         dialect = mssql.dialect()
@@ -372,8 +372,7 @@ class TypeDDLTest(fixtures.TestBase):
                                    schema.CreateTable(money_table))
         for col in money_table.c:
             index = int(col.name[1:])
-            testing.eq_(gen.get_column_specification(col), '%s %s'
-                        % (col.name, columns[index][3]))
+            testing.eq_(gen.get_column_specification(col), '{0!s} {1!s}'.format(col.name, columns[index][3]))
             self.assert_(repr(col))
 
     def test_binary(self):
@@ -415,7 +414,7 @@ class TypeDDLTest(fixtures.TestBase):
         table_args = ['test_mssql_binary', metadata]
         for index, spec in enumerate(columns):
             type_, args, kw, res = spec
-            table_args.append(Column('c%s' % index, type_(*args, **kw),
+            table_args.append(Column('c{0!s}'.format(index), type_(*args, **kw),
                               nullable=None))
         binary_table = Table(*table_args)
         dialect = mssql.dialect()
@@ -423,8 +422,7 @@ class TypeDDLTest(fixtures.TestBase):
                                    schema.CreateTable(binary_table))
         for col in binary_table.c:
             index = int(col.name[1:])
-            testing.eq_(gen.get_column_specification(col), '%s %s'
-                        % (col.name, columns[index][3]))
+            testing.eq_(gen.get_column_specification(col), '{0!s} {1!s}'.format(col.name, columns[index][3]))
             self.assert_(repr(col))
 
 metadata = None
@@ -508,7 +506,7 @@ class TypeRoundTripTest(
             numeric_table.insert().execute(numericcol=value)
 
         for value in select([numeric_table.c.numericcol]).execute():
-            assert value[0] in test_items, "%r not in test_items" % value[0]
+            assert value[0] in test_items, "{0!r} not in test_items".format(value[0])
 
     def test_float(self):
         float_table = Table(
@@ -607,7 +605,7 @@ class TypeRoundTripTest(
             type_, args, kw, res, requires = spec[0:5]
             if requires and \
                     testing._is_excluded('mssql', *requires) or not requires:
-                c = Column('c%s' % index, type_(*args, **kw), nullable=None)
+                c = Column('c{0!s}'.format(index), type_(*args, **kw), nullable=None)
                 testing.db.dialect.type_descriptor(c.type)
                 table_args.append(c)
         dates_table = Table(*table_args)
@@ -616,8 +614,7 @@ class TypeRoundTripTest(
             schema.CreateTable(dates_table))
         for col in dates_table.c:
             index = int(col.name[1:])
-            testing.eq_(gen.get_column_specification(col), '%s %s'
-                        % (col.name, columns[index][3]))
+            testing.eq_(gen.get_column_specification(col), '{0!s} {1!s}'.format(col.name, columns[index][3]))
             self.assert_(repr(col))
         dates_table.create(checkfirst=True)
         reflected_dates = Table('test_mssql_dates',
@@ -696,7 +693,7 @@ class TypeRoundTripTest(
         table_args = ['test_mssql_binary', metadata]
         for index, spec in enumerate(columns):
             type_, args, kw, res = spec
-            table_args.append(Column('c%s' % index, type_(*args, **kw),
+            table_args.append(Column('c{0!s}'.format(index), type_(*args, **kw),
                               nullable=None))
         binary_table = Table(*table_args)
         metadata.create_all()
@@ -705,15 +702,14 @@ class TypeRoundTripTest(
         for col, spec in zip(reflected_binary.c, columns):
             eq_(
                 str(col.type), spec[3],
-                "column %s %s != %s" % (col.key, str(col.type), spec[3])
+                "column {0!s} {1!s} != {2!s}".format(col.key, str(col.type), spec[3])
             )
             c1 = testing.db.dialect.type_descriptor(col.type).__class__
             c2 = \
                 testing.db.dialect.type_descriptor(
                     binary_table.c[col.name].type).__class__
             assert issubclass(c1, c2), \
-                'column %s: %r is not a subclass of %r' \
-                % (col.key, c1, c2)
+                'column {0!s}: {1!r} is not a subclass of {2!r}'.format(col.key, c1, c2)
             if binary_table.c[col.name].type.length:
                 testing.eq_(col.type.length,
                             binary_table.c[col.name].type.length)

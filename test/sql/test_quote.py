@@ -70,12 +70,12 @@ class QuoteExecTest(fixtures.TestBase):
             testing.db.execute("CREATE TABLE TAB1 (id INTEGER)")
         else:
             testing.db.execute("CREATE TABLE tab1 (id INTEGER)")
-        testing.db.execute('CREATE TABLE %s (id INTEGER)' %
-                           preparer.quote_identifier("tab2"))
-        testing.db.execute('CREATE TABLE %s (id INTEGER)' %
-                           preparer.quote_identifier("TAB3"))
-        testing.db.execute('CREATE TABLE %s (id INTEGER)' %
-                           preparer.quote_identifier("TAB4"))
+        testing.db.execute('CREATE TABLE {0!s} (id INTEGER)'.format(
+                           preparer.quote_identifier("tab2")))
+        testing.db.execute('CREATE TABLE {0!s} (id INTEGER)'.format(
+                           preparer.quote_identifier("TAB3")))
+        testing.db.execute('CREATE TABLE {0!s} (id INTEGER)'.format(
+                           preparer.quote_identifier("TAB4")))
 
         t1 = Table('tab1', self.metadata,
                    Column('id', Integer, primary_key=True),
@@ -686,8 +686,8 @@ class PreparerTest(fixtures.TestBase):
 
         def a_eq(have, want):
             if have != want:
-                print("Wanted %s" % want)
-                print("Received %s" % have)
+                print("Wanted {0!s}".format(want))
+                print("Received {0!s}".format(have))
             self.assert_(have == want)
 
         a_eq(unformat('foo'), ['foo'])
@@ -718,8 +718,8 @@ class PreparerTest(fixtures.TestBase):
 
         def a_eq(have, want):
             if have != want:
-                print("Wanted %s" % want)
-                print("Received %s" % have)
+                print("Wanted {0!s}".format(want))
+                print("Received {0!s}".format(have))
             self.assert_(have == want)
 
         a_eq(unformat('foo'), ['foo'])

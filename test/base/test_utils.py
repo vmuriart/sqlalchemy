@@ -649,7 +649,7 @@ class LRUTest(fixtures.TestBase):
                 self.id = id
 
             def __str__(self):
-                return "item id %d" % self.id
+                return "item id {0:d}".format(self.id)
 
         l = util.LRUCache(10, threshold=.2)
 

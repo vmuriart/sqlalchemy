@@ -696,7 +696,7 @@ class MiscTest(fixtures.ORMTest):
 
             session = create_session()
             session.add(b)
-            assert a in session, "base is %s" % base
+            assert a in session, "base is {0!s}".format(base)
 
     def test_compileonattr_rel_backref_b(self):
         m = MetaData()
@@ -728,6 +728,6 @@ class MiscTest(fixtures.ORMTest):
 
             session = create_session()
             session.add(a)
-            assert b in session, 'base: %s' % base
+            assert b in session, 'base: {0!s}'.format(base)
 
 

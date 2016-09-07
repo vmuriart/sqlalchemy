@@ -201,6 +201,6 @@ for path, compareto in (
         ('/somefile/header/field2', 'there'),
         ('/somefile/header/field2[@attr=foo]', 'there')
     ):
-    print("\nDocuments containing '%s=%s':" % (path, compareto), line)
+    print("\nDocuments containing '{0!s}={1!s}':".format(path, compareto), line)
     print([d.filename for d in find_document(path, compareto)])
 

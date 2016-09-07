@@ -1343,8 +1343,7 @@ class DeclarativeMixinPropertyTest(DeclarativeTestBase):
                 @declared_attr
                 def target(cls):
                     return relationship('Target',
-                                        primaryjoin='Target.id==%s.target_id'
-                                        % cls.__name__)
+                                        primaryjoin='Target.id=={0!s}.target_id'.format(cls.__name__))
             else:
 
                 @declared_attr

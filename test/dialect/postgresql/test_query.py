@@ -845,7 +845,7 @@ class TupleTest(fixtures.TestBase):
                         ).
                         in_([
                             tuple_(*[
-                                literal_column("'%s'" % letter)
+                                literal_column("'{0!s}'".format(letter))
                                 for letter in elem
                             ]) for elem in test
                         ])

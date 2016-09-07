@@ -30,21 +30,21 @@ class AssociationTest(fixtures.MappedTest):
             def __init__(self, name):
                 self.name = name
             def __repr__(self):
-                return "Item id=%d name=%s keywordassoc=%r" % (
+                return "Item id={0:d} name={1!s} keywordassoc={2!r}".format(
                     self.item_id, self.name, self.keywords)
 
         class Keyword(cls.Basic):
             def __init__(self, name):
                 self.name = name
             def __repr__(self):
-                return "Keyword id=%d name=%s" % (self.keyword_id, self.name)
+                return "Keyword id={0:d} name={1!s}".format(self.keyword_id, self.name)
 
         class KeywordAssociation(cls.Basic):
             def __init__(self, keyword, data):
                 self.keyword = keyword
                 self.data = data
             def __repr__(self):
-                return "KeywordAssociation itemid=%d keyword=%r data=%s" % (
+                return "KeywordAssociation itemid={0:d} keyword={1!r} data={2!s}".format(
                     self.item_id, self.keyword, self.data)
 
     @classmethod

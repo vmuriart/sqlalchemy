@@ -46,8 +46,8 @@ class BundleTest(fixtures.MappedTest, AssertsCompiledSQL):
     def insert_data(cls):
         sess = Session()
         sess.add_all([
-            cls.classes.Data(d1='d%dd1' % i, d2='d%dd2' % i, d3='d%dd3' % i,
-                    others=[cls.classes.Other(o1="d%do%d" % (i, j)) for j in range(5)])
+            cls.classes.Data(d1='d{0:d}d1'.format(i), d2='d{0:d}d2'.format(i), d3='d{0:d}d3'.format(i),
+                    others=[cls.classes.Other(o1="d{0:d}o{1:d}".format(i, j)) for j in range(5)])
             for i in range(10)
         ])
         sess.commit()

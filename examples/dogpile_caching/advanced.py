@@ -27,7 +27,7 @@ def load_name_range(start, end, invalidate=False):
     of data within the cache.
     """
     q = Session.query(Person).\
-            filter(Person.name.between("person %.2d" % start, "person %.2d" % end)).\
+            filter(Person.name.between("person {0:.2d}".format(start), "person {0:.2d}".format(end))).\
             options(cache_address_bits).\
             options(FromCache("default", "name_range"))
 

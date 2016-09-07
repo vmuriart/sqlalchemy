@@ -152,7 +152,7 @@ class TypesTest(fixtures.TestBase, AssertsExecutionResults, AssertsCompiledSQL):
             )
             # test that repr() copies out all arguments
             self.assert_compile(
-                eval("mysql.%r" % type_inst),
+                eval("mysql.{0!r}".format(type_inst)),
                 res
             )
 
@@ -256,9 +256,9 @@ class TypesTest(fixtures.TestBase, AssertsExecutionResults, AssertsCompiledSQL):
             )
             # test that repr() copies out all arguments
             self.assert_compile(
-                eval("mysql.%r" % type_inst)
+                eval("mysql.{0!r}".format(type_inst))
                     if type_ is not String
-                    else eval("%r" % type_inst),
+                    else eval("{0!r}".format(type_inst)),
                 res
             )
 
@@ -322,9 +322,9 @@ class TypesTest(fixtures.TestBase, AssertsExecutionResults, AssertsCompiledSQL):
                 try:
                     self.assert_(list(row) == expected)
                 except:
-                    print("Storing %s" % store)
-                    print("Expected %s" % expected)
-                    print("Found %s" % list(row))
+                    print("Storing {0!s}".format(store))
+                    print("Expected {0!s}".format(expected))
+                    print("Found {0!s}".format(list(row)))
                     raise
                 table.delete().execute().close()
 
@@ -481,7 +481,7 @@ class TypesTest(fixtures.TestBase, AssertsExecutionResults, AssertsCompiledSQL):
             Table('t', MetaData(), c)
             self.assert_compile(
                 schema.CreateColumn(c),
-                "t %s" % expected
+                "t {0!s}".format(expected)
 
             )
 

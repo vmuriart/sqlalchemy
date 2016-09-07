@@ -1223,7 +1223,7 @@ class StrongIdentityMapTest(_fixtures.FixtureTest):
 
         mapper(User, users)
 
-        for o in [User(name='u%s' % x) for x in range(10)]:
+        for o in [User(name='u{0!s}'.format(x)) for x in range(10)]:
             s.add(o)
         # o is still live after this loop...
 
@@ -1729,6 +1729,6 @@ class FlushWarningsTest(fixtures.MappedTest):
         s.add(u1)
         assert_raises_message(
             sa.exc.SAWarning,
-            "Usage of the '%s'" % method,
+            "Usage of the '{0!s}'".format(method),
             s.commit
         )

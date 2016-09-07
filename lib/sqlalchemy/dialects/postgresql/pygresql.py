@@ -44,7 +44,7 @@ class _PGNumeric(Numeric):
                 return None
             else:
                 raise exc.InvalidRequestError(
-                    "Unknown PG numeric type: %d" % coltype)
+                    "Unknown PG numeric type: {0:d}".format(coltype))
         else:
             if coltype in _FLOAT_TYPES:
                 # PyGreSQL returns float natively for 701 (float8)
@@ -53,7 +53,7 @@ class _PGNumeric(Numeric):
                 return processors.to_float
             else:
                 raise exc.InvalidRequestError(
-                    "Unknown PG numeric type: %d" % coltype)
+                    "Unknown PG numeric type: {0:d}".format(coltype))
 
 
 class _PGHStore(HSTORE):
@@ -217,7 +217,7 @@ class PGDialect_pygresql(PGDialect):
     def create_connect_args(self, url):
         opts = url.translate_connect_args(username='user')
         if 'port' in opts:
-            opts['host'] = '%s:%s' % (
+            opts['host'] = '{0!s}:{1!s}'.format(
                 opts.get('host', '').rsplit(':', 1)[0], opts.pop('port'))
         opts.update(url.query)
         return [], opts

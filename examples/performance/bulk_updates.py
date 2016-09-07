@@ -34,8 +34,8 @@ def setup_database(dburl, echo, num):
     for chunk in range(0, num, 10000):
         s.bulk_insert_mappings(Customer, [
             {
-                'name': 'customer name %d' % i,
-                'description': 'customer description %d' % i
+                'name': 'customer name {0:d}'.format(i),
+                'description': 'customer description {0:d}'.format(i)
             } for i in range(chunk, chunk + 10000)
         ])
     s.commit()

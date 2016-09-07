@@ -284,7 +284,7 @@ def bind_values(clause):
 def _quote_ddl_expr(element):
     if isinstance(element, util.string_types):
         element = element.replace("'", "''")
-        return "'%s'" % element
+        return "'{0!s}'".format(element)
     else:
         return repr(element)
 
@@ -303,8 +303,7 @@ class _repr_base(object):
             segment_length = self.max_chars // 2
             rep = (
                 rep[0:segment_length] +
-                (" ... (%d characters truncated) ... "
-                 % (lenrep - self.max_chars)) +
+                (" ... ({0:d} characters truncated) ... ".format((lenrep - self.max_chars))) +
                 rep[-segment_length:]
             )
         return rep
@@ -321,7 +320,7 @@ class _repr_row(_repr_base):
 
     def __repr__(self):
         trunc = self.trunc
-        return "(%s%s)" % (
+        return "({0!s}{1!s})".format(
             ", ".join(trunc(value) for value in self.row),
             "," if len(self.row) == 1 else ""
         )
@@ -379,7 +378,7 @@ class _repr_params(_repr_base):
                 elem_type = self._DICT
             else:
                 assert False, \
-                    "Unknown parameter type %s" % (type(multi_params[0]))
+                    "Unknown parameter type {0!s}".format((type(multi_params[0])))
 
             elements = ", ".join(
                 self._repr_params(params, elem_type)
@@ -388,29 +387,29 @@ class _repr_params(_repr_base):
             elements = ""
 
         if typ == self._LIST:
-            return "[%s]" % elements
+            return "[{0!s}]".format(elements)
         else:
-            return "(%s)" % elements
+            return "({0!s})".format(elements)
 
     def _repr_params(self, params, typ):
         trunc = self.trunc
         if typ is self._DICT:
-            return "{%s}" % (
+            return "{{{0!s}}}".format((
                 ", ".join(
-                    "%r: %s" % (key, trunc(value))
+                    "{0!r}: {1!s}".format(key, trunc(value))
                     for key, value in params.items()
                 )
-            )
+            ))
         elif typ is self._TUPLE:
-            return "(%s%s)" % (
+            return "({0!s}{1!s})".format(
                 ", ".join(trunc(value) for value in params),
                 "," if len(params) == 1 else ""
 
             )
         else:
-            return "[%s]" % (
+            return "[{0!s}]".format((
                 ", ".join(trunc(value) for value in params)
-            )
+            ))
 
 
 def adapt_criterion_to_null(crit, nulls):

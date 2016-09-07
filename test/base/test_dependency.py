@@ -300,7 +300,7 @@ class DependencySortTest(fixtures.TestBase):
               ('node4', 'node17'), ('node2', 'node20'), ('node19', 'node10'),
               ('node8', 'node4'), ('node11', 'node3'), ('node6', 'node1')
         ]
-        allnodes = ['node%d' % i for i in range(1, 21)]
+        allnodes = ['node{0:d}'.format(i) for i in range(1, 21)]
         eq_(
             topological.find_cycles(tuples, allnodes),
             set(['node11', 'node10', 'node13', 'node15', 'node14', 'node17',

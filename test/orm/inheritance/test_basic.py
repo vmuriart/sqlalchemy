@@ -40,18 +40,18 @@ class O2MTest(fixtures.MappedTest):
             def __init__(self, data=None):
                 self.data = data
             def __repr__(self):
-                return "Foo id %d, data %s" % (self.id, self.data)
+                return "Foo id {0:d}, data {1!s}".format(self.id, self.data)
         mapper(Foo, foo)
 
         class Bar(Foo):
             def __repr__(self):
-                return "Bar id %d, data %s" % (self.id, self.data)
+                return "Bar id {0:d}, data {1!s}".format(self.id, self.data)
 
         mapper(Bar, bar, inherits=Foo)
 
         class Blub(Bar):
             def __repr__(self):
-                return "Blub id %d, data %s" % (self.id, self.data)
+                return "Blub id {0:d}, data {1!s}".format(self.id, self.data)
 
         mapper(Blub, blub, inherits=Bar, properties={
             'parent_foo':relationship(Foo)
@@ -405,7 +405,7 @@ class PolymorphicOnNotLocalTest(fixtures.MappedTest):
                 elif ident == 'child':
                     instance.x = child_ident
                 else:
-                    assert False, "Got unexpected identity %r" % ident
+                    assert False, "Got unexpected identity {0!r}".format(ident)
 
         s = Session(testing.db)
         s.add_all([

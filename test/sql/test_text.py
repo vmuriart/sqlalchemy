@@ -550,15 +550,15 @@ class OrderByLabelResolutionTest(fixtures.TestBase, AssertsCompiledSQL):
 
     def _test_warning(self, stmt, offending_clause, expected):
         with expect_warnings(
-                "Can't resolve label reference %r;" % offending_clause):
+                "Can't resolve label reference {0!r};".format(offending_clause)):
             self.assert_compile(
                 stmt,
                 expected
             )
         assert_raises_message(
             exc.SAWarning,
-            "Can't resolve label reference %r; converting to text" %
-            offending_clause,
+            "Can't resolve label reference {0!r}; converting to text".format(
+            offending_clause),
             stmt.compile
         )
 

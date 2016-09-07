@@ -2396,7 +2396,7 @@ class DateTimeTZRangeTests(_RangeTypeMixin, fixtures.TablesTest):
 
     @property
     def _data_str(self):
-        return '[%s,%s)' % self.tstzs()
+        return '[{0!s},{1!s})'.format(*self.tstzs())
 
     def _data_obj(self):
         return self.extras().DateTimeTZRange(*self.tstzs())

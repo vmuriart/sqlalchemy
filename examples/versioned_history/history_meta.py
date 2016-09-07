@@ -128,7 +128,7 @@ def _history_mapper(local_mapper):
 
     else:
         bases = local_mapper.base_mapper.class_.__bases__
-    versioned_cls = type.__new__(type, "%sHistory" % cls.__name__, bases, {})
+    versioned_cls = type.__new__(type, "{0!s}History".format(cls.__name__), bases, {})
 
     m = mapper(
         versioned_cls,

@@ -71,7 +71,7 @@ class TestTypes(fixtures.TestBase, AssertsExecutionResults):
         ]:
             assert_raises_message(
                 ValueError,
-                "Couldn't parse %s string." % disp,
+                "Couldn't parse {0!s} string.".format(disp),
                 lambda: testing.db.execute(
                     text("select 'ASDF' as value", typemap={"value": typ})
                 ).scalar()
@@ -328,7 +328,7 @@ class DefaultsTest(fixtures.TestBase, AssertsCompiledSQL):
 
         specs = [(String(3), '"foo"'), (sqltypes.NUMERIC(10, 2), '100.50'),
                  (Integer, '5'), (Boolean, 'False')]
-        columns = [Column('c%i' % (i + 1), t[0],
+        columns = [Column('c{0:d}'.format((i + 1)), t[0],
                    server_default=text(t[1])) for (i, t) in
                    enumerate(specs)]
         db = testing.db
@@ -1184,7 +1184,7 @@ class ConstraintReflectionTest(fixtures.TestBase):
                 "m", "main.l", "k", "j", "i", "h", "g", "f", "e", "e1",
                     "d", "d1", "d2", "c", "b", "a1", "a2"]:
                 try:
-                    conn.execute("drop table %s" % name)
+                    conn.execute("drop table {0!s}".format(name))
                 except:
                     pass
 
@@ -1652,7 +1652,7 @@ class TypeReflectionTest(fixtures.TestBase):
         conn = testing.db.connect()
         for from_, to_ in self._fixture_as_string(fixture):
             inspector = inspect(conn)
-            conn.execute("CREATE TABLE foo (data %s)" % from_)
+            conn.execute("CREATE TABLE foo (data {0!s})".format(from_))
             try:
                 if warnings:
                     def go():

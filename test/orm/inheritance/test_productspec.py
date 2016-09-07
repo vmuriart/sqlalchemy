@@ -46,7 +46,7 @@ class InheritTest(fixtures.MappedTest):
                 self.name = name
                 self.mark = mark
             def __repr__(self):
-                return '<%s %s>' % (self.__class__.__name__, self.name)
+                return '<{0!s} {1!s}>'.format(self.__class__.__name__, self.name)
 
         class Detail(Product):
             def __init__(self, name):
@@ -63,7 +63,7 @@ class InheritTest(fixtures.MappedTest):
                 self.quantity = quantity
 
             def __repr__(self):
-                return '<%s %.01f %s>' % (
+                return '<{0!s} {1:.01f} {2!s}>'.format(
                     self.__class__.__name__,
                     self.quantity or 0.,
                     repr(self.slave)
@@ -74,7 +74,7 @@ class InheritTest(fixtures.MappedTest):
                 self.name = name
                 self.data = data
             def __repr__(self):
-                return '<%s %s>' % (self.__class__.__name__, self.name)
+                return '<{0!s} {1!s}>'.format(self.__class__.__name__, self.name)
 
         class RasterDocument(Document):
             pass

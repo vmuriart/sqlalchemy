@@ -23,7 +23,7 @@ class CompileTest(fixtures.TestBase, AssertsCompiledSQL):
         for field, subst in list(mapping.items()):
             self.assert_compile(
                 select([extract(field, t.c.col1)]),
-                'SELECT DATEPART("%s", t.col1) AS anon_1 FROM t' % subst)
+                'SELECT DATEPART("{0!s}", t.col1) AS anon_1 FROM t'.format(subst))
 
     def test_offset_not_supported(self):
         stmt = select([1]).offset(10)

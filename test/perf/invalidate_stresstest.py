@@ -42,7 +42,7 @@ def main():
 
     while True:
         result = list(engine.execute("show processlist"))
-        engine.execute("kill %d" % result[-2][0])
+        engine.execute("kill {0:d}".format(result[-2][0]))
         print "\n\n\n BOOM!!!!! \n\n\n"
         gevent.sleep(5)
         print(engine.pool.status())

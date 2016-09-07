@@ -940,15 +940,15 @@ class MultiSchemaTest(fixtures.TestBase, AssertsCompiledSQL):
         # we connect as the other user.
 
         for stmt in ("""
-create table %(test_schema)s.parent(
+create table {test_schema!s}.parent(
     id integer primary key,
     data varchar2(50)
 );
 
-create table %(test_schema)s.child(
+create table {test_schema!s}.child(
     id integer primary key,
     data varchar2(50),
-    parent_id integer references %(test_schema)s.parent(id)
+    parent_id integer references {test_schema!s}.parent(id)
 );
 
 create table local_table(
@@ -956,35 +956,35 @@ create table local_table(
     data varchar2(50)
 );
 
-create synonym %(test_schema)s.ptable for %(test_schema)s.parent;
-create synonym %(test_schema)s.ctable for %(test_schema)s.child;
+create synonym {test_schema!s}.ptable for {test_schema!s}.parent;
+create synonym {test_schema!s}.ctable for {test_schema!s}.child;
 
-create synonym %(test_schema)s_pt for %(test_schema)s.parent;
+create synonym {test_schema!s}_pt for {test_schema!s}.parent;
 
-create synonym %(test_schema)s.local_table for local_table;
+create synonym {test_schema!s}.local_table for local_table;
 
 -- can't make a ref from local schema to the
 -- remote schema's table without this,
 -- *and* cant give yourself a grant !
 -- so we give it to public.  ideas welcome.
-grant references on %(test_schema)s.parent to public;
-grant references on %(test_schema)s.child to public;
-""" % {"test_schema": testing.config.test_schema}).split(";"):
+grant references on {test_schema!s}.parent to public;
+grant references on {test_schema!s}.child to public;
+""".format(**{"test_schema": testing.config.test_schema})).split(";"):
             if stmt.strip():
                 testing.db.execute(stmt)
 
     @classmethod
     def teardown_class(cls):
         for stmt in ("""
-drop table %(test_schema)s.child;
-drop table %(test_schema)s.parent;
+drop table {test_schema!s}.child;
+drop table {test_schema!s}.parent;
 drop table local_table;
-drop synonym %(test_schema)s.ctable;
-drop synonym %(test_schema)s.ptable;
-drop synonym %(test_schema)s_pt;
-drop synonym %(test_schema)s.local_table;
+drop synonym {test_schema!s}.ctable;
+drop synonym {test_schema!s}.ptable;
+drop synonym {test_schema!s}_pt;
+drop synonym {test_schema!s}.local_table;
 
-""" % {"test_schema": testing.config.test_schema}).split(";"):
+""".format(**{"test_schema": testing.config.test_schema})).split(";"):
             if stmt.strip():
                 testing.db.execute(stmt)
 
@@ -998,7 +998,7 @@ drop synonym %(test_schema)s.local_table;
         )
         child = Table('child', meta,
             Column('cid', Integer, primary_key=True),
-            Column('pid', Integer, ForeignKey('%s.parent.pid' % schema)),
+            Column('pid', Integer, ForeignKey('{0!s}.parent.pid'.format(schema))),
             schema=schema
         )
         meta.create_all()
@@ -1008,7 +1008,7 @@ drop synonym %(test_schema)s.local_table;
 
     def test_reflect_alt_table_owner_local_synonym(self):
         meta = MetaData(testing.db)
-        parent = Table('%s_pt' % testing.config.test_schema, meta, autoload=True,
+        parent = Table('{0!s}_pt'.format(testing.config.test_schema), meta, autoload=True,
                             oracle_resolve_synonyms=True)
         self.assert_compile(parent.select(),
                 "SELECT %(test_schema)s_pt.id, "
@@ -1073,7 +1073,7 @@ drop synonym %(test_schema)s.local_table;
         try:
             meta = MetaData(testing.db)
             lcl = Table('localtable', meta, autoload=True)
-            parent = meta.tables['%s.parent' % testing.config.test_schema]
+            parent = meta.tables['{0!s}.parent'.format(testing.config.test_schema)]
             self.assert_compile(parent.join(lcl),
                                 '%(test_schema)s.parent JOIN localtable ON '
                                 '%(test_schema)s.parent.id = '
@@ -1110,7 +1110,7 @@ drop synonym %(test_schema)s.local_table;
             meta = MetaData(testing.db)
             lcl = Table('localtable', meta, autoload=True,
                         oracle_resolve_synonyms=True)
-            parent = meta.tables['%s.ptable' % testing.config.test_schema]
+            parent = meta.tables['{0!s}.ptable'.format(testing.config.test_schema)]
             self.assert_compile(
                 parent.join(lcl),
                 '%(test_schema)s.ptable JOIN localtable ON '
@@ -1286,7 +1286,7 @@ class DialectTypesTest(fixtures.TestBase, AssertsCompiledSQL):
             (oracle.RAW(50), cx_oracle._OracleRaw),
         ]:
             assert isinstance(start.dialect_impl(dialect), test), \
-                    "wanted %r got %r" % (test, start.dialect_impl(dialect))
+                    "wanted {0!r} got {1!r}".format(test, start.dialect_impl(dialect))
 
     def test_raw_compile(self):
         self.assert_compile(oracle.RAW(), "RAW")
@@ -1471,8 +1471,7 @@ class TypesTest(fixtures.TestBase):
                 (15.76, float),
             )):
                 eq_(row[i], val)
-                assert isinstance(row[i], type_), '%r is not %r' \
-                    % (row[i], type_)
+                assert isinstance(row[i], type_), '{0!r} is not {1!r}'.format(row[i], type_)
 
     def test_numeric_no_decimal_mode(self):
         engine = testing_engine(options=dict(coerce_to_decimal=False))

@@ -83,7 +83,7 @@ class MetaDataTest(fixtures.TestBase, ComparesTables):
         msgs = []
 
         def write(c, t):
-            msgs.append("attach %s.%s" % (t.name, c.name))
+            msgs.append("attach {0!s}.{1!s}".format(t.name, c.name))
         c1 = Column('foo', String())
         m = MetaData()
         for i in range(3):
@@ -92,7 +92,7 @@ class MetaDataTest(fixtures.TestBase, ComparesTables):
             # that listeners will be re-established from the
             # natural construction of things.
             cx._on_table_attach(write)
-            Table('foo%d' % i, m, cx)
+            Table('foo{0:d}'.format(i), m, cx)
         eq_(msgs, ['attach foo0.foo', 'attach foo1.foo', 'attach foo2.foo'])
 
     def test_schema_collection_add(self):
@@ -456,15 +456,15 @@ class MetaDataTest(fixtures.TestBase, ComparesTables):
             if quote_schema is not None:
                 kw['quote_schema'] = quote_schema
             t = Table(name, metadata, **kw)
-            eq_(t.schema, exp_schema, "test %d, table schema" % i)
+            eq_(t.schema, exp_schema, "test {0:d}, table schema".format(i))
             eq_(t.schema.quote if t.schema is not None else None,
                 exp_quote_schema,
-                "test %d, table quote_schema" % i)
+                "test {0:d}, table quote_schema".format(i))
             seq = Sequence(name, metadata=metadata, **kw)
-            eq_(seq.schema, exp_schema, "test %d, seq schema" % i)
+            eq_(seq.schema, exp_schema, "test {0:d}, seq schema".format(i))
             eq_(seq.schema.quote if seq.schema is not None else None,
                 exp_quote_schema,
-                "test %d, seq quote_schema" % i)
+                "test {0:d}, seq quote_schema".format(i))
 
     def test_manual_dependencies(self):
         meta = MetaData()
@@ -3134,7 +3134,7 @@ class ColumnDefinitionTest(AssertsCompiledSQL, fixtures.TestBase):
             if "special" not in column.info:
                 return compiler.visit_create_column(element, **kw)
 
-            text = "%s SPECIAL DIRECTIVE %s" % (
+            text = "{0!s} SPECIAL DIRECTIVE {1!s}".format(
                 column.name,
                 compiler.type_compiler.process(column.type)
             )
@@ -3351,11 +3351,11 @@ class CatchAllEventsTest(fixtures.RemovesEvents, fixtures.TestBase):
         canary = []
 
         def before_attach(obj, parent):
-            canary.append("%s->%s" % (obj.__class__.__name__,
+            canary.append("{0!s}->{1!s}".format(obj.__class__.__name__,
                                       parent.__class__.__name__))
 
         def after_attach(obj, parent):
-            canary.append("%s->%s" % (obj.__class__.__name__, parent))
+            canary.append("{0!s}->{1!s}".format(obj.__class__.__name__, parent))
 
         self.event_listen(
             schema.SchemaItem,
@@ -3393,12 +3393,12 @@ class CatchAllEventsTest(fixtures.RemovesEvents, fixtures.TestBase):
 
         def evt(target):
             def before_attach(obj, parent):
-                canary.append("%s->%s" % (target.__name__,
+                canary.append("{0!s}->{1!s}".format(target.__name__,
                                           parent.__class__.__name__))
 
             def after_attach(obj, parent):
                 assert hasattr(obj, 'name')  # so we can change it
-                canary.append("%s->%s" % (target.__name__, parent))
+                canary.append("{0!s}->{1!s}".format(target.__name__, parent))
             self.event_listen(target, "before_parent_attach", before_attach)
             self.event_listen(target, "after_parent_attach", after_attach)
 
@@ -3480,7 +3480,7 @@ class DialectKWArgTest(fixtures.TestBase):
             elif dialect_name == "nonparticipating":
                 return NonParticipatingDialect
             else:
-                raise exc.NoSuchModuleError("no dialect %r" % dialect_name)
+                raise exc.NoSuchModuleError("no dialect {0!r}".format(dialect_name))
         with mock.patch("sqlalchemy.dialects.registry.load", load):
             yield
 
@@ -3585,7 +3585,7 @@ class DialectKWArgTest(fixtures.TestBase):
     def test_runs_safekwarg(self):
 
         with mock.patch("sqlalchemy.util.safe_kwarg",
-                        lambda arg: "goofy_%s" % arg):
+                        lambda arg: "goofy_{0!s}".format(arg)):
             with self._fixture():
                 idx = Index('a', 'b')
                 idx.kwargs[util.u('participating_x')] = 7
@@ -3987,7 +3987,7 @@ class NamingConventionTest(fixtures.TestBase, AssertsCompiledSQL):
 
     def test_custom(self):
         def key_hash(const, table):
-            return "HASH_%s" % table.name
+            return "HASH_{0!s}".format(table.name)
 
         u1 = self._fixture(naming_convention={
             "fk": "fk_%(table_name)s_%(key_hash)s",

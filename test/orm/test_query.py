@@ -961,8 +961,8 @@ class OperatorTest(QueryTest, AssertsCompiledSQL):
                 # 'a' < 'b' -or- 'b' > 'a'.
                 compiled = str(py_op(lhs, rhs).compile(
                     dialect=default.DefaultDialect()))
-                fwd_sql = "%s %s %s" % (l_sql, fwd_op, r_sql)
-                rev_sql = "%s %s %s" % (r_sql, rev_op, l_sql)
+                fwd_sql = "{0!s} {1!s} {2!s}".format(l_sql, fwd_op, r_sql)
+                rev_sql = "{0!s} {1!s} {2!s}".format(r_sql, rev_op, l_sql)
 
                 self.assert_(compiled == fwd_sql or compiled == rev_sql,
                              "\n'" + compiled + "'\n does not match\n'" +
@@ -1390,7 +1390,7 @@ class OperatorTest(QueryTest, AssertsCompiledSQL):
             # (User.id, "users.id")
         ):
             c = expr.compile(dialect=default.DefaultDialect())
-            assert str(c) == compare, "%s != %s" % (str(c), compare)
+            assert str(c) == compare, "{0!s} != {1!s}".format(str(c), compare)
 
 
 class ExpressionTest(QueryTest, AssertsCompiledSQL):
@@ -1465,7 +1465,7 @@ class ExpressionTest(QueryTest, AssertsCompiledSQL):
 
         eq_(a1.name, 'foo1')
         eq_(a2.name, 'foo2')
-        eq_(a3.name, '%%(%d anon)s' % id(a3))
+        eq_(a3.name, '%({0:d} anon)s'.format(id(a3)))
 
     def test_labeled_subquery(self):
         User = self.classes.User

@@ -262,7 +262,7 @@ class Profiler(object):
     @classmethod
     def setup(cls, fn):
         if cls._setup is not None:
-            raise ValueError("setup function already set to %s" % cls._setup)
+            raise ValueError("setup function already set to {0!s}".format(cls._setup))
         cls._setup = staticmethod(fn)
         return fn
 
@@ -270,7 +270,7 @@ class Profiler(object):
     def setup_once(cls, fn):
         if cls._setup_once is not None:
             raise ValueError(
-                "setup_once function already set to %s" % cls._setup_once)
+                "setup_once function already set to {0!s}".format(cls._setup_once))
         cls._setup_once = staticmethod(fn)
         return fn
 
@@ -278,14 +278,14 @@ class Profiler(object):
         if self.test:
             tests = [fn for fn in self.tests if fn.__name__ == self.test]
             if not tests:
-                raise ValueError("No such test: %s" % self.test)
+                raise ValueError("No such test: {0!s}".format(self.test))
         else:
             tests = self.tests
 
         if self._setup_once:
             print("Running setup once...")
             self._setup_once(self.dburl, self.echo, self.num)
-        print("Tests to run: %s" % ", ".join([t.__name__ for t in tests]))
+        print("Tests to run: {0!s}".format(", ".join([t.__name__ for t in tests])))
         for test in tests:
             self._run_test(test)
             self.stats[-1].report()
@@ -397,12 +397,12 @@ class TestResult(object):
             self.report_stats()
 
     def _summary(self):
-        summary = "%s : %s (%d iterations)" % (
+        summary = "{0!s} : {1!s} ({2:d} iterations)".format(
             self.test.__name__, self.test.__doc__, self.profile.num)
         if self.total_time:
-            summary += "; total time %f sec" % self.total_time
+            summary += "; total time {0:f} sec".format(self.total_time)
         if self.stats:
-            summary += "; total fn calls %d" % self.stats.total_calls
+            summary += "; total fn calls {0:d}".format(self.stats.total_calls)
         return summary
 
     def report_stats(self):
@@ -418,10 +418,10 @@ class TestResult(object):
             self.stats.print_callers()
 
     def _runsnake(self):
-        filename = "%s.profile" % self.test.__name__
+        filename = "{0!s}.profile".format(self.test.__name__)
         try:
             self.stats.dump_stats(filename)
-            os.system("runsnake %s" % filename)
+            os.system("runsnake {0!s}".format(filename))
         finally:
             os.remove(filename)
 

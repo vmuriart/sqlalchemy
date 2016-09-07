@@ -23,9 +23,9 @@ def produce_test(parent, child, direction):
             ta.append(Column('id', Integer, primary_key=True, test_needs_autoincrement=True)),
             ta.append(Column('a_data', String(30)))
             if "a"== parent and direction == MANYTOONE:
-                ta.append(Column('child_id', Integer, ForeignKey("%s.id" % child, use_alter=True, name="foo")))
+                ta.append(Column('child_id', Integer, ForeignKey("{0!s}.id".format(child), use_alter=True, name="foo")))
             elif "a" == child and direction == ONETOMANY:
-                ta.append(Column('parent_id', Integer, ForeignKey("%s.id" % parent, use_alter=True, name="foo")))
+                ta.append(Column('parent_id', Integer, ForeignKey("{0!s}.id".format(parent), use_alter=True, name="foo")))
             ta = Table(*ta)
 
             tb = ["b", metadata]
@@ -34,9 +34,9 @@ def produce_test(parent, child, direction):
             tb.append(Column('b_data', String(30)))
 
             if "b"== parent and direction == MANYTOONE:
-                tb.append(Column('child_id', Integer, ForeignKey("%s.id" % child, use_alter=True, name="foo")))
+                tb.append(Column('child_id', Integer, ForeignKey("{0!s}.id".format(child), use_alter=True, name="foo")))
             elif "b" == child and direction == ONETOMANY:
-                tb.append(Column('parent_id', Integer, ForeignKey("%s.id" % parent, use_alter=True, name="foo")))
+                tb.append(Column('parent_id', Integer, ForeignKey("{0!s}.id".format(parent), use_alter=True, name="foo")))
             tb = Table(*tb)
 
             tc = ["c", metadata]
@@ -45,9 +45,9 @@ def produce_test(parent, child, direction):
             tc.append(Column('c_data', String(30)))
 
             if "c"== parent and direction == MANYTOONE:
-                tc.append(Column('child_id', Integer, ForeignKey("%s.id" % child, use_alter=True, name="foo")))
+                tc.append(Column('child_id', Integer, ForeignKey("{0!s}.id".format(child), use_alter=True, name="foo")))
             elif "c" == child and direction == ONETOMANY:
-                tc.append(Column('parent_id', Integer, ForeignKey("%s.id" % parent, use_alter=True, name="foo")))
+                tc.append(Column('parent_id', Integer, ForeignKey("{0!s}.id".format(parent), use_alter=True, name="foo")))
             tc = Table(*tc)
 
         def teardown(self):
@@ -167,7 +167,7 @@ def produce_test(parent, child, direction):
                 assert result2.id == parent2.id
                 assert result2.collection[0].id == child_obj.id
 
-    ABCTest.__name__ = "Test%sTo%s%s" % (parent, child, (direction is ONETOMANY and "O2M" or "M2O"))
+    ABCTest.__name__ = "Test{0!s}To{1!s}{2!s}".format(parent, child, (direction is ONETOMANY and "O2M" or "M2O"))
     return ABCTest
 
 # test all combinations of polymorphic a/b/c related to another of a/b/c
@@ -175,7 +175,7 @@ for parent in ["a", "b", "c"]:
     for child in ["a", "b", "c"]:
         for direction in [ONETOMANY, MANYTOONE]:
             testclass = produce_test(parent, child, direction)
-            exec("%s = testclass" % testclass.__name__)
+            exec("{0!s} = testclass".format(testclass.__name__))
             del testclass
 
 del produce_test

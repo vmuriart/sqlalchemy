@@ -953,7 +953,7 @@ class TLTransactionTest(fixtures.TestBase):
         transaction = connection.begin()
         result = connection.execute('select * from query_users')
         l = result.fetchall()
-        assert len(l) == 3, 'expected 3 got %d' % len(l)
+        assert len(l) == 3, 'expected 3 got {0:d}'.format(len(l))
         transaction.commit()
         connection.close()
 

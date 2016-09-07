@@ -20,7 +20,7 @@ class TypeReflectionTest(fixtures.TestBase):
 
     @testing.provide_metadata
     def _run_test(self, specs, attributes):
-        columns = [Column('c%i' % (i + 1), t[0]) for i, t in enumerate(specs)]
+        columns = [Column('c{0:d}'.format((i + 1)), t[0]) for i, t in enumerate(specs)]
 
         # Early 5.0 releases seem to report more "general" for columns
         # in a view, e.g. char -> varchar, tinyblob -> mediumblob
@@ -61,7 +61,7 @@ class TypeReflectionTest(fixtures.TestBase):
                         getattr(expected_spec, attr),
                         "Column %s: Attribute %s value of %s does not "
                         "match %s for type %s" % (
-                            "c%i" % (i + 1),
+                            "c{0:d}".format((i + 1)),
                             attr,
                             getattr(reflected_type, attr),
                             getattr(expected_spec, attr),
@@ -415,7 +415,7 @@ class ReflectionTest(fixtures.TestBase, AssertsExecutionResults):
         def cleanup(*arg, **kw):
             with testing.db.connect() as conn:
                 for v in ['v1', 'v2', 'v3', 'v4']:
-                    conn.execute("DROP VIEW %s" % v)
+                    conn.execute("DROP VIEW {0!s}".format(v))
 
         insp = inspect(testing.db)
         for v in ['v1', 'v2', 'v3', 'v4']:
@@ -461,19 +461,19 @@ class ReflectionTest(fixtures.TestBase, AssertsExecutionResults):
             ["t TIMESTAMP"],
             ["u TIMESTAMP DEFAULT CURRENT_TIMESTAMP"]
         ]):
-            Table("nn_t%d" % idx, meta)  # to allow DROP
+            Table("nn_t{0:d}".format(idx), meta)  # to allow DROP
 
             testing.db.execute("""
-                CREATE TABLE nn_t%d (
-                    %s
+                CREATE TABLE nn_t{0:d} (
+                    {1!s}
                 )
-            """ % (idx, ", \n".join(cols)))
+            """.format(idx, ", \n".join(cols)))
 
             reflected.extend(
                 {
                     "name": d['name'], "nullable": d['nullable'],
                     "default": d['default']}
-                for d in inspect(testing.db).get_columns("nn_t%d" % idx)
+                for d in inspect(testing.db).get_columns("nn_t{0:d}".format(idx))
             )
 
         eq_(

@@ -53,7 +53,7 @@ class Child(Base):
     parent_id = Column(Integer, ForeignKey('parent.id'))
 
     def __repr__(self):
-        return "Child(key=%r)" % self.key
+        return "Child(key={0!r})".format(self.key)
 
 Base.metadata.create_all()
 

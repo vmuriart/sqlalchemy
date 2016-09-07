@@ -177,12 +177,12 @@ class InheritTest3(fixtures.MappedTest):
             def __init__(self, data=None):
                 self.data = data
             def __repr__(self):
-                return "Foo id %d, data %s" % (self.id, self.data)
+                return "Foo id {0:d}, data {1!s}".format(self.id, self.data)
         mapper(Foo, foo)
 
         class Bar(Foo):
             def __repr__(self):
-                return "Bar id %d, data %s" % (self.id, self.data)
+                return "Bar id {0:d}, data {1!s}".format(self.id, self.data)
 
         mapper(Bar, bar, inherits=Foo, properties={
             'foos' :relationship(Foo, secondary=bar_foo, lazy='select')
@@ -206,17 +206,17 @@ class InheritTest3(fixtures.MappedTest):
             def __init__(self, data=None):
                 self.data = data
             def __repr__(self):
-                return "Foo id %d, data %s" % (self.id, self.data)
+                return "Foo id {0:d}, data {1!s}".format(self.id, self.data)
         mapper(Foo, foo)
 
         class Bar(Foo):
             def __repr__(self):
-                return "Bar id %d, data %s" % (self.id, self.data)
+                return "Bar id {0:d}, data {1!s}".format(self.id, self.data)
         mapper(Bar, bar, inherits=Foo)
 
         class Blub(Bar):
             def __repr__(self):
-                return "Blub id %d, data %s, bars %s, foos %s" % (
+                return "Blub id {0:d}, data {1!s}, bars {2!s}, foos {3!s}".format(
                         self.id, self.data, repr([b for b in self.bars]),
                         repr([f for f in self.foos]))
 

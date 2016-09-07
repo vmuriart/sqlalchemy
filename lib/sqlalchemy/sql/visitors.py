@@ -70,7 +70,7 @@ def _generate_dispatch(cls):
             # There is an optimization opportunity here because the
             # the string name of the class's __visit_name__ is known at
             # this early stage (import time) so it can be pre-constructed.
-            getter = operator.attrgetter("visit_%s" % visit_name)
+            getter = operator.attrgetter("visit_{0!s}".format(visit_name))
 
             def _compiler_dispatch(self, visitor, **kw):
                 try:
@@ -84,7 +84,7 @@ def _generate_dispatch(cls):
             # __visit_name__ is not yet a string. As a result, the visit
             # string has to be recalculated with each compilation.
             def _compiler_dispatch(self, visitor, **kw):
-                visit_attr = 'visit_%s' % self.__visit_name__
+                visit_attr = 'visit_{0!s}'.format(self.__visit_name__)
                 try:
                     meth = getattr(visitor, visit_attr)
                 except AttributeError:
@@ -116,7 +116,7 @@ class ClauseVisitor(object):
 
     def traverse_single(self, obj, **kw):
         for v in self._visitor_iterator:
-            meth = getattr(v, "visit_%s" % obj.__visit_name__, None)
+            meth = getattr(v, "visit_{0!s}".format(obj.__visit_name__), None)
             if meth:
                 return meth(obj, **kw)
 

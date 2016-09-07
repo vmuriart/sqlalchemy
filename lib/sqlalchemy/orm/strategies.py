@@ -250,7 +250,7 @@ class DeferredColumnLoader(LoaderStrategy):
             (
                 loadopt and
                 self.group and
-                loadopt.local_opts.get('undefer_group_%s' % self.group, False)
+                loadopt.local_opts.get('undefer_group_{0!s}'.format(self.group), False)
             )
             or
             (
@@ -381,7 +381,7 @@ class RaiseLoader(NoLoader):
 
         def invoke_raise_load(state, passive):
             raise sa_exc.InvalidRequestError(
-                "'%s' is not available due to lazy='raise'" % self
+                "'{0!s}' is not available due to lazy='raise'".format(self)
             )
 
         set_lazy_callable = InstanceState._instance_level_callable_processor(

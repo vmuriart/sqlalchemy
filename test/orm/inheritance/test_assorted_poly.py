@@ -21,7 +21,7 @@ class AttrSettable(object):
     def __init__(self, **kwargs):
         [setattr(self, k, v) for k, v in kwargs.items()]
     def __repr__(self):
-        return self.__class__.__name__ + "(%s)" % (hex(id(self)))
+        return self.__class__.__name__ + "({0!s})".format((hex(id(self))))
 
 
 class RelationshipTest1(fixtures.MappedTest):
@@ -342,7 +342,7 @@ def _generate_test(jointype="join1", usedata=False):
             assert m.data.data == 'ms data'
 
     do_test = function_named(
-        _do_test, 'test_relationship_on_base_class_%s_%s' % (
+        _do_test, 'test_relationship_on_base_class_{0!s}_{1!s}'.format(
         jointype, data and "nodata" or "data"))
     return do_test
 
@@ -390,21 +390,19 @@ class RelationshipTest4(fixtures.MappedTest):
                 for key, value in kwargs.items():
                     setattr(self, key, value)
             def __repr__(self):
-                return "Ordinary person %s" % self.name
+                return "Ordinary person {0!s}".format(self.name)
         class Engineer(Person):
             def __repr__(self):
-                return "Engineer %s, status %s" % \
-                        (self.name, self.status)
+                return "Engineer {0!s}, status {1!s}".format(self.name, self.status)
         class Manager(Person):
             def __repr__(self):
-                return "Manager %s, status %s" % \
-                        (self.name, self.longer_status)
+                return "Manager {0!s}, status {1!s}".format(self.name, self.longer_status)
         class Car(object):
             def __init__(self, **kwargs):
                 for key, value in kwargs.items():
                     setattr(self, key, value)
             def __repr__(self):
-                return "Car number %d" % self.car_id
+                return "Car number {0:d}".format(self.car_id)
 
         # create a union that represents both types of joins.
         employee_join = polymorphic_union(
@@ -431,11 +429,11 @@ class RelationshipTest4(fixtures.MappedTest):
 
         # creating 5 managers named from M1 to E5
         for i in range(1,5):
-            session.add(Manager(name="M%d" % i,
+            session.add(Manager(name="M{0:d}".format(i),
                                 longer_status="YYYYYYYYY"))
         # creating 5 engineers named from E1 to E5
         for i in range(1,5):
-            session.add(Engineer(name="E%d" % i,status="X"))
+            session.add(Engineer(name="E{0:d}".format(i),status="X"))
 
         session.flush()
 
@@ -516,21 +514,19 @@ class RelationshipTest5(fixtures.MappedTest):
                 for key, value in kwargs.items():
                     setattr(self, key, value)
             def __repr__(self):
-                return "Ordinary person %s" % self.name
+                return "Ordinary person {0!s}".format(self.name)
         class Engineer(Person):
             def __repr__(self):
-                return "Engineer %s, status %s" % \
-                        (self.name, self.status)
+                return "Engineer {0!s}, status {1!s}".format(self.name, self.status)
         class Manager(Person):
             def __repr__(self):
-                return "Manager %s, status %s" % \
-                        (self.name, self.longer_status)
+                return "Manager {0!s}, status {1!s}".format(self.name, self.longer_status)
         class Car(object):
             def __init__(self, **kwargs):
                 for key, value in kwargs.items():
                     setattr(self, key, value)
             def __repr__(self):
-                return "Car number %d" % self.car_id
+                return "Car number {0:d}".format(self.car_id)
 
         person_mapper   = mapper(Person, people,
                                     polymorphic_on=people.c.type,
@@ -652,31 +648,29 @@ class RelationshipTest7(fixtures.MappedTest):
 
         class Status(PersistentObject):
             def __repr__(self):
-                return "Status %s" % self.name
+                return "Status {0!s}".format(self.name)
 
         class Person(PersistentObject):
             def __repr__(self):
-                return "Ordinary person %s" % self.name
+                return "Ordinary person {0!s}".format(self.name)
 
         class Engineer(Person):
             def __repr__(self):
-                return "Engineer %s, field %s" % (self.name,
+                return "Engineer {0!s}, field {1!s}".format(self.name,
                                                 self.field)
 
         class Manager(Person):
             def __repr__(self):
-                return "Manager %s, category %s" % (self.name,
+                return "Manager {0!s}, category {1!s}".format(self.name,
                                                 self.category)
 
         class Car(PersistentObject):
             def __repr__(self):
-                return "Car number %d, name %s" % \
-                                        (self.car_id, self.name)
+                return "Car number {0:d}, name {1!s}".format(self.car_id, self.name)
 
         class Offraod_Car(Car):
             def __repr__(self):
-                return "Offroad Car number %d, name %s" % \
-                                        (self.car_id,self.name)
+                return "Offroad Car number {0:d}, name {1!s}".format(self.car_id, self.name)
 
         employee_join = polymorphic_union(
                 {
@@ -720,9 +714,9 @@ class RelationshipTest7(fixtures.MappedTest):
                 car=Car()
             else:
                 car=Offraod_Car()
-            session.add(Manager(name="M%d" % i,
+            session.add(Manager(name="M{0:d}".format(i),
                                 category="YYYYYYYYY",car=car))
-            session.add(Engineer(name="E%d" % i,field="X",car=car))
+            session.add(Engineer(name="E{0:d}".format(i),field="X",car=car))
             session.flush()
             session.expunge_all()
 
@@ -843,21 +837,21 @@ class GenerativeTest(fixtures.TestBase, AssertsExecutionResults):
                     setattr(self, key, value)
         class Status(PersistentObject):
             def __repr__(self):
-                return "Status %s" % self.name
+                return "Status {0!s}".format(self.name)
         class Person(PersistentObject):
             def __repr__(self):
-                return "Ordinary person %s" % self.name
+                return "Ordinary person {0!s}".format(self.name)
         class Engineer(Person):
             def __repr__(self):
-                return "Engineer %s, field %s, status %s" % (
+                return "Engineer {0!s}, field {1!s}, status {2!s}".format(
                                         self.name, self.field, self.status)
         class Manager(Person):
             def __repr__(self):
-                return "Manager %s, category %s, status %s" % (
+                return "Manager {0!s}, category {1!s}, status {2!s}".format(
                                         self.name, self.category, self.status)
         class Car(PersistentObject):
             def __repr__(self):
-                return "Car number %d" % self.car_id
+                return "Car number {0:d}".format(self.car_id)
 
         # create a union that represents both types of joins.
         employee_join = polymorphic_union(
@@ -902,9 +896,9 @@ class GenerativeTest(fixtures.TestBase, AssertsExecutionResults):
                 st=active
             else:
                 st=dead
-            session.add(Manager(name="M%d" % i,
+            session.add(Manager(name="M{0:d}".format(i),
                                 category="YYYYYYYYY",status=st))
-            session.add(Engineer(name="E%d" % i,field="X",status=st))
+            session.add(Engineer(name="E{0:d}".format(i),field="X",status=st))
 
         session.flush()
 

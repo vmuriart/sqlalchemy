@@ -128,7 +128,7 @@ class SQLModeDetectionTest(fixtures.TestBase):
     def _options(self, modes):
         def connect(con, record):
             cursor = con.cursor()
-            cursor.execute("set sql_mode='%s'" % (",".join(modes)))
+            cursor.execute("set sql_mode='{0!s}'".format((",".join(modes))))
         e = engines.testing_engine(options={
             'pool_events':[
                 (connect, 'first_connect'),

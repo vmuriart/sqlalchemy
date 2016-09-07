@@ -811,7 +811,7 @@ def __converting_factory(specimen_cls, original_factory):
         return instrumented_cls(collection)
 
     # often flawed but better than nothing
-    wrapper.__name__ = "%sWrapper" % original_factory.__name__
+    wrapper.__name__ = "{0!s}Wrapper".format(original_factory.__name__)
     wrapper.__doc__ = original_factory.__doc__
 
     return wrapper
@@ -935,7 +935,7 @@ def _set_collection_attributes(cls, roles, methods):
                                                before, argument, after))
     # intern the role map
     for role, method_name in roles.items():
-        setattr(cls, '_sa_%s' % role, getattr(cls, method_name))
+        setattr(cls, '_sa_{0!s}'.format(role), getattr(cls, method_name))
 
     cls._sa_adapter = None
 
@@ -966,7 +966,7 @@ def _instrument_membership_mutator(method, before, argument, after):
             if pos_arg is None:
                 if named_arg not in kw:
                     raise sa_exc.ArgumentError(
-                        "Missing argument %s" % argument)
+                        "Missing argument {0!s}".format(argument))
                 value = kw[named_arg]
             else:
                 if len(args) > pos_arg:
@@ -975,7 +975,7 @@ def _instrument_membership_mutator(method, before, argument, after):
                     value = kw[named_arg]
                 else:
                     raise sa_exc.ArgumentError(
-                        "Missing argument %s" % argument)
+                        "Missing argument {0!s}".format(argument))
 
         initiator = kw.pop('_sa_initiator', None)
         if initiator is False:

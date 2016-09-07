@@ -49,7 +49,7 @@ class PolymorphicCircularTest(fixtures.MappedTest):
                 if data is not None:
                     self.data = data
             def __repr__(self):
-                return "%s(%s, %s, %s)" % (self.__class__.__name__, self.id, repr(str(self.name)), repr(self.data))
+                return "{0!s}({1!s}, {2!s}, {3!s})".format(self.__class__.__name__, self.id, repr(str(self.name)), repr(self.data))
 
         class Table1B(Table1):
             pass
@@ -64,7 +64,7 @@ class PolymorphicCircularTest(fixtures.MappedTest):
             def __init__(self, data):
                 self.data = data
             def __repr__(self):
-                return "%s(%s, %s)" % (self.__class__.__name__, self.id, repr(str(self.data)))
+                return "{0!s}({1!s}, {2!s})".format(self.__class__.__name__, self.id, repr(str(self.data)))
 
         try:
             # this is how the mapping used to work.  ensure that this raises an error now
@@ -138,7 +138,7 @@ class PolymorphicCircularTest(fixtures.MappedTest):
         obj = None
         for c in classes:
             if isinstance(c, type):
-                newobj = c('item %d' % count)
+                newobj = c('item {0:d}'.format(count))
                 count += 1
             else:
                 newobj = c

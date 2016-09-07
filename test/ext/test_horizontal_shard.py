@@ -227,7 +227,7 @@ class DistinctEngineShardTest(ShardTest, fixtures.TestBase):
         for db in (db1, db2, db3, db4):
             db.connect().invalidate()
         for i in range(1, 5):
-            os.remove("shard%d.db" % i)
+            os.remove("shard{0:d}.db".format(i))
 
 class AttachedFileShardTest(ShardTest, fixtures.TestBase):
     schema = "changeme"

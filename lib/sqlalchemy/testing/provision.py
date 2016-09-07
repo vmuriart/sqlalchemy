@@ -91,12 +91,12 @@ def _configs_for_db_operation():
 
 @register.init
 def _create_db(cfg, eng, ident):
-    raise NotImplementedError("no DB creation routine for cfg: %s" % eng.url)
+    raise NotImplementedError("no DB creation routine for cfg: {0!s}".format(eng.url))
 
 
 @register.init
 def _drop_db(cfg, eng, ident):
-    raise NotImplementedError("no DB drop routine for cfg: %s" % eng.url)
+    raise NotImplementedError("no DB drop routine for cfg: {0!s}".format(eng.url))
 
 
 @register.init
@@ -132,7 +132,7 @@ def _sqlite_follower_url_from_main(url, ident):
     if not url.database or url.database == ':memory:':
         return url
     else:
-        return sa_url.make_url("sqlite:///%s.db" % ident)
+        return sa_url.make_url("sqlite:///{0!s}.db".format(ident))
 
 
 @_post_configure_engine.for_db("sqlite")
@@ -148,8 +148,7 @@ def _sqlite_post_configure_engine(url, engine, follower_ident):
                 'ATTACH DATABASE "test_schema.db" AS test_schema')
         else:
             dbapi_connection.execute(
-                'ATTACH DATABASE "%s_test_schema.db" AS test_schema'
-                % follower_ident)
+                'ATTACH DATABASE "{0!s}_test_schema.db" AS test_schema'.format(follower_ident))
 
 
 @_create_db.for_db("postgresql")
@@ -164,7 +163,7 @@ def _pg_create_db(cfg, eng, ident):
         for attempt in range(3):
             try:
                 conn.execute(
-                    "CREATE DATABASE %s TEMPLATE %s" % (ident, currentdb))
+                    "CREATE DATABASE {0!s} TEMPLATE {1!s}".format(ident, currentdb))
             except exc.OperationalError as err:
                 if attempt != 2 and "accessed by other users" in str(err):
                     time.sleep(.2)
@@ -182,15 +181,15 @@ def _mysql_create_db(cfg, eng, ident):
             _mysql_drop_db(cfg, conn, ident)
         except Exception:
             pass
-        conn.execute("CREATE DATABASE %s" % ident)
-        conn.execute("CREATE DATABASE %s_test_schema" % ident)
-        conn.execute("CREATE DATABASE %s_test_schema_2" % ident)
+        conn.execute("CREATE DATABASE {0!s}".format(ident))
+        conn.execute("CREATE DATABASE {0!s}_test_schema".format(ident))
+        conn.execute("CREATE DATABASE {0!s}_test_schema_2".format(ident))
 
 
 @_configure_follower.for_db("mysql")
 def _mysql_configure_follower(config, ident):
-    config.test_schema = "%s_test_schema" % ident
-    config.test_schema_2 = "%s_test_schema_2" % ident
+    config.test_schema = "{0!s}_test_schema".format(ident)
+    config.test_schema_2 = "{0!s}_test_schema_2".format(ident)
 
 
 @_create_db.for_db("sqlite")
@@ -208,23 +207,23 @@ def _pg_drop_db(cfg, eng, ident):
                 "where usename=current_user and pid != pg_backend_pid() "
                 "and datname=:dname"
             ), dname=ident)
-        conn.execute("DROP DATABASE %s" % ident)
+        conn.execute("DROP DATABASE {0!s}".format(ident))
 
 
 @_drop_db.for_db("sqlite")
 def _sqlite_drop_db(cfg, eng, ident):
     if ident:
-        os.remove("%s_test_schema.db" % ident)
+        os.remove("{0!s}_test_schema.db".format(ident))
     else:
-        os.remove("%s.db" % ident)
+        os.remove("{0!s}.db".format(ident))
 
 
 @_drop_db.for_db("mysql")
 def _mysql_drop_db(cfg, eng, ident):
     with eng.connect() as conn:
-        conn.execute("DROP DATABASE %s_test_schema" % ident)
-        conn.execute("DROP DATABASE %s_test_schema_2" % ident)
-        conn.execute("DROP DATABASE %s" % ident)
+        conn.execute("DROP DATABASE {0!s}_test_schema".format(ident))
+        conn.execute("DROP DATABASE {0!s}_test_schema_2".format(ident))
+        conn.execute("DROP DATABASE {0!s}".format(ident))
 
 
 @_create_db.for_db("oracle")
@@ -233,23 +232,23 @@ def _oracle_create_db(cfg, eng, ident):
     # similar, so that the default tablespace is not "system"; reflection will
     # fail otherwise
     with eng.connect() as conn:
-        conn.execute("create user %s identified by xe" % ident)
-        conn.execute("create user %s_ts1 identified by xe" % ident)
-        conn.execute("create user %s_ts2 identified by xe" % ident)
-        conn.execute("grant dba to %s" % (ident, ))
-        conn.execute("grant unlimited tablespace to %s" % ident)
-        conn.execute("grant unlimited tablespace to %s_ts1" % ident)
-        conn.execute("grant unlimited tablespace to %s_ts2" % ident)
+        conn.execute("create user {0!s} identified by xe".format(ident))
+        conn.execute("create user {0!s}_ts1 identified by xe".format(ident))
+        conn.execute("create user {0!s}_ts2 identified by xe".format(ident))
+        conn.execute("grant dba to {0!s}".format(ident ))
+        conn.execute("grant unlimited tablespace to {0!s}".format(ident))
+        conn.execute("grant unlimited tablespace to {0!s}_ts1".format(ident))
+        conn.execute("grant unlimited tablespace to {0!s}_ts2".format(ident))
 
 @_configure_follower.for_db("oracle")
 def _oracle_configure_follower(config, ident):
-    config.test_schema = "%s_ts1" % ident
-    config.test_schema_2 = "%s_ts2" % ident
+    config.test_schema = "{0!s}_ts1".format(ident)
+    config.test_schema_2 = "{0!s}_ts2".format(ident)
 
 
 def _ora_drop_ignore(conn, dbname):
     try:
-        conn.execute("drop user %s cascade" % dbname)
+        conn.execute("drop user {0!s} cascade".format(dbname))
         log.info("Reaped db: %s", dbname)
         return True
     except exc.DatabaseError as err:
@@ -266,8 +265,8 @@ def _oracle_drop_db(cfg, eng, ident):
         # while there is a "kill session" command in Oracle,
         # it unfortunately does not release the connection sufficiently.
         _ora_drop_ignore(conn, ident)
-        _ora_drop_ignore(conn, "%s_ts1" % ident)
-        _ora_drop_ignore(conn, "%s_ts2" % ident)
+        _ora_drop_ignore(conn, "{0!s}_ts1".format(ident))
+        _ora_drop_ignore(conn, "{0!s}_ts2".format(ident))
 
 
 def reap_oracle_dbs(eng, idents_file):
@@ -289,10 +288,10 @@ def reap_oracle_dbs(eng, idents_file):
                 continue
             elif name in idents:
                 to_drop.add(name)
-                if "%s_ts1" % name in all_names:
-                    to_drop.add("%s_ts1" % name)
-                if "%s_ts2" % name in all_names:
-                    to_drop.add("%s_ts2" % name)
+                if "{0!s}_ts1".format(name) in all_names:
+                    to_drop.add("{0!s}_ts1".format(name))
+                if "{0!s}_ts2".format(name) in all_names:
+                    to_drop.add("{0!s}_ts2".format(name))
 
         dropped = total = 0
         for total, username in enumerate(to_drop, 1):

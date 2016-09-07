@@ -76,7 +76,7 @@ class PolymorphicVerticalProperty(object):
             pairs = set(self.cls.type_map.values())
             whens = [
                 (
-                    literal_column("'%s'" % discriminator),
+                    literal_column("'{0!s}'".format(discriminator)),
                     cast(getattr(self.cls, attribute), String)
                 ) for attribute, discriminator in pairs
                 if attribute is not None
@@ -88,7 +88,7 @@ class PolymorphicVerticalProperty(object):
             return self._case() != cast(other, String)
 
     def __repr__(self):
-        return '<%s %r=%r>' % (self.__class__.__name__, self.key, self.value)
+        return '<{0!s} {1!r}={2!r}>'.format(self.__class__.__name__, self.key, self.value)
 
 @event.listens_for(PolymorphicVerticalProperty, "mapper_configured", propagate=True)
 def on_new_class(mapper, cls_):
@@ -153,7 +153,7 @@ if __name__ == '__main__':
             self.name = name
 
         def __repr__(self):
-            return "Animal(%r)" % self.name
+            return "Animal({0!r})".format(self.name)
 
         @classmethod
         def with_characteristic(self, key, value):

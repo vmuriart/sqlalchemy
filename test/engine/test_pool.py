@@ -733,26 +733,26 @@ class DeprecatedPoolListenerTest(PoolTestBase):
                 eq_((item in self.checked_in), in_cin)
 
             def inst_connect(self, con, record):
-                print("connect(%s, %s)" % (con, record))
+                print("connect({0!s}, {1!s})".format(con, record))
                 assert con is not None
                 assert record is not None
                 self.connected.append(con)
 
             def inst_first_connect(self, con, record):
-                print("first_connect(%s, %s)" % (con, record))
+                print("first_connect({0!s}, {1!s})".format(con, record))
                 assert con is not None
                 assert record is not None
                 self.first_connected.append(con)
 
             def inst_checkout(self, con, record, proxy):
-                print("checkout(%s, %s, %s)" % (con, record, proxy))
+                print("checkout({0!s}, {1!s}, {2!s})".format(con, record, proxy))
                 assert con is not None
                 assert record is not None
                 assert proxy is not None
                 self.checked_out.append(con)
 
             def inst_checkin(self, con, record):
-                print("checkin(%s, %s)" % (con, record))
+                print("checkin({0!s}, {1!s})".format(con, record))
                 # con can be None if invalidated
                 assert record is not None
                 self.checked_in.append(con)
@@ -1054,10 +1054,10 @@ class QueuePoolTest(PoolTestBase):
 
         assert len(timeouts) > 0
         for t in timeouts:
-            assert t >= 3, "Not all timeouts were >= 3 seconds %r" % timeouts
+            assert t >= 3, "Not all timeouts were >= 3 seconds {0!r}".format(timeouts)
             # normally, the timeout should under 4 seconds,
             # but on a loaded down buildbot it can go up.
-            assert t < 14, "Not all timeouts were < 14 seconds %r" % timeouts
+            assert t < 14, "Not all timeouts were < 14 seconds {0!r}".format(timeouts)
 
     def _test_overflow(self, thread_count, max_overflow):
         gc_collect()
@@ -1233,7 +1233,7 @@ class QueuePoolTest(PoolTestBase):
                 for t in threads:
                     t.join(join_timeout)
 
-        eq_(len(success), 12, "successes: %s" % success)
+        eq_(len(success), 12, "successes: {0!s}".format(success))
 
     def test_connrec_invalidated_within_checkout_no_race(self):
         """Test that a concurrent ConnectionRecord.invalidate() which

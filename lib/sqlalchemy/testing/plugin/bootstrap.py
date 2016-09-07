@@ -25,7 +25,7 @@ to_bootstrap = locals()['to_bootstrap']
 
 
 def load_file_as_module(name):
-    path = os.path.join(os.path.dirname(bootstrap_file), "%s.py" % name)
+    path = os.path.join(os.path.dirname(bootstrap_file), "{0!s}.py".format(name))
     if sys.version_info >= (3, 3):
         from importlib import machinery
         mod = machinery.SourceFileLoader(name, path).load_module()
@@ -41,4 +41,4 @@ elif to_bootstrap == "nose":
     sys.modules["sqla_plugin_base"] = load_file_as_module("plugin_base")
     sys.modules["sqla_noseplugin"] = load_file_as_module("noseplugin")
 else:
-    raise Exception("unknown bootstrap: %s" % to_bootstrap)  # noqa
+    raise Exception("unknown bootstrap: {0!s}".format(to_bootstrap))  # noqa
