@@ -1,4 +1,0 @@
-[gerrit]
-host=gerrit.sqlalchemy.org
-project=zzzeek/sqlalchemy
-defaultbranch=master
