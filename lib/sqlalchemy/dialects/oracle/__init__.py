@@ -5,7 +5,7 @@
 # This module is part of SQLAlchemy and is released under
 # the MIT License: http://www.opensource.org/licenses/mit-license.php
 
-from sqlalchemy.dialects.oracle import base, cx_oracle, zxjdbc
+from sqlalchemy.dialects.oracle import base, cx_oracle
 
 base.dialect = cx_oracle.dialect
 
