@@ -15,18 +15,14 @@ if not sys.flags.no_user_site:
     # that the package in question is locally present, but since we have
     # ./lib/, we need to punch that in.
     # We check no_user_site to honor the use of this flag.
-    sys.path.insert(
-        0,
-        os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), '..', 'lib')
-    )
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                    '..', 'lib'))
 
 # use bootstrapping so that test plugins are loaded
 # without touching the main library before coverage starts
 bootstrap_file = os.path.join(
-    os.path.dirname(__file__), "..", "lib", "sqlalchemy",
-    "testing", "plugin", "bootstrap.py"
-)
+    os.path.dirname(__file__), "..", "lib", "sqlalchemy", "testing",
+    "plugin", "bootstrap.py")
 
 with open(bootstrap_file) as f:
     code = compile(f.read(), "bootstrap.py", 'exec')
