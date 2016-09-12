@@ -66,7 +66,6 @@ class UserDefinedTest(fixtures.TestBase, AssertsCompiledSQL):
             return "POSTGRES_FOO"
 
         from sqlalchemy.dialects.sqlite import base as sqlite
-        from sqlalchemy.dialects.postgresql import base as postgresql
 
         self.assert_compile(
             MyType(),
@@ -74,11 +73,6 @@ class UserDefinedTest(fixtures.TestBase, AssertsCompiledSQL):
             dialect=sqlite.dialect()
         )
 
-        self.assert_compile(
-            MyType(),
-            "POSTGRES_FOO",
-            dialect=postgresql.dialect()
-        )
 
     def test_stateful(self):
         class MyThingy(ColumnClause):
@@ -165,21 +159,6 @@ class UserDefinedTest(fixtures.TestBase, AssertsCompiledSQL):
             str, MyThingy()
         )
 
-    def test_default_subclass(self):
-        from sqlalchemy.types import ARRAY
-
-        class MyArray(ARRAY):
-            pass
-
-        @compiles(MyArray, "sqlite")
-        def sl_array(elem, compiler, **kw):
-            return "array"
-
-        self.assert_compile(
-            MyArray(Integer),
-            "INTEGER[]",
-            dialect="postgresql"
-        )
 
     def test_annotations(self):
         """test that annotated clause constructs use the
@@ -259,63 +238,6 @@ class UserDefinedTest(fixtures.TestBase, AssertsCompiledSQL):
                             "DROP THINGY",
                             )
 
-    def test_functions(self):
-        from sqlalchemy.dialects import postgresql
-
-        class MyUtcFunction(FunctionElement):
-            pass
-
-        @compiles(MyUtcFunction)
-        def visit_myfunc(element, compiler, **kw):
-            return "utcnow()"
-
-        @compiles(MyUtcFunction, 'postgresql')
-        def visit_myfunc(element, compiler, **kw):
-            return "timezone('utc', current_timestamp)"
-
-        self.assert_compile(
-            MyUtcFunction(),
-            "utcnow()",
-            use_default_dialect=True
-        )
-        self.assert_compile(
-            MyUtcFunction(),
-            "timezone('utc', current_timestamp)",
-            dialect=postgresql.dialect()
-        )
-
-    def test_function_calls_base(self):
-        from sqlalchemy.dialects import mssql
-
-        class greatest(FunctionElement):
-            type = Numeric()
-            name = 'greatest'
-
-        @compiles(greatest)
-        def default_greatest(element, compiler, **kw):
-            return compiler.visit_function(element)
-
-        @compiles(greatest, 'mssql')
-        def case_greatest(element, compiler, **kw):
-            arg1, arg2 = list(element.clauses)
-            return "CASE WHEN {0!s} > {1!s} THEN {2!s} ELSE {3!s} END".format(
-                compiler.process(arg1),
-                compiler.process(arg2),
-                compiler.process(arg1),
-                compiler.process(arg2)
-            )
-
-        self.assert_compile(
-            greatest('a', 'b'),
-            'greatest(:greatest_1, :greatest_2)',
-            use_default_dialect=True
-        )
-        self.assert_compile(
-            greatest('a', 'b'),
-            "CASE WHEN :greatest_1 > :greatest_2 "
-            "THEN :greatest_1 ELSE :greatest_2 END",
-            dialect=mssql.dialect()
-        )
 
     def test_subclasses_one(self):
         class Base(FunctionElement):

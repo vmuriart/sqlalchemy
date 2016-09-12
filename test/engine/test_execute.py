@@ -870,37 +870,6 @@ class CompiledCacheTest(fixtures.TestBase):
             eq_(conn.scalar(stmt), 1)
 
 
-class MockStrategyTest(fixtures.TestBase):
-    def _engine_fixture(self):
-        buf = util.StringIO()
-
-        def dump(sql, *multiparams, **params):
-            buf.write(util.text_type(sql.compile(dialect=engine.dialect)))
-
-        engine = create_engine('postgresql://', strategy='mock', executor=dump)
-        return engine, buf
-
-    def test_sequence_not_duped(self):
-        engine, buf = self._engine_fixture()
-        metadata = MetaData()
-        t = Table('testtable', metadata,
-                  Column(
-                      'pk', Integer, Sequence('testtable_pk_seq'),
-                      primary_key=True)
-                  )
-
-        t.create(engine)
-        t.drop(engine)
-
-        eq_(
-            re.findall(r'CREATE (\w+)', buf.getvalue()),
-            ["SEQUENCE", "TABLE"]
-        )
-
-        eq_(
-            re.findall(r'DROP (\w+)', buf.getvalue()),
-            ["SEQUENCE", "TABLE"]
-        )
 
 
 class SchemaTranslateTest(fixtures.TestBase, testing.AssertsExecutionResults):
