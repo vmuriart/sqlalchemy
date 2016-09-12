@@ -1,31 +1,14 @@
 language: python
-python: 3.5
+python: 3.4
 
 env:
     - TOXENV=flake8
-    - TOXENV=py27
-    - TOXENV=py34
-    - TOXENV=py35
-
-matrix:
-    fast_finish: true
-
-    include:
-        - python: "nightly"
-          env: TOXENV=py36
-
-    allow_failures:
-        - env: TOXENV=flake8
-        - python: "nightly"
 
 install:
     - pip install tox codecov
 
 script:
     - tox
-
-after_success:
-    - codecov
 
 notifications:
     email: false

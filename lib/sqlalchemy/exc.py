@@ -83,8 +83,7 @@ class CircularDependencyError(SQLAlchemyError):
         self.edges = edges
 
     def __reduce__(self):
-        return self.__class__, (None, self.cycles,
-                                self.edges, self.args[0])
+        return self.__class__, (None, self.cycles, self.edges, self.args[0])
 
 
 class CompileError(SQLAlchemyError):
@@ -177,8 +176,8 @@ class NoReferencedColumnError(NoReferenceError):
         self.column_name = cname
 
     def __reduce__(self):
-        return self.__class__, (self.args[0], self.table_name,
-                                self.column_name)
+        return self.__class__, (
+            self.args[0], self.table_name, self.column_name)
 
 
 class NoSuchTableError(InvalidRequestError):
@@ -248,8 +247,8 @@ class StatementError(SQLAlchemyError):
         self.detail.append(msg)
 
     def __reduce__(self):
-        return self.__class__, (self.args[0], self.statement,
-                                self.params, self.orig)
+        return self.__class__, (
+            self.args[0], self.statement, self.params, self.orig)
 
     def __str__(self):
         from sqlalchemy.sql import util
@@ -260,9 +259,8 @@ class StatementError(SQLAlchemyError):
             if self.params:
                 params_repr = util._repr_params(self.params, 10)
                 details.append("[parameters: {0!r}]".format(params_repr))
-        return ' '.join([
-                            "({0!s})".format(det) for det in self.detail
-                            ] + details)
+        return ' '.join(
+            ["({0!s})".format(det) for det in self.detail] + details)
 
     def __unicode__(self):
         return self.__str__()
@@ -299,8 +297,8 @@ class DBAPIError(StatementError):
         # Don't ever wrap these, just return them directly as if
         # DBAPIError didn't exist.
         if (isinstance(orig, BaseException) and
-                not isinstance(orig, Exception)) or \
-            isinstance(orig, DontWrapMixin):
+                not isinstance(orig, Exception)) or isinstance(orig,
+                                                               DontWrapMixin):
             return orig
 
         if orig is not None:
@@ -311,8 +309,7 @@ class DBAPIError(StatementError):
                     "({0!s}.{1!s}) {2!s}".format(orig.__class__.__module__,
                                                  orig.__class__.__name__,
                                                  orig),
-                    statement, params, orig
-                )
+                    statement, params, orig)
 
             glob = globals()
             for super_ in orig.__class__.__mro__:
@@ -335,14 +332,11 @@ class DBAPIError(StatementError):
             text = str(orig)
         except Exception as e:
             text = 'Error in str() of DB-API-generated exception: ' + str(e)
-        StatementError.__init__(
-            self,
-            '({0!s}.{1!s}) {2!s}'.format(
-                orig.__class__.__module__, orig.__class__.__name__, text),
-            statement,
-            params,
-            orig
-        )
+        StatementError.__init__(self,
+                                '({0!s}.{1!s}) {2!s}'.format(
+                                    orig.__class__.__module__,
+                                    orig.__class__.__name__, text),
+                                statement, params, orig)
         self.connection_invalidated = connection_invalidated
 
 

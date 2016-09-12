@@ -16,14 +16,13 @@ if sys.version_info < (2, 6):
 
 cpython = platform.python_implementation() == 'CPython'
 
-ext_modules = [
-    Extension('sqlalchemy.cprocessors',
-              sources=['lib/sqlalchemy/cextension/processors.c']),
-    Extension('sqlalchemy.cresultproxy',
-              sources=['lib/sqlalchemy/cextension/resultproxy.c']),
-    Extension('sqlalchemy.cutils',
-              sources=['lib/sqlalchemy/cextension/utils.c'])
-]
+ext_modules = [Extension('sqlalchemy.cprocessors',
+                         sources=['lib/sqlalchemy/cextension/processors.c']),
+               Extension('sqlalchemy.cresultproxy',
+                         sources=['lib/sqlalchemy/cextension/resultproxy.c']),
+               Extension('sqlalchemy.cutils',
+                         sources=['lib/sqlalchemy/cextension/utils.c'])
+               ]
 
 ext_errors = (CCompilerError, DistutilsExecError, DistutilsPlatformError)
 if sys.platform == 'win32':
@@ -109,8 +108,7 @@ def status_msgs(*msgs):
 
 
 with open(os.path.join(
-    os.path.dirname(__file__),
-    'lib', 'sqlalchemy', '__init__.py')) as v_file:
+    os.path.dirname(__file__), 'lib', 'sqlalchemy', '__init__.py')) as v_file:
     VERSION = re.compile(
         r".*__version__ = '(.*?)'", re.S).match(v_file.read()).group(1)
 
@@ -167,35 +165,27 @@ def run_setup(with_cext):
 
 if not cpython:
     run_setup(False)
-    status_msgs(
-        "WARNING: C extensions are not supported on " +
-        "this Python platform, speedups are not enabled.",
-        "Plain-Python build succeeded."
-    )
+    status_msgs("WARNING: C extensions are not supported on " +
+                "this Python platform, speedups are not enabled.",
+                "Plain-Python build succeeded.")
 elif os.environ.get('DISABLE_SQLALCHEMY_CEXT'):
     run_setup(False)
-    status_msgs(
-        "DISABLE_SQLALCHEMY_CEXT is set; " +
-        "not attempting to build C extensions.",
-        "Plain-Python build succeeded."
-    )
+    status_msgs("DISABLE_SQLALCHEMY_CEXT is set; " +
+                "not attempting to build C extensions.",
+                "Plain-Python build succeeded.")
 
 else:
     try:
         run_setup(True)
     except BuildFailed as exc:
-        status_msgs(
-            exc.cause,
-            "WARNING: The C extension could not be compiled, " +
-            "speedups are not enabled.",
-            "Failure information, if any, is above.",
-            "Retrying the build without the C extension now."
-        )
+        status_msgs(exc.cause,
+                    "WARNING: The C extension could not be compiled, " +
+                    "speedups are not enabled.",
+                    "Failure information, if any, is above.",
+                    "Retrying the build without the C extension now.")
 
         run_setup(False)
 
-        status_msgs(
-            "WARNING: The C extension could not be compiled, " +
-            "speedups are not enabled.",
-            "Plain-Python build succeeded."
-        )
+        status_msgs("WARNING: The C extension could not be compiled, " +
+                    "speedups are not enabled.",
+                    "Plain-Python build succeeded.")
