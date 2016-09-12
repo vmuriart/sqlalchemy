@@ -8,10 +8,11 @@
 """Helpers related to deprecation of functions, methods, classes, other
 functionality."""
 
-from .. import exc
-import warnings
 import re
+import warnings
+
 from .langhelpers import decorator
+from .. import exc
 
 
 def warn_deprecated(msg, stacklevel=3):

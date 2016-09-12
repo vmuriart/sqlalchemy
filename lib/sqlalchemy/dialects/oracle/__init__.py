@@ -8,16 +8,3 @@
 from sqlalchemy.dialects.oracle import base, cx_oracle
 
 base.dialect = cx_oracle.dialect
-
-from sqlalchemy.dialects.oracle.base import \
-    VARCHAR, NVARCHAR, CHAR, DATE, NUMBER, \
-    BLOB, BFILE, CLOB, NCLOB, TIMESTAMP, RAW, \
-    FLOAT, DOUBLE_PRECISION, LONG, dialect, INTERVAL, \
-    VARCHAR2, NVARCHAR2, ROWID, dialect
-
-__all__ = (
-    'VARCHAR', 'NVARCHAR', 'CHAR', 'DATE', 'NUMBER',
-    'BLOB', 'BFILE', 'CLOB', 'NCLOB', 'TIMESTAMP', 'RAW',
-    'FLOAT', 'DOUBLE_PRECISION', 'LONG', 'dialect', 'INTERVAL',
-    'VARCHAR2', 'NVARCHAR2', 'ROWID'
-)

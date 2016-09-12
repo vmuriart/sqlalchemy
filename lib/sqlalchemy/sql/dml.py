@@ -9,14 +9,13 @@ Provide :class:`.Insert`, :class:`.Update` and :class:`.Delete`.
 
 """
 
-from .base import Executable, _generative, _from_objects, DialectKWArgs, \
-    ColumnCollection
+from .base import Executable, _generative, _from_objects, DialectKWArgs
 from .elements import ClauseElement, _literal_as_text, Null, and_, _clone, \
     _column_as_key
 from .selectable import _interpret_as_from, _interpret_as_select, \
     HasPrefixes, HasCTE
-from .. import util
 from .. import exc
+from .. import util
 
 
 class UpdateBase(

@@ -283,25 +283,26 @@ columns for non-unique indexes, all but the last column for unique indexes).
 
 import re
 
-from sqlalchemy import util, sql
 from sqlalchemy.engine import default, reflection
+
+from sqlalchemy import types as sqltypes, schema as sa_schema
+from sqlalchemy import util, sql
 from sqlalchemy.sql import compiler, visitors, expression, util as sql_util
 from sqlalchemy.sql import operators as sql_operators
 from sqlalchemy.sql.elements import quoted_name
-from sqlalchemy import types as sqltypes, schema as sa_schema
-from sqlalchemy.types import VARCHAR, NVARCHAR, CHAR, \
-    BLOB, CLOB, TIMESTAMP, FLOAT
+from sqlalchemy.types import VARCHAR, NVARCHAR, CHAR, BLOB, CLOB, TIMESTAMP, \
+    FLOAT
 
-RESERVED_WORDS = \
-    set('SHARE RAW DROP BETWEEN FROM DESC OPTION PRIOR LONG THEN '
-        'DEFAULT ALTER IS INTO MINUS INTEGER NUMBER GRANT IDENTIFIED '
-        'ALL TO ORDER ON FLOAT DATE HAVING CLUSTER NOWAIT RESOURCE '
-        'ANY TABLE INDEX FOR UPDATE WHERE CHECK SMALLINT WITH DELETE '
-        'BY ASC REVOKE LIKE SIZE RENAME NOCOMPRESS NULL GROUP VALUES '
-        'AS IN VIEW EXCLUSIVE COMPRESS SYNONYM SELECT INSERT EXISTS '
-        'NOT TRIGGER ELSE CREATE INTERSECT PCTFREE DISTINCT USER '
-        'CONNECT SET MODE OF UNIQUE VARCHAR2 VARCHAR LOCK OR CHAR '
-        'DECIMAL UNION PUBLIC AND START UID COMMENT CURRENT LEVEL'.split())
+RESERVED_WORDS = set(
+    'SHARE RAW DROP BETWEEN FROM DESC OPTION PRIOR LONG THEN '
+    'DEFAULT ALTER IS INTO MINUS INTEGER NUMBER GRANT IDENTIFIED '
+    'ALL TO ORDER ON FLOAT DATE HAVING CLUSTER NOWAIT RESOURCE '
+    'ANY TABLE INDEX FOR UPDATE WHERE CHECK SMALLINT WITH DELETE '
+    'BY ASC REVOKE LIKE SIZE RENAME NOCOMPRESS NULL GROUP VALUES '
+    'AS IN VIEW EXCLUSIVE COMPRESS SYNONYM SELECT INSERT EXISTS '
+    'NOT TRIGGER ELSE CREATE INTERSECT PCTFREE DISTINCT USER '
+    'CONNECT SET MODE OF UNIQUE VARCHAR2 VARCHAR LOCK OR CHAR '
+    'DECIMAL UNION PUBLIC AND START UID COMMENT CURRENT LEVEL'.split())
 
 NO_ARG_FNS = set('UID CURRENT_DATE SYSDATE USER '
                  'CURRENT_TIME CURRENT_TIMESTAMP'.split())

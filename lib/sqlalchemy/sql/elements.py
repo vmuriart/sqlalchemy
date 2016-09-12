@@ -12,18 +12,18 @@
 
 from __future__ import unicode_literals
 
-from .. import util, exc, inspection
-from . import type_api
-from . import operators
-from .visitors import Visitable, cloned_traverse, traverse
-from .annotation import Annotated
 import itertools
+import numbers
+import operator
+import re
+
+from . import operators
+from . import type_api
+from .annotation import Annotated
 from .base import Executable, PARSE_AUTOCOMMIT, Immutable, NO_ARG
 from .base import _generative
-import numbers
-
-import re
-import operator
+from .visitors import Visitable, cloned_traverse, traverse
+from .. import util, exc, inspection
 
 
 def _clone(element, **kw):

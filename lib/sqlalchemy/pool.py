@@ -20,12 +20,11 @@ SQLAlchemy connection pool.
 import time
 import traceback
 import weakref
+from collections import deque
 
 from . import exc, log, util
 from .util import queue as sqla_queue
 from .util import threading, memoized_property, chop_traceback
-
-from collections import deque
 
 proxies = {}
 

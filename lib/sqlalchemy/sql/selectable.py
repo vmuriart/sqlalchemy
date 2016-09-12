@@ -10,6 +10,17 @@ SQL tables and derived rowsets.
 
 """
 
+import collections
+import itertools
+import operator
+from operator import attrgetter
+
+from sqlalchemy.sql.visitors import Visitable
+from . import operators
+from . import type_api
+from .annotation import Annotated
+from .base import Immutable, Executable, _generative, \
+    ColumnCollection, ColumnSet, _from_objects, Generative
 from .elements import ClauseElement, TextClause, ClauseList, \
     and_, Grouping, UnaryExpression, literal_column, BindParameter
 from .elements import _clone, \
@@ -17,19 +28,9 @@ from .elements import _clone, \
     _select_iterables, _anonymous_label, _clause_element_as_expr, \
     _cloned_intersection, _cloned_difference, True_, \
     _literal_as_label_reference, _literal_and_labels_as_label_reference
-from .base import Immutable, Executable, _generative, \
-    ColumnCollection, ColumnSet, _from_objects, Generative
-from . import type_api
+from .. import exc
 from .. import inspection
 from .. import util
-from .. import exc
-from operator import attrgetter
-from . import operators
-import operator
-import collections
-from .annotation import Annotated
-import itertools
-from sqlalchemy.sql.visitors import Visitable
 
 
 def _interpret_as_from(element):

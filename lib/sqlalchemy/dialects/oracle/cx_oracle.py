@@ -289,15 +289,14 @@ a period "." as the decimal character.
 
 from __future__ import absolute_import
 
-from .base import OracleCompiler, OracleDialect, OracleExecutionContext
-from . import base as oracle
-from ...engine import result as _result
-from sqlalchemy import types as sqltypes, util, exc, processors
-from sqlalchemy import util
-import random
-import collections
 import decimal
+import random
 import re
+
+from sqlalchemy import types as sqltypes, exc, processors
+from sqlalchemy import util
+from . import base as oracle
+from .base import OracleCompiler, OracleDialect, OracleExecutionContext
 
 
 class _OracleNumeric(sqltypes.Numeric):
@@ -563,21 +562,14 @@ class OracleExecutionContext_cx_oracle(OracleExecutionContext):
 
     def get_result_proxy(self):
         if hasattr(self, 'out_parameters') and self.compiled.returning:
-            returning_params = dict(
-                (k, v.getvalue())
-                for k, v in self.out_parameters.items()
-            )
-            return ReturningResultProxy(self, returning_params)
+            returning_params = dict((k, v.getvalue())
+                                    for k, v in self.out_parameters.items())
+            return None
 
         result = None
         if self.cursor.description is not None:
             for column in self.cursor.description:
                 type_code = column[1]
-                if type_code in self.dialect._cx_oracle_binary_types:
-                    result = _result.BufferedColumnResultProxy(self)
-
-        if result is None:
-            result = _result.ResultProxy(self)
 
         if hasattr(self, 'out_parameters'):
             if self.compiled_parameters is not None and \
@@ -631,28 +623,6 @@ class OracleExecutionContext_cx_oracle_with_unicode(
     def _execute_scalar(self, stmt):
         return super(OracleExecutionContext_cx_oracle_with_unicode, self). \
             _execute_scalar(util.text_type(stmt))
-
-
-class ReturningResultProxy(_result.FullyBufferedResultProxy):
-    """Result proxy which stuffs the _returning clause + outparams
-    into the fetch."""
-
-    def __init__(self, context, returning_params):
-        self._returning_params = returning_params
-        super(ReturningResultProxy, self).__init__(context)
-
-    def _cursor_description(self):
-        returning = self.context.compiled.returning
-        return [
-            ("ret_{0:d}".format(i), None)
-            for i, col in enumerate(returning)
-            ]
-
-    def _buffer_rows(self):
-        return collections.deque(
-            [tuple(self._returning_params["ret_{0:d}".format(i)]
-                   for i, c in enumerate(self._returning_params))]
-        )
 
 
 class OracleDialect_cx_oracle(OracleDialect):

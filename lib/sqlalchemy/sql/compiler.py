@@ -24,11 +24,12 @@ To generate user-defined SQL strings, see
 """
 
 import contextlib
+import itertools
 import re
+
 from . import schema, sqltypes, operators, functions, visitors, \
     elements, selectable, crud
 from .. import util, exc
-import itertools
 
 RESERVED_WORDS = set([
     'all', 'analyse', 'analyze', 'and', 'any', 'array',

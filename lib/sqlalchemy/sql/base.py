@@ -9,11 +9,12 @@
 
 """
 
-from .. import util, exc
-import itertools
-from .visitors import ClauseVisitor
-import re
 import collections
+import itertools
+import re
+
+from .visitors import ClauseVisitor
+from .. import util, exc
 
 PARSE_AUTOCOMMIT = util.symbol('PARSE_AUTOCOMMIT')
 NO_ARG = util.symbol('NO_ARG')
@@ -90,12 +91,10 @@ class _DialectArgView(collections.MutableMapping):
                    self.obj.dialect_options.values())
 
     def __iter__(self):
-        return (
-            util.safe_kwarg("{0!s}_{1!s}".format(dialect_name, value_name))
-            for dialect_name in self.obj.dialect_options
-            for value_name in
-            self.obj.dialect_options[dialect_name]._non_defaults
-        )
+        return (util.safe_kwarg("{0!s}_{1!s}".format(dialect_name, value_name))
+                for dialect_name in self.obj.dialect_options
+                for value_name in
+                self.obj.dialect_options[dialect_name]._non_defaults)
 
 
 class _DialectArgDict(collections.MutableMapping):

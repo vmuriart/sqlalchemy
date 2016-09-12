@@ -24,10 +24,11 @@ http://techspot.zzzeek.org/2008/01/23/expression-transformations/
 
 """
 
-from collections import deque
-from .. import util
 import operator
+from collections import deque
+
 from .. import exc
+from .. import util
 
 __all__ = ['VisitableType', 'Visitable', 'ClauseVisitor',
            'CloningVisitor', 'ReplacingCloningVisitor', 'iterate',
@@ -53,8 +54,7 @@ class VisitableType(type):
     """
 
     def __init__(cls, clsname, bases, clsdict):
-        if clsname != 'Visitable' and \
-            hasattr(cls, '__visit_name__'):
+        if clsname != 'Visitable' and hasattr(cls, '__visit_name__'):
             _generate_dispatch(cls)
 
         super(VisitableType, cls).__init__(clsname, bases, clsdict)
@@ -310,8 +310,8 @@ def replacement_traverse(obj, opts, replace):
     stop_on = set([id(x) for x in opts.get('stop_on', [])])
 
     def clone(elem, **kw):
-        if id(elem) in stop_on or \
-                'no_replacement_traverse' in elem._annotations:
+        if (id(elem) in
+                stop_on or 'no_replacement_traverse' in elem._annotations):
             return elem
         else:
             newelem = replace(elem)

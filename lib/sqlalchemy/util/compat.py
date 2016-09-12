@@ -50,12 +50,6 @@ if py3k:
     import builtins
 
     from inspect import getfullargspec as inspect_getfullargspec
-    from urllib.parse import (quote_plus, unquote_plus,
-                              parse_qsl, quote, unquote)
-    import configparser
-    from io import StringIO
-
-    from io import BytesIO as byte_buffer
 
 
     def inspect_getargspec(func):
@@ -106,7 +100,6 @@ if py3k:
     itertools_filterfalse = itertools.filterfalse
     itertools_filter = filter
     itertools_imap = map
-    from itertools import zip_longest
 
     import base64
 

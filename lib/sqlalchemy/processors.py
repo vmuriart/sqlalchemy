@@ -14,8 +14,8 @@ They all share one common characteristic: None is passed through unchanged.
 """
 
 import codecs
-import re
 import datetime
+import re
 
 from . import util
 

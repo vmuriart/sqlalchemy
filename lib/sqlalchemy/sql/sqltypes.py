@@ -9,23 +9,23 @@
 
 """
 
-import datetime as dt
 import codecs
 import collections
+import datetime as dt
+import decimal
 import json
 
 from . import elements
-from .type_api import TypeEngine, TypeDecorator, to_instance
+from . import operators
+from .base import _bind_or_error, SchemaEventTarget
 from .elements import quoted_name, TypeCoerce as type_coerce, _defer_name, \
     Slice, _literal_as_binds
-from .. import exc, util, processors
-from .base import _bind_or_error, SchemaEventTarget
-from . import operators
-from .. import inspection
+from .type_api import TypeEngine, TypeDecorator, to_instance
 from .. import event
-from ..util import pickle
+from .. import exc, util, processors
+from .. import inspection
 from ..util import compat
-import decimal
+from ..util import pickle
 
 if util.jython:
     import array

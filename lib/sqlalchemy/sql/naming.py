@@ -10,12 +10,13 @@
 
 """
 
+import re
+
+from .elements import _defer_name, _defer_none_name, conv
 from .schema import Constraint, ForeignKeyConstraint, PrimaryKeyConstraint, \
     UniqueConstraint, CheckConstraint, Index, Table, Column
-from .. import event, events
+from .. import event
 from .. import exc
-from .elements import _truncated_label, _defer_name, _defer_none_name, conv
-import re
 
 
 class ConventionDict(object):

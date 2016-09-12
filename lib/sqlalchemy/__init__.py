@@ -102,27 +102,6 @@ from .types import (
     VARCHAR,
 )
 
-from .schema import (
-    CheckConstraint,
-    Column,
-    ColumnDefault,
-    Constraint,
-    DefaultClause,
-    FetchedValue,
-    ForeignKey,
-    ForeignKeyConstraint,
-    Index,
-    MetaData,
-    PassiveDefault,
-    PrimaryKeyConstraint,
-    Sequence,
-    Table,
-    ThreadLocalMetaData,
-    UniqueConstraint,
-    DDL,
-    BLANK_SCHEMA
-)
-
 from .inspection import inspect
 
 __version__ = '1.1.0'

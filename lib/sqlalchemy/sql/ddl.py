@@ -10,12 +10,12 @@ to invoke them for a create/drop call.
 
 """
 
-from .. import util
-from .elements import ClauseElement
 from .base import Executable, _generative, SchemaVisitor, _bind_or_error
-from ..util import topological
+from .elements import ClauseElement
 from .. import event
 from .. import exc
+from .. import util
+from ..util import topological
 
 
 class _DDLCompiles(ClauseElement):

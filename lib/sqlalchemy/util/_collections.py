@@ -8,13 +8,15 @@
 """Collection classes and helpers."""
 
 from __future__ import absolute_import
-import weakref
+
+import collections
 import operator
+import types
+import weakref
+
+from . import py2k
 from .compat import threading, itertools_filterfalse, string_types, \
     binary_types
-from . import py2k
-import types
-import collections
 
 EMPTY_SET = frozenset()
 
@@ -917,7 +919,7 @@ class LRUCache(dict):
         try:
             while len(self) > self.capacity + self.capacity * self.threshold:
                 by_counter = sorted(dict.values(self),
-                                    key=operator.itemgetter(2),  reverse=True)
+                                    key=operator.itemgetter(2), reverse=True)
                 for item in by_counter[self.capacity:]:
                     try:
                         del self[item[0]]

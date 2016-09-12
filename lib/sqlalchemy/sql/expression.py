@@ -30,29 +30,19 @@ __all__ = [
     'tuple_', 'type_coerce', 'union', 'union_all', 'update', 'within_group',
     'TableSample', 'tablesample']
 
-from .visitors import Visitable
-from .functions import func, modifier, FunctionElement, Function
-from ..util.langhelpers import public_factory
+from .base import ColumnCollection, Generative, Executable
+from .dml import Insert, Update, Delete
 from .elements import ClauseElement, ColumnElement, \
     BindParameter, CollectionAggregate, UnaryExpression, BooleanClauseList, \
     Label, Cast, Case, ColumnClause, TextClause, Over, Null, \
     True_, False_, BinaryExpression, Tuple, TypeClause, Extract, \
     Grouping, WithinGroup, not_, \
     collate, literal_column, between, \
-    literal, outparam, TypeCoerce, ClauseList, FunctionFilter
-
-from .elements import SavepointClause, RollbackToSavepointClause, \
-    ReleaseSavepointClause
-
-from .base import ColumnCollection, Generative, Executable, \
-    PARSE_AUTOCOMMIT
-
+    literal, outparam, TypeCoerce, FunctionFilter
 from .selectable import Alias, Join, Select, Selectable, TableClause, \
-    CompoundSelect, CTE, FromClause, FromGrouping, Lateral, SelectBase, \
-    alias, GenerativeSelect, subquery, HasCTE, HasPrefixes, HasSuffixes, \
-    lateral, Exists, ScalarSelect, TextAsFrom, TableSample, tablesample
-
-from .dml import Insert, Update, Delete, UpdateBase, ValuesBase
+    CompoundSelect, FromClause, FromGrouping, Lateral, SelectBase, \
+    alias, subquery, lateral, Exists, ScalarSelect, TableSample, tablesample
+from ..util.langhelpers import public_factory
 
 # factory functions - these pull class-bound constructors and classmethods
 # from SQL elements and selectables into public functions.  This allows
@@ -108,14 +98,6 @@ funcfilter = public_factory(
 
 # internal functions still being called from tests and the ORM,
 # these might be better off in some other namespace
-from .base import _from_objects
-from .elements import _literal_as_text, _clause_element_as_expr, \
-    _is_column, _labeled, _only_column_elements, _string_or_unprintable, \
-    _truncated_label, _clone, _cloned_difference, _cloned_intersection, \
-    _column_as_key, _literal_as_binds, _select_iterables, \
-    _corresponding_column_or_error, _literal_as_label_reference, \
-    _expression_literal_as_text
-from .selectable import _interpret_as_from
 
 # old names for compatibility
 _Executable = Executable
