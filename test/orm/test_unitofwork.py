@@ -817,7 +817,7 @@ class DefaultTest(fixtures.MappedTest):
     @classmethod
     def define_tables(cls, metadata):
         use_string_defaults = testing.against('postgresql', 'oracle', 'sqlite',
-                                              'mssql')
+                                              )
 
         if use_string_defaults:
             hohotype = String(30)

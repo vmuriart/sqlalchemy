@@ -2916,18 +2916,6 @@ class CRUDTest(fixtures.TestBase, AssertsCompiledSQL):
             u, "UPDATE mytable SET name=:name "
                "FROM myothertable WHERE myothertable.otherid = mytable.myid")
 
-        self.assert_compile(u,
-                            "UPDATE mytable SET name=:name "
-                            "FROM mytable, myothertable WHERE "
-                            "myothertable.otherid = mytable.myid",
-                            dialect=mssql.dialect())
-
-        self.assert_compile(u.where(table2.c.othername == mt.c.name),
-                            "UPDATE mytable SET name=:name "
-                            "FROM mytable, myothertable, mytable AS mytable_1 "
-                            "WHERE myothertable.otherid = mytable.myid "
-                            "AND myothertable.othername = mytable_1.name",
-                            dialect=mssql.dialect())
 
     def test_binds_that_match_columns(self):
         """test bind params named after column names

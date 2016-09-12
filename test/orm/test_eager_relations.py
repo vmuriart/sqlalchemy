@@ -816,28 +816,6 @@ class EagerTest(_fixtures.FixtureTest, testing.AssertsCompiledSQL):
 
         q = sess.query(User)
 
-        if not testing.against('mssql'):
-            l = q.join('orders').order_by(
-                Order.user_id.desc()).limit(2).offset(1)
-            eq_([
-                User(id=9,
-                     orders=[Order(id=2), Order(id=4)],
-                     addresses=[Address(id=5)]
-                     ),
-                User(id=7,
-                     orders=[Order(id=1), Order(id=3), Order(id=5)],
-                     addresses=[Address(id=1)]
-                     )
-            ], l.all())
-
-        l = q.join('addresses').order_by(
-            Address.email_address.desc()).limit(1).offset(0)
-        eq_([
-            User(id=7,
-                 orders=[Order(id=1), Order(id=3), Order(id=5)],
-                 addresses=[Address(id=1)]
-                 )
-        ], l.all())
 
     def test_limit_4(self):
         User, Order, addresses, users, orders = (self.classes.User,
@@ -3854,10 +3832,7 @@ class CorrelatedSubqueryTest(fixtures.MappedTest):
                 correlate(users).order_by(salias.c.date.desc()).limit(1)
 
         # can't win on this one
-        if testing.against("mssql"):
-            operator = operators.in_op
-        else:
-            operator = operators.eq
+        operator = operators.eq
 
         if labeled == 'label':
             stuff_view = stuff_view.label('foo')

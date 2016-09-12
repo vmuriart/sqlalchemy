@@ -97,33 +97,6 @@ class GenerativeQueryTest(fixtures.MappedTest):
         query = create_session().query(func.sum(foo.c.bar))
         assert query.filter(foo.c.bar < 30).one() == (435,)
 
-    @testing.fails_on('firebird', 'FIXME: unknown')
-    @testing.fails_on('mssql',
-                      'AVG produces an average as the original column type on mssql.')
-    def test_aggregate_2(self):
-        foo = self.tables.foo
-
-        query = create_session().query(func.avg(foo.c.bar))
-        avg = query.filter(foo.c.bar < 30).one()[0]
-        eq_(float(round(avg, 1)), 14.5)
-
-    @testing.fails_on('mssql',
-                      'AVG produces an average as the original column type on mssql.')
-    def test_aggregate_3(self):
-        foo, Foo = self.tables.foo, self.classes.Foo
-
-        query = create_session().query(Foo)
-
-        avg_f = \
-            next(query.filter(foo.c.bar < 30).values(sa.func.avg(foo.c.bar)))[
-                0]
-        assert float(round(avg_f, 1)) == 14.5
-
-        avg_o = \
-            next(query.filter(foo.c.bar < 30).values(sa.func.avg(foo.c.bar)))[
-                0]
-        assert float(round(avg_o, 1)) == 14.5
-
     def test_filter(self):
         Foo = self.classes.Foo
 

@@ -200,12 +200,6 @@ class LazyTest(_fixtures.FixtureTest):
         sess = create_session()
         q = sess.query(User)
 
-        if testing.against('mssql'):
-            l = q.limit(2).all()
-            assert self.static.user_all_result[:2] == l
-        else:
-            l = q.limit(2).offset(1).all()
-            assert self.static.user_all_result[1:3] == l
 
     def test_distinct(self):
         users, items, order_items, orders, \

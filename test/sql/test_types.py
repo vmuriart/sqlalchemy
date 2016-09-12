@@ -241,23 +241,6 @@ class TypeAffinityTest(fixtures.TestBase):
             eq_(t1._compare_type_affinity(t2), comp,
                 "{0!s} {1!s}".format(t1, t2))
 
-    def test_decorator_doesnt_cache(self):
-        from sqlalchemy.dialects import postgresql
-
-        class MyType(TypeDecorator):
-            impl = CHAR
-
-            def load_dialect_impl(self, dialect):
-                if dialect.name == 'postgresql':
-                    return dialect.type_descriptor(postgresql.UUID())
-                else:
-                    return dialect.type_descriptor(CHAR(32))
-
-        t1 = MyType()
-        d = postgresql.dialect()
-        assert t1._type_affinity is String
-        assert t1.dialect_impl(d)._type_affinity is postgresql.UUID
-
 
 class PickleTypesTest(fixtures.TestBase):
     def test_pickle_types(self):
@@ -365,109 +348,11 @@ class UserDefinedTest(fixtures.TablesTest, AssertsCompiledSQL):
             literal_binds=True
         )
 
-    def test_typedecorator_impl(self):
-        for impl_, exp, kw in [
-            (Float, "FLOAT", {}),
-            (Float, "FLOAT(2)", {'precision': 2}),
-            (Float(2), "FLOAT(2)", {'precision': 4}),
-            (Numeric(19, 2), "NUMERIC(19, 2)", {}),
-        ]:
-            for dialect_ in (
-                dialects.postgresql, dialects.mssql, dialects.mysql):
-                dialect_ = dialect_.dialect()
-
-                raw_impl = types.to_instance(impl_, **kw)
-
-                class MyType(types.TypeDecorator):
-                    impl = impl_
-
-                dec_type = MyType(**kw)
-
-                eq_(dec_type.impl.__class__, raw_impl.__class__)
-
-                raw_dialect_impl = raw_impl.dialect_impl(dialect_)
-                dec_dialect_impl = dec_type.dialect_impl(dialect_)
-                eq_(dec_dialect_impl.__class__, MyType)
-                eq_(
-                    raw_dialect_impl.__class__,
-                    dec_dialect_impl.impl.__class__)
-
-                self.assert_compile(
-                    MyType(**kw),
-                    exp,
-                    dialect=dialect_
-                )
-
-    def test_user_defined_typedec_impl(self):
-        class MyType(types.TypeDecorator):
-            impl = Float
-
-            def load_dialect_impl(self, dialect):
-                if dialect.name == 'sqlite':
-                    return String(50)
-                else:
-                    return super(MyType, self).load_dialect_impl(dialect)
-
-        sl = dialects.sqlite.dialect()
-        pg = dialects.postgresql.dialect()
-        t = MyType()
-        self.assert_compile(t, "VARCHAR(50)", dialect=sl)
-        self.assert_compile(t, "FLOAT", dialect=pg)
-        eq_(
-            t.dialect_impl(dialect=sl).impl.__class__,
-            String().dialect_impl(dialect=sl).__class__
-        )
-        eq_(
-            t.dialect_impl(dialect=pg).impl.__class__,
-            Float().dialect_impl(pg).__class__
-        )
-
     def test_type_decorator_repr(self):
         class MyType(TypeDecorator):
             impl = VARCHAR
 
         eq_(repr(MyType(45)), "MyType(length=45)")
-
-    def test_user_defined_typedec_impl_bind(self):
-        class TypeOne(types.TypeEngine):
-
-            def bind_processor(self, dialect):
-                def go(value):
-                    return value + " ONE"
-
-                return go
-
-        class TypeTwo(types.TypeEngine):
-
-            def bind_processor(self, dialect):
-                def go(value):
-                    return value + " TWO"
-
-                return go
-
-        class MyType(types.TypeDecorator):
-            impl = TypeOne
-
-            def load_dialect_impl(self, dialect):
-                if dialect.name == 'sqlite':
-                    return TypeOne()
-                else:
-                    return TypeTwo()
-
-            def process_bind_param(self, value, dialect):
-                return "MYTYPE " + value
-
-        sl = dialects.sqlite.dialect()
-        pg = dialects.postgresql.dialect()
-        t = MyType()
-        eq_(
-            t._cached_bind_processor(sl)('foo'),
-            "MYTYPE foo ONE"
-        )
-        eq_(
-            t._cached_bind_processor(pg)('foo'),
-            "MYTYPE foo TWO"
-        )
 
     def test_user_defined_dialect_specific_args(self):
         class MyType(types.UserDefinedType):
@@ -941,29 +826,6 @@ class VariantTest(fixtures.TestBase, AssertsCompiledSQL):
             lambda: v.with_variant(self.UTypeThree(), 'postgresql')
         )
 
-    def test_compile(self):
-        self.assert_compile(
-            self.variant,
-            "UTYPEONE",
-            use_default_dialect=True
-        )
-        self.assert_compile(
-            self.variant,
-            "UTYPEONE",
-            dialect=dialects.mysql.dialect()
-        )
-        self.assert_compile(
-            self.variant,
-            "UTYPETWO",
-            dialect=dialects.postgresql.dialect()
-        )
-
-    def test_to_instance(self):
-        self.assert_compile(
-            self.UTypeOne().with_variant(self.UTypeTwo, "postgresql"),
-            "UTYPETWO",
-            dialect=dialects.postgresql.dialect()
-        )
 
     def test_compile_composite(self):
         self.assert_compile(
