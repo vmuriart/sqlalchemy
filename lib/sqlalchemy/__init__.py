@@ -132,7 +132,6 @@ __version__ = '1.1.0'
 def __go(lcls):
     global __all__
 
-    from . import events
     from . import util as _sa_util
 
     import inspect as _inspect

@@ -21,10 +21,9 @@ import time
 import traceback
 import weakref
 
-from . import exc, log, event, interfaces, util
+from . import exc, log, util
 from .util import queue as sqla_queue
-from .util import threading, memoized_property, \
-    chop_traceback
+from .util import threading, memoized_property, chop_traceback
 
 from collections import deque
 
@@ -239,9 +238,6 @@ class Pool(log.Identified):
             self.dispatch._update(_dispatch, only_propagate=False)
         if _dialect:
             self._dialect = _dialect
-        if events:
-            for fn, target in events:
-                event.listen(self, target, fn)
         if listeners:
             util.warn_deprecated(
                 "The 'listeners' argument to Pool (and "
@@ -303,7 +299,7 @@ class Pool(log.Identified):
         of some or all of the named methods in PoolListener.
 
         """
-        interfaces.PoolListener._adapt_listener(self, listener)
+        pass
 
     def unique_connection(self):
         """Produce a DBAPI connection that is not referenced by any
