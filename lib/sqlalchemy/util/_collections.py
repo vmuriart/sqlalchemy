@@ -917,8 +917,7 @@ class LRUCache(dict):
         try:
             while len(self) > self.capacity + self.capacity * self.threshold:
                 by_counter = sorted(dict.values(self),
-                                    key=operator.itemgetter(2),
-                                    reverse=True)
+                                    key=operator.itemgetter(2),  reverse=True)
                 for item in by_counter[self.capacity:]:
                     try:
                         del self[item[0]]
@@ -938,13 +937,10 @@ def lightweight_named_tuple(name, fields):
     if tp_cls:
         return tp_cls
 
-    tp_cls = type(
-        name, (_LW,),
-        dict([
-                 (field, _property_getters[idx])
-                 for idx, field in enumerate(fields) if field is not None
-                 ] + [('__slots__', ())])
-    )
+    tp_cls = type(name, (_LW,),
+                  dict([(field, _property_getters[idx])
+                        for idx, field in enumerate(fields)
+                        if field is not None] + [('__slots__', ())]))
 
     tp_cls._real_fields = fields
     tp_cls._fields = tuple([f for f in fields if f is not None])

@@ -87,9 +87,8 @@ def decode_slice(slc):
 def _unique_symbols(used, *bases):
     used = set(used)
     for base in bases:
-        pool = itertools.chain((base,),
-                               compat.itertools_imap(lambda i: base + str(i),
-                                                     range(1000)))
+        pool = itertools.chain((base,), compat.itertools_imap(
+            lambda i: base + str(i), range(1000)))
         for sym in pool:
             if sym not in used:
                 used.add(sym)
@@ -203,8 +202,7 @@ class PluginLoader(object):
         except ImportError:
             pass
         else:
-            for impl in pkg_resources.iter_entry_points(
-                self.group, name):
+            for impl in pkg_resources.iter_entry_points(self.group, name):
                 self.impls[name] = impl.load
                 return impl.load()
 
@@ -239,8 +237,8 @@ def get_cls_kwargs(cls, _set=None):
 
     ctr = cls.__dict__.get('__init__', False)
 
-    has_init = ctr and isinstance(ctr, types.FunctionType) and \
-               isinstance(ctr.__code__, types.CodeType)
+    has_init = (ctr and isinstance(ctr, types.FunctionType) and
+                isinstance(ctr.__code__, types.CodeType))
 
     if has_init:
         names, has_kw = inspect_func_args(ctr)
@@ -438,9 +436,9 @@ def getargspec_init(method):
         return compat.inspect_getargspec(method)
     except TypeError:
         if method is object.__init__:
-            return (['self'], None, None, None)
+            return ['self'], None, None, None
         else:
-            return (['self'], 'args', 'kwargs', None)
+            return ['self'], 'args', 'kwargs', None
 
 
 def unbound_method_to_callable(func_or_cls):
@@ -472,8 +470,8 @@ def generic_repr(obj, additional_kw=(), to_inspect=None, omit_kwarg=()):
     vargs = None
     for i, insp in enumerate(to_inspect):
         try:
-            (_args, _vargs, vkw, defaults) = \
-                compat.inspect_getargspec(insp.__init__)
+            (_args, _vargs, vkw, defaults) = compat.inspect_getargspec(
+                insp.__init__)
         except TypeError:
             continue
         else:
@@ -486,17 +484,12 @@ def generic_repr(obj, additional_kw=(), to_inspect=None, omit_kwarg=()):
                 else:
                     pos_args.extend(_args[1:])
             else:
-                kw_args.update([
-                                   (arg, missing) for arg in
-                                   _args[1:-default_len]
-                                   ])
+                kw_args.update([(arg, missing) for arg in
+                                _args[1:-default_len]])
 
             if default_len:
-                kw_args.update([
-                                   (arg, default)
-                                   for arg, default
-                                   in zip(_args[-default_len:], defaults)
-                                   ])
+                kw_args.update([(arg, default) for arg, default in
+                                zip(_args[-default_len:], defaults)])
     output = []
 
     output.extend(repr(getattr(obj, arg, None)) for arg in pos_args)
@@ -566,7 +559,7 @@ def class_hierarchy(cls):
         if isinstance(cls, types.ClassType):
             return list()
 
-    hier = set([cls])
+    hier = {cls}
     process = list(cls.__mro__)
     while process:
         c = process.pop()
@@ -586,8 +579,8 @@ def class_hierarchy(cls):
             if c.__module__ == 'builtins' or not hasattr(c, '__subclasses__'):
                 continue
         else:
-            if c.__module__ == '__builtin__' or not hasattr(
-                c, '__subclasses__'):
+            if c.__module__ == '__builtin__' or not hasattr(c,
+                                                            '__subclasses__'):
                 continue
 
         for s in [_ for _ in c.__subclasses__() if _ not in hier]:
@@ -882,11 +875,7 @@ class dependencies(object):
         for dep in deps:
             tokens = dep.split(".")
             self.import_deps.append(
-                dependencies._importlater(
-                    ".".join(tokens[0:-1]),
-                    tokens[-1]
-                )
-            )
+                dependencies._importlater(".".join(tokens[0:-1]), tokens[-1]))
 
     def __call__(self, fn):
         import_deps = self.import_deps
@@ -906,10 +895,9 @@ class dependencies(object):
 
         outer_spec = format_argspec_plus(spec, grouped=False)
 
-        code = 'lambda {args!s}: fn({apply_kw!s})'.format(**{
-            "args": outer_spec['args'],
-            "apply_kw": inner_spec['apply_kw']
-        })
+        code = 'lambda {args!s}: fn({apply_kw!s})'.format(
+            **{"args": outer_spec['args'],
+               "apply_kw": inner_spec['apply_kw']})
 
         decorated = eval(code, locals())
         decorated.__defaults__ = getattr(fn, 'im_func', fn).__defaults__
@@ -959,8 +947,7 @@ class dependencies(object):
         def _resolve(self):
             dependencies._unresolved.discard(self)
             self._initial_import = compat.import_(
-                self._il_path, globals(), locals(),
-                [self._il_addtl])
+                self._il_path, globals(), locals(), [self._il_addtl])
 
         def __getattr__(self, key):
             if key == 'module':
@@ -971,8 +958,7 @@ class dependencies(object):
             except AttributeError:
                 raise AttributeError(
                     "Module {0!s} has no attribute '{1!s}'".format(
-                        self._full_path, key)
-                )
+                        self._full_path, key))
             self.__dict__[key] = attr
             return attr
 
@@ -1034,9 +1020,8 @@ def constructor_copy(obj, cls, *args, **kw):
     """
 
     names = get_cls_kwargs(cls)
-    kw.update(
-        (k, obj.__dict__[k]) for k in names.difference(kw)
-        if k in obj.__dict__)
+    kw.update((k, obj.__dict__[k]) for k in names.difference(kw)
+              if k in obj.__dict__)
     return cls(*args, **kw)
 
 
@@ -1288,10 +1273,9 @@ class _hash_limit_string(compat.text_type):
     """
 
     def __new__(cls, value, num, args):
-        interpolated = (value % args) + \
-                       (
-                           " (this warning may be suppressed after {0:d} occurrences)".format(
-                               num))
+        interpolated = (value % args) + (
+            " (this warning may be suppressed after {0:d} occurrences)".format(
+                num))
         self = super(_hash_limit_string, cls).__new__(cls, interpolated)
         self._hash = hash(
             "{0!s}_{1:d}".format(value, hash(interpolated) % num))

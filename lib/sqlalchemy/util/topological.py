@@ -29,11 +29,9 @@ def sort_as_subsets(tuples, allitems, deterministic_order=False):
                 output.add(node)
 
         if not output:
-            raise CircularDependencyError(
-                "Circular dependency detected.",
-                find_cycles(tuples, allitems),
-                _gen_edges(edges)
-            )
+            raise CircularDependencyError("Circular dependency detected.",
+                                          find_cycles(tuples, allitems),
+                                          _gen_edges(edges))
 
         todo.difference_update(output)
         yield output
@@ -92,8 +90,4 @@ def find_cycles(tuples, allitems):
 
 
 def _gen_edges(edges):
-    return set([
-                   (right, left)
-                   for left in edges
-                   for right in edges[left]
-                   ])
+    return set([(right, left) for left in edges for right in edges[left]])

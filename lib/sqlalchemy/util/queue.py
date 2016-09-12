@@ -26,14 +26,12 @@ __all__ = ['Empty', 'Full', 'Queue']
 
 
 class Empty(Exception):
-    "Exception raised by Queue.get(block=0)/get_nowait()."
-
+    """Exception raised by Queue.get(block=0)/get_nowait()."""
     pass
 
 
 class Full(Exception):
-    "Exception raised by Queue.put(block=0)/put_nowait()."
-
+    """Exception raised by Queue.put(block=0)/put_nowait()."""
     pass
 
 
