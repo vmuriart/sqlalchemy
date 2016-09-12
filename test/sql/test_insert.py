@@ -468,36 +468,6 @@ class InsertTest(_InsertTestBase, fixtures.TablesTest, AssertsCompiledSQL):
 
         )
 
-    def test_anticipate_no_pk_composite_pk_implicit_returning(self):
-        t = Table(
-            't', MetaData(), Column('x', Integer, primary_key=True),
-            Column('y', Integer, primary_key=True)
-        )
-        d = postgresql.dialect()
-        d.implicit_returning = True
-        assert_raises_message(
-            exc.CompileError,
-            "Column 't.y' is marked as a member.*"
-            "Note that as of SQLAlchemy 1.1,",
-            t.insert().compile, dialect=d, column_keys=['x']
-
-        )
-
-    def test_anticipate_no_pk_composite_pk_prefetch(self):
-        t = Table(
-            't', MetaData(), Column('x', Integer, primary_key=True),
-            Column('y', Integer, primary_key=True)
-        )
-        d = postgresql.dialect()
-        d.implicit_returning = False
-        assert_raises_message(
-            exc.CompileError,
-            "Column 't.y' is marked as a member.*"
-            "Note that as of SQLAlchemy 1.1,",
-            t.insert().compile, dialect=d, column_keys=['x']
-
-        )
-
     def test_anticipate_nullable_composite_pk(self):
         t = Table(
             't', MetaData(), Column('x', Integer, primary_key=True),
@@ -521,126 +491,6 @@ class InsertTest(_InsertTestBase, fixtures.TablesTest, AssertsCompiledSQL):
             "may not store NULL.$",
             t.insert().compile, column_keys=['q']
 
-        )
-
-    def test_anticipate_no_pk_non_composite_pk_implicit_returning(self):
-        t = Table(
-            't', MetaData(),
-            Column('x', Integer, primary_key=True, autoincrement=False),
-            Column('q', Integer)
-        )
-        d = postgresql.dialect()
-        d.implicit_returning = True
-        assert_raises_message(
-            exc.CompileError,
-            "Column 't.x' is marked as a member.*"
-            "may not store NULL.$",
-            t.insert().compile, dialect=d, column_keys=['q']
-
-        )
-
-    def test_anticipate_no_pk_non_composite_pk_prefetch(self):
-        t = Table(
-            't', MetaData(),
-            Column('x', Integer, primary_key=True, autoincrement=False),
-            Column('q', Integer)
-        )
-        d = postgresql.dialect()
-        d.implicit_returning = False
-        assert_raises_message(
-            exc.CompileError,
-            "Column 't.x' is marked as a member.*"
-            "may not store NULL.$",
-            t.insert().compile, dialect=d, column_keys=['q']
-
-        )
-
-
-class InsertImplicitReturningTest(
-    _InsertTestBase, fixtures.TablesTest, AssertsCompiledSQL):
-    __dialect__ = postgresql.dialect(implicit_returning=True)
-
-    def test_insert_select(self):
-        table1 = self.tables.mytable
-        sel = select([table1.c.myid, table1.c.name]).where(
-            table1.c.name == 'foo')
-        ins = self.tables.myothertable.insert(). \
-            from_select(("otherid", "othername"), sel)
-        self.assert_compile(
-            ins,
-            "INSERT INTO myothertable (otherid, othername) "
-            "SELECT mytable.myid, mytable.name FROM mytable "
-            "WHERE mytable.name = %(name_1)s",
-            checkparams={"name_1": "foo"}
-        )
-
-    def test_insert_select_return_defaults(self):
-        table1 = self.tables.mytable
-        sel = select([table1.c.myid, table1.c.name]).where(
-            table1.c.name == 'foo')
-        ins = self.tables.myothertable.insert(). \
-            from_select(("otherid", "othername"), sel). \
-            return_defaults(self.tables.myothertable.c.otherid)
-        self.assert_compile(
-            ins,
-            "INSERT INTO myothertable (otherid, othername) "
-            "SELECT mytable.myid, mytable.name FROM mytable "
-            "WHERE mytable.name = %(name_1)s",
-            checkparams={"name_1": "foo"}
-        )
-
-    def test_insert_multiple_values(self):
-        ins = self.tables.myothertable.insert().values([
-            {"othername": "foo"},
-            {"othername": "bar"},
-        ])
-        self.assert_compile(
-            ins,
-            "INSERT INTO myothertable (othername) "
-            "VALUES (%(othername_0)s), "
-            "(%(othername_1)s)",
-            checkparams={
-                'othername_1': 'bar',
-                'othername_0': 'foo'}
-        )
-
-    def test_insert_multiple_values_return_defaults(self):
-        # TODO: not sure if this should raise an
-        # error or what
-        ins = self.tables.myothertable.insert().values([
-            {"othername": "foo"},
-            {"othername": "bar"},
-        ]).return_defaults(self.tables.myothertable.c.otherid)
-        self.assert_compile(
-            ins,
-            "INSERT INTO myothertable (othername) "
-            "VALUES (%(othername_0)s), "
-            "(%(othername_1)s)",
-            checkparams={
-                'othername_1': 'bar',
-                'othername_0': 'foo'}
-        )
-
-    def test_insert_single_list_values(self):
-        ins = self.tables.myothertable.insert().values([
-            {"othername": "foo"},
-        ])
-        self.assert_compile(
-            ins,
-            "INSERT INTO myothertable (othername) "
-            "VALUES (%(othername_0)s)",
-            checkparams={'othername_0': 'foo'}
-        )
-
-    def test_insert_single_element_values(self):
-        ins = self.tables.myothertable.insert().values(
-            {"othername": "foo"},
-        )
-        self.assert_compile(
-            ins,
-            "INSERT INTO myothertable (othername) "
-            "VALUES (%(othername)s) RETURNING myothertable.otherid",
-            checkparams={'othername': 'foo'}
         )
 
 
@@ -852,25 +702,6 @@ class MultirowTest(_InsertTestBase, fixtures.TablesTest, AssertsCompiledSQL):
 
         stmt = table.insert().values(values)
 
-        eq_(
-            {k: v.type._type_affinity
-             for (k, v) in
-             stmt.compile(dialect=postgresql.dialect()).binds.items()},
-            {
-                'foo': Integer, 'data_2': String, 'id_0': Integer,
-                'id_2': Integer, 'foo_1': Integer, 'data_1': String,
-                'id_1': Integer, 'foo_2': Integer, 'data_0': String}
-        )
-
-        self.assert_compile(
-            stmt,
-            'INSERT INTO sometable (id, data, foo) VALUES '
-            '(%(id_0)s, %(data_0)s, %(foo)s), '
-            '(%(id_1)s, %(data_1)s, %(foo_1)s), '
-            '(%(id_2)s, %(data_2)s, %(foo_2)s)',
-            checkparams=checkparams,
-            dialect=postgresql.dialect())
-
     def test_python_fn_default(self):
         metadata = MetaData()
         table = Table('sometable', metadata,
@@ -897,24 +728,6 @@ class MultirowTest(_InsertTestBase, fixtures.TablesTest, AssertsCompiledSQL):
         }
 
         stmt = table.insert().values(values)
-        eq_(
-            {k: v.type._type_affinity
-             for (k, v) in
-             stmt.compile(dialect=postgresql.dialect()).binds.items()},
-            {
-                'foo': Integer, 'data_2': String, 'id_0': Integer,
-                'id_2': Integer, 'foo_1': Integer, 'data_1': String,
-                'id_1': Integer, 'foo_2': Integer, 'data_0': String}
-        )
-
-        self.assert_compile(
-            stmt,
-            "INSERT INTO sometable (id, data, foo) VALUES "
-            "(%(id_0)s, %(data_0)s, %(foo)s), "
-            "(%(id_1)s, %(data_1)s, %(foo_1)s), "
-            "(%(id_2)s, %(data_2)s, %(foo_2)s)",
-            checkparams=checkparams,
-            dialect=postgresql.dialect())
 
     def test_sql_functions(self):
         metadata = MetaData()
@@ -947,17 +760,6 @@ class MultirowTest(_InsertTestBase, fixtures.TablesTest, AssertsCompiledSQL):
             'id_4': 5,
             'data_4': 'bar'
         }
-
-        self.assert_compile(
-            table.insert().values(values),
-            "INSERT INTO sometable (id, data, foo) VALUES "
-            "(%(id_0)s, %(data_0)s, foob()), "
-            "(%(id_1)s, %(data_1)s, foob()), "
-            "(%(id_2)s, %(data_2)s, bar()), "
-            "(%(id_3)s, %(data_3)s, %(foo_3)s), "
-            "(%(id_4)s, %(data_4)s, foob())",
-            checkparams=checkparams,
-            dialect=postgresql.dialect())
 
     def test_server_default(self):
         metadata = MetaData()
