@@ -2,7 +2,6 @@
 
 from sqlalchemy import Column, Integer, MetaData, String, Table, \
     bindparam, exc, func, insert, select, column, text, table
-from sqlalchemy.dialects import mysql, postgresql
 from sqlalchemy.engine import default
 from sqlalchemy.testing import AssertsCompiledSQL, \
     assert_raises_message, fixtures, eq_
@@ -88,14 +87,6 @@ class InsertTest(_InsertTestBase, fixtures.TablesTest, AssertsCompiledSQL):
             'unknowncol': 'oops'
         }
 
-        stmt = insert(table1, values=checkparams)
-        assert_raises_message(
-            exc.CompileError,
-            'Unconsumed column names: unknowncol',
-            stmt.compile,
-            dialect=postgresql.dialect()
-        )
-
     def test_unconsumed_names_multi_values_dict(self):
         table1 = self.tables.mytable
 
@@ -108,14 +99,6 @@ class InsertTest(_InsertTestBase, fixtures.TablesTest, AssertsCompiledSQL):
             'name': 'someone',
             'unknowncol': 'oops'
         }]
-
-        stmt = insert(table1, values=checkparams)
-        assert_raises_message(
-            exc.CompileError,
-            'Unconsumed column names: unknowncol',
-            stmt.compile,
-            dialect=postgresql.dialect()
-        )
 
     def test_insert_with_values_tuple(self):
         table1 = self.tables.mytable
@@ -174,12 +157,6 @@ class InsertTest(_InsertTestBase, fixtures.TablesTest, AssertsCompiledSQL):
             stmt,
             'INSERT C D INTO mytable (myid, name, description) '
             'VALUES (:myid, :name, :description)')
-
-        self.assert_compile(
-            stmt,
-            'INSERT A B C D INTO mytable (myid, name, description) '
-            'VALUES (%s, %s, %s)',
-            dialect=mysql.dialect())
 
     def test_inline_default(self):
         metadata = MetaData()
@@ -848,15 +825,6 @@ class MultirowTest(_InsertTestBase, fixtures.TablesTest, AssertsCompiledSQL):
             'foo_1': 'plainfoo',
         }
 
-        self.assert_compile(
-            table.insert().values(values),
-            'INSERT INTO sometable (id, data, foo) VALUES '
-            '(%(id_0)s, %(data_0)s, foobar()), '
-            '(%(id_1)s, %(data_1)s, %(foo_1)s), '
-            '(%(id_2)s, %(data_2)s, foobar())',
-            checkparams=checkparams,
-            dialect=postgresql.dialect())
-
     def test_python_scalar_default(self):
         metadata = MetaData()
         table = Table('sometable', metadata,
@@ -1012,15 +980,6 @@ class MultirowTest(_InsertTestBase, fixtures.TablesTest, AssertsCompiledSQL):
             'data_1': 'data2',
             'data_2': 'data3',
         }
-
-        self.assert_compile(
-            table.insert().values(values),
-            'INSERT INTO sometable (id, data) VALUES '
-            '(%(id_0)s, %(data_0)s), '
-            '(%(id_1)s, %(data_1)s), '
-            '(%(id_2)s, %(data_2)s)',
-            checkparams=checkparams,
-            dialect=postgresql.dialect())
 
     def test_server_default_absent_value(self):
         metadata = MetaData()

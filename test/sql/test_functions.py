@@ -13,7 +13,7 @@ from sqlalchemy.sql.functions import GenericFunction, FunctionElement
 import decimal
 from sqlalchemy import testing
 from sqlalchemy.testing import fixtures, AssertsCompiledSQL, engines
-from sqlalchemy.dialects import sqlite, postgresql, mysql, oracle
+from sqlalchemy.dialects import sqlite, oracle
 from sqlalchemy.testing import assert_raises_message
 
 table1 = table('mytable',
@@ -68,8 +68,6 @@ class CompileTest(fixtures.TestBase, AssertsCompiledSQL):
 
         for ret, dialect in [
             ('CURRENT_TIMESTAMP', sqlite.dialect()),
-            ('now()', postgresql.dialect()),
-            ('now()', mysql.dialect()),
             ('CURRENT_TIMESTAMP', oracle.dialect())
         ]:
             self.assert_compile(func.now(), ret, dialect=dialect)
@@ -80,8 +78,6 @@ class CompileTest(fixtures.TestBase, AssertsCompiledSQL):
 
         for ret, dialect in [
             ('random()', sqlite.dialect()),
-            ('random()', postgresql.dialect()),
-            ('rand()', mysql.dialect()),
             ('random()', oracle.dialect())
         ]:
             self.assert_compile(func.random(), ret, dialect=dialect)

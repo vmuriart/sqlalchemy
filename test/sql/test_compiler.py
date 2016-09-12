@@ -26,8 +26,7 @@ from sqlalchemy import exc, sql, util, types, schema
 from sqlalchemy.sql import table, column, label
 from sqlalchemy.sql.expression import ClauseList, _literal_as_text, HasPrefixes
 from sqlalchemy.engine import default
-from sqlalchemy.dialects import mysql, mssql, postgresql, oracle, \
-    sqlite, sybase
+from sqlalchemy.dialects import oracle, sqlite
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.sql import compiler
 

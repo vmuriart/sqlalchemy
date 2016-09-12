@@ -1,7 +1,6 @@
 from sqlalchemy.testing import fixtures
 from sqlalchemy.testing import AssertsCompiledSQL, assert_raises_message
 from sqlalchemy.sql import table, column, select, func, literal, exists, and_
-from sqlalchemy.dialects import mssql
 from sqlalchemy.engine import default
 from sqlalchemy.exc import CompileError
 
@@ -104,19 +103,6 @@ class CTETest(fixtures.TestBase, AssertsCompiledSQL):
 
         # quick check that the "WITH RECURSIVE" varies per
         # dialect
-        self.assert_compile(
-            s, "WITH anon_1(sub_part, part, quantity) "
-               "AS (SELECT parts.sub_part AS sub_part, parts.part "
-               "AS part, parts.quantity AS quantity FROM parts "
-               "WHERE parts.part = :part_1 UNION "
-               "SELECT parts_1.sub_part AS sub_part, "
-               "parts_1.part AS part, parts_1.quantity "
-               "AS quantity FROM parts AS parts_1, anon_1 AS anon_2 "
-               "WHERE parts_1.part = anon_2.sub_part) "
-               "SELECT anon_1.sub_part, "
-               "sum(anon_1.quantity) AS total_quantity FROM anon_1 "
-               "JOIN parts ON anon_1.part = parts.part "
-               "GROUP BY anon_1.sub_part", dialect=mssql.dialect())
 
     def test_recursive_union_no_alias_one(self):
         s1 = select([literal(0).label("x")])

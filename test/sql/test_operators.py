@@ -17,8 +17,7 @@ from sqlalchemy.sql import compiler
 from sqlalchemy.types import TypeEngine, TypeDecorator, UserDefinedType, \
     Boolean, NullType, MatchType, Indexable, Concatenable, ARRAY, JSON, \
     DateTime
-from sqlalchemy.dialects import mysql, firebird, postgresql, oracle, \
-    sqlite, mssql
+from sqlalchemy.dialects import oracle, sqlite
 from sqlalchemy import util
 import datetime
 import collections
@@ -1488,9 +1487,7 @@ class OperatorAssociativityTest(fixtures.TestBase, testing.AssertsCompiledSQL):
 class IsDistinctFromTest(fixtures.TestBase, testing.AssertsCompiledSQL):
     __dialect__ = 'default'
 
-    table1 = table('mytable',
-                   column('myid', Integer),
-                   )
+    table1 = table('mytable', column('myid', Integer), )
 
     def test_is_distinct_from(self):
         self.assert_compile(self.table1.c.myid.is_distinct_from(1),
@@ -1498,22 +1495,11 @@ class IsDistinctFromTest(fixtures.TestBase, testing.AssertsCompiledSQL):
 
     def test_is_distinct_from_sqlite(self):
         self.assert_compile(self.table1.c.myid.is_distinct_from(1),
-                            "mytable.myid IS NOT ?",
-                            dialect=sqlite.dialect())
-
-    def test_is_distinct_from_postgresql(self):
-        self.assert_compile(self.table1.c.myid.is_distinct_from(1),
-                            "mytable.myid IS DISTINCT FROM %(myid_1)s",
-                            dialect=postgresql.dialect())
+                            "mytable.myid IS NOT ?", dialect=sqlite.dialect())
 
     def test_not_is_distinct_from(self):
         self.assert_compile(~self.table1.c.myid.is_distinct_from(1),
                             "mytable.myid IS NOT DISTINCT FROM :myid_1")
-
-    def test_not_is_distinct_from_postgresql(self):
-        self.assert_compile(~self.table1.c.myid.is_distinct_from(1),
-                            "mytable.myid IS NOT DISTINCT FROM %(myid_1)s",
-                            dialect=postgresql.dialect())
 
     def test_isnot_distinct_from(self):
         self.assert_compile(self.table1.c.myid.isnot_distinct_from(1),
@@ -1521,35 +1507,19 @@ class IsDistinctFromTest(fixtures.TestBase, testing.AssertsCompiledSQL):
 
     def test_isnot_distinct_from_sqlite(self):
         self.assert_compile(self.table1.c.myid.isnot_distinct_from(1),
-                            "mytable.myid IS ?",
-                            dialect=sqlite.dialect())
-
-    def test_isnot_distinct_from_postgresql(self):
-        self.assert_compile(self.table1.c.myid.isnot_distinct_from(1),
-                            "mytable.myid IS NOT DISTINCT FROM %(myid_1)s",
-                            dialect=postgresql.dialect())
+                            "mytable.myid IS ?", dialect=sqlite.dialect())
 
     def test_not_isnot_distinct_from(self):
         self.assert_compile(~self.table1.c.myid.isnot_distinct_from(1),
                             "mytable.myid IS DISTINCT FROM :myid_1")
 
-    def test_not_isnot_distinct_from_postgresql(self):
-        self.assert_compile(~self.table1.c.myid.isnot_distinct_from(1),
-                            "mytable.myid IS DISTINCT FROM %(myid_1)s",
-                            dialect=postgresql.dialect())
-
 
 class InTest(fixtures.TestBase, testing.AssertsCompiledSQL):
     __dialect__ = 'default'
 
-    table1 = table('mytable',
-                   column('myid', Integer),
-                   )
-    table2 = table(
-        'myothertable',
-        column('otherid', Integer),
-        column('othername', String)
-    )
+    table1 = table('mytable', column('myid', Integer), )
+    table2 = table('myothertable', column('otherid', Integer),
+                   column('othername', String))
 
     def test_in_1(self):
         self.assert_compile(self.table1.c.myid.in_(['a']),
@@ -1594,11 +1564,9 @@ class InTest(fixtures.TestBase, testing.AssertsCompiledSQL):
 
     def test_in_11(self):
         self.assert_compile(
-            self.table1.c.myid.in_(
-                [
-                    literal('a') +
-                    literal('a'),
-                    literal('b')]),
+            self.table1.c.myid.in_([literal('a') +
+                                    literal('a'),
+                                    literal('b')]),
             "mytable.myid IN (:param_1 || :param_2, :param_3)")
 
     def test_in_12(self):
@@ -1624,11 +1592,7 @@ class InTest(fixtures.TestBase, testing.AssertsCompiledSQL):
 
     def test_in_17(self):
         self.assert_compile(
-            self.table1.c.myid.in_(
-                [
-                    literal('a'),
-                    self.table1.c.myid +
-                    'a']),
+            self.table1.c.myid.in_([literal('a'), self.table1.c.myid + 'a']),
             "mytable.myid IN (:param_1, mytable.myid + :myid_1)")
 
     def test_in_18(self):
@@ -1989,39 +1953,15 @@ class LikeTest(fixtures.TestBase, testing.AssertsCompiledSQL):
             ~self.table1.c.myid.ilike('somstr', escape='\\'),
             "lower(mytable.myid) NOT LIKE lower(:myid_1) ESCAPE '\\'")
 
-    def test_like_7(self):
-        self.assert_compile(
-            self.table1.c.myid.ilike('somstr', escape='\\'),
-            "mytable.myid ILIKE %(myid_1)s ESCAPE '\\\\'",
-            dialect=postgresql.dialect())
-
-    def test_like_8(self):
-        self.assert_compile(
-            ~self.table1.c.myid.ilike('somstr', escape='\\'),
-            "mytable.myid NOT ILIKE %(myid_1)s ESCAPE '\\\\'",
-            dialect=postgresql.dialect())
-
     def test_like_9(self):
         self.assert_compile(
             self.table1.c.name.ilike('%something%'),
             "lower(mytable.name) LIKE lower(:name_1)")
 
-    def test_like_10(self):
-        self.assert_compile(
-            self.table1.c.name.ilike('%something%'),
-            "mytable.name ILIKE %(name_1)s",
-            dialect=postgresql.dialect())
-
     def test_like_11(self):
         self.assert_compile(
             ~self.table1.c.name.ilike('%something%'),
             "lower(mytable.name) NOT LIKE lower(:name_1)")
-
-    def test_like_12(self):
-        self.assert_compile(
-            ~self.table1.c.name.ilike('%something%'),
-            "mytable.name NOT ILIKE %(name_1)s",
-            dialect=postgresql.dialect())
 
 
 class BetweenTest(fixtures.TestBase, testing.AssertsCompiledSQL):
@@ -2076,22 +2016,6 @@ class MatchTest(fixtures.TestBase, testing.AssertsCompiledSQL):
                             "mytable.myid MATCH ?",
                             dialect=sqlite.dialect())
 
-    def test_match_2(self):
-        self.assert_compile(
-            self.table1.c.myid.match('somstr'),
-            "MATCH (mytable.myid) AGAINST (%s IN BOOLEAN MODE)",
-            dialect=mysql.dialect())
-
-    def test_match_3(self):
-        self.assert_compile(self.table1.c.myid.match('somstr'),
-                            "CONTAINS (mytable.myid, :myid_1)",
-                            dialect=mssql.dialect())
-
-    def test_match_4(self):
-        self.assert_compile(self.table1.c.myid.match('somstr'),
-                            "mytable.myid @@ to_tsquery(%(myid_1)s)",
-                            dialect=postgresql.dialect())
-
     def test_match_5(self):
         self.assert_compile(self.table1.c.myid.match('somstr'),
                             "CONTAINS (mytable.myid, :myid_1)",
@@ -2101,26 +2025,6 @@ class MatchTest(fixtures.TestBase, testing.AssertsCompiledSQL):
         expr = self.table1.c.myid.match('somstr')
         assert expr.type._type_affinity is MatchType()._type_affinity
         assert isinstance(expr.type, MatchType)
-
-    def test_boolean_inversion_postgresql(self):
-        self.assert_compile(
-            ~self.table1.c.myid.match('somstr'),
-            "NOT mytable.myid @@ to_tsquery(%(myid_1)s)",
-            dialect=postgresql.dialect())
-
-    def test_boolean_inversion_mysql(self):
-        # because mysql doesnt have native boolean
-        self.assert_compile(
-            ~self.table1.c.myid.match('somstr'),
-            "NOT MATCH (mytable.myid) AGAINST (%s IN BOOLEAN MODE)",
-            dialect=mysql.dialect())
-
-    def test_boolean_inversion_mssql(self):
-        # because mssql doesnt have native boolean
-        self.assert_compile(
-            ~self.table1.c.myid.match('somstr'),
-            "NOT CONTAINS (mytable.myid, :myid_1)",
-            dialect=mssql.dialect())
 
 
 class ComposedLikeOperatorsTest(fixtures.TestBase, testing.AssertsCompiledSQL):
@@ -2168,38 +2072,6 @@ class ComposedLikeOperatorsTest(fixtures.TestBase, testing.AssertsCompiledSQL):
             checkparams={'x_1': 'y'}
         )
 
-    def test_contains_concat(self):
-        self.assert_compile(
-            column('x').contains('y'),
-            "x LIKE concat(concat('%%', %s), '%%')",
-            checkparams={'x_1': 'y'},
-            dialect=mysql.dialect()
-        )
-
-    def test_not_contains_concat(self):
-        self.assert_compile(
-            ~column('x').contains('y'),
-            "x NOT LIKE concat(concat('%%', %s), '%%')",
-            checkparams={'x_1': 'y'},
-            dialect=mysql.dialect()
-        )
-
-    def test_contains_literal_concat(self):
-        self.assert_compile(
-            column('x').contains(literal_column('y')),
-            "x LIKE concat(concat('%%', y), '%%')",
-            checkparams={},
-            dialect=mysql.dialect()
-        )
-
-    def test_contains_text_concat(self):
-        self.assert_compile(
-            column('x').contains(text('y')),
-            "x LIKE concat(concat('%%', y), '%%')",
-            checkparams={},
-            dialect=mysql.dialect()
-        )
-
     def test_startswith(self):
         self.assert_compile(
             column('x').startswith('y'),
@@ -2242,54 +2114,6 @@ class ComposedLikeOperatorsTest(fixtures.TestBase, testing.AssertsCompiledSQL):
             checkparams={}
         )
 
-    def test_startswith_concat(self):
-        self.assert_compile(
-            column('x').startswith('y'),
-            "x LIKE concat(%s, '%%')",
-            checkparams={'x_1': 'y'},
-            dialect=mysql.dialect()
-        )
-
-    def test_not_startswith_concat(self):
-        self.assert_compile(
-            ~column('x').startswith('y'),
-            "x NOT LIKE concat(%s, '%%')",
-            checkparams={'x_1': 'y'},
-            dialect=mysql.dialect()
-        )
-
-    def test_startswith_firebird(self):
-        self.assert_compile(
-            column('x').startswith('y'),
-            "x STARTING WITH :x_1",
-            checkparams={'x_1': 'y'},
-            dialect=firebird.dialect()
-        )
-
-    def test_not_startswith_firebird(self):
-        self.assert_compile(
-            ~column('x').startswith('y'),
-            "x NOT STARTING WITH :x_1",
-            checkparams={'x_1': 'y'},
-            dialect=firebird.dialect()
-        )
-
-    def test_startswith_literal_mysql(self):
-        self.assert_compile(
-            column('x').startswith(literal_column('y')),
-            "x LIKE concat(y, '%%')",
-            checkparams={},
-            dialect=mysql.dialect()
-        )
-
-    def test_startswith_text_mysql(self):
-        self.assert_compile(
-            column('x').startswith(text('y')),
-            "x LIKE concat(y, '%%')",
-            checkparams={},
-            dialect=mysql.dialect()
-        )
-
     def test_endswith(self):
         self.assert_compile(
             column('x').endswith('y'),
@@ -2330,38 +2154,6 @@ class ComposedLikeOperatorsTest(fixtures.TestBase, testing.AssertsCompiledSQL):
             column('x').endswith(text('y')),
             "x LIKE '%%' || y",
             checkparams={}
-        )
-
-    def test_endswith_mysql(self):
-        self.assert_compile(
-            column('x').endswith('y'),
-            "x LIKE concat('%%', %s)",
-            checkparams={'x_1': 'y'},
-            dialect=mysql.dialect()
-        )
-
-    def test_not_endswith_mysql(self):
-        self.assert_compile(
-            ~column('x').endswith('y'),
-            "x NOT LIKE concat('%%', %s)",
-            checkparams={'x_1': 'y'},
-            dialect=mysql.dialect()
-        )
-
-    def test_endswith_literal_mysql(self):
-        self.assert_compile(
-            column('x').endswith(literal_column('y')),
-            "x LIKE concat('%%', y)",
-            checkparams={},
-            dialect=mysql.dialect()
-        )
-
-    def test_endswith_text_mysql(self):
-        self.assert_compile(
-            column('x').endswith(text('y')),
-            "x LIKE concat('%%', y)",
-            checkparams={},
-            dialect=mysql.dialect()
         )
 
 
@@ -2504,32 +2296,6 @@ class AnyAllTest(fixtures.TestBase, testing.AssertsCompiledSQL):
             t.c.arrval.all(5, operator.gt),
             ":param_1 > ALL (tab1.arrval)",
             checkparams={"param_1": 5}
-        )
-
-    def test_any_array_expression(self):
-        t = self._fixture()
-
-        self.assert_compile(
-            5 == any_(t.c.arrval[5:6] + postgresql.array([3, 4])),
-            "%(param_1)s = ANY (tab1.arrval[%(arrval_1)s:%(arrval_2)s] || "
-            "ARRAY[%(param_2)s, %(param_3)s])",
-            checkparams={
-                'arrval_2': 6, 'param_1': 5, 'param_3': 4,
-                'arrval_1': 5, 'param_2': 3},
-            dialect='postgresql'
-        )
-
-    def test_all_array_expression(self):
-        t = self._fixture()
-
-        self.assert_compile(
-            5 == all_(t.c.arrval[5:6] + postgresql.array([3, 4])),
-            "%(param_1)s = ALL (tab1.arrval[%(arrval_1)s:%(arrval_2)s] || "
-            "ARRAY[%(param_2)s, %(param_3)s])",
-            checkparams={
-                'arrval_2': 6, 'param_1': 5, 'param_3': 4,
-                'arrval_1': 5, 'param_2': 3},
-            dialect='postgresql'
         )
 
     def test_any_subq(self):

@@ -1,7 +1,6 @@
 from sqlalchemy import Integer, String, ForeignKey, and_, or_, func, \
     literal, update, table, bindparam, column, select, exc
 from sqlalchemy import testing
-from sqlalchemy.dialects import mysql
 from sqlalchemy.engine import default
 from sqlalchemy.testing import AssertsCompiledSQL, eq_, fixtures, \
     assert_raises_message
@@ -358,11 +357,6 @@ class UpdateTest(_UpdateFromTestBase, fixtures.TablesTest, AssertsCompiledSQL):
                             'UPDATE C D mytable SET myid=:myid, name=:name, '
                             'description=:description')
 
-        self.assert_compile(
-            stmt,
-            'UPDATE A B C D mytable SET myid=%s, name=%s, description=%s',
-            dialect=mysql.dialect())
-
     def test_update_to_expression(self):
         """test update from an expression.
 
@@ -401,17 +395,6 @@ class UpdateTest(_UpdateFromTestBase, fixtures.TablesTest, AssertsCompiledSQL):
             "WHERE mytable.name = anon_1.othername",
             checkpositional=('foo', 5),
             dialect=dialect
-        )
-
-        self.assert_compile(
-            upd,
-            "UPDATE mytable, (SELECT myothertable.otherid AS otherid, "
-            "myothertable.othername AS othername "
-            "FROM myothertable "
-            "WHERE myothertable.otherid = %s) AS anon_1 SET mytable.name=%s "
-            "WHERE mytable.name = anon_1.othername",
-            checkpositional=(5, 'foo'),
-            dialect=mysql.dialect()
         )
 
 
@@ -521,22 +504,6 @@ class UpdateFromCompileTest(_UpdateFromTestBase, fixtures.TablesTest,
             'addresses.id = dingalings.address_id AND '
             'dingalings.id = :id_1',
             checkparams=checkparams)
-
-    def test_render_table_mysql(self):
-        users, addresses = self.tables.users, self.tables.addresses
-
-        self.assert_compile(
-            users.update().
-                values(name='newname').
-                where(users.c.id == addresses.c.user_id).
-                where(addresses.c.email_address == 'e1'),
-            'UPDATE users, addresses '
-            'SET users.name=%s '
-            'WHERE '
-            'users.id = addresses.user_id AND '
-            'addresses.email_address = %s',
-            checkparams={'email_address_1': 'e1', 'name': 'newname'},
-            dialect=mysql.dialect())
 
     def test_render_subquery(self):
         users, addresses = self.tables.users, self.tables.addresses

@@ -2,7 +2,6 @@
 
 from sqlalchemy import Column, Integer, String, Table, delete, select, and_, \
     or_
-from sqlalchemy.dialects import mysql
 from sqlalchemy.testing import AssertsCompiledSQL, fixtures
 
 
@@ -62,9 +61,6 @@ class DeleteTest(_DeleteTestBase, fixtures.TablesTest, AssertsCompiledSQL):
         self.assert_compile(stmt,
                             'DELETE C D FROM mytable')
 
-        self.assert_compile(stmt,
-                            'DELETE A B C D FROM mytable',
-                            dialect=mysql.dialect())
 
     def test_alias(self):
         table1 = self.tables.mytable
