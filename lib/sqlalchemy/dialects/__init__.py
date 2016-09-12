@@ -5,17 +5,9 @@
 # This module is part of SQLAlchemy and is released under
 # the MIT License: http://www.opensource.org/licenses/mit-license.php
 
-__all__ = (
-    'firebird',
-    'mssql',
-    'mysql',
-    'oracle',
-    'postgresql',
-    'sqlite',
-    'sybase',
-)
-
 from .. import util
+
+__all__ = ('oracle', 'sqlite',)
 
 _translates = {'postgres': 'postgresql'}
 
